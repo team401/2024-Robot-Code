@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.drive;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -6,9 +6,7 @@ import java.util.function.DoubleSupplier;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.CommandSwerveDrivetrain;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.utils.Deadband;
 
 public class DriveWithJoysticks extends Command {
     CommandSwerveDrivetrain drivetrain;
@@ -22,8 +20,8 @@ public class DriveWithJoysticks extends Command {
     double yMpS;
     double rotRadpS;
 
-    SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric().withIsOpenLoop(true);
-    SwerveRequest.RobotCentric driveRobot = new SwerveRequest.RobotCentric().withIsOpenLoop(true);
+    SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric();
+    SwerveRequest.RobotCentric driveRobot = new SwerveRequest.RobotCentric();
     SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
