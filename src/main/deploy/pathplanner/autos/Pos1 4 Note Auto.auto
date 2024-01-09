@@ -1,0 +1,61 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.3949707899415804,
+      "y": 6.596756050654959
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "playNoteAtSpeaker"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Pos1 to Ring1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "playNoteAtSpeaker"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Ring1 to Ring2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "playNoteAtSpeaker"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Ring2 to Ring3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "playNoteAtSpeaker"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
