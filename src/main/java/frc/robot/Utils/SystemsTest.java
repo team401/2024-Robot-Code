@@ -1,3 +1,5 @@
+// TODO: WIP - Not tested
+
 package frc.robot.Utils;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -22,7 +24,7 @@ public class SystemsTest extends Command {
 
     @Override
     public void initialize() {
-        subsystem.setVolts(inverted ? 0.1 : -0.1);
+        subsystem.setVolts(inverted ? 0.5 : -0.5);
         timer.start();
     }
 

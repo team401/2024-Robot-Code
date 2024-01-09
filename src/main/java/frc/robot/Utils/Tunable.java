@@ -1,5 +1,6 @@
 package frc.robot.Utils;
 
+// Interface for subsystems to be tuned
 public interface Tunable {
     public double getPosition();
 
