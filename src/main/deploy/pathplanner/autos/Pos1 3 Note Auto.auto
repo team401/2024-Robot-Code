@@ -26,13 +26,13 @@
         {
           "type": "named",
           "data": {
-            "name": null
+            "name": "intakeNote"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 2.0
+            "waitTime": 1.0
           }
         },
         {
@@ -42,9 +42,9 @@
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "Ring1 to Ring2"
+            "waitTime": 0.0
           }
         }
       ]
