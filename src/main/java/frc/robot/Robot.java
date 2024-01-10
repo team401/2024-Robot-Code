@@ -13,6 +13,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -24,16 +25,13 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
  * project.
  */
 public class Robot extends LoggedRobot {
-    /**
-     * This function is run when the robot is first started up and should be used
-     * for any
-     * initialization code.
-     */
+    private RobotContainer robotContainer;
+
     @Override
     public void robotInit() {
-        Logger.recordMetadata("ProjectName", "2024 401 Comp Robot"); // TODO: Name the robot!
+        Logger.recordMetadata("ProjectName", "2024 - 401 Comp Robot"); // TODO: Name the robot!
 
-        if (isReal()) {
+        if (Constants.currentMode == Constants.Mode.REAL) {
             // Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs") TODO: Add back later
             Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
             new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
@@ -45,10 +43,13 @@ public class Robot extends LoggedRobot {
         }
 
         Logger.start();
+
+        robotContainer = new RobotContainer();
     }
 
     @Override
     public void robotPeriodic() {
+        CommandScheduler.getInstance().run();
     }
 
     @Override
