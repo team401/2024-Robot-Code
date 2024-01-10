@@ -27,6 +27,7 @@ The scoring control flow is separated into two subsystems (shooter & aimer).
 <img src="images/rampShooter.png" alt="ramp-up" width="200">
 <img src="images/shootShooter.png" alt="shoot" width="100">
 <br>
+
 #### Aimer
 X
 
