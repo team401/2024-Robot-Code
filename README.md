@@ -13,33 +13,32 @@ Key Features:
 * X
 * X
 
-### Drivetrain
+## Drivetrain
 
-### Intake
+## Intake
 
-### Scoring
+## Scoring
 The scoring control flow is separated into two subsystems (shooter & aimer).
 
-#### Shooter
+### Shooter
 <br>
-<img src="images/ShooterStates.png" alt="shooter-states" width="200">
-<img src="images/idleShooter.png" alt="idle" width="200">
-<img src="images/rampShooter.png" alt="ramp-up" width="200">
-<img src="images/shootShooter.png" alt="shoot" width="100">
-<br>
+<img src="images/ShooterStates.png" alt="shooter-states" width="250">
+<img src="images/idleShooter.png" alt="idle" width="250">
+<img src="images/rampShooter.png" alt="ramp-up" width="250">
+<img src="images/shootShooter.png" alt="shoot" width="150">
 
-#### Aimer
+### Aimer
 X
 
-### Endgame
+## Endgame
 
-### Nav
+## Nav
 
-### Auto
+## Auto
 
-### Sim
+## Sim
 
-### UX
+## UX
 
 
 ## Roadmap
