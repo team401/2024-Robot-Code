@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * build.gradle file in the
  * project.
  */
-<<<<<<< HEAD
 public class Robot extends LoggedRobot {
     private RobotContainer robotContainer;
 
@@ -47,20 +46,6 @@ public class Robot extends LoggedRobot {
 
         robotContainer = new RobotContainer();
     }
-=======
-public class Robot extends TimedRobot {
-  /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
-
-  private RobotContainer robotContainer = new RobotContainer();
-  
-  @Override
-  public void robotInit() {
-    
-  }
->>>>>>> efcbb6e (forgot to add robotcontainer to robot (fixed), not tested since literally all firmware needs to be updated)
 
     @Override
     public void robotPeriodic() {
