@@ -13,7 +13,7 @@ import frc.robot.drive.CommandSwerveDrivetrain;
 
 public final class Constants {
 
-    public static final Mode currentMode = Mode.SIM;
+    public static final Mode currentMode = Robot.isReal() ? Mode.REAL : Mode.SIM;
 
     public static enum Mode {
         REAL,

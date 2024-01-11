@@ -5,8 +5,10 @@ import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Utils.Deadband;
 
 public class DriveWithJoysticks extends Command {
     CommandSwerveDrivetrain drivetrain;
@@ -57,14 +59,19 @@ public class DriveWithJoysticks extends Command {
             rotRadpS *= 0.5;
         }
 
+        
+
         if (xMpS == 0 && yMpS == 0 && rotRadpS == 0) {
             // If not moving, brake
+            SmartDashboard.putString("running", "break");
             drivetrain.applyRequest(() -> brake);
         } else if (fieldCentric.getAsBoolean()) {
+            SmartDashboard.putString("running", "fieldCentric");
             drivetrain.applyRequest(() -> drive.withVelocityX(-xMpS)
                     .withVelocityY(-yMpS)
                     .withRotationalRate(-rotRadpS));
         } else {
+            SmartDashboard.putString("running", "robotCentric");
             drivetrain.applyRequest(() -> driveRobot.withVelocityX(-xMpS)
                     .withVelocityY(-yMpS)
                     .withRotationalRate(-rotRadpS));
