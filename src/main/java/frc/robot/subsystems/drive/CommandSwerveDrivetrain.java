@@ -31,11 +31,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         return run(() -> setControl(requestSupplier.get()));
     }
 
-    public Command zoom(Supplier<double[]> controls) {
-        return run(() -> setControl(new SwerveRequest.RobotCentric().withVelocityX(controls.get()[0])
-                .withVelocityY(controls.get()[1]).withRotationalRate(controls.get()[2])));
-    }
-
     @Override
     public void periodic() {
         if (Constants.currentMode == Constants.Mode.SIM) {
