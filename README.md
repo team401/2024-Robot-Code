@@ -18,7 +18,7 @@ Key Features:
 ## Intake
 
 ## Scoring
-The scoring control flow is separated into two subsystems (shooter & aimer).
+The scoring subsystem has one state machine that controls both the aimer and the shooter. Below is a past version with two separate control flows.
 
 ### Shooter
 <br>
