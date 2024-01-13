@@ -9,7 +9,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
-import frc.robot.drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 
 public final class Constants {
 

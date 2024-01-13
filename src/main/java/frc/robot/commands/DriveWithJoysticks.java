@@ -1,4 +1,4 @@
-package frc.robot.drive;
+package frc.robot.commands;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -7,6 +7,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Utils.Deadband;
 
@@ -59,19 +60,17 @@ public class DriveWithJoysticks extends Command {
             rotRadpS *= 0.5;
         }
 
-        
+        SmartDashboard.putNumber("x_vel", xMpS);
+        SmartDashboard.putNumber("y_vel", yMpS);
 
         if (xMpS == 0 && yMpS == 0 && rotRadpS == 0) {
             // If not moving, brake
-            SmartDashboard.putString("running", "break");
             drivetrain.applyRequest(() -> brake);
         } else if (fieldCentric.getAsBoolean()) {
-            SmartDashboard.putString("running", "fieldCentric");
             drivetrain.applyRequest(() -> drive.withVelocityX(-xMpS)
                     .withVelocityY(-yMpS)
                     .withRotationalRate(-rotRadpS));
         } else {
-            SmartDashboard.putString("running", "robotCentric");
             drivetrain.applyRequest(() -> driveRobot.withVelocityX(-xMpS)
                     .withVelocityY(-yMpS)
                     .withRotationalRate(-rotRadpS));
