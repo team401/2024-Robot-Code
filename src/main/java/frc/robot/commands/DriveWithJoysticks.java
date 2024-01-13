@@ -60,18 +60,15 @@ public class DriveWithJoysticks extends Command {
             rotRadpS *= 0.5;
         }
 
-        SmartDashboard.putNumber("x_vel", xMpS);
-        SmartDashboard.putNumber("y_vel", yMpS);
-
         if (xMpS == 0 && yMpS == 0 && rotRadpS == 0) {
             // If not moving, brake
-            drivetrain.applyRequest(() -> brake);
+            drivetrain.setControl(brake);
         } else if (fieldCentric.getAsBoolean()) {
-            drivetrain.applyRequest(() -> drive.withVelocityX(-xMpS)
+            drivetrain.setControl(drive.withVelocityX(-xMpS)
                     .withVelocityY(-yMpS)
                     .withRotationalRate(-rotRadpS));
         } else {
-            drivetrain.applyRequest(() -> driveRobot.withVelocityX(-xMpS)
+            drivetrain.setControl(driveRobot.withVelocityX(-xMpS)
                     .withVelocityY(-yMpS)
                     .withRotationalRate(-rotRadpS));
         }
