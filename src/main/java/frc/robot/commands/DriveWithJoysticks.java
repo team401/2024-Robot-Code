@@ -5,6 +5,7 @@ import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
@@ -22,11 +23,6 @@ public class DriveWithJoysticks extends Command {
     double xMpS;
     double yMpS;
     double rotRadpS;
-
-    SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric();
-    SwerveRequest.RobotCentric driveRobot = new SwerveRequest.RobotCentric();
-    SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-    SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
     public DriveWithJoysticks(CommandSwerveDrivetrain drivetrain, DoubleSupplier x, DoubleSupplier y,
             DoubleSupplier rot, BooleanSupplier fieldCentric, BooleanSupplier babyMode) {
@@ -60,18 +56,8 @@ public class DriveWithJoysticks extends Command {
             rotRadpS *= 0.5;
         }
 
-        if (xMpS == 0 && yMpS == 0 && rotRadpS == 0) {
-            // If not moving, brake
-            drivetrain.setControl(brake);
-        } else if (fieldCentric.getAsBoolean()) {
-            drivetrain.setControl(drive.withVelocityX(-xMpS)
-                    .withVelocityY(-yMpS)
-                    .withRotationalRate(-rotRadpS));
-        } else {
-            drivetrain.setControl(driveRobot.withVelocityX(-xMpS)
-                    .withVelocityY(-yMpS)
-                    .withRotationalRate(-rotRadpS));
-        }
+        drivetrain.setGoalChassisSpeeds(new ChassisSpeeds(xMpS, yMpS, rotRadpS), fieldCentric.getAsBoolean());
+
     }
 
     @Override
