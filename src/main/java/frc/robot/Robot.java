@@ -14,6 +14,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.SimIO;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -26,11 +27,14 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends LoggedRobot {
     private RobotContainer robotContainer;
+    public SimIO simIO = new SimIO();
 
     @Override
     public void robotInit() {
         Logger.recordMetadata("ProjectName", "2024 - 401 Comp Robot"); // TODO: Name the robot!
 
+        simIO.resetEncoders();
+        
         if (Constants.currentMode == Constants.Mode.REAL) {
             // Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs") TODO: Add back later
             Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
