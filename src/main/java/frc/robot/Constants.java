@@ -1,9 +1,19 @@
 package frc.robot;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
+
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 
@@ -25,6 +35,21 @@ public final class Constants {
         public static final double MaxAngularRateRadiansPerSec = Math.PI * 2; // 2 PI is one full
         // rotation per second
         public static final double deadbandPercent = 0.16;
+    }
+
+    public static final class VisionConstants {
+        public static final double fieldLengthM = 69.0;
+        public static final double fieldWidthM = 420.0;
+
+        public static final List<AprilTag> tags = new ArrayList<>();
+
+        public static final AprilTagFieldLayout fieldLayout =
+            new AprilTagFieldLayout(tags, fieldLengthM, fieldWidthM);
+
+        public static final double singleTagAmbiguityCutoff = 0.05;
+
+        public static final Matrix<N3, N1> highCameraConfindence = VecBuilder.fill(0.45, 0.45, 1);
+        public static final Matrix<N3, N1> lowCameraConfindence = VecBuilder.fill(1.2, 1.2, 10);
     }
 
     public static final class TunerConstants {
