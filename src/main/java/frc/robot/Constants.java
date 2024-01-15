@@ -48,8 +48,10 @@ public final class Constants {
 
         public static final double singleTagAmbiguityCutoff = 0.05;
 
-        public static final Matrix<N3, N1> highCameraConfindence = VecBuilder.fill(0.45, 0.45, 1);
-        public static final Matrix<N3, N1> lowCameraConfindence = VecBuilder.fill(1.2, 1.2, 10);
+        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(0.45, 0.45, 1);
+        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(1.2, 1.2, 10);
+
+        public static final Matrix<N3, N1> driveUncertainty = VecBuilder.fill(0.1, 0.1, 0.1);
     }
 
     public static final class TunerConstants {
