@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.TunerConstants;
+import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.scoring.AimerIOSim;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
@@ -38,6 +39,13 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
+        drivetrain.setDefaultCommand(new DriveWithJoysticks(drivetrain,
+        () -> -controller.getLeftY(),
+        () -> -controller.getLeftX(),
+        () -> -controller.getRightX(),
+        () -> true,
+        () -> false));
+
         controller.a().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.INTAKE)))
             .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
 

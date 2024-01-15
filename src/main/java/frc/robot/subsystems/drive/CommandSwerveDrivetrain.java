@@ -20,13 +20,12 @@ import frc.robot.Constants;
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
     private double vx, vy, omega;
-    private boolean fieldCentric = true; 
+    private boolean fieldCentric = true;
 
     private SwerveRequest.FieldCentric driveFieldCentric = new SwerveRequest.FieldCentric();
     private SwerveRequest.RobotCentric driveRobotCentric = new SwerveRequest.RobotCentric();
     private SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-
 
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency,
             SwerveModuleConstants... modules) {
@@ -42,24 +41,21 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         vy = chassisSpeeds.vyMetersPerSecond;
         omega = chassisSpeeds.omegaRadiansPerSecond;
         fieldCentric = fieldCen;
-
     }
 
     private void controlDrivetrain() {
         if (vx == 0 && vy == 0 && omega == 0) {
             setControl(brake);
+        } else if (!fieldCentric) {
+            setControl(driveRobotCentric
+                    .withVelocityX(vx)
+                    .withVelocityY(vy)
+                    .withRotationalRate(omega));
         } else {
-            if (!fieldCentric) {
-                setControl(driveRobotCentric
+            setControl(driveFieldCentric
                     .withVelocityX(vx)
                     .withVelocityY(vy)
                     .withRotationalRate(omega));
-            } else {
-                setControl(driveFieldCentric
-                    .withVelocityX(vx)
-                    .withVelocityY(vy)
-                    .withRotationalRate(omega));
-            }
         }
     }
 
@@ -71,6 +67,5 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         SmartDashboard.putNumber("x", vx);
 
         controlDrivetrain();
-        
     }
 }
