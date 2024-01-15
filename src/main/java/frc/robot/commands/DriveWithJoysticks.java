@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Utils.Deadband;
+import frc.robot.utils.Deadband;
 
 public class DriveWithJoysticks extends Command {
     CommandSwerveDrivetrain drivetrain;

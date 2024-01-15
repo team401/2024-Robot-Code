@@ -32,10 +32,10 @@ public class RobotContainer {
 
     private void configureBindings() {
         drivetrain.setDefaultCommand(new DriveWithJoysticks(drivetrain,
-        () -> controller.getLeftY(),
-        () -> controller.getLeftX(),
-        () -> controller.getRightX(),
-        () -> false,
+        () -> -controller.getLeftY(),
+        () -> -controller.getLeftX(),
+        () -> -controller.getRightX(),
+        () -> true,
         () -> false));
 
         rightJoystick.button(2)

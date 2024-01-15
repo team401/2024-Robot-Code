@@ -1,6 +1,6 @@
 package frc.robot;
 
-//import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
@@ -88,8 +88,8 @@ public class Telemetry {
                 pose.getRotation().getDegrees()
         });
 
-        //Logger.recordOutput("pose/Pose2d", pose);
-        //Logger.recordOutput("pose/fieldPose", table.getDoubleArrayTopic("/Pose/robotPose"));
+        Logger.recordOutput("pose/Pose2d", pose);
+        // Logger.recordOutput("pose/fieldPose", table.getDoubleArrayTopic("/Pose/robotPose"));
 
         robotRotation = pose.getRotation().getRadians();
 

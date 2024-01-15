@@ -1,27 +1,15 @@
 {
   "NTProvider": {
     "types": {
-      "/FMSInfo": "FMSInfo"
-    }
-  },
-  "NetworkTables": {
-    "transitory": {
-      "Shuffleboard": {
-        ".recording": {
-          "open": true
-        },
-        "open": true
-      }
+      "/FMSInfo": "FMSInfo",
+      "/Pose": "Field2d",
+      "/SmartDashboard/Module 0": "Mechanism2d",
+      "/SmartDashboard/Module 1": "Mechanism2d",
+      "/SmartDashboard/Module 2": "Mechanism2d",
+      "/SmartDashboard/Module 3": "Mechanism2d"
     }
   },
   "NetworkTables Info": {
     "visible": true
-  },
-  "Plot": {
-    "Plot <0>": {
-      "window": {
-        "visible": false
-      }
-    }
   }
 }

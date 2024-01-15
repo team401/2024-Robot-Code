@@ -1,6 +1,6 @@
 // TODO: WIP - Not tested
 
-package frc.robot.Utils;
+package frc.robot.utils;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
