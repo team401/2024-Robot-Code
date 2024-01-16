@@ -1,4 +1,4 @@
-package frc.robot.Utils;
+package frc.robot.utils;
 
 // Interface for subsystems to be tuned
 public interface Tunable {

@@ -1,9 +1,9 @@
 // TODO: WIP - Not tested
 
-package frc.robot.Utils.FeedForward;
+package frc.robot.utils.feedforward;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Utils.Tunable;
+import frc.robot.utils.Tunable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class TuneS extends Command {
