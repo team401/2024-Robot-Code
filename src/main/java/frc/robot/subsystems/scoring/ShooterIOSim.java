@@ -18,7 +18,7 @@ public class ShooterIOSim implements ShooterIO {
     double kickerVolts = 0.0;
 
     @Override
-    public void setShooterVelRPM(double vel) {
+    public void setShooterVelocityRPM(double vel) {
         shooterGoalVelRPM = vel;
     }
 
@@ -33,8 +33,8 @@ public class ShooterIOSim implements ShooterIO {
 
         shooterAppliedVolts = shooterFeedforward.calculate(shooterSim.getAngularVelocityRadPerSec()) + shooterController.calculate(shooterSim.getAngularVelocityRadPerSec(), shooterGoalVelRPM * 2.0 * Math.PI / 60.0);
 
-        inputs.shooterVelRPM = shooterSim.getAngularVelocityRadPerSec() * 60.0 / (2.0 * Math.PI);
-        inputs.shooterGoalVelRPM = shooterGoalVelRPM;
+        inputs.shooterVelocityRPM = shooterSim.getAngularVelocityRadPerSec() * 60.0 / (2.0 * Math.PI);
+        inputs.shooterGoalVelocityRPM = shooterGoalVelRPM;
         inputs.shooterAppliedVolts = shooterAppliedVolts;
         inputs.shooterCurrentAmps = shooterSim.getCurrentDrawAmps();
 

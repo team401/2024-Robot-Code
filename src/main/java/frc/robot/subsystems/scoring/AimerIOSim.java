@@ -17,7 +17,7 @@ public class AimerIOSim implements AimerIO {
     double appliedVolts = 0.0;
 
     @Override
-    public void setAimAngRad(double angle) {
+    public void setAimAngleRad(double angle) {
         goalAngRad = angle;
     }
 
@@ -28,7 +28,7 @@ public class AimerIOSim implements AimerIO {
         appliedVolts = feedforward.calculate(sim.getAngleRads(), sim.getVelocityRadPerSec()) + controller.calculate(sim.getAngleRads(), goalAngRad);
         sim.setInputVoltage(appliedVolts);
 
-        inputs.aimPositionRad = sim.getAngleRads();
+        inputs.aimAngleRad = sim.getAngleRads();
 
         inputs.aimAppliedVolts = appliedVolts;
         inputs.aimCurrentAmps = sim.getCurrentDrawAmps();

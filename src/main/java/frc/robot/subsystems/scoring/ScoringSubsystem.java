@@ -10,10 +10,10 @@ public class ScoringSubsystem extends SubsystemBase {
     private final AimerIO aimerIo;
     private final AimerIOInputsAutoLogged aimerInputs = new AimerIOInputsAutoLogged();
 
-    private final Timer timer = new Timer();
+    private final Timer shootTimer = new Timer();
 
     private enum ScoringState {
-        WAIT,
+        IDLE,
         INTAKE,
         PRIME,
         SHOOT,
@@ -24,11 +24,13 @@ public class ScoringSubsystem extends SubsystemBase {
         INTAKE,
         AIM,
         SHOOT,
-        ABORT,
+        WAIT,
         ENDGAME
     }
 
-    private ScoringState state = ScoringState.WAIT;
+    private ScoringState state = ScoringState.IDLE;
+
+    private ScoringAction action = ScoringAction.WAIT;
 
     public ScoringSubsystem(ShooterIO shooterIo, AimerIO aimerIo) {
         this.shooterIo = shooterIo;
@@ -36,66 +38,67 @@ public class ScoringSubsystem extends SubsystemBase {
     }
 
     public void setAction(ScoringAction action) {
-        switch (action) {
-            case INTAKE:
-                if (state == ScoringState.WAIT) {
-                    state = ScoringState.INTAKE;
-
-                    aimerIo.setAimAngRad(0);
-                    shooterIo.setShooterVelRPM(-10);
-                    shooterIo.setKickerVolts(-1);
-                }
-                break;
-            case AIM:
-                if (state == ScoringState.WAIT && true) { // TODO: Add banner sensor
-                    state = ScoringState.PRIME;
-
-                    shooterIo.setShooterVelRPM(100);
-                }
-                break;
-            case SHOOT:
-                if (state == ScoringState.PRIME) {
-                    state = ScoringState.SHOOT;
-
-                    shooterIo.setKickerVolts(1);
-                    timer.reset();
-                    timer.start();
-                }
-                break;
-            case ABORT:
-                state = ScoringState.WAIT;
-
-                aimerIo.setAimAngRad(0);
-                shooterIo.setShooterVelRPM(0);
-                shooterIo.setKickerVolts(0);
-                break;
-            case ENDGAME:
-                if (state == ScoringState.WAIT) {
-                    state = ScoringState.ENDGAME;
-                }
-                break;
-        }
+        this.action = action;
     }
 
-    private void abort() {}
+    private void idle() {
+        aimerIo.setAimAngleRad(0);
+        shooterIo.setShooterVelocityRPM(0);
+        shooterIo.setKickerVolts(0);
+
+        if (true && action == ScoringAction.INTAKE) { // TODO: Banner sensor NOT triggered
+            state = ScoringState.INTAKE;
+        } else if (action == ScoringAction.AIM) {
+            state = ScoringState.PRIME;
+        } else if (action == ScoringAction.ENDGAME) {
+            state = ScoringState.ENDGAME;
+        }
+    }
 
     private void intake() {
-        if (true) { // TODO: Banner sensor triggered
-            setAction(ScoringAction.ABORT);
+        aimerIo.setAimAngleRad(0);
+        shooterIo.setShooterVelocityRPM(-10);
+        shooterIo.setKickerVolts(-1);
+
+        if (true || action == ScoringAction.WAIT) { // TODO: Banner sensor triggered
+            state = ScoringState.IDLE;
         }
     }
 
-    private void aim() {
-        aimerIo.setAimAngRad(findShootAngleRads());
+    private void prime() {
+        shooterIo.setShooterVelocityRPM(100);
+        aimerIo.setAimAngleRad(findShootAngleRads());
+
+        boolean shooterReady = Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM) < 10; // TODO: Tune
+        boolean armReady = Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad) < 0.1; // TODO: Tune
+        boolean driveReady = true; // TODO: Add drive ready
+        boolean hasNote = true; // TODO: Add banner sensor
+
+        boolean primeReady = shooterReady && armReady && driveReady && hasNote;
+
+        if (action == ScoringAction.WAIT) {
+            state = ScoringState.IDLE;
+        } else if (action == ScoringAction.SHOOT && primeReady) {
+            state = ScoringState.SHOOT;
+
+            shootTimer.reset();
+            shootTimer.start();
+        }
     }
 
     private void shoot() {
-        if (timer.get() > 0.5) { // TODO: Tune time
-            setAction(ScoringAction.ABORT);
+        shooterIo.setKickerVolts(5);
+
+        if (shootTimer.get() > 0.5) { // TODO: Tune time
+            state = ScoringState.PRIME;
+
+            shootTimer.stop();
         }
     }
 
-    private void endgame() {} // TODO: Later
+    private void endgame() { // TODO: Later
+        state = ScoringState.IDLE;
+    }
 
     private double findShootAngleRads() { // TODO: Interpolate
         double distancetoGoal = Math.sqrt(Math.pow(Math.sqrt(Math.pow(1, 2) + Math.pow(1, 2)), 2) + Math.pow(1, 2));
@@ -108,14 +111,14 @@ public class ScoringSubsystem extends SubsystemBase {
         aimerIo.updateInputs(aimerInputs);
 
         switch (state) {
-            case WAIT:
-                abort();
+            case IDLE:
+                idle();
                 break;
             case INTAKE:
                 intake();
                 break;
             case PRIME:
-                aim();
+                prime();
                 break;
             case SHOOT:
                 shoot();

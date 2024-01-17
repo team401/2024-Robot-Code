@@ -37,7 +37,19 @@ public class RobotContainer {
         configureModes();
     }
 
-    private void configureBindings() {}
+    private void configureBindings() {
+        controller.a().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.INTAKE)))
+            .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+
+        controller.b().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.AIM)))
+            .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+
+        controller.x().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT)))
+            .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+
+        controller.y().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.ENDGAME)))
+            .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+    }
 
 
     private void configureModes() {
