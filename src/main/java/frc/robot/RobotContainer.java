@@ -32,6 +32,7 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
+        // spotless:off
         drivetrain.setDefaultCommand(new DriveWithJoysticks(drivetrain,
         () -> -controller.getLeftY(),
         () -> -controller.getLeftX(),
@@ -39,47 +40,34 @@ public class RobotContainer {
         () -> true,
         () -> false));
 
-        controller.a().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.INTAKE)))
-            .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+        controller.a().onTrue(new InstantCommand(
+                                () -> scoringSubsystem.setAction(
+                                                ScoringSubsystem.ScoringAction.INTAKE)))
+                .onFalse(new InstantCommand(
+                                () -> scoringSubsystem.setAction(
+                                                ScoringSubsystem.ScoringAction.WAIT)));
 
-        controller
-                .b()
-                .onTrue(
-                        new InstantCommand(
-                                () ->
-                                        scoringSubsystem.setAction(
+        controller.b().onTrue(new InstantCommand(
+                                () -> scoringSubsystem.setAction(
                                                 ScoringSubsystem.ScoringAction.AIM)))
-                .onFalse(
-                        new InstantCommand(
-                                () ->
-                                        scoringSubsystem.setAction(
+                .onFalse(new InstantCommand(
+                                () -> scoringSubsystem.setAction(
                                                 ScoringSubsystem.ScoringAction.WAIT)));
 
-        controller
-                .x()
-                .onTrue(
-                        new InstantCommand(
-                                () ->
-                                        scoringSubsystem.setAction(
+        controller.x().onTrue(new InstantCommand(
+                                () -> scoringSubsystem.setAction(
                                                 ScoringSubsystem.ScoringAction.SHOOT)))
-                .onFalse(
-                        new InstantCommand(
-                                () ->
-                                        scoringSubsystem.setAction(
+                .onFalse(new InstantCommand(
+                                () -> scoringSubsystem.setAction(
                                                 ScoringSubsystem.ScoringAction.WAIT)));
 
-        controller
-                .y()
-                .onTrue(
-                        new InstantCommand(
-                                () ->
-                                        scoringSubsystem.setAction(
+        controller.y().onTrue(new InstantCommand(
+                                () -> scoringSubsystem.setAction(
                                                 ScoringSubsystem.ScoringAction.ENDGAME)))
-                .onFalse(
-                        new InstantCommand(
-                                () ->
-                                        scoringSubsystem.setAction(
+                .onFalse(new InstantCommand(
+                                () -> scoringSubsystem.setAction(
                                                 ScoringSubsystem.ScoringAction.WAIT)));
+        // spotless:on
     }
 
     private void configureModes() {}
