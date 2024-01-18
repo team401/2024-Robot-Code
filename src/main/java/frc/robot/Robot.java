@@ -25,7 +25,15 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends LoggedRobot {
+    @SuppressWarnings("unused")
     private RobotContainer robotContainer;
+
+    @SuppressWarnings("unused")
+    private PowerDistribution pdh;
+
+    public Robot() {
+        super(Constants.loopTime);
+    }
 
     @Override
     public void robotInit() {
@@ -34,7 +42,7 @@ public class Robot extends LoggedRobot {
         if (Constants.currentMode == Constants.Mode.REAL) {
             // Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs") TODO: Add back later
             Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-            new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+            pdh = new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
         } else {
             setUseTiming(false); // Run as fast as possible
             String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
