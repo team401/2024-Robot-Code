@@ -27,6 +27,7 @@ import frc.robot.subsystems.sensors.SensorManager;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
+    SensorManager sensorManager;
 
     CommandJoystick leftJoystick = new CommandJoystick(0);
     CommandJoystick rightJoystick = new CommandJoystick(1);
@@ -113,5 +114,9 @@ public class RobotContainer {
         tagVision.setCameraConsumer(
                 (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
         tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
+    }
+
+    public SensorManager getSensorManager() {
+        return sensorManager;
     }
 }
