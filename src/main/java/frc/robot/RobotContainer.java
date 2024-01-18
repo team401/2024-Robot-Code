@@ -1,7 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
@@ -10,18 +9,16 @@ import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.scoring.AimerIOSim;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ShooterIOSim;
-
-import com.ctre.phoenix6.Utils;
-
+import frc.robot.subsystems.sensors.BannerIOReal;
+import frc.robot.subsystems.sensors.BannerIOSim;
+import frc.robot.subsystems.sensors.SensorManager;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
+    SensorManager sensorManager;
 
     CommandJoystick leftJoystick = new CommandJoystick(0);
     CommandJoystick rightJoystick = new CommandJoystick(1);
@@ -63,12 +60,18 @@ public class RobotContainer {
 
         switch (Constants.currentMode) {
             case REAL:
-                scoringSubsystem = new ScoringSubsystem(new ShooterIOSim(), new AimerIOSim());
+                sensorManager = new SensorManager(new BannerIOReal(Constants.SensorConstants.bannerPort));
+                scoringSubsystem = new ScoringSubsystem(new ShooterIOSim(), new AimerIOSim(), sensorManager);
                 break;
             case SIM:
-                scoringSubsystem = new ScoringSubsystem(new ShooterIOSim(), new AimerIOSim());
+                sensorManager = new SensorManager(new BannerIOSim());
+                scoringSubsystem = new ScoringSubsystem(new ShooterIOSim(), new AimerIOSim(), sensorManager);
                 break;
             case REPLAY:
         }
+    }
+
+    public SensorManager getSensorManager() {
+        return sensorManager;
     }
 }

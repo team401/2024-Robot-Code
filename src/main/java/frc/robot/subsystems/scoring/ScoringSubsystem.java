@@ -2,6 +2,7 @@ package frc.robot.subsystems.scoring;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.sensors.SensorManager;
 
 public class ScoringSubsystem extends SubsystemBase {
     private final ShooterIO shooterIo;
@@ -9,6 +10,8 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private final AimerIO aimerIo;
     private final AimerIOInputsAutoLogged aimerInputs = new AimerIOInputsAutoLogged();
+
+    private SensorManager sensors;
 
     private final Timer shootTimer = new Timer();
 
@@ -32,9 +35,10 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private ScoringAction action = ScoringAction.WAIT;
 
-    public ScoringSubsystem(ShooterIO shooterIo, AimerIO aimerIo) {
+    public ScoringSubsystem(ShooterIO shooterIo, AimerIO aimerIo, SensorManager sensors) {
         this.shooterIo = shooterIo;
         this.aimerIo = aimerIo;
+        this.sensors = sensors;
     }
 
     public void setAction(ScoringAction action) {
@@ -46,7 +50,7 @@ public class ScoringSubsystem extends SubsystemBase {
         shooterIo.setShooterVelocityRPM(0);
         shooterIo.setKickerVolts(0);
 
-        if (true && action == ScoringAction.INTAKE) { // TODO: Banner sensor NOT triggered
+        if (hasNote() && action == ScoringAction.INTAKE) {
             state = ScoringState.INTAKE;
         } else if (action == ScoringAction.AIM) {
             state = ScoringState.PRIME;
@@ -60,7 +64,7 @@ public class ScoringSubsystem extends SubsystemBase {
         shooterIo.setShooterVelocityRPM(-10);
         shooterIo.setKickerVolts(-1);
 
-        if (true || action == ScoringAction.WAIT) { // TODO: Banner sensor triggered
+        if (hasNote() || action == ScoringAction.WAIT) {
             state = ScoringState.IDLE;
         }
     }
@@ -72,7 +76,7 @@ public class ScoringSubsystem extends SubsystemBase {
         boolean shooterReady = Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM) < 10; // TODO: Tune
         boolean armReady = Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad) < 0.1; // TODO: Tune
         boolean driveReady = true; // TODO: Add drive ready
-        boolean hasNote = true; // TODO: Add banner sensor
+        boolean hasNote = hasNote();
 
         boolean primeReady = shooterReady && armReady && driveReady && hasNote;
 
@@ -103,6 +107,10 @@ public class ScoringSubsystem extends SubsystemBase {
     private double findShootAngleRads() { // TODO: Interpolate
         double distancetoGoal = Math.sqrt(Math.pow(Math.sqrt(Math.pow(1, 2) + Math.pow(1, 2)), 2) + Math.pow(1, 2));
         return Math.atan2(distancetoGoal, 1);
+    }
+
+    private boolean hasNote() {
+        return sensors.hasNote();
     }
 
     @Override

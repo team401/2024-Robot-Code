@@ -5,9 +5,6 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 
@@ -23,6 +20,10 @@ public final class Constants {
     }
 
     public static final class CANDevices {}
+
+    public static final class SensorConstants {
+        public static final int bannerPort = 1; // TODO: Change this
+    }
 
     public static final class DriveConstants {
         public static final double MaxSpeedMetPerSec = 6;
