@@ -85,7 +85,7 @@ public class Telemetry {
         fieldPub.set(new double[] {
                 pose.getX(),
                 pose.getY(),
-                pose.getRotation().getDegrees()
+                pose.getRotation().getRadians()
         });
 
         Logger.recordOutput("pose/Pose2d", pose);

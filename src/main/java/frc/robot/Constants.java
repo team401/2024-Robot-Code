@@ -5,9 +5,6 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 
@@ -49,7 +46,7 @@ public final class Constants {
 
         // Theoretical free speed (m/s) at 12v applied output;
         // This needs to be tuned to your individual robot
-        private static final double kSpeedAt12VoltsMps = 6.0;
+        public  static final double kSpeedAt12VoltsMps = 6.0;
 
         // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
         // This may need to be tuned to your individual robot
