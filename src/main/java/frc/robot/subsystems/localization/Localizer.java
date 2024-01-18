@@ -2,28 +2,25 @@ package frc.robot.subsystems.localization;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.utils.PoseKalmanFilter;
-import frc.robot.utils.PoseEstimator;
 
 public class Localizer extends SubsystemBase {
     private final List<CameraIO> cameras;
     private final List<CameraIOInputsAutoLogged> cameraInputs = new ArrayList<>();
 
-    private Supplier<Twist2d> odometrySupplier;
+    private Consumer<CameraData> cameraConsumer;
 
-    private PoseEstimator poseEstimator = new PoseEstimator();
+    private Supplier<Pose2d> fieldToRobotSupplier;
 
     public Localizer(List<CameraIO> cameras) {
         this.cameras = cameras;
@@ -39,33 +36,24 @@ public class Localizer extends SubsystemBase {
             
             var inputs = cameraInputs.get(i);
 
-            poseEstimator.addCameraMeasurement(
-                inputs.latestFieldToRobot,
-                cameraUncertainty(inputs.averageTagDistanceM),
-                inputs.latestTimestampSeconds);
+            cameraConsumer.accept(
+                new CameraData(
+                    inputs.latestFieldToRobot,
+                    inputs.latestTimestampSeconds,
+                    cameraUncertainty(inputs.averageTagDistanceM)));
+
+            Logger.recordOutput("Camera"+i+"/fieldToRobot", inputs.latestFieldToRobot);
         }
-
-        poseEstimator.addOdometryMeasurement(
-            odometrySupplier.get(),
-            VisionConstants.driveUncertainty,
-            Timer.getFPGATimestamp());
-
-        Logger.recordOutput("FieldToRobot", getFieldToRobot());
     }
 
-    public Pose2d getFieldToRobot() {
-        return poseEstimator.getFieldToRobot();
+    public void setCameraConsumer(Consumer<CameraData> cameraConsumer) {
+        this.cameraConsumer = cameraConsumer;
     }
 
-    public void setOdometrySupplier(Supplier<Twist2d> odometrySupplier) {
-        this.odometrySupplier = odometrySupplier;
-    }
-
-    // I love 31-character symbol names
     private Matrix<N3, N1> cameraUncertainty(double averageTagDistanceM) {
         /*
          * On this year's field, Apriltags are arranged into rough 'corridors' between the stage and
-         * speaker, and a central 'dessert,' where few tags can be found. It follows that we should
+         * speaker, and a central 'desert,' where few tags can be found. It follows that we should
          * determine the variance of our camera mesurements based on that.
          */
         if (averageTagDistanceM < 2.0 && this.robotInMidField()) {
@@ -76,7 +64,12 @@ public class Localizer extends SubsystemBase {
     }
 
     private boolean robotInMidField() {
-        // TODO
-        return false;
+        return fieldToRobotSupplier.get().getX() > VisionConstants.midfieldLowThreshold
+            && fieldToRobotSupplier.get().getX() < VisionConstants.midfieldHighThreshold;
     }
+
+    /**
+     * This class exists solely because java has no functional interface for a function with 3 inputs
+     */
+    public static record CameraData(Pose2d pose, double timestamp, Matrix<N3, N1> variance) {}
 }

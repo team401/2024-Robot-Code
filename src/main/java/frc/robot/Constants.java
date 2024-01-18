@@ -41,6 +41,9 @@ public final class Constants {
         public static final double fieldLengthM = 69.0;
         public static final double fieldWidthM = 420.0;
 
+        public static final double midfieldLowThreshold = 69.0;
+        public static final double midfieldHighThreshold = 420.0;
+
         public static final List<AprilTag> tags = new ArrayList<>();
 
         public static final AprilTagFieldLayout fieldLayout =
