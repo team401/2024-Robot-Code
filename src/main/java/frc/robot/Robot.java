@@ -42,7 +42,10 @@ public class Robot extends LoggedRobot {
         if (Constants.currentMode == Constants.Mode.REAL) {
             // Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs") TODO: Add back later
             Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-            pdh = new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+            new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+        } else if (Constants.currentMode == Constants.Mode.SIM) {
+            // Logger.addDataReceiver(new WPILOGWriter("logs/")); TODO: Add back later
+            Logger.addDataReceiver(new NT4Publisher());
         } else {
             setUseTiming(false); // Run as fast as possible
             String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
