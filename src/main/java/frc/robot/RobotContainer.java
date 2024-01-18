@@ -23,8 +23,7 @@ public class RobotContainer {
 
     CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain;
 
-    Telemetry driveTelemetry = new Telemetry(
-        DriveConstants.MaxSpeedMetPerSec);
+    Telemetry driveTelemetry = new Telemetry(DriveConstants.MaxSpeedMetPerSec);
 
     public RobotContainer() {
         configureBindings();

@@ -20,7 +20,7 @@ jobs:
         run: chmod +x gradlew
       
       # Checks the code format with gradle
-      - name: Check formatting.
+      - name: Check formatting
         run: ./gradlew spotlessCheck
 
    # The "build" job checks that the robot code builds correctly and that any unit tests pass.
