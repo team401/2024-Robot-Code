@@ -21,8 +21,9 @@ public class DriveWithJoysticks extends Command {
     double yMpS;
     double rotRadpS;
 
-    public DriveWithJoysticks(CommandSwerveDrivetrain drivetrain, DoubleSupplier x, DoubleSupplier y,
-            DoubleSupplier rot, BooleanSupplier fieldCentric, BooleanSupplier babyMode) {
+    public DriveWithJoysticks(CommandSwerveDrivetrain drivetrain, DoubleSupplier x,
+            DoubleSupplier y, DoubleSupplier rot, BooleanSupplier fieldCentric,
+            BooleanSupplier babyMode) {
         this.drivetrain = drivetrain;
         this.x = x;
         this.y = y;
@@ -34,8 +35,7 @@ public class DriveWithJoysticks extends Command {
     }
 
     @Override
-    public void initialize() {
-    }
+    public void initialize() {}
 
     @Override
     public void execute() {
@@ -53,13 +53,13 @@ public class DriveWithJoysticks extends Command {
             rotRadpS *= 0.5;
         }
 
-        drivetrain.setGoalChassisSpeeds(new ChassisSpeeds(xMpS, yMpS, rotRadpS), fieldCentric.getAsBoolean());
+        drivetrain.setGoalChassisSpeeds(new ChassisSpeeds(xMpS, yMpS, rotRadpS),
+                fieldCentric.getAsBoolean());
 
     }
 
     @Override
-    public void end(boolean interrupted) {
-    }
+    public void end(boolean interrupted) {}
 
     @Override
     public boolean isFinished() {

@@ -13,19 +13,11 @@ public class ScoringSubsystem extends SubsystemBase {
     private final Timer shootTimer = new Timer();
 
     private enum ScoringState {
-        IDLE,
-        INTAKE,
-        PRIME,
-        SHOOT,
-        ENDGAME
+        IDLE, INTAKE, PRIME, SHOOT, ENDGAME
     }
 
     public enum ScoringAction {
-        INTAKE,
-        AIM,
-        SHOOT,
-        WAIT,
-        ENDGAME
+        INTAKE, AIM, SHOOT, WAIT, ENDGAME
     }
 
     private ScoringState state = ScoringState.IDLE;
@@ -69,8 +61,11 @@ public class ScoringSubsystem extends SubsystemBase {
         shooterIo.setShooterVelocityRPM(100);
         aimerIo.setAimAngleRad(findShootAngleRads());
 
-        boolean shooterReady = Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM) < 10; // TODO: Tune
-        boolean armReady = Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad) < 0.1; // TODO: Tune
+        boolean shooterReady = Math
+                .abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM) < 10; // TODO:
+                                                                                                    // Tune
+        boolean armReady = Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad) < 0.1; // TODO:
+                                                                                                  // Tune
         boolean driveReady = true; // TODO: Add drive ready
         boolean hasNote = true; // TODO: Add banner sensor
 
@@ -101,7 +96,8 @@ public class ScoringSubsystem extends SubsystemBase {
     }
 
     private double findShootAngleRads() { // TODO: Interpolate
-        double distancetoGoal = Math.sqrt(Math.pow(Math.sqrt(Math.pow(1, 2) + Math.pow(1, 2)), 2) + Math.pow(1, 2));
+        double distancetoGoal =
+                Math.sqrt(Math.pow(Math.sqrt(Math.pow(1, 2) + Math.pow(1, 2)), 2) + Math.pow(1, 2));
         return Math.atan2(distancetoGoal, 1);
     }
 

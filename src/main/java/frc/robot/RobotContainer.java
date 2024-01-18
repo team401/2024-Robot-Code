@@ -49,23 +49,32 @@ public class RobotContainer {
         controller.a().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.INTAKE)))
             .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
 
-        controller.b().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.AIM)))
-            .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+        controller.b()
+                .onTrue(new InstantCommand(
+                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.AIM)))
+                .onFalse(new InstantCommand(
+                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
 
-        controller.x().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT)))
-            .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+        controller.x()
+                .onTrue(new InstantCommand(
+                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT)))
+                .onFalse(new InstantCommand(
+                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
 
-        controller.y().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.ENDGAME)))
-            .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+        controller.y()
+                .onTrue(new InstantCommand(
+                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.ENDGAME)))
+                .onFalse(new InstantCommand(
+                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
     }
 
 
-    private void configureModes() {
-    }
+    private void configureModes() {}
 
     public void configureSubsystems() {
         if (Constants.currentMode == Constants.Mode.SIM) {
-            drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
+            drivetrain
+                    .seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
         }
         drivetrain.registerTelemetry(driveTelemetry::telemeterize);
 
