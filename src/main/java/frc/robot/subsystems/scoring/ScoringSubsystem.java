@@ -13,11 +13,19 @@ public class ScoringSubsystem extends SubsystemBase {
     private final Timer shootTimer = new Timer();
 
     private enum ScoringState {
-        IDLE, INTAKE, PRIME, SHOOT, ENDGAME
+        IDLE,
+        INTAKE,
+        PRIME,
+        SHOOT,
+        ENDGAME
     }
 
     public enum ScoringAction {
-        INTAKE, AIM, SHOOT, WAIT, ENDGAME
+        INTAKE,
+        AIM,
+        SHOOT,
+        WAIT,
+        ENDGAME
     }
 
     private ScoringState state = ScoringState.IDLE;
@@ -61,11 +69,13 @@ public class ScoringSubsystem extends SubsystemBase {
         shooterIo.setShooterVelocityRPM(100);
         aimerIo.setAimAngleRad(findShootAngleRads());
 
-        boolean shooterReady = Math
-                .abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM) < 10; // TODO:
-                                                                                                    // Tune
-        boolean armReady = Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad) < 0.1; // TODO:
-                                                                                                  // Tune
+        boolean shooterReady =
+                Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM)
+                        < 10; // TODO:
+        // Tune
+        boolean armReady =
+                Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad) < 0.1; // TODO:
+        // Tune
         boolean driveReady = true; // TODO: Add drive ready
         boolean hasNote = true; // TODO: Add banner sensor
 
@@ -120,7 +130,7 @@ public class ScoringSubsystem extends SubsystemBase {
                 shoot();
                 break;
             case ENDGAME:
-                endgame();// TODO: Later
+                endgame(); // TODO: Later
                 break;
         }
     }

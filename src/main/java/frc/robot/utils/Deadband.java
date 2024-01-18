@@ -24,8 +24,8 @@ public class Deadband {
     }
 
     // 3D Deadband in a spherical format
-    public static double[] threeAxisDeadband(double inputX, double inputY, double inputZ,
-            double deadband) {
+    public static double[] threeAxisDeadband(
+            double inputX, double inputY, double inputZ, double deadband) {
         double[] output = new double[3];
         if (Math.sqrt(Math.pow(inputX, 2) + Math.pow(inputY, 2) + Math.pow(inputZ, 2)) < deadband) {
             output[0] = 0;

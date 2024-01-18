@@ -33,9 +33,11 @@ public class ShooterIOSim implements ShooterIO {
     public void updateInputs(ShooterIOInputs inputs) {
         shooterSim.update(Constants.loopTime);
 
-        shooterAppliedVolts = shooterFeedforward.calculate(shooterSim.getAngularVelocityRadPerSec())
-                + shooterController.calculate(shooterSim.getAngularVelocityRadPerSec(),
-                        shooterGoalVelRPM * 2.0 * Math.PI / 60.0);
+        shooterAppliedVolts =
+                shooterFeedforward.calculate(shooterSim.getAngularVelocityRadPerSec())
+                        + shooterController.calculate(
+                                shooterSim.getAngularVelocityRadPerSec(),
+                                shooterGoalVelRPM * 2.0 * Math.PI / 60.0);
 
         inputs.shooterVelocityRPM =
                 shooterSim.getAngularVelocityRadPerSec() * 60.0 / (2.0 * Math.PI);

@@ -25,7 +25,9 @@ public class AimerIOSim implements AimerIO {
     public void updateInputs(AimerIOInputs inputs) {
         sim.update(Constants.loopTime);
 
-        appliedVolts = feedforward.calculate(sim.getAngleRads(), sim.getVelocityRadPerSec()) + controller.calculate(sim.getAngleRads(), goalAngRad);
+        appliedVolts =
+                feedforward.calculate(sim.getAngleRads(), sim.getVelocityRadPerSec())
+                        + controller.calculate(sim.getAngleRads(), goalAngRad);
         sim.setInputVoltage(appliedVolts);
 
         inputs.aimAngleRad = sim.getAngleRads();

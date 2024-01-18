@@ -5,6 +5,17 @@
 
 > :warning: **WIP**: We are still too early in the season to add proper features/details.
 
+# Getting Started
+
+## Dependencies
+- For formatting support, install emeraldwalk RunOnSave:
+```
+code --install-extension emeraldwalk.RunOnSave
+```
+
+
+# Robot
+
 ## About the Robot
 Our 2024 robot does X.
 

@@ -6,6 +6,18 @@ on:
   pull_request:
     branches: [ '**' ]
 jobs:
+  # The "format" job checks that the style guide is followed correctly.
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      # Grant execute permission for gradlew
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      
+      # Checks the code format with gradle
+      - name: Check formatting.
+        run: ./gradlew spotlessCheck
+
    # The "build" job checks that the robot code builds correctly and that any unit tests pass.
   build:
     # The type of runner that the job will run on
@@ -34,15 +46,3 @@ jobs:
       with:
         name: test-artifacts
         path: ${{ github.workspace }}/build/test-results/frcUserProgramTest
-  
-  # The "format" job checks that the style guide is followed correctly.
-  format:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3 # v2 minimum required
-      - uses: axel-op/googlejavaformat-action@v3
-        with:
-          args: "--replace --aosp"
-          skip-commit: true
-      - name: Print diffs
-        run: git --no-pager diff --exit-code

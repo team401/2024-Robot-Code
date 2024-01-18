@@ -37,8 +37,10 @@ public class SystemsTest extends Command {
     @Override
     public boolean isFinished() {
         if (timer.hasElapsed(0.5)) {
-            System.out.println("*********************************** Faliure with "
-                    + subsystem.toString() + " ***********************************");
+            System.out.println(
+                    "*********************************** Faliure with "
+                            + subsystem.toString()
+                            + " ***********************************");
             return true;
         } else if (subsystem.getVel() > 0.1) {
             return true;
