@@ -30,6 +30,10 @@ public final class Constants {
 
     public static final class CANDevices {}
 
+    public static final class SensorConstants {
+        public static final int bannerPort = 1; // TODO: Change this
+    }
+
     public static final class DriveConstants {
         public static final double MaxSpeedMetPerSec = 6;
         public static final double MaxAngularRateRadiansPerSec = Math.PI * 2; // 2 PI is one full

@@ -21,9 +21,13 @@ import frc.robot.subsystems.scoring.ShooterIOSim;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import frc.robot.subsystems.sensors.BannerIOReal;
+import frc.robot.subsystems.sensors.BannerIOSim;
+import frc.robot.subsystems.sensors.SensorManager;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
+    SensorManager sensorManager;
 
     CommandJoystick leftJoystick = new CommandJoystick(0);
     CommandJoystick rightJoystick = new CommandJoystick(1);
@@ -91,7 +95,7 @@ public class RobotContainer {
 
         switch (Constants.currentMode) {
             case REAL:
-                scoringSubsystem = new ScoringSubsystem(new ShooterIOSim(), new AimerIOSim());
+                scoringSubsystem = new ScoringSubsystem(new ShooterIOSim(), new AimerIOSim(), sensorManager);
 
                 List<CameraIO> realCameras = new ArrayList<>();
                 for (CameraParams params : VisionConstants.cameras) {
@@ -100,7 +104,7 @@ public class RobotContainer {
                 tagVision = new VisionLocalizer(realCameras);
                 break;
             case SIM:
-                scoringSubsystem = new ScoringSubsystem(new ShooterIOSim(), new AimerIOSim());
+                scoringSubsystem = new ScoringSubsystem(new ShooterIOSim(), new AimerIOSim(), sensorManager);
 
                 tagVision = new VisionLocalizer(Collections.emptyList());
                 break;
@@ -110,5 +114,9 @@ public class RobotContainer {
         tagVision.setCameraConsumer(
                 (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
         tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
+    }
+
+    public SensorManager getSensorManager() {
+        return sensorManager;
     }
 }
