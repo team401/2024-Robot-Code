@@ -1,7 +1,5 @@
 package frc.robot.subsystems.drive;
 
-import java.util.function.Supplier;
-
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
@@ -70,10 +68,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                                             new ReplanningConfig()),
             ()->false, // Change this if the path needs to be flipped on red vs blue
             this); // Subsystem for requirements
-    }
-
-    public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
-        return run(() -> this.setControl(requestSupplier.get()));
     }
 
     public Command getAutoPath(String pathName) {
