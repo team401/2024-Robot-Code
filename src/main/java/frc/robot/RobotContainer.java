@@ -9,16 +9,12 @@ import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.scoring.AimerIOSim;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ShooterIOSim;
-import frc.robot.subsystems.sensors.BannerIOReal;
-import frc.robot.subsystems.sensors.BannerIOSim;
-import frc.robot.subsystems.sensors.SensorManager;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
-    SensorManager sensorManager;
 
     CommandJoystick leftJoystick = new CommandJoystick(0);
     CommandJoystick rightJoystick = new CommandJoystick(1);
@@ -60,18 +56,12 @@ public class RobotContainer {
 
         switch (Constants.currentMode) {
             case REAL:
-                sensorManager = new SensorManager(new BannerIOReal(Constants.SensorConstants.bannerPort));
-                scoringSubsystem = new ScoringSubsystem(new ShooterIOSim(), new AimerIOSim(), sensorManager);
+                scoringSubsystem = new ScoringSubsystem(new ShooterIOSim(), new AimerIOSim());
                 break;
             case SIM:
-                sensorManager = new SensorManager(new BannerIOSim());
-                scoringSubsystem = new ScoringSubsystem(new ShooterIOSim(), new AimerIOSim(), sensorManager);
+                scoringSubsystem = new ScoringSubsystem(new ShooterIOSim(), new AimerIOSim());
                 break;
             case REPLAY:
         }
-    }
-
-    public SensorManager getSensorManager() {
-        return sensorManager;
     }
 }
