@@ -10,7 +10,6 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
-
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
@@ -20,8 +19,8 @@ import frc.robot.Constants;
 import frc.robot.Constants.TunerConstants;
 
 /**
- * Class that extends the Phoenix SwerveDrivetrain class and implements subsystem
- * so it can be used in command-based projects easily.
+ * Class that extends the Phoenix SwerveDrivetrain class and implements subsystem so it can be used
+ * in command-based projects easily.
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
     private double vx, vy, omega = 0.0;
@@ -30,19 +29,24 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private SwerveRequest.FieldCentric driveFieldCentric = new SwerveRequest.FieldCentric();
     private SwerveRequest.RobotCentric driveRobotCentric = new SwerveRequest.RobotCentric();
     private SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-    
+
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier simNotifier = null;
     private double lastSimTime;
 
-    public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency, SwerveModuleConstants... modules) {
+    public CommandSwerveDrivetrain(
+            SwerveDrivetrainConstants driveTrainConstants,
+            double OdometryUpdateFrequency,
+            SwerveModuleConstants... modules) {
         super(driveTrainConstants, OdometryUpdateFrequency, modules);
         configurePathPlanner();
         if (Constants.currentMode == Constants.Mode.SIM) {
             startSimThread();
         }
     }
-    public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, SwerveModuleConstants... modules) {
+
+    public CommandSwerveDrivetrain(
+            SwerveDrivetrainConstants driveTrainConstants, SwerveModuleConstants... modules) {
         super(driveTrainConstants, modules);
         configurePathPlanner();
         if (Constants.currentMode == Constants.Mode.SIM) {
@@ -57,17 +61,20 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         }
 
         AutoBuilder.configureHolonomic(
-            ()->this.getState().Pose, // Supplier of current robot pose
-            this::seedFieldRelative,  // Consumer for seeding pose against auto
-            this::getCurrentRobotChassisSpeeds,
-            (speeds)->this.setGoalChassisSpeeds(speeds, true), // Consumer of ChassisSpeeds to drive the robot
-            new HolonomicPathFollowerConfig(new PIDConstants(10, 0, 0),
-                                            new PIDConstants(10, 0, 0),
-                                            TunerConstants.kSpeedAt12VoltsMps,
-                                            driveBaseRadius,
-                                            new ReplanningConfig()),
-            ()->false, // Change this if the path needs to be flipped on red vs blue
-            this); // Subsystem for requirements
+                () -> this.getState().Pose, // Supplier of current robot pose
+                this::seedFieldRelative, // Consumer for seeding pose against auto
+                this::getCurrentRobotChassisSpeeds,
+                (speeds) ->
+                        this.setGoalChassisSpeeds(
+                                speeds, true), // Consumer of ChassisSpeeds to drive the robot
+                new HolonomicPathFollowerConfig(
+                        new PIDConstants(10, 0, 0),
+                        new PIDConstants(10, 0, 0),
+                        TunerConstants.kSpeedAt12VoltsMps,
+                        driveBaseRadius,
+                        new ReplanningConfig()),
+                () -> false, // Change this if the path needs to be flipped on red vs blue
+                this); // Subsystem for requirements
     }
 
     public Command getAutoPath(String pathName) {
@@ -82,14 +89,16 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         lastSimTime = Utils.getCurrentTimeSeconds();
 
         /* Run simulation at a faster rate so PID gains behave more reasonably */
-        simNotifier = new Notifier(() -> {
-            final double currentTime = Utils.getCurrentTimeSeconds();
-            double deltaTime = currentTime - lastSimTime;
-            lastSimTime = currentTime;
+        simNotifier =
+                new Notifier(
+                        () -> {
+                            final double currentTime = Utils.getCurrentTimeSeconds();
+                            double deltaTime = currentTime - lastSimTime;
+                            lastSimTime = currentTime;
 
-            /* use the measured time delta, get battery voltage from WPILib */
-            updateSimState(deltaTime, RobotController.getBatteryVoltage());
-        });
+                            /* use the measured time delta, get battery voltage from WPILib */
+                            updateSimState(deltaTime, RobotController.getBatteryVoltage());
+                        });
         simNotifier.startPeriodic(kSimLoopPeriod);
     }
 
@@ -104,15 +113,17 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         if (vx == 0 && vy == 0 && omega == 0) {
             setControl(brake);
         } else if (!fieldCentric) {
-            setControl(driveRobotCentric
-                    .withVelocityX(vx)
-                    .withVelocityY(vy)
-                    .withRotationalRate(omega));
+            setControl(
+                    driveRobotCentric
+                            .withVelocityX(vx)
+                            .withVelocityY(vy)
+                            .withRotationalRate(omega));
         } else {
-            setControl(driveFieldCentric
-                    .withVelocityX(vx)
-                    .withVelocityY(vy)
-                    .withRotationalRate(omega));
+            setControl(
+                    driveFieldCentric
+                            .withVelocityX(vx)
+                            .withVelocityY(vy)
+                            .withRotationalRate(omega));
         }
     }
 

@@ -2,9 +2,9 @@
 
 package frc.robot.utils.feedforward;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.utils.Tunable;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class TuneS extends Command {
     private Tunable subsystem;

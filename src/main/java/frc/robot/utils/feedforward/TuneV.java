@@ -2,11 +2,10 @@
 
 package frc.robot.utils.feedforward;
 
-import java.util.ArrayList;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.utils.Tunable;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.ArrayList;
 
 public class TuneV extends Command {
     private Tunable subsystem;

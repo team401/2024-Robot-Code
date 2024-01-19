@@ -1,6 +1,8 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -11,15 +13,6 @@ import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.scoring.AimerIOSim;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ShooterIOSim;
-
-import com.ctre.phoenix6.Utils;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
@@ -39,6 +32,7 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
+        // spotless:off
         drivetrain.setDefaultCommand(new DriveWithJoysticks(drivetrain,
         () -> -controller.getLeftY(),
         () -> -controller.getLeftX(),
@@ -46,26 +40,42 @@ public class RobotContainer {
         () -> true,
         () -> false));
 
-        controller.a().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.INTAKE)))
-            .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+        controller.a().onTrue(new InstantCommand(
+                                () -> scoringSubsystem.setAction(
+                                                ScoringSubsystem.ScoringAction.INTAKE)))
+                .onFalse(new InstantCommand(
+                                () -> scoringSubsystem.setAction(
+                                                ScoringSubsystem.ScoringAction.WAIT)));
 
-        controller.b().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.AIM)))
-            .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+        controller.b().onTrue(new InstantCommand(
+                                () -> scoringSubsystem.setAction(
+                                                ScoringSubsystem.ScoringAction.AIM)))
+                .onFalse(new InstantCommand(
+                                () -> scoringSubsystem.setAction(
+                                                ScoringSubsystem.ScoringAction.WAIT)));
 
-        controller.x().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT)))
-            .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+        controller.x().onTrue(new InstantCommand(
+                                () -> scoringSubsystem.setAction(
+                                                ScoringSubsystem.ScoringAction.SHOOT)))
+                .onFalse(new InstantCommand(
+                                () -> scoringSubsystem.setAction(
+                                                ScoringSubsystem.ScoringAction.WAIT)));
 
-        controller.y().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.ENDGAME)))
-            .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+        controller.y().onTrue(new InstantCommand(
+                                () -> scoringSubsystem.setAction(
+                                                ScoringSubsystem.ScoringAction.ENDGAME)))
+                .onFalse(new InstantCommand(
+                                () -> scoringSubsystem.setAction(
+                                                ScoringSubsystem.ScoringAction.WAIT)));
+        // spotless:on
     }
 
-
-    private void configureModes() {
-    }
+    private void configureModes() {}
 
     public void configureSubsystems() {
         if (Constants.currentMode == Constants.Mode.SIM) {
-            drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
+            drivetrain.seedFieldRelative(
+                    new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
         }
         drivetrain.registerTelemetry(driveTelemetry::telemeterize);
 

@@ -4,7 +4,6 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
-
 import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 
@@ -23,22 +22,21 @@ public final class Constants {
 
     public static final class DriveConstants {
         public static final double MaxSpeedMetPerSec = 6;
-        public static final double MaxAngularRateRadiansPerSec = Math.PI * 2; // 2 PI is one full rotation per second
+        public static final double MaxAngularRateRadiansPerSec = Math.PI * 2; // 2 PI is one full
+        // rotation per second
         public static final double deadbandPercent = 0.16;
     }
 
     public static final class TunerConstants {
         // Both sets of gains need to be tuned to your individual robot
         // The steer motor uses MotionMagicVoltage control
-        private static final Slot0Configs steerGains = new Slot0Configs()
-                .withKP(7).withKI(0).withKD(0)
-                .withKS(0).withKV(1.5).withKA(0);
+        private static final Slot0Configs steerGains =
+                new Slot0Configs().withKP(7).withKI(0).withKD(0).withKS(0).withKV(1.5).withKA(0);
         // When using closed-loop control, the drive motor uses:
         // - VelocityVoltage, if DrivetrainConstants.SupportsPro is false (default)
         // - VelocityTorqueCurrentFOC, if DrivetrainConstants.SupportsPro is true
-        private static final Slot0Configs driveGains = new Slot0Configs()
-                .withKP(0.7).withKI(0).withKD(3.5)
-                .withKS(0).withKV(0).withKA(0);
+        private static final Slot0Configs driveGains =
+                new Slot0Configs().withKP(0.7).withKI(0).withKD(3.5).withKS(0).withKV(0).withKA(0);
 
         // The stator current at which the wheels start to slip;
         // This needs to be tuned to your individual robot
@@ -46,7 +44,7 @@ public final class Constants {
 
         // Theoretical free speed (m/s) at 12v applied output;
         // This needs to be tuned to your individual robot
-        public  static final double kSpeedAt12VoltsMps = 6.0;
+        public static final double kSpeedAt12VoltsMps = 6.0;
 
         // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
         // This may need to be tuned to your individual robot
@@ -67,23 +65,25 @@ public final class Constants {
         private static final double kSteerInertia = 0.00001;
         private static final double kDriveInertia = 0.001;
 
-        private static final SwerveDrivetrainConstants DrivetrainConstants = new SwerveDrivetrainConstants()
-                .withPigeon2Id(kPigeonId)
-                .withCANbusName(kCANbusName);
+        private static final SwerveDrivetrainConstants DrivetrainConstants =
+                new SwerveDrivetrainConstants()
+                        .withPigeon2Id(kPigeonId)
+                        .withCANbusName(kCANbusName);
 
-        private static final SwerveModuleConstantsFactory ConstantCreator = new SwerveModuleConstantsFactory()
-                .withDriveMotorGearRatio(kDriveGearRatio)
-                .withSteerMotorGearRatio(kSteerGearRatio)
-                .withWheelRadius(kWheelRadiusInches)
-                .withSlipCurrent(kSlipCurrentA)
-                .withSteerMotorGains(steerGains)
-                .withDriveMotorGains(driveGains)
-                .withSpeedAt12VoltsMps(kSpeedAt12VoltsMps)
-                .withSteerInertia(kSteerInertia)
-                .withDriveInertia(kDriveInertia)
-                .withFeedbackSource(SwerveModuleConstants.SteerFeedbackType.FusedCANcoder)
-                .withCouplingGearRatio(kCoupleRatio)
-                .withSteerMotorInverted(kSteerMotorReversed);
+        private static final SwerveModuleConstantsFactory ConstantCreator =
+                new SwerveModuleConstantsFactory()
+                        .withDriveMotorGearRatio(kDriveGearRatio)
+                        .withSteerMotorGearRatio(kSteerGearRatio)
+                        .withWheelRadius(kWheelRadiusInches)
+                        .withSlipCurrent(kSlipCurrentA)
+                        .withSteerMotorGains(steerGains)
+                        .withDriveMotorGains(driveGains)
+                        .withSpeedAt12VoltsMps(kSpeedAt12VoltsMps)
+                        .withSteerInertia(kSteerInertia)
+                        .withDriveInertia(kDriveInertia)
+                        .withFeedbackSource(SwerveModuleConstants.SteerFeedbackType.FusedCANcoder)
+                        .withCouplingGearRatio(kCoupleRatio)
+                        .withSteerMotorInverted(kSteerMotorReversed);
 
         // Front Left
         private static final int kFrontLeftDriveMotorId = 2;
@@ -121,25 +121,46 @@ public final class Constants {
         private static final double kBackRightXPosInches = -11.875;
         private static final double kBackRightYPosInches = -8.875;
 
-        private static final SwerveModuleConstants FrontLeft = ConstantCreator.createModuleConstants(
-                kFrontLeftSteerMotorId, kFrontLeftDriveMotorId, kFrontLeftEncoderId, kFrontLeftEncoderOffset,
-                Units.inchesToMeters(kFrontLeftXPosInches), Units.inchesToMeters(kFrontLeftYPosInches),
-                kInvertLeftSide);
-        private static final SwerveModuleConstants FrontRight = ConstantCreator.createModuleConstants(
-                kFrontRightSteerMotorId, kFrontRightDriveMotorId, kFrontRightEncoderId, kFrontRightEncoderOffset,
-                Units.inchesToMeters(kFrontRightXPosInches), Units.inchesToMeters(kFrontRightYPosInches),
-                kInvertRightSide);
-        private static final SwerveModuleConstants BackLeft = ConstantCreator.createModuleConstants(
-                kBackLeftSteerMotorId, kBackLeftDriveMotorId, kBackLeftEncoderId, kBackLeftEncoderOffset,
-                Units.inchesToMeters(kBackLeftXPosInches), Units.inchesToMeters(kBackLeftYPosInches), kInvertLeftSide);
-        private static final SwerveModuleConstants BackRight = ConstantCreator.createModuleConstants(
-                kBackRightSteerMotorId, kBackRightDriveMotorId, kBackRightEncoderId, kBackRightEncoderOffset,
-                Units.inchesToMeters(kBackRightXPosInches), Units.inchesToMeters(kBackRightYPosInches),
-                kInvertRightSide);
+        private static final SwerveModuleConstants FrontLeft =
+                ConstantCreator.createModuleConstants(
+                        kFrontLeftSteerMotorId,
+                        kFrontLeftDriveMotorId,
+                        kFrontLeftEncoderId,
+                        kFrontLeftEncoderOffset,
+                        Units.inchesToMeters(kFrontLeftXPosInches),
+                        Units.inchesToMeters(kFrontLeftYPosInches),
+                        kInvertLeftSide);
+        private static final SwerveModuleConstants FrontRight =
+                ConstantCreator.createModuleConstants(
+                        kFrontRightSteerMotorId,
+                        kFrontRightDriveMotorId,
+                        kFrontRightEncoderId,
+                        kFrontRightEncoderOffset,
+                        Units.inchesToMeters(kFrontRightXPosInches),
+                        Units.inchesToMeters(kFrontRightYPosInches),
+                        kInvertRightSide);
+        private static final SwerveModuleConstants BackLeft =
+                ConstantCreator.createModuleConstants(
+                        kBackLeftSteerMotorId,
+                        kBackLeftDriveMotorId,
+                        kBackLeftEncoderId,
+                        kBackLeftEncoderOffset,
+                        Units.inchesToMeters(kBackLeftXPosInches),
+                        Units.inchesToMeters(kBackLeftYPosInches),
+                        kInvertLeftSide);
+        private static final SwerveModuleConstants BackRight =
+                ConstantCreator.createModuleConstants(
+                        kBackRightSteerMotorId,
+                        kBackRightDriveMotorId,
+                        kBackRightEncoderId,
+                        kBackRightEncoderOffset,
+                        Units.inchesToMeters(kBackRightXPosInches),
+                        Units.inchesToMeters(kBackRightYPosInches),
+                        kInvertRightSide);
 
-        public static final CommandSwerveDrivetrain DriveTrain = new CommandSwerveDrivetrain(DrivetrainConstants,
-                FrontLeft,
-                FrontRight, BackLeft, BackRight);
+        public static final CommandSwerveDrivetrain DriveTrain =
+                new CommandSwerveDrivetrain(
+                        DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight);
     }
 
     public static final class Scoring {
@@ -151,7 +172,6 @@ public final class Constants {
         public static final double aimerkG = 0.0;
         public static final double aimerkV = 0.0;
         public static final double aimerkA = 0.0;
-
 
         public static final double shooterkP = 1.0;
         public static final double shooterkI = 0.0;
