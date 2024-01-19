@@ -1,18 +1,16 @@
 package frc.robot.subsystems.localization;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class VisionLocalizer extends SubsystemBase {
     private final List<CameraIO> cameras;
@@ -30,21 +28,22 @@ public class VisionLocalizer extends SubsystemBase {
         }
     }
 
-
     @Override
     public void periodic() {
         for (int i = 0; i < cameras.size(); i++) {
             cameras.get(i).updateInputs(cameraInputs.get(i));
-            
+
             var inputs = cameraInputs.get(i);
 
             cameraConsumer.accept(
-                new CameraMeasurement(
-                    inputs.latestFieldToRobot,
-                    inputs.latestTimestampSeconds,
-                    cameraUncertainty(inputs.averageTagDistanceM)));
+                    new CameraMeasurement(
+                            inputs.latestFieldToRobot,
+                            inputs.latestTimestampSeconds,
+                            cameraUncertainty(inputs.averageTagDistanceM)));
 
-            Logger.recordOutput("Vision/"+cameras.get(i).getName()+"/fieldToRobot", inputs.latestFieldToRobot);
+            Logger.recordOutput(
+                    "Vision/" + cameras.get(i).getName() + "/fieldToRobot",
+                    inputs.latestFieldToRobot);
         }
     }
 
@@ -67,11 +66,13 @@ public class VisionLocalizer extends SubsystemBase {
 
     private boolean robotInMidField() {
         return fieldToRobotSupplier.get().getX() > VisionConstants.midfieldLowThreshold
-            && fieldToRobotSupplier.get().getX() < VisionConstants.midfieldHighThreshold;
+                && fieldToRobotSupplier.get().getX() < VisionConstants.midfieldHighThreshold;
     }
 
     /**
-     * This class exists solely because java has no functional interface for a function with 3 inputs
+     * This class exists solely because java has no functional interface for a function with 3
+     * inputs
      */
-    public static record CameraMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> variance) {}
+    public static record CameraMeasurement(
+            Pose2d pose, double timestamp, Matrix<N3, N1> variance) {}
 }

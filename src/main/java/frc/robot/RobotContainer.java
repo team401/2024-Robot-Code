@@ -18,7 +18,6 @@ import frc.robot.subsystems.localization.VisionLocalizer;
 import frc.robot.subsystems.scoring.AimerIOSim;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ShooterIOSim;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -109,6 +108,6 @@ public class RobotContainer {
         }
 
         tagVision.setCameraConsumer(
-            (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
+                (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
     }
 }

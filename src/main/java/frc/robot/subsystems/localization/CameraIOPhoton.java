@@ -1,7 +1,11 @@
 package frc.robot.subsystems.localization;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import frc.robot.Constants.VisionConstants;
+import frc.robot.Constants.VisionConstants.CameraParams;
 import java.util.Optional;
-
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -9,12 +13,6 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
-
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import frc.robot.Constants.VisionConstants;
-import frc.robot.Constants.VisionConstants.CameraParams;
 
 public class CameraIOPhoton implements CameraIO {
     private final PhotonCamera camera;
@@ -26,10 +24,11 @@ public class CameraIOPhoton implements CameraIO {
 
     public CameraIOPhoton(String name, Transform3d robotToCamera) {
         camera = new PhotonCamera(name);
-        poseEstimator = new PhotonPoseEstimator(
-            VisionConstants.fieldLayout,
-            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-            robotToCamera);
+        poseEstimator =
+                new PhotonPoseEstimator(
+                        VisionConstants.fieldLayout,
+                        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                        robotToCamera);
 
         this.name = name;
     }
@@ -55,11 +54,12 @@ public class CameraIOPhoton implements CameraIO {
 
         photonPose.filter(CameraIOPhoton::filterPhotonPose);
 
-        photonPose.ifPresent((pose) -> {
-            inputs.latestFieldToRobot = pose.estimatedPose.toPose2d();
-            inputs.latestTimestampSeconds = this.latestTimestampSeconds;
-            inputs.averageTagDistanceM = calculateAverageTagDistance(pose);
-        });
+        photonPose.ifPresent(
+                (pose) -> {
+                    inputs.latestFieldToRobot = pose.estimatedPose.toPose2d();
+                    inputs.latestTimestampSeconds = this.latestTimestampSeconds;
+                    inputs.averageTagDistanceM = calculateAverageTagDistance(pose);
+                });
     }
 
     @Override
@@ -88,10 +88,13 @@ public class CameraIOPhoton implements CameraIO {
     private static double calculateAverageTagDistance(EstimatedRobotPose pose) {
         double distance = 0.0;
         for (PhotonTrackedTarget target : pose.targetsUsed) {
-            distance += target.getBestCameraToTarget().getTranslation().getDistance(new Translation3d());
+            distance +=
+                    target.getBestCameraToTarget()
+                            .getTranslation()
+                            .getDistance(new Translation3d());
         }
         distance /= pose.targetsUsed.size();
-        
+
         return distance;
     }
 }
