@@ -229,7 +229,7 @@ public final class Constants {
                         DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight);
     }
 
-    public static final class Scoring {
+    public static final class ScoringConstants {
         public static final double aimerkP = 1.0;
         public static final double aimerkI = 0.0;
         public static final double aimerkD = 0.0;
@@ -246,5 +246,16 @@ public final class Constants {
         public static final double shooterkS = 0.0;
         public static final double shooterkV = 0.0;
         public static final double shooterkA = 0.0;
+
+
+        public static final int aimLeftMotorId = 9;
+        public static final int aimRightMotorId = 10;
+
+        public static final int shooterLeftMotorId = 11;
+        public static final int shooterRightMotorId = 12;
+
+        public static final int aimEncoderPort = 0; // TODO: Change
+
+        public static final int kickerMotorId = 13;
     }
 }
