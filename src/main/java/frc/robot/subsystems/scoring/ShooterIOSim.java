@@ -5,21 +5,21 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Constants;
-import frc.robot.Constants.Scoring;
+import frc.robot.Constants.ScoringConstants;
 
 public class ShooterIOSim implements ShooterIO {
     // TODO: Tune this later
     private final FlywheelSim shooterSim = new FlywheelSim(DCMotor.getNeoVortex(1), 1.0, 1.0);
-    private final PIDController shooterController = new PIDController(Scoring.shooterkP, Scoring.shooterkI, Scoring.shooterkD);
-    private final SimpleMotorFeedforward shooterFeedforward = new SimpleMotorFeedforward(Scoring.shooterkS, Scoring.shooterkV, Scoring.shooterkA);
+    private final PIDController shooterController = new PIDController(ScoringConstants.shooterkP, ScoringConstants.shooterkI, ScoringConstants.shooterkD);
+    private final SimpleMotorFeedforward shooterFeedforward = new SimpleMotorFeedforward(ScoringConstants.shooterkS, ScoringConstants.shooterkV, ScoringConstants.shooterkA);
 
     double shooterAppliedVolts = 0.0;
     double shooterGoalVelRPM = 0.0;
     double kickerVolts = 0.0;
 
     @Override
-    public void setShooterVelocityRPM(double vel) {
-        shooterGoalVelRPM = vel;
+    public void setShooterVelocityRPM(double velocity) {
+        shooterGoalVelRPM = velocity;
     }
 
     @Override

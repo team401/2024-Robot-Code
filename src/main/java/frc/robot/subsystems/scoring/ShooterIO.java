@@ -16,7 +16,7 @@ public interface ShooterIO {
 
     public default void updateInputs(ShooterIOInputs inputs) {}
 
-    public default void setShooterVelocityRPM(double vel) {}
+    public default void setShooterVelocityRPM(double velocity) {}
 
     public default void setKickerVolts(double volts) {}
 }
