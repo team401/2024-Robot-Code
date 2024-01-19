@@ -14,20 +14,22 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
 
-public class Localizer extends SubsystemBase {
+public class VisionLocalizer extends SubsystemBase {
     private final List<CameraIO> cameras;
     private final List<CameraIOInputsAutoLogged> cameraInputs = new ArrayList<>();
 
-    private Consumer<CameraData> cameraConsumer;
+    // avoid NullPointerExceptions by setting a default no-op
+    private Consumer<CameraMeasurement> cameraConsumer = (c) -> {};
 
     private Supplier<Pose2d> fieldToRobotSupplier;
 
-    public Localizer(List<CameraIO> cameras) {
+    public VisionLocalizer(List<CameraIO> cameras) {
         this.cameras = cameras;
         for (int i = 0; i < cameras.size(); i++) {
             cameraInputs.add(new CameraIOInputsAutoLogged());
         }
     }
+
 
     @Override
     public void periodic() {
@@ -37,16 +39,16 @@ public class Localizer extends SubsystemBase {
             var inputs = cameraInputs.get(i);
 
             cameraConsumer.accept(
-                new CameraData(
+                new CameraMeasurement(
                     inputs.latestFieldToRobot,
                     inputs.latestTimestampSeconds,
                     cameraUncertainty(inputs.averageTagDistanceM)));
 
-            Logger.recordOutput("Camera"+i+"/fieldToRobot", inputs.latestFieldToRobot);
+            Logger.recordOutput("Vision/"+cameras.get(i).getName()+"/fieldToRobot", inputs.latestFieldToRobot);
         }
     }
 
-    public void setCameraConsumer(Consumer<CameraData> cameraConsumer) {
+    public void setCameraConsumer(Consumer<CameraMeasurement> cameraConsumer) {
         this.cameraConsumer = cameraConsumer;
     }
 
@@ -71,5 +73,5 @@ public class Localizer extends SubsystemBase {
     /**
      * This class exists solely because java has no functional interface for a function with 3 inputs
      */
-    public static record CameraData(Pose2d pose, double timestamp, Matrix<N3, N1> variance) {}
+    public static record CameraMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> variance) {}
 }

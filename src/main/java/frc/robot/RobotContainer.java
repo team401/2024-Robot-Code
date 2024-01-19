@@ -8,11 +8,20 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.TunerConstants;
+import frc.robot.Constants.VisionConstants;
+import frc.robot.Constants.VisionConstants.CameraParams;
 import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.localization.CameraIO;
+import frc.robot.subsystems.localization.CameraIOPhoton;
+import frc.robot.subsystems.localization.VisionLocalizer;
 import frc.robot.subsystems.scoring.AimerIOSim;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ShooterIOSim;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
@@ -20,6 +29,8 @@ public class RobotContainer {
     CommandJoystick leftJoystick = new CommandJoystick(0);
     CommandJoystick rightJoystick = new CommandJoystick(1);
     CommandXboxController controller = new CommandXboxController(2);
+
+    VisionLocalizer tagVision;
 
     CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain;
 
@@ -82,11 +93,22 @@ public class RobotContainer {
         switch (Constants.currentMode) {
             case REAL:
                 scoringSubsystem = new ScoringSubsystem(new ShooterIOSim(), new AimerIOSim());
+
+                List<CameraIO> realCameras = new ArrayList<>();
+                for (CameraParams params : VisionConstants.cameras) {
+                    realCameras.add(CameraIOPhoton.fromCameraParams(params));
+                }
+                tagVision = new VisionLocalizer(realCameras);
                 break;
             case SIM:
                 scoringSubsystem = new ScoringSubsystem(new ShooterIOSim(), new AimerIOSim());
+
+                tagVision = new VisionLocalizer(Collections.emptyList());
                 break;
             case REPLAY:
         }
+
+        tagVision.setCameraConsumer(
+            (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
     }
 }

@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.Constants.VisionConstants.CameraParams;
 
 public class CameraIOPhoton implements CameraIO {
     private final PhotonCamera camera;
@@ -21,12 +22,20 @@ public class CameraIOPhoton implements CameraIO {
 
     private double latestTimestampSeconds = 0.0;
 
+    private String name;
+
     public CameraIOPhoton(String name, Transform3d robotToCamera) {
         camera = new PhotonCamera(name);
         poseEstimator = new PhotonPoseEstimator(
             VisionConstants.fieldLayout,
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             robotToCamera);
+
+        this.name = name;
+    }
+
+    public static CameraIOPhoton fromCameraParams(CameraParams params) {
+        return new CameraIOPhoton(params.name(), params.robotToCamera());
     }
 
     @Override
@@ -51,6 +60,11 @@ public class CameraIOPhoton implements CameraIO {
             inputs.latestTimestampSeconds = this.latestTimestampSeconds;
             inputs.averageTagDistanceM = calculateAverageTagDistance(pose);
         });
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     private static boolean filterPhotonPose(EstimatedRobotPose photonPose) {

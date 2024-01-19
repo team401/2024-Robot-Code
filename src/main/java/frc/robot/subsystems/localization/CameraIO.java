@@ -14,4 +14,7 @@ public interface CameraIO {
     }
 
     public default void updateInputs(CameraIOInputs inputs) {}
+
+    // this value can't be updated by the outside world, so it doesn't count as an input
+    public default String getName() { return ""; }
 }

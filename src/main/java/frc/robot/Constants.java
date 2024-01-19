@@ -1,6 +1,7 @@
 package frc.robot;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -12,6 +13,8 @@ import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
@@ -38,6 +41,7 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
+        // TODO: input field data from the manual
         public static final double fieldLengthM = 69.0;
         public static final double fieldWidthM = 420.0;
 
@@ -55,6 +59,12 @@ public final class Constants {
         public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(1.2, 1.2, 10);
 
         public static final Matrix<N3, N1> driveUncertainty = VecBuilder.fill(0.1, 0.1, 0.1);
+
+        // TODO: set up cameras in PhotonVision
+        public static final List<CameraParams> cameras = List.of(
+            new CameraParams("this isn't a real camera", new Transform3d()));
+
+        public static record CameraParams(String name, Transform3d robotToCamera) {}
     }
 
     public static final class TunerConstants {
