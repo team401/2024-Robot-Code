@@ -1,7 +1,5 @@
 package frc.robot;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -16,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import org.littletonrobotics.junction.Logger;
 
 public class Telemetry {
     private final double maxSpeed;
@@ -104,11 +103,7 @@ public class Telemetry {
         /* Telemeterize the pose */
         Pose2d pose = state.Pose;
         fieldTypePub.set("Field2d");
-        fieldPub.set(new double[] {
-                pose.getX(),
-                pose.getY(),
-                pose.getRotation().getRadians()
-        });
+        fieldPub.set(new double[] {pose.getX(), pose.getY(), pose.getRotation().getRadians()});
 
         Logger.recordOutput("pose/Pose2d", pose);
         // Logger.recordOutput("pose/fieldPose", table.getDoubleArrayTopic("/Pose/robotPose"));

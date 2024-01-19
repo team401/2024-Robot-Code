@@ -9,9 +9,12 @@ import frc.robot.Constants.Scoring;
 
 public class AimerIOSim implements AimerIO {
     // TODO: Tune this later
-    private final SingleJointedArmSim sim = new SingleJointedArmSim(DCMotor.getNeoVortex(2), 1.0, 1.0, 1.0, 0.0, 1.0, true, 0.0);
-    private final PIDController controller = new PIDController(Scoring.aimerkP, Scoring.aimerkI, Scoring.aimerkD);
-    private final ArmFeedforward feedforward = new ArmFeedforward(Scoring.aimerkS, Scoring.aimerkG, Scoring.aimerkV, Scoring.aimerkA);
+    private final SingleJointedArmSim sim =
+            new SingleJointedArmSim(DCMotor.getNeoVortex(2), 1.0, 1.0, 1.0, 0.0, 1.0, true, 0.0);
+    private final PIDController controller =
+            new PIDController(Scoring.aimerkP, Scoring.aimerkI, Scoring.aimerkD);
+    private final ArmFeedforward feedforward =
+            new ArmFeedforward(Scoring.aimerkS, Scoring.aimerkG, Scoring.aimerkV, Scoring.aimerkA);
 
     double goalAngRad = 0.0;
     double appliedVolts = 0.0;
