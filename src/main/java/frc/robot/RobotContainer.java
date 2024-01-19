@@ -109,5 +109,6 @@ public class RobotContainer {
 
         tagVision.setCameraConsumer(
                 (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
+        tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
     }
 }

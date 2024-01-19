@@ -78,7 +78,7 @@ public class CameraIOPhoton implements CameraIO {
 
         Pose3d pose = photonPose.estimatedPose;
         // check that the pose isn't insane
-        if (pose.getZ() > 1 || pose.getZ() < 0.1) {
+        if (pose.getZ() > 1 || pose.getZ() < -0.1) {
             return false;
         }
 

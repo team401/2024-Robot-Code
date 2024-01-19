@@ -138,4 +138,8 @@ public class Telemetry {
     public double getRotationRadians() {
         return robotRotation;
     }
+
+    public Pose2d getFieldToRobot() {
+        return m_lastPose;
+    }
 }

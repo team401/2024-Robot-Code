@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.VisionConstants;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,10 +46,16 @@ public class VisionLocalizer extends SubsystemBase {
                     "Vision/" + cameras.get(i).getName() + "/fieldToRobot",
                     inputs.latestFieldToRobot);
         }
+
+        Logger.recordOutput("Vision/robotInMidField", robotInMidField());
     }
 
     public void setCameraConsumer(Consumer<CameraMeasurement> cameraConsumer) {
         this.cameraConsumer = cameraConsumer;
+    }
+
+    public void setFieldToRobotSupplier(Supplier<Pose2d> fieldToRobotSupplier) {
+        this.fieldToRobotSupplier = fieldToRobotSupplier;
     }
 
     private Matrix<N3, N1> cameraUncertainty(double averageTagDistanceM) {
@@ -65,8 +72,8 @@ public class VisionLocalizer extends SubsystemBase {
     }
 
     private boolean robotInMidField() {
-        return fieldToRobotSupplier.get().getX() > VisionConstants.midfieldLowThreshold
-                && fieldToRobotSupplier.get().getX() < VisionConstants.midfieldHighThreshold;
+        return fieldToRobotSupplier.get().getX() > FieldConstants.midfieldLowThresholdM
+                && fieldToRobotSupplier.get().getX() < FieldConstants.midfieldHighThresholdM;
     }
 
     /**

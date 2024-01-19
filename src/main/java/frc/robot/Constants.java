@@ -4,7 +4,6 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
-import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -12,8 +11,10 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 public final class Constants {
@@ -36,18 +37,17 @@ public final class Constants {
         public static final double deadbandPercent = 0.16;
     }
 
+    public static final class FieldConstants {
+        public static final double lengthM = 16.451;
+        public static final double widthM = 8.211;
+
+        public static final double midfieldLowThresholdM = 5.87;
+        public static final double midfieldHighThresholdM = 10.72;
+    }
+
     public static final class VisionConstants {
-        // TODO: input field data from the manual
-        public static final double fieldLengthM = 69.0;
-        public static final double fieldWidthM = 420.0;
-
-        public static final double midfieldLowThreshold = 69.0;
-        public static final double midfieldHighThreshold = 420.0;
-
-        public static final List<AprilTag> tags = new ArrayList<>();
-
-        public static final AprilTagFieldLayout fieldLayout =
-                new AprilTagFieldLayout(tags, fieldLengthM, fieldWidthM);
+        public static final String tagLayoutName = "2024-WPI";
+        public static final AprilTagFieldLayout fieldLayout = initLayout(tagLayoutName);
 
         public static final double singleTagAmbiguityCutoff = 0.05;
 
@@ -61,6 +61,23 @@ public final class Constants {
                 List.of(new CameraParams("this isn't a real camera", new Transform3d()));
 
         public static record CameraParams(String name, Transform3d robotToCamera) {}
+
+        private static AprilTagFieldLayout initLayout(String name) {
+            AprilTagFieldLayout layout;
+            // AprilTagFieldLayout's constructor thows an IOException, so we must catch it in order
+            // to initialize our layout as a static constant
+            try {
+                layout =
+                        new AprilTagFieldLayout(
+                                Filesystem.getDeployDirectory().getAbsolutePath()
+                                        + "/taglayout/2024-WPI"
+                                        + ".json");
+            } catch (IOException ioe) {
+                // TODO: print a standardized error
+                layout = new AprilTagFieldLayout(Collections.emptyList(), 0.0, 0.0);
+            }
+            return layout;
+        }
     }
 
     public static final class TunerConstants {
