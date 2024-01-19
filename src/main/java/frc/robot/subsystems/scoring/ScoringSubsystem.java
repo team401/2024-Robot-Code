@@ -1,8 +1,9 @@
 package frc.robot.subsystems.scoring;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.sensors.SensorManager;
+import frc.robot.Constants;
 
 public class ScoringSubsystem extends SubsystemBase {
     private final ShooterIO shooterIo;
@@ -11,7 +12,7 @@ public class ScoringSubsystem extends SubsystemBase {
     private final AimerIO aimerIo;
     private final AimerIOInputsAutoLogged aimerInputs = new AimerIOInputsAutoLogged();
 
-    private SensorManager sensors;
+    DigitalInput bannerSensor = new DigitalInput(Constants.SensorConstants.bannerPort);
 
     private final Timer shootTimer = new Timer();
 
@@ -35,10 +36,9 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private ScoringAction action = ScoringAction.WAIT;
 
-    public ScoringSubsystem(ShooterIO shooterIo, AimerIO aimerIo, SensorManager sensors) {
+    public ScoringSubsystem(ShooterIO shooterIo, AimerIO aimerIo) {
         this.shooterIo = shooterIo;
         this.aimerIo = aimerIo;
-        this.sensors = sensors;
     }
 
     public void setAction(ScoringAction action) {
@@ -116,7 +116,7 @@ public class ScoringSubsystem extends SubsystemBase {
     }
 
     private boolean hasNote() {
-        return sensors.hasNote();
+        return bannerSensor.get();
     }
 
     @Override
