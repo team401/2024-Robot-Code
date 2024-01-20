@@ -16,6 +16,7 @@ import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 
 public class RobotContainer {
+    private RobotContainer robotContainer;
     CommandJoystick leftJoystick = new CommandJoystick(0);
     CommandJoystick rightJoystick = new CommandJoystick(1);
     CommandXboxController controller = new CommandXboxController(2);
@@ -28,6 +29,7 @@ public class RobotContainer {
         configureBindings();
         configureSubsystems();
         configureModes();
+        robotContainer = new RobotContainer();
     }
 
     private void configureBindings() {
