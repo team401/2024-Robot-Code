@@ -58,9 +58,18 @@ public final class Constants {
 
         // TODO: set up cameras in PhotonVision
         public static final List<CameraParams> cameras =
-                List.of(new CameraParams("this isn't a real camera", new Transform3d()));
+                List.of(
+                        new CameraParams("FrontLeft", 640, 480, 20, new Transform3d()),
+                        new CameraParams("FrontRight", 640, 480, 20, new Transform3d()),
+                        new CameraParams("BackLeft", 640, 480, 20, new Transform3d()),
+                        new CameraParams("BackRight", 640, 480, 20, new Transform3d()));
 
-        public static record CameraParams(String name, Transform3d robotToCamera) {}
+        public static record CameraParams(
+                String name,
+                int xResolution,
+                int yResolution,
+                int fps,
+                Transform3d robotToCamera) {}
 
         private static AprilTagFieldLayout initLayout(String name) {
             AprilTagFieldLayout layout;
