@@ -39,6 +39,7 @@ public class RobotContainer {
         configureBindings();
         configureSubsystems();
         configureModes();
+        robotContainer = new RobotContainer();
     }
 
     // spotless:off
