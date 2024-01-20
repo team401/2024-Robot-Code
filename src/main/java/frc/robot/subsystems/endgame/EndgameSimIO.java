@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.endgame;
 
 import com.revrobotics.CANSparkMax;
 
@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.EndgameConstants;
 
 
-public class SimIO extends IO {
+public class EndgameSimIO extends EndgameIO {
     Encoder leftEndgameEncoder = new Encoder (0, 1);
     Encoder rightEndgameEncoder = new Encoder (2,3);
     private CANSparkMax leftEndgameMotor, rightEndgameMotor;

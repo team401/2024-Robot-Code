@@ -23,7 +23,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
     @SuppressWarnings("unused")
     private RobotContainer robotContainer;
-    public SimIO simIO = new SimIO();
+    public EndgameSimIO simIO = new EndgameSimIO();
 
     @SuppressWarnings("unused")
     private PowerDistribution pdh;
