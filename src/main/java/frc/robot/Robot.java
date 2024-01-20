@@ -14,7 +14,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.SimIO;
+import frc.robot.subsystems.endgame.EndgameSimIO;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -27,7 +27,7 @@ import frc.robot.subsystems.SimIO;
  */
 public class Robot extends LoggedRobot {
     private RobotContainer robotContainer;
-    public SimIO simIO = new SimIO();
+    public EndgameSimIO simIO = new EndgameSimIO();
 
     @Override
     public void robotInit() {
