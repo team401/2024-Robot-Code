@@ -4,8 +4,18 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 public final class Constants {
     public static final double loopTime = 0.02;
@@ -25,6 +35,58 @@ public final class Constants {
         public static final double MaxAngularRateRadiansPerSec = Math.PI * 2; // 2 PI is one full
         // rotation per second
         public static final double deadbandPercent = 0.16;
+    }
+
+    public static final class FieldConstants {
+        public static final double lengthM = 16.451;
+        public static final double widthM = 8.211;
+
+        public static final double midfieldLowThresholdM = 5.87;
+        public static final double midfieldHighThresholdM = 10.72;
+    }
+
+    public static final class VisionConstants {
+        public static final String tagLayoutName = "2024-WPI";
+        public static final AprilTagFieldLayout fieldLayout = initLayout(tagLayoutName);
+
+        public static final double singleTagAmbiguityCutoff = 0.05;
+
+        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(0.45, 0.45, 1);
+        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(1.2, 1.2, 10);
+
+        public static final Matrix<N3, N1> driveUncertainty = VecBuilder.fill(0.1, 0.1, 0.1);
+
+        // TODO: set up cameras in PhotonVision
+        public static final List<CameraParams> cameras =
+                List.of(
+                        new CameraParams("FrontLeft", 640, 480, 20, new Transform3d()),
+                        new CameraParams("FrontRight", 640, 480, 20, new Transform3d()),
+                        new CameraParams("BackLeft", 640, 480, 20, new Transform3d()),
+                        new CameraParams("BackRight", 640, 480, 20, new Transform3d()));
+
+        public static record CameraParams(
+                String name,
+                int xResolution,
+                int yResolution,
+                int fps,
+                Transform3d robotToCamera) {}
+
+        private static AprilTagFieldLayout initLayout(String name) {
+            AprilTagFieldLayout layout;
+            // AprilTagFieldLayout's constructor thows an IOException, so we must catch it in order
+            // to initialize our layout as a static constant
+            try {
+                layout =
+                        new AprilTagFieldLayout(
+                                Filesystem.getDeployDirectory().getAbsolutePath()
+                                        + "/taglayout/2024-WPI"
+                                        + ".json");
+            } catch (IOException ioe) {
+                // TODO: print a standardized error
+                layout = new AprilTagFieldLayout(Collections.emptyList(), 0.0, 0.0);
+            }
+            return layout;
+        }
     }
 
     public static final class TunerConstants {
