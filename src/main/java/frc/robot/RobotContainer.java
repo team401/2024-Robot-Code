@@ -21,9 +21,6 @@ import frc.robot.subsystems.scoring.ShooterIOSim;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
