@@ -55,9 +55,9 @@ public class ScoringSubsystem extends SubsystemBase {
 
         this.poseSupplier = poseSupplier;
 
-        shooterInterpolated = new InterpolateDouble(ScoringConstants.getAimerMap());
+        shooterInterpolated = new InterpolateDouble(ScoringConstants.getShooterMap());
 
-        aimerInterpolated = new InterpolateDouble(ScoringConstants.getShooterMap());
+        aimerInterpolated = new InterpolateDouble(ScoringConstants.getAimerMap());
     }
 
     public void setAction(ScoringAction action) {

@@ -231,9 +231,9 @@ public final class Constants {
     }
 
     public static final class ScoringConstants {
-        public static final double aimerkP = 5.0;
+        public static final double aimerkP = 6.0;
         public static final double aimerkI = 0.0;
-        public static final double aimerkD = 0.8;
+        public static final double aimerkD = 1.0;
 
         public static final double aimerkS = 0.0;
         public static final double aimerkG = 0.0;
@@ -262,17 +262,17 @@ public final class Constants {
         // Value - Aimer angle in radians
         public static HashMap<Double, Double> getAimerMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
-            map.put(0.0, 0.2);
-            map.put(1.0, 0.4);
-            map.put(2.0, 0.6);
-            map.put(3.0, 0.8);
-            map.put(4.0, 1.0);
-            map.put(5.0, 1.2);
-            map.put(6.0, 1.4);
-            map.put(7.0, 1.6);
-            map.put(8.0, 1.8);
-            map.put(9.0, 1.9);
-            map.put(10.0, 1.95);
+            map.put(0.0, 1.0);
+            map.put(1.0, 0.9);
+            map.put(2.0, 0.85);
+            map.put(3.0, 0.83);
+            map.put(4.0, 0.64);
+            map.put(5.0, 0.59);
+            map.put(6.0, 0.48);
+            map.put(7.0, 0.34);
+            map.put(8.0, 0.27);
+            map.put(9.0, 0.15);
+            map.put(10.0, 0.1);
 
             return map;
         }
@@ -291,7 +291,7 @@ public final class Constants {
             map.put(7.0, 160.0);
             map.put(8.0, 180.0);
             map.put(9.0, 190.0);
-            map.put(10.0, 1.95);
+            map.put(10.0, 200.0);
 
             return map;
         }

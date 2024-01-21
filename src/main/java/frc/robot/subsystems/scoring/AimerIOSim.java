@@ -32,7 +32,7 @@ public class AimerIOSim implements AimerIO {
                     ScoringConstants.aimerkV,
                     ScoringConstants.aimerkA);
     private final TrapezoidProfile profile =
-            new TrapezoidProfile(new TrapezoidProfile.Constraints(0.5, 0.2));
+            new TrapezoidProfile(new TrapezoidProfile.Constraints(0.8, 0.4));
 
     private final Timer timer = new Timer();
 
@@ -70,7 +70,8 @@ public class AimerIOSim implements AimerIO {
         // appliedVolts = controller.calculate(sim.getAngleRads(), goalAngleRad);
         sim.setInputVoltage(appliedVolts);
 
-        inputs.aimGoalAngleRad = goalAngleRad;
+        // inputs.aimGoalAngleRad = goalAngleRad;
+        inputs.aimGoalAngleRad = trapezoidSetpoint.position;
         inputs.aimAngleRad = sim.getAngleRads();
 
         inputs.aimAppliedVolts = appliedVolts;
