@@ -9,11 +9,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.Constants.VisionConstants.CameraParams;
 import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
-import frc.robot.subsystems.localization.CameraIO;
-import frc.robot.subsystems.localization.CameraIOPhoton;
+import frc.robot.subsystems.localization.VisionIOReal;
+import frc.robot.subsystems.localization.VisionIOSim;
 import frc.robot.subsystems.localization.VisionLocalizer;
 import frc.robot.subsystems.scoring.AimerIOSim;
 import frc.robot.subsystems.scoring.AimerIOTalon;
@@ -103,11 +102,7 @@ public class RobotContainer {
                                 new AimerIOTalon(),
                                 driveTelemetry::getFieldToRobot);
 
-                List<CameraIO> realCameras = new ArrayList<>();
-                for (CameraParams params : VisionConstants.cameras) {
-                    realCameras.add(CameraIOPhoton.fromCameraParams(params));
-                }
-                tagVision = new VisionLocalizer(realCameras);
+                tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
                 break;
             case SIM:
                 scoringSubsystem =
@@ -116,9 +111,10 @@ public class RobotContainer {
                                 new AimerIOSim(),
                                 driveTelemetry::getFieldToRobot);
 
-                tagVision = new VisionLocalizer(Collections.emptyList());
+                tagVision = new VisionLocalizer(new VisionIOSim(VisionConstants.cameras));
                 break;
             case REPLAY:
+                break;
         }
 
         tagVision.setCameraConsumer(

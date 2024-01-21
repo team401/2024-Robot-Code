@@ -10,12 +10,8 @@ public interface CameraIO {
         public Pose2d latestFieldToRobot;
         public double latestTimestampSeconds;
         public double averageTagDistanceM;
+        public String name;
     }
 
     public default void updateInputs(CameraIOInputs inputs) {}
-
-    // this value can't be updated by the outside world, so it doesn't count as an input
-    public default String getName() {
-        return "";
-    }
 }

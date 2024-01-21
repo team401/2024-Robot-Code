@@ -7,6 +7,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
@@ -78,16 +79,41 @@ public final class Constants {
         // TODO: set up cameras in PhotonVision
         public static final List<CameraParams> cameras =
                 List.of(
-                        new CameraParams("FrontLeft", 640, 480, 20, new Transform3d()),
-                        new CameraParams("FrontRight", 640, 480, 20, new Transform3d()),
-                        new CameraParams("BackLeft", 640, 480, 20, new Transform3d()),
-                        new CameraParams("BackRight", 640, 480, 20, new Transform3d()));
+                        new CameraParams(
+                                "FrontLeft",
+                                640,
+                                480,
+                                20,
+                                Rotation2d.fromDegrees(70),
+                                new Transform3d()),
+                        new CameraParams(
+                                "FrontRight",
+                                640,
+                                480,
+                                20,
+                                Rotation2d.fromDegrees(70),
+                                new Transform3d()),
+                        new CameraParams(
+                                "BackLeft",
+                                640,
+                                480,
+                                20,
+                                Rotation2d.fromDegrees(70),
+                                new Transform3d()),
+                        new CameraParams(
+                                "BackRight",
+                                640,
+                                480,
+                                20,
+                                Rotation2d.fromDegrees(70),
+                                new Transform3d()));
 
         public static record CameraParams(
                 String name,
                 int xResolution,
                 int yResolution,
                 int fps,
+                Rotation2d fov,
                 Transform3d robotToCamera) {}
 
         private static AprilTagFieldLayout initLayout(String name) {
