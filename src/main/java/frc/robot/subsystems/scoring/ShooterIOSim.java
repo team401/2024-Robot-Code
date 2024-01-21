@@ -10,8 +10,16 @@ import frc.robot.Constants.ScoringConstants;
 public class ShooterIOSim implements ShooterIO {
     // TODO: Tune this later
     private final FlywheelSim shooterSim = new FlywheelSim(DCMotor.getNeoVortex(1), 1.0, 0.1);
-    private final PIDController shooterController = new PIDController(ScoringConstants.shooterkP, ScoringConstants.shooterkI, ScoringConstants.shooterkD);
-    private final SimpleMotorFeedforward shooterFeedforward = new SimpleMotorFeedforward(ScoringConstants.shooterkS, ScoringConstants.shooterkV, ScoringConstants.shooterkA);
+    private final PIDController shooterController =
+            new PIDController(
+                    ScoringConstants.shooterkP,
+                    ScoringConstants.shooterkI,
+                    ScoringConstants.shooterkD);
+    private final SimpleMotorFeedforward shooterFeedforward =
+            new SimpleMotorFeedforward(
+                    ScoringConstants.shooterkS,
+                    ScoringConstants.shooterkV,
+                    ScoringConstants.shooterkA);
 
     double shooterAppliedVolts = 0.0;
     double shooterGoalVelRPM = 0.0;
@@ -31,7 +39,11 @@ public class ShooterIOSim implements ShooterIO {
     public void updateInputs(ShooterIOInputs inputs) {
         shooterSim.update(Constants.loopTime);
 
-        shooterAppliedVolts = shooterFeedforward.calculate(shooterSim.getAngularVelocityRadPerSec()) + shooterController.calculate(shooterSim.getAngularVelocityRadPerSec(), shooterGoalVelRPM * 2.0 * Math.PI / 60.0);
+        shooterAppliedVolts =
+                shooterFeedforward.calculate(shooterSim.getAngularVelocityRadPerSec())
+                        + shooterController.calculate(
+                                shooterSim.getAngularVelocityRadPerSec(),
+                                shooterGoalVelRPM * 2.0 * Math.PI / 60.0);
         shooterSim.setInputVoltage(shooterAppliedVolts);
 
         inputs.shooterVelocityRPM =

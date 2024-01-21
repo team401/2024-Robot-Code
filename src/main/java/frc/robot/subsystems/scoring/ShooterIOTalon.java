@@ -5,7 +5,6 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import frc.robot.Constants.ScoringConstants;
 
@@ -16,7 +15,11 @@ public class ShooterIOTalon implements ShooterIO {
     private final TalonFX shooterRight = new TalonFX(ScoringConstants.shooterRightMotorId);
 
     MotionMagicVelocityVoltage controller = new MotionMagicVelocityVoltage(0).withSlot(0);
-    SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(ScoringConstants.shooterkS, ScoringConstants.shooterkV, ScoringConstants.shooterkA);
+    SimpleMotorFeedforward feedforward =
+            new SimpleMotorFeedforward(
+                    ScoringConstants.shooterkS,
+                    ScoringConstants.shooterkV,
+                    ScoringConstants.shooterkA);
     private final Slot0Configs slot0 = new Slot0Configs();
 
     double goalVelocityRPM = 0.0;

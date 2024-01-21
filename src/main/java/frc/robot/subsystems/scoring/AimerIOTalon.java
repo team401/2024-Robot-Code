@@ -1,18 +1,12 @@
 package frc.robot.subsystems.scoring;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.ControlModeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
-import frc.robot.Constants;
 import frc.robot.Constants.ScoringConstants;
 
 public class AimerIOTalon implements AimerIO {
@@ -21,7 +15,12 @@ public class AimerIOTalon implements AimerIO {
     private final TalonFX armRight = new TalonFX(ScoringConstants.aimRightMotorId);
 
     private final MotionMagicVoltage controller = new MotionMagicVoltage(0).withSlot(0);
-    private final ArmFeedforward feedforward = new ArmFeedforward(ScoringConstants.aimerkS, ScoringConstants.aimerkG, ScoringConstants.aimerkV, ScoringConstants.aimerkA);
+    private final ArmFeedforward feedforward =
+            new ArmFeedforward(
+                    ScoringConstants.aimerkS,
+                    ScoringConstants.aimerkG,
+                    ScoringConstants.aimerkV,
+                    ScoringConstants.aimerkA);
     private final Slot0Configs slot0 = new Slot0Configs();
 
     private final DutyCycleEncoder encoder = new DutyCycleEncoder(ScoringConstants.aimEncoderPort);
@@ -37,7 +36,7 @@ public class AimerIOTalon implements AimerIO {
         slot0.withKP(ScoringConstants.aimerkP);
         slot0.withKI(ScoringConstants.aimerkI);
         slot0.withKD(ScoringConstants.aimerkD);
-        
+
         slot0.withKS(ScoringConstants.aimerkS);
         slot0.withKG(ScoringConstants.aimerkG);
         slot0.withKV(ScoringConstants.aimerkV);
@@ -54,7 +53,8 @@ public class AimerIOTalon implements AimerIO {
 
     @Override
     public void updateInputs(AimerIOInputs inputs) {
-        controller.withFeedForward(feedforward.calculate(goalAngleRad, armLeft.getVelocity().getValueAsDouble()));
+        controller.withFeedForward(
+                feedforward.calculate(goalAngleRad, armLeft.getVelocity().getValueAsDouble()));
 
         armLeft.setControl(controller.withPosition(goalAngleRad).withSlot(0));
 

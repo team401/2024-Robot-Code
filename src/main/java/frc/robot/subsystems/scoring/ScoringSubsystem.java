@@ -1,11 +1,16 @@
 package frc.robot.subsystems.scoring;
 
-import org.littletonrobotics.junction.Logger;
-
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.ScoringConstants;
+import frc.robot.utils.InterpolateDouble;
+import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class ScoringSubsystem extends SubsystemBase {
     private final ShooterIO shooterIo;
@@ -17,6 +22,11 @@ public class ScoringSubsystem extends SubsystemBase {
     DigitalInput bannerSensor = new DigitalInput(Constants.SensorConstants.bannerPort);
 
     private final Timer shootTimer = new Timer();
+
+    private final Supplier<Pose2d> poseSupplier;
+
+    private final InterpolateDouble shooterInterpolated;
+    private final InterpolateDouble aimerInterpolated;
 
     private enum ScoringState {
         IDLE,
@@ -39,9 +49,15 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private ScoringAction action = ScoringAction.WAIT;
 
-    public ScoringSubsystem(ShooterIO shooterIo, AimerIO aimerIo) {
+    public ScoringSubsystem(ShooterIO shooterIo, AimerIO aimerIo, Supplier<Pose2d> poseSupplier) {
         this.shooterIo = shooterIo;
         this.aimerIo = aimerIo;
+
+        this.poseSupplier = poseSupplier;
+
+        shooterInterpolated = new InterpolateDouble(ScoringConstants.getAimerMap());
+
+        aimerInterpolated = new InterpolateDouble(ScoringConstants.getShooterMap());
     }
 
     public void setAction(ScoringAction action) {
@@ -73,12 +89,16 @@ public class ScoringSubsystem extends SubsystemBase {
     }
 
     private void prime() {
-        shooterIo.setShooterVelocityRPM(100);
-        // aimerIo.setAimAngleRad(findShootAngleRads());
-        aimerIo.setAimAngleRad(1);
+        double distancetoGoal = findDistanceToGoal();
+        shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
+        aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal));
 
-        boolean shooterReady = Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM) < 10; // TODO: Tune
-        boolean armReady = Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad) < 0.01; // TODO: Tune
+        boolean shooterReady =
+                Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM)
+                        < 10; // TODO: Tune
+        boolean armReady =
+                Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad)
+                        < 0.01; // TODO: Tune
         boolean driveReady = true; // TODO: Add drive ready
         boolean hasNote = hasNote();
 
@@ -108,10 +128,24 @@ public class ScoringSubsystem extends SubsystemBase {
         state = ScoringState.IDLE;
     }
 
-    private double findShootAngleRads() { // TODO: Interpolate
+    private double findDistanceToGoal() {
+        Translation2d speakerPose =
+                false // TODO: CHANGE THIS URGENT
+                        // DriverStation.getAlliance().get() == DriverStation.Alliance.Red
+                        ? new Translation2d(
+                                Units.inchesToMeters(652.73), Units.inchesToMeters(218.42))
+                        : new Translation2d(
+                                Units.inchesToMeters(-1.5),
+                                Units.inchesToMeters(218.42)); // TODO: Might have to change these
+        Pose2d robotPose = poseSupplier.get();
         double distancetoGoal =
-                Math.sqrt(Math.pow(Math.sqrt(Math.pow(1, 2) + Math.pow(1, 2)), 2) + Math.pow(1, 2));
-        return Math.atan2(distancetoGoal, 1);
+                Math.sqrt(
+                        Math.pow(Math.abs(robotPose.getX() - speakerPose.getX()), 2)
+                                + Math.pow(
+                                        Math.abs(robotPose.getY() - speakerPose.getY()),
+                                        2)); // TODO: Change to be more accurate
+        Logger.recordOutput("scoring/distance", distancetoGoal);
+        return distancetoGoal;
     }
 
     public boolean hasNote() {

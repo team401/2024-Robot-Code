@@ -12,10 +12,27 @@ import frc.robot.Constants.ScoringConstants;
 
 public class AimerIOSim implements AimerIO {
     // TODO: Tune this later
-    private final SingleJointedArmSim sim = new SingleJointedArmSim(DCMotor.getNeoVortex(2), 1.0, SingleJointedArmSim.estimateMOI(0.5, 4.5), 0.5, 0.0, 2.0, false, 0.0);
-    private final PIDController controller = new PIDController(ScoringConstants.aimerkP, ScoringConstants.aimerkI, ScoringConstants.aimerkD);
-    private final ArmFeedforward feedforward = new ArmFeedforward(ScoringConstants.aimerkS, ScoringConstants.aimerkG, ScoringConstants.aimerkV, ScoringConstants.aimerkA);
-    private final TrapezoidProfile profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(0.5, 0.2));
+    private final SingleJointedArmSim sim =
+            new SingleJointedArmSim(
+                    DCMotor.getNeoVortex(2),
+                    1.0,
+                    SingleJointedArmSim.estimateMOI(0.5, 4.5),
+                    0.5,
+                    0.0,
+                    2.0,
+                    false,
+                    0.0);
+    private final PIDController controller =
+            new PIDController(
+                    ScoringConstants.aimerkP, ScoringConstants.aimerkI, ScoringConstants.aimerkD);
+    private final ArmFeedforward feedforward =
+            new ArmFeedforward(
+                    ScoringConstants.aimerkS,
+                    ScoringConstants.aimerkG,
+                    ScoringConstants.aimerkV,
+                    ScoringConstants.aimerkA);
+    private final TrapezoidProfile profile =
+            new TrapezoidProfile(new TrapezoidProfile.Constraints(0.5, 0.2));
 
     private final Timer timer = new Timer();
 
@@ -41,9 +58,15 @@ public class AimerIOSim implements AimerIO {
     public void updateInputs(AimerIOInputs inputs) {
         sim.update(Constants.loopTime);
 
-        State trapezoidSetpoint = profile.calculate(timer.get(), new State(initialAngle, initialVelocity), new State(goalAngleRad, 0));
+        State trapezoidSetpoint =
+                profile.calculate(
+                        timer.get(),
+                        new State(initialAngle, initialVelocity),
+                        new State(goalAngleRad, 0));
 
-        appliedVolts = feedforward.calculate(trapezoidSetpoint.position, trapezoidSetpoint.velocity) + controller.calculate(sim.getAngleRads(), trapezoidSetpoint.position);
+        appliedVolts =
+                feedforward.calculate(trapezoidSetpoint.position, trapezoidSetpoint.velocity)
+                        + controller.calculate(sim.getAngleRads(), trapezoidSetpoint.position);
         // appliedVolts = controller.calculate(sim.getAngleRads(), goalAngleRad);
         sim.setInputVoltage(appliedVolts);
 

@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public final class Constants {
@@ -239,7 +240,6 @@ public final class Constants {
         public static final double aimerkV = 0.0;
         public static final double aimerkA = 0.0;
 
-
         public static final double shooterkP = 10.0;
         public static final double shooterkI = 0.0;
         public static final double shooterkD = 0.0;
@@ -247,7 +247,6 @@ public final class Constants {
         public static final double shooterkS = 0.0;
         public static final double shooterkV = 0.0;
         public static final double shooterkA = 0.0;
-
 
         public static final int aimLeftMotorId = 9;
         public static final int aimRightMotorId = 10;
@@ -258,5 +257,43 @@ public final class Constants {
         public static final int aimEncoderPort = 0; // TODO: Change
 
         public static final int kickerMotorId = 13;
+
+        // Key - Distance in meters
+        // Value - Aimer angle in radians
+        public static HashMap<Double, Double> getAimerMap() { // TODO: Find this
+            HashMap<Double, Double> map = new HashMap<Double, Double>();
+            map.put(0.0, 0.2);
+            map.put(1.0, 0.4);
+            map.put(2.0, 0.6);
+            map.put(3.0, 0.8);
+            map.put(4.0, 1.0);
+            map.put(5.0, 1.2);
+            map.put(6.0, 1.4);
+            map.put(7.0, 1.6);
+            map.put(8.0, 1.8);
+            map.put(9.0, 1.9);
+            map.put(10.0, 1.95);
+
+            return map;
+        }
+
+        // Key - Distance in meters
+        // Value - Shooter RPM
+        public static HashMap<Double, Double> getShooterMap() { // TODO: Find this
+            HashMap<Double, Double> map = new HashMap<Double, Double>();
+            map.put(0.0, 20.0);
+            map.put(1.0, 40.0);
+            map.put(2.0, 60.0);
+            map.put(3.0, 80.0);
+            map.put(4.0, 100.0);
+            map.put(5.0, 120.0);
+            map.put(6.0, 140.0);
+            map.put(7.0, 160.0);
+            map.put(8.0, 180.0);
+            map.put(9.0, 190.0);
+            map.put(10.0, 1.95);
+
+            return map;
+        }
     }
 }

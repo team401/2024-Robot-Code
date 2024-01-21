@@ -16,8 +16,10 @@ import frc.robot.subsystems.localization.CameraIO;
 import frc.robot.subsystems.localization.CameraIOPhoton;
 import frc.robot.subsystems.localization.VisionLocalizer;
 import frc.robot.subsystems.scoring.AimerIOSim;
+import frc.robot.subsystems.scoring.AimerIOTalon;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ShooterIOSim;
+import frc.robot.subsystems.scoring.ShooterIOTalon;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,24 +45,69 @@ public class RobotContainer {
 
     private void configureBindings() {
         // spotless:off
-        drivetrain.setDefaultCommand(new DriveWithJoysticks(drivetrain,
-        () -> -controller.getLeftY(),
-        () -> -controller.getLeftX(),
-        () -> -controller.getRightX(),
-        () -> true,
-        () -> false));
+        drivetrain.setDefaultCommand(
+                new DriveWithJoysticks(
+                        drivetrain,
+                        () -> -controller.getLeftY(),
+                        () -> -controller.getLeftX(),
+                        () -> -controller.getRightX(),
+                        () -> true,
+                        () -> false));
 
-        controller.a().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.INTAKE)));
+        // spotless:off .a()
+        controller
+                .button(12)
+                .onTrue(
+                        new InstantCommand(
+                                () ->
+                                        scoringSubsystem.setAction(
+                                                ScoringSubsystem.ScoringAction.INTAKE)));
 
-        controller.b().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.AIM)));
+        // spotless:off .b()
+        controller
+                .button(11)
+                .onTrue(
+                        new InstantCommand(
+                                () ->
+                                        scoringSubsystem.setAction(
+                                                ScoringSubsystem.ScoringAction.AIM)));
 
-        controller.x().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT)))
-            .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.AIM)));
+        // spotless:off .x()
+        controller
+                .button(10)
+                .onTrue(
+                        new InstantCommand(
+                                () ->
+                                        scoringSubsystem.setAction(
+                                                ScoringSubsystem.ScoringAction.SHOOT)))
+                .onFalse(
+                        new InstantCommand(
+                                () ->
+                                        scoringSubsystem.setAction(
+                                                ScoringSubsystem.ScoringAction.AIM)));
 
-        controller.y().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.ENDGAME)))
-            .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+        // spotless:off .y()
+        controller
+                .button(9)
+                .onTrue(
+                        new InstantCommand(
+                                () ->
+                                        scoringSubsystem.setAction(
+                                                ScoringSubsystem.ScoringAction.ENDGAME)))
+                .onFalse(
+                        new InstantCommand(
+                                () ->
+                                        scoringSubsystem.setAction(
+                                                ScoringSubsystem.ScoringAction.WAIT)));
 
-        controller.start().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+        // spotless:off .start()
+        controller
+                .button(4)
+                .onTrue(
+                        new InstantCommand(
+                                () ->
+                                        scoringSubsystem.setAction(
+                                                ScoringSubsystem.ScoringAction.WAIT)));
     }
 
     private void configureModes() {}
@@ -74,7 +121,11 @@ public class RobotContainer {
 
         switch (Constants.currentMode) {
             case REAL:
-                scoringSubsystem = new ScoringSubsystem(new ShooterIOSim(), new AimerIOSim());
+                scoringSubsystem =
+                        new ScoringSubsystem(
+                                new ShooterIOTalon(),
+                                new AimerIOTalon(),
+                                driveTelemetry::getFieldToRobot);
 
                 List<CameraIO> realCameras = new ArrayList<>();
                 for (CameraParams params : VisionConstants.cameras) {
@@ -83,7 +134,11 @@ public class RobotContainer {
                 tagVision = new VisionLocalizer(realCameras);
                 break;
             case SIM:
-                scoringSubsystem = new ScoringSubsystem(new ShooterIOSim(), new AimerIOSim());
+                scoringSubsystem =
+                        new ScoringSubsystem(
+                                new ShooterIOSim(),
+                                new AimerIOSim(),
+                                driveTelemetry::getFieldToRobot);
 
                 tagVision = new VisionLocalizer(Collections.emptyList());
                 break;
