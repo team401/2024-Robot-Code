@@ -1,5 +1,7 @@
 package frc.robot.subsystems.scoring;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,8 +22,9 @@ public class ScoringSubsystem extends SubsystemBase {
         IDLE,
         INTAKE,
         PRIME,
+        AMP_PRIME,
         SHOOT,
-        ENDGAME
+        ENDGAME,
     }
 
     public enum ScoringAction {
@@ -50,12 +53,12 @@ public class ScoringSubsystem extends SubsystemBase {
         shooterIo.setShooterVelocityRPM(0);
         shooterIo.setKickerVolts(0);
 
-        if (hasNote() && action == ScoringAction.INTAKE) {
+        if (!hasNote() && action == ScoringAction.INTAKE) {
             state = ScoringState.INTAKE;
         } else if (action == ScoringAction.AIM) {
             state = ScoringState.PRIME;
         } else if (action == ScoringAction.ENDGAME) {
-            state = ScoringState.ENDGAME;
+            // state = ScoringState.ENDGAME; TODO: Later
         }
     }
 
@@ -71,15 +74,11 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private void prime() {
         shooterIo.setShooterVelocityRPM(100);
-        aimerIo.setAimAngleRad(findShootAngleRads());
+        // aimerIo.setAimAngleRad(findShootAngleRads());
+        aimerIo.setAimAngleRad(1);
 
-        boolean shooterReady =
-                Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM)
-                        < 10; // TODO:
-        // Tune
-        boolean armReady =
-                Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad) < 0.1; // TODO:
-        // Tune
+        boolean shooterReady = Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM) < 10; // TODO: Tune
+        boolean armReady = Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad) < 0.01; // TODO: Tune
         boolean driveReady = true; // TODO: Add drive ready
         boolean hasNote = hasNote();
 
@@ -115,14 +114,20 @@ public class ScoringSubsystem extends SubsystemBase {
         return Math.atan2(distancetoGoal, 1);
     }
 
-    private boolean hasNote() {
+    public boolean hasNote() {
         return bannerSensor.get();
     }
 
     @Override
     public void periodic() {
+        Logger.recordOutput("scoring/State", state.toString());
+        Logger.recordOutput("scoring/Action", action.toString());
+
         shooterIo.updateInputs(shooterInputs);
         aimerIo.updateInputs(aimerInputs);
+
+        Logger.processInputs("scoring/shooter", shooterInputs);
+        Logger.processInputs("scoring/aimer", aimerInputs);
 
         switch (state) {
             case IDLE:
