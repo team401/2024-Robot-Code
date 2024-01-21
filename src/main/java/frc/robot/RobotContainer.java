@@ -39,17 +39,17 @@ public class RobotContainer {
         () -> true,
         () -> false));
 
-        controller.a().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.INTAKE)))
-            .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+        controller.a().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.INTAKE)));
 
-        controller.b().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.AIM)))
-            .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+        controller.b().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.AIM)));
 
         controller.x().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT)))
-            .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+            .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.AIM)));
 
         controller.y().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.ENDGAME)))
             .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+
+        controller.start().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
     }
 
 

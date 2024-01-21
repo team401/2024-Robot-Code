@@ -147,9 +147,9 @@ public final class Constants {
     }
 
     public static final class ScoringConstants {
-        public static final double aimerkP = 1.0;
+        public static final double aimerkP = 5.0;
         public static final double aimerkI = 0.0;
-        public static final double aimerkD = 0.0;
+        public static final double aimerkD = 0.8;
 
         public static final double aimerkS = 0.0;
         public static final double aimerkG = 0.0;
@@ -157,7 +157,7 @@ public final class Constants {
         public static final double aimerkA = 0.0;
 
 
-        public static final double shooterkP = 1.0;
+        public static final double shooterkP = 10.0;
         public static final double shooterkI = 0.0;
         public static final double shooterkD = 0.0;
 
