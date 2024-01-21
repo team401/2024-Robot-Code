@@ -55,33 +55,33 @@ public class RobotContainer {
                         () -> false));
 
         // spotless:off
-        controller
-                .a().onTrue(new InstantCommand(
-                    () ->scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.INTAKE)));
+        controller.a()
+            .onTrue(new InstantCommand(
+                () ->scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.INTAKE)));
 
         // spotless:off
-        controller
-                .b().onTrue(new InstantCommand(
-                    () ->scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.AIM)));
+        controller.b()
+            .onTrue(new InstantCommand(
+                () ->scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.AIM)));
 
         // spotless:off
-        controller
-                .x().onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT)))
-                .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.AIM)));
+        controller.x()
+            .onTrue(new InstantCommand(
+                () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT)))
+            .onFalse(new InstantCommand(
+                () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.AIM)));
 
         // spotless:off
-        controller
-                .y().onTrue(new InstantCommand(
-                    () ->scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.ENDGAME)))
-                .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+        controller.y()
+            .onTrue(new InstantCommand(
+                () ->scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.ENDGAME)))
+            .onFalse(new InstantCommand(
+                () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
 
         // spotless:off
-        controller
-                .start().onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+        controller.start()
+            .onTrue(new InstantCommand(
+                () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
     }
 
     private void configureModes() {}
