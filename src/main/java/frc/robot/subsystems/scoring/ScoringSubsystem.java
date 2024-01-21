@@ -96,13 +96,13 @@ public class ScoringSubsystem extends SubsystemBase {
         boolean shooterReady =
                 Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM)
                         < 10; // TODO: Tune
-        boolean armReady =
+        boolean aimReady =
                 Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad)
                         < 0.01; // TODO: Tune
         boolean driveReady = true; // TODO: Add drive ready
         boolean hasNote = hasNote();
 
-        boolean primeReady = shooterReady && armReady && driveReady && hasNote;
+        boolean primeReady = shooterReady && aimReady && driveReady && hasNote;
 
         if (action == ScoringAction.WAIT) {
             state = ScoringState.IDLE;

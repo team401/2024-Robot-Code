@@ -11,8 +11,8 @@ import frc.robot.Constants.ScoringConstants;
 
 public class AimerIOTalon implements AimerIO {
     // TODO: Tune this later
-    private final TalonFX armLeft = new TalonFX(ScoringConstants.aimLeftMotorId);
-    private final TalonFX armRight = new TalonFX(ScoringConstants.aimRightMotorId);
+    private final TalonFX aimerLeft = new TalonFX(ScoringConstants.aimLeftMotorId);
+    private final TalonFX aimerRight = new TalonFX(ScoringConstants.aimRightMotorId);
 
     private final MotionMagicVoltage controller = new MotionMagicVoltage(0).withSlot(0);
     private final ArmFeedforward feedforward =
@@ -28,10 +28,10 @@ public class AimerIOTalon implements AimerIO {
     double goalAngleRad = 0.0;
 
     public AimerIOTalon() {
-        armRight.setControl(new Follower(ScoringConstants.aimLeftMotorId, true));
+        aimerRight.setControl(new Follower(ScoringConstants.aimLeftMotorId, true));
 
-        armLeft.setNeutralMode(NeutralModeValue.Brake);
-        armRight.setNeutralMode(NeutralModeValue.Brake);
+        aimerLeft.setNeutralMode(NeutralModeValue.Brake);
+        aimerRight.setNeutralMode(NeutralModeValue.Brake);
 
         slot0.withKP(ScoringConstants.aimerkP);
         slot0.withKI(ScoringConstants.aimerkI);
@@ -42,8 +42,8 @@ public class AimerIOTalon implements AimerIO {
         slot0.withKV(ScoringConstants.aimerkV);
         slot0.withKA(ScoringConstants.aimerkA);
 
-        armLeft.getConfigurator().apply(slot0);
-        armRight.getConfigurator().apply(slot0);
+        aimerLeft.getConfigurator().apply(slot0);
+        aimerRight.getConfigurator().apply(slot0);
     }
 
     @Override
@@ -54,14 +54,14 @@ public class AimerIOTalon implements AimerIO {
     @Override
     public void updateInputs(AimerIOInputs inputs) {
         controller.withFeedForward(
-                feedforward.calculate(goalAngleRad, armLeft.getVelocity().getValueAsDouble()));
+                feedforward.calculate(goalAngleRad, aimerLeft.getVelocity().getValueAsDouble()));
 
-        armLeft.setControl(controller.withPosition(goalAngleRad).withSlot(0));
+        aimerLeft.setControl(controller.withPosition(goalAngleRad).withSlot(0));
 
         inputs.aimGoalAngleRad = goalAngleRad;
         inputs.aimAngleRad = encoder.getAbsolutePosition() * 2 * Math.PI;
 
-        inputs.aimAppliedVolts = armLeft.getMotorVoltage().getValueAsDouble();
-        inputs.aimCurrentAmps = armLeft.getSupplyCurrent().getValueAsDouble();
+        inputs.aimAppliedVolts = aimerLeft.getMotorVoltage().getValueAsDouble();
+        inputs.aimCurrentAmps = aimerLeft.getSupplyCurrent().getValueAsDouble();
     }
 }
