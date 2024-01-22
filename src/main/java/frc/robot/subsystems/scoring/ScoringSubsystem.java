@@ -2,11 +2,11 @@ package frc.robot.subsystems.scoring;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.utils.InterpolateDouble;
 import java.util.function.Supplier;
@@ -95,14 +95,14 @@ public class ScoringSubsystem extends SubsystemBase {
 
         boolean shooterReady =
                 Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM)
-                        < 10; // TODO: Tune
+                        < ScoringConstants.shooterVelocityRPMMargin; // TODO: Tune
         boolean aimReady =
                 Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad)
-                        < 0.01; // TODO: Tune
+                        < ScoringConstants.aimAngleRadiansMargin; // TODO: Tune
         boolean driveReady = true; // TODO: Add drive ready
-        boolean hasNote = hasNote();
+        boolean notePresent = hasNote();
 
-        boolean primeReady = shooterReady && aimReady && driveReady && hasNote;
+        boolean primeReady = shooterReady && aimReady && driveReady && notePresent;
 
         if (action == ScoringAction.WAIT) {
             state = ScoringState.IDLE;
@@ -129,27 +129,20 @@ public class ScoringSubsystem extends SubsystemBase {
     }
 
     private double findDistanceToGoal() {
-        Translation2d speakerPose =
-                false // TODO: CHANGE THIS URGENT
-                        // DriverStation.getAlliance().get() == DriverStation.Alliance.Red
-                        ? new Translation2d(
-                                Units.inchesToMeters(652.73), Units.inchesToMeters(218.42))
-                        : new Translation2d(
-                                Units.inchesToMeters(-1.5),
-                                Units.inchesToMeters(218.42)); // TODO: Might have to change these
+        Translation2d speakerPose = FieldConstants.speakerPose;
         Pose2d robotPose = poseSupplier.get();
         double distancetoGoal =
                 Math.sqrt(
                         Math.pow(Math.abs(robotPose.getX() - speakerPose.getX()), 2)
                                 + Math.pow(
                                         Math.abs(robotPose.getY() - speakerPose.getY()),
-                                        2)); // TODO: Change to be more accurate
+                                        2));
         Logger.recordOutput("scoring/distance", distancetoGoal);
         return distancetoGoal;
     }
 
     public boolean hasNote() {
-        return bannerSensor.get();
+        return shooterInputs.bannerSensor;
     }
 
     @Override

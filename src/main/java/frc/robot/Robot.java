@@ -39,7 +39,7 @@ public class Robot extends LoggedRobot {
             // Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs") TODO:
             // Add back later
             Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-            new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+            pdh = new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
         } else if (Constants.currentMode == Constants.Mode.SIM) {
             // Logger.addDataReceiver(new WPILOGWriter("logs/")); TODO: Add back later
             Logger.addDataReceiver(new NT4Publisher());

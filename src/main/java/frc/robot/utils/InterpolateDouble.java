@@ -17,16 +17,18 @@ public class InterpolateDouble {
         double lowerKey = 0;
         double upperKey = 0;
         for (double k : map.keySet()) {
-            if (k < key && k > lowerKey) {
+            if (k < key) {
                 lowerKey = k;
-            } else if (k > key && k < upperKey) {
+            } else {
                 upperKey = k;
+                break;
             }
         }
 
         double lowerValue = map.get(lowerKey);
         double upperValue = map.get(upperKey);
 
-        return lowerValue + (key - lowerKey) * (upperValue - lowerValue) / (upperKey - lowerKey);
+        double t = (key - lowerKey) / (upperKey - lowerKey);
+        return lowerValue * (1.0 - t) + t * upperValue;
     }
 }

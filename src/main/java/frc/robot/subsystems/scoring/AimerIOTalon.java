@@ -1,11 +1,11 @@
 package frc.robot.subsystems.scoring;
 
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.robot.Constants.ScoringConstants;
 
@@ -15,12 +15,7 @@ public class AimerIOTalon implements AimerIO {
     private final TalonFX aimerRight = new TalonFX(ScoringConstants.aimRightMotorId);
 
     private final MotionMagicVoltage controller = new MotionMagicVoltage(0).withSlot(0);
-    private final ArmFeedforward feedforward =
-            new ArmFeedforward(
-                    ScoringConstants.aimerkS,
-                    ScoringConstants.aimerkG,
-                    ScoringConstants.aimerkV,
-                    ScoringConstants.aimerkA);
+    private final MotionMagicConfigs configs = new MotionMagicConfigs();
     private final Slot0Configs slot0 = new Slot0Configs();
 
     private final DutyCycleEncoder encoder = new DutyCycleEncoder(ScoringConstants.aimEncoderPort);
@@ -42,8 +37,14 @@ public class AimerIOTalon implements AimerIO {
         slot0.withKV(ScoringConstants.aimerkV);
         slot0.withKA(ScoringConstants.aimerkA);
 
+        configs.withMotionMagicAcceleration(ScoringConstants.aimAcceleration);
+        configs.withMotionMagicCruiseVelocity(ScoringConstants.aimCruiseVelocity);
+
         aimerLeft.getConfigurator().apply(slot0);
         aimerRight.getConfigurator().apply(slot0);
+
+        aimerLeft.getConfigurator().apply(configs);
+        aimerRight.getConfigurator().apply(configs);
     }
 
     @Override
@@ -53,10 +54,7 @@ public class AimerIOTalon implements AimerIO {
 
     @Override
     public void updateInputs(AimerIOInputs inputs) {
-        controller.withFeedForward(
-                feedforward.calculate(goalAngleRad, aimerLeft.getVelocity().getValueAsDouble()));
-
-        aimerLeft.setControl(controller.withPosition(goalAngleRad).withSlot(0));
+        aimerLeft.setControl(controller.withPosition(goalAngleRad));
 
         inputs.aimGoalAngleRad = goalAngleRad;
         inputs.aimAngleRad = encoder.getAbsolutePosition() * 2 * Math.PI;

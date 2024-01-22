@@ -8,6 +8,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
@@ -29,6 +30,10 @@ public final class Constants {
         REPLAY
     }
 
+    public static final class ConversionConstants {
+        public static final double kRadiansPerSecondToRPM = 60.0 / (2.0 * Math.PI);
+    }
+
     public static final class CANDevices {}
 
     public static final class SensorConstants {
@@ -48,6 +53,15 @@ public final class Constants {
 
         public static final double midfieldLowThresholdM = 5.87;
         public static final double midfieldHighThresholdM = 10.72;
+
+        public static final Translation2d speakerPose =
+                false // TODO: CHANGE THIS URGENT
+                        // DriverStation.getAlliance().get() == DriverStation.Alliance.Red
+                        ? new Translation2d(
+                                Units.inchesToMeters(652.73), Units.inchesToMeters(218.42))
+                        : new Translation2d(
+                                Units.inchesToMeters(-1.5),
+                                Units.inchesToMeters(218.42)); // TODO: Might have to change these
     }
 
     public static final class VisionConstants {
@@ -258,6 +272,16 @@ public final class Constants {
 
         public static final int kickerMotorId = 13;
 
+        public static final double aimAcceleration = 1;
+        public static final double aimCruiseVelocity = 1;
+
+        public static final double shooterAcceleration = 1;
+        public static final double shooterJerk = 1;
+
+        public static final double shooterVelocityRPMMargin = 0;
+        public static final double aimAngleRadiansMargin = 0;
+
+        // WARNING - These must by monotonically increasing
         // Key - Distance in meters
         // Value - Aimer angle in radians
         public static HashMap<Double, Double> getAimerMap() { // TODO: Find this
