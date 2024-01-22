@@ -105,8 +105,7 @@ public class Telemetry {
         fieldTypePub.set("Field2d");
         fieldPub.set(new double[] {pose.getX(), pose.getY(), pose.getRotation().getRadians()});
 
-        Logger.recordOutput("pose/Pose2d", pose);
-        // Logger.recordOutput("pose/fieldPose", table.getDoubleArrayTopic("/Pose/robotPose"));
+        Logger.recordOutput("Telemetry/fieldToRobot", pose);
 
         robotRotation = pose.getRotation().getRadians();
 

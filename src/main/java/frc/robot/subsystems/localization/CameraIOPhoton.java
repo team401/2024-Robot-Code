@@ -6,7 +6,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.VisionConstants.CameraParams;
 import java.util.Optional;
-import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -59,13 +58,7 @@ public class CameraIOPhoton implements CameraIO {
 
     @Override
     public void updateInputs(CameraIOInputs inputs) {
-        inputs.name = this.name;
-
-        if (!camera.isConnected()) {
-            Logger.recordOutput("Vision/" + camera.getName() + "/Connected", false);
-            return;
-        }
-        Logger.recordOutput("Vision/" + camera.getName() + "/Connected", true);
+        inputs.connected = camera.isConnected();
 
         PhotonPipelineResult result = camera.getLatestResult();
         if (result.getTimestampSeconds() == latestTimestampSeconds) {

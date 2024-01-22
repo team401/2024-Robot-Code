@@ -111,14 +111,17 @@ public class RobotContainer {
                                 new AimerIOSim(),
                                 driveTelemetry::getFieldToRobot);
 
-                tagVision = new VisionLocalizer(new VisionIOSim(VisionConstants.cameras));
+                tagVision =
+                        new VisionLocalizer(
+                                new VisionIOSim(
+                                        VisionConstants.cameras, driveTelemetry::getFieldToRobot));
                 break;
             case REPLAY:
                 break;
         }
 
-        tagVision.setCameraConsumer(
-                (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
-        tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
+        // tagVision.setCameraConsumer(
+        //         (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
+        // tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
     }
 }

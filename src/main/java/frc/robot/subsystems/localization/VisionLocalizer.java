@@ -19,7 +19,7 @@ public class VisionLocalizer extends SubsystemBase {
     // avoid NullPointerExceptions by setting a default no-op
     private Consumer<CameraMeasurement> cameraConsumer = (c) -> {};
 
-    private Supplier<Pose2d> fieldToRobotSupplier;
+    private Supplier<Pose2d> fieldToRobotSupplier = () -> new Pose2d();
 
     public VisionLocalizer(VisionIO io) {
         this.io = io;
@@ -33,9 +33,6 @@ public class VisionLocalizer extends SubsystemBase {
                             inputs.latestFieldToRobot,
                             inputs.latestTimestampSeconds,
                             cameraUncertainty(inputs.averageTagDistanceM)));
-
-            Logger.recordOutput(
-                    "Vision/" + inputs.name + "/fieldToRobot", inputs.latestFieldToRobot);
         }
 
         Logger.recordOutput("Vision/robotInMidField", robotInMidField());
