@@ -6,18 +6,19 @@ import java.util.HashMap;
 
 public class InterpolateDouble {
     private HashMap<Double, Double> map;
+    private ArrayList<Double> sortedKeys;
 
     public InterpolateDouble(HashMap<Double, Double> map) {
         this.map = map;
+
+        sortedKeys = new ArrayList<Double>(map.keySet());
+        Collections.sort(sortedKeys);
     }
 
     public double getValue(double key) {
         if (map.containsKey(key)) {
             return map.get(key);
         }
-
-        ArrayList<Double> sortedKeys = new ArrayList<Double>(map.keySet());
-        Collections.sort(sortedKeys);
 
         double lowerKey = 0;
         double upperKey = 0;
