@@ -1,5 +1,7 @@
 package frc.robot.utils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class InterpolateDouble {
@@ -14,9 +16,12 @@ public class InterpolateDouble {
             return map.get(key);
         }
 
+        ArrayList<Double> sortedKeys = new ArrayList<Double>(map.keySet());
+        Collections.sort(sortedKeys);
+
         double lowerKey = 0;
         double upperKey = 0;
-        for (double k : map.keySet()) {
+        for (double k : sortedKeys) {
             if (k < key) {
                 lowerKey = k;
             } else {

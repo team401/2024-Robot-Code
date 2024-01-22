@@ -281,7 +281,7 @@ public final class Constants {
         public static final double shooterVelocityRPMMargin = 0;
         public static final double aimAngleRadiansMargin = 0;
 
-        // WARNING - These must by monotonically increasing
+        // NOTE - These should be monotonically increasing
         // Key - Distance in meters
         // Value - Aimer angle in radians
         public static HashMap<Double, Double> getAimerMap() { // TODO: Find this
