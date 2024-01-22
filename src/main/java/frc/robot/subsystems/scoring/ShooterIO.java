@@ -12,11 +12,13 @@ public interface ShooterIO {
 
         public double kickerAppliedVolts = 0.0;
         public double kickerCurrentAmps = 0.0;
+
+        public boolean bannerSensor = false;
     }
 
     public default void updateInputs(ShooterIOInputs inputs) {}
 
-    public default void setShooterVelocityRPM(double vel) {}
+    public default void setShooterVelocityRPM(double velocity) {}
 
     public default void setKickerVolts(double volts) {}
 }

@@ -1,7 +1,14 @@
 package frc.robot.subsystems.scoring;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.ScoringConstants;
+import frc.robot.utils.InterpolateDouble;
+import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class ScoringSubsystem extends SubsystemBase {
     private final ShooterIO shooterIo;
@@ -12,12 +19,18 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private final Timer shootTimer = new Timer();
 
+    private final Supplier<Pose2d> poseSupplier;
+
+    private final InterpolateDouble shooterInterpolated;
+    private final InterpolateDouble aimerInterpolated;
+
     private enum ScoringState {
         IDLE,
         INTAKE,
         PRIME,
+        AMP_PRIME,
         SHOOT,
-        ENDGAME
+        ENDGAME,
     }
 
     public enum ScoringAction {
@@ -32,9 +45,15 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private ScoringAction action = ScoringAction.WAIT;
 
-    public ScoringSubsystem(ShooterIO shooterIo, AimerIO aimerIo) {
+    public ScoringSubsystem(ShooterIO shooterIo, AimerIO aimerIo, Supplier<Pose2d> poseSupplier) {
         this.shooterIo = shooterIo;
         this.aimerIo = aimerIo;
+
+        this.poseSupplier = poseSupplier;
+
+        shooterInterpolated = new InterpolateDouble(ScoringConstants.getShooterMap());
+
+        aimerInterpolated = new InterpolateDouble(ScoringConstants.getAimerMap());
     }
 
     public void setAction(ScoringAction action) {
@@ -46,12 +65,12 @@ public class ScoringSubsystem extends SubsystemBase {
         shooterIo.setShooterVelocityRPM(0);
         shooterIo.setKickerVolts(0);
 
-        if (true && action == ScoringAction.INTAKE) { // TODO: Banner sensor NOT triggered
+        if (!hasNote() && action == ScoringAction.INTAKE) {
             state = ScoringState.INTAKE;
         } else if (action == ScoringAction.AIM) {
             state = ScoringState.PRIME;
         } else if (action == ScoringAction.ENDGAME) {
-            state = ScoringState.ENDGAME;
+            // state = ScoringState.ENDGAME; TODO: Later
         }
     }
 
@@ -60,26 +79,26 @@ public class ScoringSubsystem extends SubsystemBase {
         shooterIo.setShooterVelocityRPM(-10);
         shooterIo.setKickerVolts(-1);
 
-        if (true || action == ScoringAction.WAIT) { // TODO: Banner sensor triggered
+        if (hasNote() || action == ScoringAction.WAIT) {
             state = ScoringState.IDLE;
         }
     }
 
     private void prime() {
-        shooterIo.setShooterVelocityRPM(100);
-        aimerIo.setAimAngleRad(findShootAngleRads());
+        double distancetoGoal = findDistanceToGoal();
+        shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
+        aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal));
 
         boolean shooterReady =
                 Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM)
-                        < 10; // TODO:
-        // Tune
-        boolean armReady =
-                Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad) < 0.1; // TODO:
-        // Tune
+                        < ScoringConstants.shooterVelocityRPMMargin; // TODO: Tune
+        boolean aimReady =
+                Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad)
+                        < ScoringConstants.aimAngleRadiansMargin; // TODO: Tune
         boolean driveReady = true; // TODO: Add drive ready
-        boolean hasNote = true; // TODO: Add banner sensor
+        boolean notePresent = hasNote();
 
-        boolean primeReady = shooterReady && armReady && driveReady && hasNote;
+        boolean primeReady = shooterReady && aimReady && driveReady && notePresent;
 
         if (action == ScoringAction.WAIT) {
             state = ScoringState.IDLE;
@@ -105,16 +124,31 @@ public class ScoringSubsystem extends SubsystemBase {
         state = ScoringState.IDLE;
     }
 
-    private double findShootAngleRads() { // TODO: Interpolate
+    private double findDistanceToGoal() {
+        Translation2d speakerPose = FieldConstants.speakerPose;
+        Pose2d robotPose = poseSupplier.get();
         double distancetoGoal =
-                Math.sqrt(Math.pow(Math.sqrt(Math.pow(1, 2) + Math.pow(1, 2)), 2) + Math.pow(1, 2));
-        return Math.atan2(distancetoGoal, 1);
+                Math.sqrt(
+                        Math.pow(Math.abs(robotPose.getX() - speakerPose.getX()), 2)
+                                + Math.pow(Math.abs(robotPose.getY() - speakerPose.getY()), 2));
+        Logger.recordOutput("scoring/distance", distancetoGoal);
+        return distancetoGoal;
+    }
+
+    public boolean hasNote() {
+        return shooterInputs.bannerSensor;
     }
 
     @Override
     public void periodic() {
+        Logger.recordOutput("scoring/State", state.toString());
+        Logger.recordOutput("scoring/Action", action.toString());
+
         shooterIo.updateInputs(shooterInputs);
         aimerIo.updateInputs(aimerInputs);
+
+        Logger.processInputs("scoring/shooter", shooterInputs);
+        Logger.processInputs("scoring/aimer", aimerInputs);
 
         switch (state) {
             case IDLE:

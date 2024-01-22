@@ -8,6 +8,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
@@ -15,6 +16,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public final class Constants {
@@ -28,7 +30,15 @@ public final class Constants {
         REPLAY
     }
 
+    public static final class ConversionConstants {
+        public static final double kRadiansPerSecondToRPM = 60.0 / (2.0 * Math.PI);
+    }
+
     public static final class CANDevices {}
+
+    public static final class SensorConstants {
+        public static final int bannerPort = 1; // TODO: Change this
+    }
 
     public static final class DriveConstants {
         public static final double MaxSpeedMetPerSec = 6;
@@ -43,6 +53,15 @@ public final class Constants {
 
         public static final double midfieldLowThresholdM = 5.87;
         public static final double midfieldHighThresholdM = 10.72;
+
+        public static final Translation2d speakerPose =
+                false // TODO: CHANGE THIS URGENT
+                        // DriverStation.getAlliance().get() == DriverStation.Alliance.Red
+                        ? new Translation2d(
+                                Units.inchesToMeters(652.73), Units.inchesToMeters(218.42))
+                        : new Translation2d(
+                                Units.inchesToMeters(-1.5),
+                                Units.inchesToMeters(218.42)); // TODO: Might have to change these
     }
 
     public static final class VisionConstants {
@@ -225,22 +244,80 @@ public final class Constants {
                         DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight);
     }
 
-    public static final class Scoring {
-        public static final double aimerkP = 1.0;
+    public static final class ScoringConstants {
+        public static final double aimerkP = 6.0;
         public static final double aimerkI = 0.0;
-        public static final double aimerkD = 0.0;
+        public static final double aimerkD = 1.0;
 
         public static final double aimerkS = 0.0;
         public static final double aimerkG = 0.0;
         public static final double aimerkV = 0.0;
         public static final double aimerkA = 0.0;
 
-        public static final double shooterkP = 1.0;
+        public static final double shooterkP = 10.0;
         public static final double shooterkI = 0.0;
         public static final double shooterkD = 0.0;
 
         public static final double shooterkS = 0.0;
         public static final double shooterkV = 0.0;
         public static final double shooterkA = 0.0;
+
+        public static final int aimLeftMotorId = 9;
+        public static final int aimRightMotorId = 10;
+
+        public static final int shooterLeftMotorId = 11;
+        public static final int shooterRightMotorId = 12;
+
+        public static final int aimEncoderPort = 0; // TODO: Change
+
+        public static final int kickerMotorId = 13;
+
+        public static final double aimAcceleration = 1;
+        public static final double aimCruiseVelocity = 1;
+
+        public static final double shooterAcceleration = 1;
+        public static final double shooterJerk = 1;
+
+        public static final double shooterVelocityRPMMargin = 0;
+        public static final double aimAngleRadiansMargin = 0;
+
+        // NOTE - These should be monotonically increasing
+        // Key - Distance in meters
+        // Value - Aimer angle in radians
+        public static HashMap<Double, Double> getAimerMap() { // TODO: Find this
+            HashMap<Double, Double> map = new HashMap<Double, Double>();
+            map.put(0.0, 1.0);
+            map.put(1.0, 0.9);
+            map.put(2.0, 0.85);
+            map.put(3.0, 0.83);
+            map.put(4.0, 0.64);
+            map.put(5.0, 0.59);
+            map.put(6.0, 0.48);
+            map.put(7.0, 0.34);
+            map.put(8.0, 0.27);
+            map.put(9.0, 0.15);
+            map.put(10.0, 0.1);
+
+            return map;
+        }
+
+        // Key - Distance in meters
+        // Value - Shooter RPM
+        public static HashMap<Double, Double> getShooterMap() { // TODO: Find this
+            HashMap<Double, Double> map = new HashMap<Double, Double>();
+            map.put(0.0, 20.0);
+            map.put(1.0, 40.0);
+            map.put(2.0, 60.0);
+            map.put(3.0, 80.0);
+            map.put(4.0, 100.0);
+            map.put(5.0, 120.0);
+            map.put(6.0, 140.0);
+            map.put(7.0, 160.0);
+            map.put(8.0, 180.0);
+            map.put(9.0, 190.0);
+            map.put(10.0, 200.0);
+
+            return map;
+        }
     }
 }
