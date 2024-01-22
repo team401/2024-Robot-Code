@@ -134,9 +134,7 @@ public class ScoringSubsystem extends SubsystemBase {
         double distancetoGoal =
                 Math.sqrt(
                         Math.pow(Math.abs(robotPose.getX() - speakerPose.getX()), 2)
-                                + Math.pow(
-                                        Math.abs(robotPose.getY() - speakerPose.getY()),
-                                        2));
+                                + Math.pow(Math.abs(robotPose.getY() - speakerPose.getY()), 2));
         Logger.recordOutput("scoring/distance", distancetoGoal);
         return distancetoGoal;
     }
