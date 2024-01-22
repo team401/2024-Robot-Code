@@ -30,6 +30,12 @@ public class Intake extends SubsystemBase {
             case FEEDING:
                 feeding();
                 break;
+            case HOLDING:
+                holding();
+                break;
+            case PASSING:
+                passing();
+                break;
         }
 
         Logger.recordOutput("Intake/running", inputs.backMotorVoltage != 0.0);
@@ -45,7 +51,6 @@ public class Intake extends SubsystemBase {
 
     private void idle() {
         if (shouldBeRunning) {
-            // TODO: if the shooter has a note, don't intake
             state = State.SEEKING;
             io.setIntakeVoltage(5);
         }
@@ -55,19 +60,39 @@ public class Intake extends SubsystemBase {
         if (inputs.backMotorCurrent > 20) {
             state = State.FEEDING;
             io.setIntakeVoltage(2);
+            io.setBeltVolatge(2);
         }
     }
 
     private void feeding() {
         if (inputs.backMotorCurrent < 5) {
-            state = State.IDLE;
+            state = State.HOLDING;
             io.setIntakeVoltage(0);
+            io.setBeltVolatge(0);
         }
     }
 
+    private void holding() {
+        // TODO: interact with shooter
+        /* 
+         * if the shooter is ready to take a note, start the belt and transition
+         * to passing.
+         */
+    }
+
+    private void passing() {
+        // TODO: interact with shooter
+        /*
+         * if the shooter has the note (banner sensor), stop the belt and
+         * return to idle.
+         */
+    }
+
     private enum State {
-        IDLE,
-        SEEKING,
-        FEEDING
+        IDLE, // do nothing
+        SEEKING, // running intake wheels in search of a note
+        FEEDING, // taking in a note and passing it to the belt
+        HOLDING, // holding a note in the belt until the shooter can take it
+        PASSING // moving the belt to pass a note to the shooter
     }
 }
