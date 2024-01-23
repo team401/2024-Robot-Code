@@ -11,10 +11,10 @@ public class HoodIOSim implements HoodIO {
             new SingleJointedArmSim(
                     DCMotor.getNeoVortex(1),
                     1.0,
-                    SingleJointedArmSim.estimateMOI(0.1, 0.1),
+                    SingleJointedArmSim.estimateMOI(0.1, 1),
                     0.1,
                     0.0,
-                    2.0,
+                    1.0,
                     false,
                     0.0);
     private final PIDController controller =

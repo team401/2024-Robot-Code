@@ -2,7 +2,12 @@ package frc.robot.subsystems.scoring;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ScoringConstants;
@@ -27,21 +32,31 @@ public class ScoringSubsystem extends SubsystemBase {
     private final InterpolateDouble shooterInterpolated;
     private final InterpolateDouble aimerInterpolated;
 
+    private final Mechanism2d mechanism = new Mechanism2d(2.2, 1.2);
+    private final MechanismRoot2d rootMechanism = mechanism.getRoot("scoring", 1.1, 0.1);
+    private final MechanismLigament2d aimMechanism =
+            rootMechanism.append(new MechanismLigament2d("aimer", 1.0, 0.0));
+    private final MechanismLigament2d hoodMechanism =
+            aimMechanism.append(
+                    new MechanismLigament2d("hood", 0.1, 0.0, 1.0, new Color8Bit(0, 200, 50)));
+
     private enum ScoringState {
         IDLE,
         INTAKE,
         PRIME,
         AMP_PRIME,
         SHOOT,
-        ENDGAME,
+        AMP_SHOOT,
+        ENDGAME
     }
 
     public enum ScoringAction {
+        WAIT,
         INTAKE,
         AIM,
-        AMP_SCORE,
+        AMP_AIM,
         SHOOT,
-        WAIT,
+        AMP_SHOOT,
         ENDGAME
     }
 
@@ -70,12 +85,13 @@ public class ScoringSubsystem extends SubsystemBase {
         aimerIo.setAimAngleRad(0);
         shooterIo.setShooterVelocityRPM(0);
         shooterIo.setKickerVolts(0);
+        hoodIo.setHoodAngleRad(0);
 
         if (!hasNote() && action == ScoringAction.INTAKE) {
             state = ScoringState.INTAKE;
         } else if (action == ScoringAction.AIM) {
             state = ScoringState.PRIME;
-        } else if (action == ScoringAction.AMP_SCORE) {
+        } else if (action == ScoringAction.AMP_AIM) {
             state = ScoringState.AMP_PRIME;
         } else if (action == ScoringAction.ENDGAME) {
             // state = ScoringState.ENDGAME; TODO: Later
@@ -83,7 +99,14 @@ public class ScoringSubsystem extends SubsystemBase {
     }
 
     private void intake() {
-        aimerIo.setAimAngleRad(0);
+        double closestAngleRad = aimerInputs.aimAngleRad;
+        if (!canIntake()) {
+            closestAngleRad =
+                    aimerInputs.aimAngleRad < Math.PI / 2 - ScoringConstants.intakeAngleTolerance
+                            ? Math.PI - ScoringConstants.intakeAngleTolerance
+                            : Math.PI + ScoringConstants.intakeAngleTolerance;
+        }
+        aimerIo.setAimAngleRad(closestAngleRad);
         shooterIo.setShooterVelocityRPM(-10);
         shooterIo.setKickerVolts(-1);
         hoodIo.setHoodAngleRad(0);
@@ -121,8 +144,8 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private void ampPrime() {
         shooterIo.setShooterVelocityRPM(ScoringConstants.shooterAmpVelocityRPM);
-        aimerIo.setAimAngleRad(Math.PI);
-        hoodIo.setHoodAngleRad(Math.PI / 2);
+        aimerIo.setAimAngleRad(1);
+        hoodIo.setHoodAngleRad(1);
 
         boolean shooterReady =
                 Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM)
@@ -141,7 +164,7 @@ public class ScoringSubsystem extends SubsystemBase {
         if (action == ScoringAction.WAIT) {
             state = ScoringState.IDLE;
         } else if (action == ScoringAction.SHOOT && primeReady) {
-            state = ScoringState.SHOOT;
+            state = ScoringState.AMP_SHOOT;
 
             shootTimer.reset();
             shootTimer.start();
@@ -153,6 +176,16 @@ public class ScoringSubsystem extends SubsystemBase {
 
         if (shootTimer.get() > 0.5) { // TODO: Tune time
             state = ScoringState.PRIME;
+
+            shootTimer.stop();
+        }
+    }
+
+    private void ampShoot() {
+        shooterIo.setKickerVolts(5);
+
+        if (shootTimer.get() > 0.5) { // TODO: Tune time
+            state = ScoringState.AMP_PRIME;
 
             shootTimer.stop();
         }
@@ -177,6 +210,11 @@ public class ScoringSubsystem extends SubsystemBase {
         return shooterInputs.bannerSensor;
     }
 
+    public boolean canIntake() {
+        return Math.abs(aimerInputs.aimAngleRad - Math.PI / 2)
+                < ScoringConstants.intakeAngleTolerance;
+    }
+
     @Override
     public void periodic() {
         Logger.recordOutput("scoring/State", state.toString());
@@ -189,6 +227,10 @@ public class ScoringSubsystem extends SubsystemBase {
         Logger.processInputs("scoring/shooter", shooterInputs);
         Logger.processInputs("scoring/aimer", aimerInputs);
         Logger.processInputs("scoring/hood", hoodInputs);
+
+        aimMechanism.setAngle(Units.radiansToDegrees(aimerInputs.aimAngleRad));
+        hoodMechanism.setAngle(-Units.radiansToDegrees(hoodInputs.hoodAngleRad));
+        Logger.recordOutput("scoring/mechanism2d", mechanism);
 
         switch (state) {
             case IDLE:
@@ -205,6 +247,9 @@ public class ScoringSubsystem extends SubsystemBase {
                 break;
             case SHOOT:
                 shoot();
+                break;
+            case AMP_SHOOT:
+                ampShoot();
                 break;
             case ENDGAME:
                 endgame(); // TODO: Later

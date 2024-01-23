@@ -85,7 +85,7 @@ public class RobotContainer {
         controller.back()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AMP_SCORE)));
+                        ScoringSubsystem.ScoringAction.AMP_AIM)));
 
         controller.start()
                 .onTrue(new InstantCommand(
