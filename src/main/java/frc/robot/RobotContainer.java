@@ -17,6 +17,8 @@ import frc.robot.subsystems.localization.CameraIOPhoton;
 import frc.robot.subsystems.localization.VisionLocalizer;
 import frc.robot.subsystems.scoring.AimerIOSim;
 import frc.robot.subsystems.scoring.AimerIOTalon;
+import frc.robot.subsystems.scoring.HoodIOSim;
+import frc.robot.subsystems.scoring.HoodIOVortex;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ShooterIOSim;
 import frc.robot.subsystems.scoring.ShooterIOTalon;
@@ -79,6 +81,11 @@ public class RobotContainer {
                 .onFalse(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.WAIT)));
+        
+        controller.back()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.AMP_SCORE)));
 
         controller.start()
                 .onTrue(new InstantCommand(
@@ -101,6 +108,7 @@ public class RobotContainer {
                         new ScoringSubsystem(
                                 new ShooterIOTalon(),
                                 new AimerIOTalon(),
+                                new HoodIOVortex(),
                                 driveTelemetry::getFieldToRobot);
 
                 List<CameraIO> realCameras = new ArrayList<>();
@@ -114,6 +122,7 @@ public class RobotContainer {
                         new ScoringSubsystem(
                                 new ShooterIOSim(),
                                 new AimerIOSim(),
+                                new HoodIOSim(),
                                 driveTelemetry::getFieldToRobot);
 
                 tagVision = new VisionLocalizer(Collections.emptyList());

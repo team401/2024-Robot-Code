@@ -278,8 +278,17 @@ public final class Constants {
         public static final double shooterAcceleration = 1;
         public static final double shooterJerk = 1;
 
-        public static final double shooterVelocityRPMMargin = 0;
-        public static final double aimAngleRadiansMargin = 0;
+        public static final double shooterVelocityRPMMargin = 10;
+        public static final double aimAngleRadiansMargin = Math.PI / 100;
+
+        public static final int hoodId = 14;
+
+        public static final double hoodkP = 0.1;
+        public static final double hoodkI = 0.0;
+        public static final double hoodkD = 0.0;
+
+        public static final double shooterAmpVelocityRPM = 10;
+        public static final double hoodAngleRadiansMargin = Math.PI / 100;
 
         // NOTE - These should be monotonically increasing
         // Key - Distance in meters

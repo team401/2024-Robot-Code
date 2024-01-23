@@ -17,6 +17,9 @@ public class ScoringSubsystem extends SubsystemBase {
     private final AimerIO aimerIo;
     private final AimerIOInputsAutoLogged aimerInputs = new AimerIOInputsAutoLogged();
 
+    private final HoodIO hoodIo;
+    private final HoodIOInputsAutoLogged hoodInputs = new HoodIOInputsAutoLogged();
+
     private final Timer shootTimer = new Timer();
 
     private final Supplier<Pose2d> poseSupplier;
@@ -36,6 +39,7 @@ public class ScoringSubsystem extends SubsystemBase {
     public enum ScoringAction {
         INTAKE,
         AIM,
+        AMP_SCORE,
         SHOOT,
         WAIT,
         ENDGAME
@@ -45,9 +49,11 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private ScoringAction action = ScoringAction.WAIT;
 
-    public ScoringSubsystem(ShooterIO shooterIo, AimerIO aimerIo, Supplier<Pose2d> poseSupplier) {
+    public ScoringSubsystem(
+            ShooterIO shooterIo, AimerIO aimerIo, HoodIO hoodIo, Supplier<Pose2d> poseSupplier) {
         this.shooterIo = shooterIo;
         this.aimerIo = aimerIo;
+        this.hoodIo = hoodIo;
 
         this.poseSupplier = poseSupplier;
 
@@ -69,6 +75,8 @@ public class ScoringSubsystem extends SubsystemBase {
             state = ScoringState.INTAKE;
         } else if (action == ScoringAction.AIM) {
             state = ScoringState.PRIME;
+        } else if (action == ScoringAction.AMP_SCORE) {
+            state = ScoringState.AMP_PRIME;
         } else if (action == ScoringAction.ENDGAME) {
             // state = ScoringState.ENDGAME; TODO: Later
         }
@@ -78,6 +86,7 @@ public class ScoringSubsystem extends SubsystemBase {
         aimerIo.setAimAngleRad(0);
         shooterIo.setShooterVelocityRPM(-10);
         shooterIo.setKickerVolts(-1);
+        hoodIo.setHoodAngleRad(0);
 
         if (hasNote() || action == ScoringAction.WAIT) {
             state = ScoringState.IDLE;
@@ -99,6 +108,35 @@ public class ScoringSubsystem extends SubsystemBase {
         boolean notePresent = hasNote();
 
         boolean primeReady = shooterReady && aimReady && driveReady && notePresent;
+
+        if (action == ScoringAction.WAIT) {
+            state = ScoringState.IDLE;
+        } else if (action == ScoringAction.SHOOT && primeReady) {
+            state = ScoringState.SHOOT;
+
+            shootTimer.reset();
+            shootTimer.start();
+        }
+    }
+
+    private void ampPrime() {
+        shooterIo.setShooterVelocityRPM(ScoringConstants.shooterAmpVelocityRPM);
+        aimerIo.setAimAngleRad(Math.PI);
+        hoodIo.setHoodAngleRad(Math.PI / 2);
+
+        boolean shooterReady =
+                Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM)
+                        < ScoringConstants.shooterVelocityRPMMargin; // TODO: Tune
+        boolean aimReady =
+                Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad)
+                        < ScoringConstants.aimAngleRadiansMargin; // TODO: Tune
+        boolean hoodReady =
+                Math.abs(hoodInputs.hoodAngleRad - hoodInputs.hoodGoalAngleRad)
+                        < ScoringConstants.hoodAngleRadiansMargin; // TODO: Tune
+        boolean driveReady = true; // TODO: Add drive ready
+        boolean notePresent = hasNote();
+
+        boolean primeReady = shooterReady && aimReady && hoodReady && driveReady && notePresent;
 
         if (action == ScoringAction.WAIT) {
             state = ScoringState.IDLE;
@@ -146,9 +184,11 @@ public class ScoringSubsystem extends SubsystemBase {
 
         shooterIo.updateInputs(shooterInputs);
         aimerIo.updateInputs(aimerInputs);
+        hoodIo.updateInputs(hoodInputs);
 
         Logger.processInputs("scoring/shooter", shooterInputs);
         Logger.processInputs("scoring/aimer", aimerInputs);
+        Logger.processInputs("scoring/hood", hoodInputs);
 
         switch (state) {
             case IDLE:
@@ -159,6 +199,9 @@ public class ScoringSubsystem extends SubsystemBase {
                 break;
             case PRIME:
                 prime();
+                break;
+            case AMP_PRIME:
+                ampPrime();
                 break;
             case SHOOT:
                 shoot();
