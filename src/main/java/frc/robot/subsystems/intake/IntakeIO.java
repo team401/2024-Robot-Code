@@ -20,5 +20,5 @@ public interface IntakeIO {
 
     public default void setIntakeVoltage(double volts) {}
 
-    public default void setBeltVolatge(double volts) {}
+    public default void setBeltVoltage(double volts) {}
 }
