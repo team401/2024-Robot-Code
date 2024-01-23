@@ -1,6 +1,7 @@
 package frc.robot.subsystems.intake;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -9,6 +10,8 @@ public class IntakeSubsystem extends SubsystemBase {
     private IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
     private State state = State.IDLE;
+
+    private BooleanSupplier scorerWantsNote = () -> false;
 
     private boolean shouldBeRunning = false;
 
@@ -40,6 +43,10 @@ public class IntakeSubsystem extends SubsystemBase {
         Logger.recordOutput("intake/belting", inputs.beltMotorVoltage != 0.0);
 
         Logger.recordOutput("intake/state", state.toString());
+    }
+
+    public void setScoringSupplier(BooleanSupplier scorerWantsNote) {
+        this.scorerWantsNote = scorerWantsNote;
     }
 
     public void run(boolean shouldBeRunning) {
@@ -78,17 +85,19 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     private void passing() {
-        // TODO: interact with shooter
-        /*
-         * If the shooter is ready to take a note, move the belt. When we don't
-         * have the note anymore, stop and jump to IDLE.
-         */
+        if (scorerWantsNote.getAsBoolean()) {
+            io.setBeltVoltage(2);
+        }
+        if (inputs.beltMotorCurrent < 5) {
+            state = State.IDLE;
+            io.setBeltVoltage(0);
+        }
     }
 
     private enum State {
         IDLE, // do nothing
         SEEKING, // running intake wheels in search of a note
-        FEEDING, // taking in a note and pass it to the belt
+        FEEDING, // taking in a note and passing it to the belt
         PASSING // move the belt to pass the note to the shooter when its ready
     }
 }

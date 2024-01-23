@@ -366,6 +366,8 @@ public final class Constants {
         public static final double aimMaxAngleRadians = Math.PI / 2;
 
         public static final double timeToPutAimDown = 2;
+        public static final double maxAimIntake = 0.0;
+        public static final double minAimIntake = 0.0;
 
         // NOTE - These should be monotonically increasing
         // Key - Distance in meters

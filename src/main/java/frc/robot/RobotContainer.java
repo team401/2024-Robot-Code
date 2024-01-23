@@ -17,10 +17,10 @@ import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.endgame.EndgameSimIO;
 import frc.robot.subsystems.endgame.EndgameSparkMaxIO;
 import frc.robot.subsystems.endgame.EndgameSubsystem;
-import frc.robot.subsystems.localization.VisionIOReal;
-import frc.robot.subsystems.localization.VisionIOSim;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.localization.VisionIOReal;
+import frc.robot.subsystems.localization.VisionIOSim;
 import frc.robot.subsystems.localization.VisionLocalizer;
 import frc.robot.subsystems.scoring.AimerIOSim;
 import frc.robot.subsystems.scoring.AimerIOTalon;
@@ -169,6 +169,12 @@ public class RobotContainer {
         drivetrain.setPoseSupplier(driveTelemetry::getFieldToRobot);
         drivetrain.setSpeakerSupplier(this::getFieldToSpeaker);
         Commands.run(driveTelemetry::logDataSynchronously).ignoringDisable(true).schedule();
+
+        intake.setScoringSupplier(scoringSubsystem::canIntake);
+
+        tagVision.setCameraConsumer(
+                (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
+        tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
     }
 
     public void enabledInit() {
