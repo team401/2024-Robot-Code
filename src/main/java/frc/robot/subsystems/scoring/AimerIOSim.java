@@ -80,8 +80,8 @@ public class AimerIOSim implements AimerIO {
         // appliedVolts = controller.calculate(sim.getAngleRads(), goalAngleRad);
         sim.setInputVoltage(appliedVolts);
 
-        // inputs.aimGoalAngleRad = goalAngleRad;
-        inputs.aimGoalAngleRad = trapezoidSetpoint.position;
+        inputs.aimGoalAngleRad = goalAngleRad;
+        // inputs.aimGoalAngleRad = trapezoidSetpoint.position;
         inputs.aimAngleRad = sim.getAngleRads();
 
         inputs.aimAppliedVolts = appliedVolts;

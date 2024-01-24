@@ -290,7 +290,7 @@ public final class Constants {
         public static final double shooterAmpVelocityRPM = 10;
         public static final double hoodAngleRadiansMargin = Math.PI / 100;
 
-        public static final double intakeAngleTolerance = Math.PI / 2;
+        public static final double intakeAngleTolerance = 0.1;
 
         // NOTE - These should be monotonically increasing
         // Key - Distance in meters

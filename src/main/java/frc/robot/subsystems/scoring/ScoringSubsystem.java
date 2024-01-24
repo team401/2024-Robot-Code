@@ -56,7 +56,6 @@ public class ScoringSubsystem extends SubsystemBase {
         AIM,
         AMP_AIM,
         SHOOT,
-        AMP_SHOOT,
         ENDGAME
     }
 
@@ -102,16 +101,16 @@ public class ScoringSubsystem extends SubsystemBase {
     }
 
     private void intake() {
-        double closestAngleRad = aimerInputs.aimAngleRad;
-        if (!canIntake()) {
-            closestAngleRad =
+        if (canIntake()) {
+            aimerIo.setAimAngleRad(aimerInputs.aimAngleRad);
+        } else {
+            double closestAngleRad =
                     aimerInputs.aimAngleRad < Math.PI / 2 - ScoringConstants.intakeAngleTolerance
                             ? Math.PI - ScoringConstants.intakeAngleTolerance
                             : Math.PI + ScoringConstants.intakeAngleTolerance;
+            aimerIo.setAimAngleRad(closestAngleRad);
         }
-        aimerIo.setAimAngleRad(closestAngleRad);
-        shooterIo.setShooterVelocityRPM(-10);
-        shooterIo.setKickerVolts(-1);
+        shooterIo.setKickerVolts(0);
         hoodIo.setHoodAngleRad(0);
 
         if (hasNote() || action == ScoringAction.WAIT) {
@@ -136,7 +135,7 @@ public class ScoringSubsystem extends SubsystemBase {
 
         boolean primeReady = shooterReady && aimReady && driveReady && notePresent;
 
-        if (action == ScoringAction.WAIT) {
+        if (action != ScoringAction.SHOOT && action != ScoringAction.AIM) {
             state = ScoringState.IDLE;
         } else if (action == ScoringAction.SHOOT && primeReady) {
             state = ScoringState.SHOOT;
@@ -165,7 +164,7 @@ public class ScoringSubsystem extends SubsystemBase {
 
         boolean primeReady = shooterReady && aimReady && hoodReady && driveReady && notePresent;
 
-        if (action == ScoringAction.WAIT) {
+        if (action != ScoringAction.SHOOT && action != ScoringAction.AMP_AIM) {
             state = ScoringState.IDLE;
         } else if (action == ScoringAction.SHOOT && primeReady) {
             state = ScoringState.AMP_SHOOT;
