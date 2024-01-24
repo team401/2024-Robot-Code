@@ -14,7 +14,7 @@ public class HoodIOSim implements HoodIO {
                     SingleJointedArmSim.estimateMOI(0.1, 1),
                     0.1,
                     0.0,
-                    1.0,
+                    Math.PI,
                     false,
                     0.0);
     private final PIDController controller =

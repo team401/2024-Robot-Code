@@ -15,7 +15,7 @@ public class AimerIOSim implements AimerIO {
     private final SingleJointedArmSim sim =
             new SingleJointedArmSim(
                     DCMotor.getNeoVortex(2),
-                    1.0,
+                    1.5,
                     SingleJointedArmSim.estimateMOI(0.5, 4.5),
                     0.5,
                     0.0,
@@ -32,7 +32,7 @@ public class AimerIOSim implements AimerIO {
                     ScoringConstants.aimerkV,
                     ScoringConstants.aimerkA);
     private final TrapezoidProfile profile =
-            new TrapezoidProfile(new TrapezoidProfile.Constraints(0.8, 0.4));
+            new TrapezoidProfile(new TrapezoidProfile.Constraints(0.8, 0.8));
 
     private final Timer timer = new Timer();
 

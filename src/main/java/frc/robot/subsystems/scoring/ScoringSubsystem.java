@@ -144,8 +144,8 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private void ampPrime() {
         shooterIo.setShooterVelocityRPM(ScoringConstants.shooterAmpVelocityRPM);
-        aimerIo.setAimAngleRad(1);
-        hoodIo.setHoodAngleRad(1);
+        aimerIo.setAimAngleRad(Math.PI / 2);
+        hoodIo.setHoodAngleRad(Math.PI / 2);
 
         boolean shooterReady =
                 Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM)
@@ -172,6 +172,10 @@ public class ScoringSubsystem extends SubsystemBase {
     }
 
     private void shoot() {
+        double distancetoGoal = findDistanceToGoal();
+        shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
+        aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal));
+
         shooterIo.setKickerVolts(5);
 
         if (shootTimer.get() > 0.5) { // TODO: Tune time
@@ -229,7 +233,7 @@ public class ScoringSubsystem extends SubsystemBase {
         Logger.processInputs("scoring/hood", hoodInputs);
 
         aimMechanism.setAngle(Units.radiansToDegrees(aimerInputs.aimAngleRad));
-        hoodMechanism.setAngle(-Units.radiansToDegrees(hoodInputs.hoodAngleRad));
+        hoodMechanism.setAngle(Units.radiansToDegrees(hoodInputs.hoodAngleRad));
         Logger.recordOutput("scoring/mechanism2d", mechanism);
 
         switch (state) {

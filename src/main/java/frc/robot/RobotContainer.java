@@ -82,7 +82,7 @@ public class RobotContainer {
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.WAIT)));
         
-        controller.back()
+        controller.povUp()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.AMP_AIM)));
