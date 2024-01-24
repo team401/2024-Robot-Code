@@ -3,6 +3,7 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -115,6 +116,7 @@ public class RobotContainer {
         }
 
         drivetrain.registerTelemetry(driveTelemetry::telemeterize);
+        Commands.run(driveTelemetry::logDataSynchronously).schedule();
 
         tagVision.setCameraConsumer(
                 (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
