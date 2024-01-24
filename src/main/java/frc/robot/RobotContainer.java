@@ -3,26 +3,23 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.Constants.VisionConstants.CameraParams;
 import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
-import frc.robot.subsystems.localization.CameraIO;
-import frc.robot.subsystems.localization.CameraIOPhoton;
+import frc.robot.subsystems.localization.VisionIOReal;
+import frc.robot.subsystems.localization.VisionIOSim;
 import frc.robot.subsystems.localization.VisionLocalizer;
 import frc.robot.subsystems.scoring.AimerIOSim;
 import frc.robot.subsystems.scoring.AimerIOTalon;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ShooterIOSim;
 import frc.robot.subsystems.scoring.ShooterIOTalon;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
@@ -89,12 +86,6 @@ public class RobotContainer {
     private void configureModes() {}
 
     public void configureSubsystems() {
-        if (Constants.currentMode == Constants.Mode.SIM) {
-            drivetrain.seedFieldRelative(
-                    new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
-        }
-        drivetrain.registerTelemetry(driveTelemetry::telemeterize);
-
         switch (Constants.currentMode) {
             case REAL:
                 scoringSubsystem =
@@ -103,23 +94,29 @@ public class RobotContainer {
                                 new AimerIOTalon(),
                                 driveTelemetry::getFieldToRobot);
 
-                List<CameraIO> realCameras = new ArrayList<>();
-                for (CameraParams params : VisionConstants.cameras) {
-                    realCameras.add(CameraIOPhoton.fromCameraParams(params));
-                }
-                tagVision = new VisionLocalizer(realCameras);
+                tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
                 break;
             case SIM:
+                drivetrain.seedFieldRelative(
+                        new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
+
                 scoringSubsystem =
                         new ScoringSubsystem(
                                 new ShooterIOSim(),
                                 new AimerIOSim(),
                                 driveTelemetry::getFieldToRobot);
 
-                tagVision = new VisionLocalizer(Collections.emptyList());
+                tagVision =
+                        new VisionLocalizer(
+                                new VisionIOSim(
+                                        VisionConstants.cameras, driveTelemetry::getFieldToRobot));
                 break;
             case REPLAY:
+                break;
         }
+
+        drivetrain.registerTelemetry(driveTelemetry::telemeterize);
+        Commands.run(driveTelemetry::logDataSynchronously).ignoringDisable(true).schedule();
 
         tagVision.setCameraConsumer(
                 (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));

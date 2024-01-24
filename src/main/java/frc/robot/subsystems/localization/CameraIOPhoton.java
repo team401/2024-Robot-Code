@@ -6,11 +6,13 @@ import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.VisionConstants.CameraParams;
 import java.util.Optional;
-import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.SimCameraProperties;
+import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -23,27 +25,44 @@ public class CameraIOPhoton implements CameraIO {
     private String name;
 
     public CameraIOPhoton(String name, Transform3d robotToCamera) {
-        camera = new PhotonCamera(name);
+        this(new PhotonCamera(name), robotToCamera);
+    }
+
+    public CameraIOPhoton(PhotonCamera camera, Transform3d robotToCamera) {
+        this.camera = camera;
+
+        name = camera.getName();
         poseEstimator =
                 new PhotonPoseEstimator(
                         VisionConstants.fieldLayout,
                         PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                         robotToCamera);
-
-        this.name = name;
     }
 
-    public static CameraIOPhoton fromCameraParams(CameraParams params) {
+    public static CameraIOPhoton fromRealCameraParams(CameraParams params) {
         return new CameraIOPhoton(params.name(), params.robotToCamera());
+    }
+
+    public static CameraIOPhoton fromSimCameraParams(
+            CameraParams params, VisionSystemSim sim, boolean stream) {
+        PhotonCamera camera = new PhotonCamera(params.name());
+
+        SimCameraProperties props = new SimCameraProperties();
+        props.setCalibration(params.xResolution(), params.yResolution(), params.fov());
+        props.setFPS(params.fps());
+
+        PhotonCameraSim cameraSim = new PhotonCameraSim(camera, props);
+        sim.addCamera(cameraSim, params.robotToCamera());
+
+        cameraSim.enableRawStream(stream);
+        cameraSim.enableProcessedStream(stream);
+
+        return new CameraIOPhoton(camera, params.robotToCamera());
     }
 
     @Override
     public void updateInputs(CameraIOInputs inputs) {
-        if (!camera.isConnected()) {
-            Logger.recordOutput("Vision/" + camera.getName() + "/Connected", false);
-            return;
-        }
-        Logger.recordOutput("Vision/" + camera.getName() + "/Connected", true);
+        inputs.connected = camera.isConnected();
 
         PhotonPipelineResult result = camera.getLatestResult();
         if (result.getTimestampSeconds() == latestTimestampSeconds) {
@@ -57,14 +76,10 @@ public class CameraIOPhoton implements CameraIO {
         photonPose.ifPresent(
                 (pose) -> {
                     inputs.latestFieldToRobot = pose.estimatedPose.toPose2d();
+
                     inputs.latestTimestampSeconds = this.latestTimestampSeconds;
                     inputs.averageTagDistanceM = calculateAverageTagDistance(pose);
                 });
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     private static boolean filterPhotonPose(EstimatedRobotPose photonPose) {

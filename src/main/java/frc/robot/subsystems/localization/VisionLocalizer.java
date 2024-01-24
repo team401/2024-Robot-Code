@@ -7,44 +7,32 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.VisionConstants;
-import java.util.ArrayList;
-import java.util.List;
+import frc.robot.subsystems.localization.CameraIO.CameraIOInputs;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class VisionLocalizer extends SubsystemBase {
-    private final List<CameraIO> cameras;
-    private final List<CameraIOInputsAutoLogged> cameraInputs = new ArrayList<>();
+
+    private VisionIO io;
 
     // avoid NullPointerExceptions by setting a default no-op
     private Consumer<CameraMeasurement> cameraConsumer = (c) -> {};
 
-    private Supplier<Pose2d> fieldToRobotSupplier;
+    private Supplier<Pose2d> fieldToRobotSupplier = () -> new Pose2d();
 
-    public VisionLocalizer(List<CameraIO> cameras) {
-        this.cameras = cameras;
-        for (int i = 0; i < cameras.size(); i++) {
-            cameraInputs.add(new CameraIOInputsAutoLogged());
-        }
+    public VisionLocalizer(VisionIO io) {
+        this.io = io;
     }
 
     @Override
     public void periodic() {
-        for (int i = 0; i < cameras.size(); i++) {
-            cameras.get(i).updateInputs(cameraInputs.get(i));
-
-            var inputs = cameraInputs.get(i);
-
+        for (CameraIOInputs inputs : io.getInputs()) {
             cameraConsumer.accept(
                     new CameraMeasurement(
                             inputs.latestFieldToRobot,
                             inputs.latestTimestampSeconds,
                             cameraUncertainty(inputs.averageTagDistanceM)));
-
-            Logger.recordOutput(
-                    "Vision/" + cameras.get(i).getName() + "/fieldToRobot",
-                    inputs.latestFieldToRobot);
         }
 
         Logger.recordOutput("Vision/robotInMidField", robotInMidField());

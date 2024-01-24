@@ -100,13 +100,15 @@ public class Telemetry {
 
     /* Accept the swerve drive state and telemeterize it to smartdashboard */
     public void telemeterize(SwerveDriveState state) {
+        /*
+         * PSA: Do not call the Logger in this method. This method is called
+         * by a separate thread, and the Logger does not support multi-threading.
+         * Your robot program will crash.
+         */
         /* Telemeterize the pose */
         Pose2d pose = state.Pose;
         fieldTypePub.set("Field2d");
         fieldPub.set(new double[] {pose.getX(), pose.getY(), pose.getRotation().getRadians()});
-
-        Logger.recordOutput("pose/Pose2d", pose);
-        // Logger.recordOutput("pose/fieldPose", table.getDoubleArrayTopic("/Pose/robotPose"));
 
         robotRotation = pose.getRotation().getRadians();
 
@@ -133,6 +135,15 @@ public class Telemetry {
 
             SmartDashboard.putData("Module " + i, m_moduleMechanisms[i]);
         }
+    }
+
+    /**
+     * Calls the Logger to publish telemetry data. Call this method from the same thread as
+     * CommandScheduler.
+     */
+    public void logDataSynchronously() {
+        Pose2d pose = new Pose2d(m_lastPose.getX(), m_lastPose.getY(), m_lastPose.getRotation());
+        Logger.recordOutput("Telemetry/fieldToRobot", pose);
     }
 
     public double getRotationRadians() {
