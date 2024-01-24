@@ -32,7 +32,7 @@ public class AimerIOSim implements AimerIO {
                     ScoringConstants.aimerkV,
                     ScoringConstants.aimerkA);
     private final TrapezoidProfile profile =
-            new TrapezoidProfile(new TrapezoidProfile.Constraints(0.8, 0.8));
+            new TrapezoidProfile(new TrapezoidProfile.Constraints(0.8, 0.5));
 
     private final Timer timer = new Timer();
 
@@ -51,6 +51,16 @@ public class AimerIOSim implements AimerIO {
             initialAngle = sim.getAngleRads();
             initialVelocity = sim.getVelocityRadPerSec();
         }
+        goalAngleRad = angle;
+    }
+
+    @Override
+    public void followAimAngleRad(double angle) {
+        if (goalAngleRad != angle) {
+            initialAngle = sim.getAngleRads();
+            initialVelocity = sim.getVelocityRadPerSec();
+        }
+
         goalAngleRad = angle;
     }
 

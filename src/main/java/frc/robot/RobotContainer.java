@@ -56,17 +56,17 @@ public class RobotContainer {
                         () -> true,
                         () -> false));
 
-        controller.a()
+        controller.button(12)
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.INTAKE)));
 
-        controller.b()
+        controller.button(11)
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.AIM)));
 
-        controller.x()
+        controller.button(10)
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.SHOOT)))
@@ -74,7 +74,7 @@ public class RobotContainer {
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.AIM)));
 
-        controller.y()
+        controller.button(9)
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.ENDGAME)))
@@ -82,15 +82,51 @@ public class RobotContainer {
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.WAIT)));
         
-        controller.povUp()
+        controller.button(7)
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.AMP_AIM)));
 
-        controller.start()
+        controller.button(8)
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.WAIT)));
+        
+        // controller.a()
+        //         .onTrue(new InstantCommand(
+        //             () -> scoringSubsystem.setAction(
+        //                 ScoringSubsystem.ScoringAction.INTAKE)));
+
+        // controller.b()
+        //         .onTrue(new InstantCommand(
+        //             () -> scoringSubsystem.setAction(
+        //                 ScoringSubsystem.ScoringAction.AIM)));
+
+        // controller.x()
+        //         .onTrue(new InstantCommand(
+        //             () -> scoringSubsystem.setAction(
+        //                 ScoringSubsystem.ScoringAction.SHOOT)))
+        //         .onFalse(new InstantCommand(
+        //             () -> scoringSubsystem.setAction(
+        //                 ScoringSubsystem.ScoringAction.AIM)));
+
+        // controller.y()
+        //         .onTrue(new InstantCommand(
+        //             () -> scoringSubsystem.setAction(
+        //                 ScoringSubsystem.ScoringAction.ENDGAME)))
+        //         .onFalse(new InstantCommand(
+        //             () -> scoringSubsystem.setAction(
+        //                 ScoringSubsystem.ScoringAction.WAIT)));
+        
+        // controller.povUp()
+        //         .onTrue(new InstantCommand(
+        //             () -> scoringSubsystem.setAction(
+        //                 ScoringSubsystem.ScoringAction.AMP_AIM)));
+
+        // controller.start()
+        //         .onTrue(new InstantCommand(
+        //             () -> scoringSubsystem.setAction(
+        //                 ScoringSubsystem.ScoringAction.WAIT)));
     } // spotless:on
 
     private void configureModes() {}

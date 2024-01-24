@@ -38,7 +38,7 @@ public class ScoringSubsystem extends SubsystemBase {
             rootMechanism.append(new MechanismLigament2d("aimer", 1.0, 0.0));
     private final MechanismLigament2d hoodMechanism =
             aimMechanism.append(
-                    new MechanismLigament2d("hood", 0.1, 0.0, 1.0, new Color8Bit(0, 200, 50)));
+                    new MechanismLigament2d("hood", 0.1, 0.0, 10.0, new Color8Bit(0, 200, 50)));
 
     private enum ScoringState {
         IDLE,
@@ -87,10 +87,13 @@ public class ScoringSubsystem extends SubsystemBase {
         shooterIo.setKickerVolts(0);
         hoodIo.setHoodAngleRad(0);
 
+        Logger.recordOutput("scoring/aimGoal", 0.0);
+
         if (!hasNote() && action == ScoringAction.INTAKE) {
             state = ScoringState.INTAKE;
         } else if (action == ScoringAction.AIM) {
             state = ScoringState.PRIME;
+            aimerIo.setAimAngleRad(Math.PI / 2);
         } else if (action == ScoringAction.AMP_AIM) {
             state = ScoringState.AMP_PRIME;
         } else if (action == ScoringAction.ENDGAME) {
@@ -118,8 +121,9 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private void prime() {
         double distancetoGoal = findDistanceToGoal();
+        Logger.recordOutput("scoring/aimGoal", aimerInterpolated.getValue(distancetoGoal));
         shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
-        aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal));
+        aimerIo.followAimAngleRad(aimerInterpolated.getValue(distancetoGoal));
 
         boolean shooterReady =
                 Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM)
@@ -174,7 +178,7 @@ public class ScoringSubsystem extends SubsystemBase {
     private void shoot() {
         double distancetoGoal = findDistanceToGoal();
         shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
-        aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal));
+        aimerIo.followAimAngleRad(aimerInterpolated.getValue(distancetoGoal));
 
         shooterIo.setKickerVolts(5);
 

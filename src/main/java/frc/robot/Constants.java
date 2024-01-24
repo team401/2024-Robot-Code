@@ -246,8 +246,8 @@ public final class Constants {
 
     public static final class ScoringConstants {
         public static final double aimerkP = 6.0;
-        public static final double aimerkI = 0.0;
-        public static final double aimerkD = 1.0;
+        public static final double aimerkI = 0.4;
+        public static final double aimerkD = 2.5;
 
         public static final double aimerkS = 0.0;
         public static final double aimerkG = 0.0;
@@ -283,9 +283,9 @@ public final class Constants {
 
         public static final int hoodId = 14;
 
-        public static final double hoodkP = 0.1;
+        public static final double hoodkP = 0.02;
         public static final double hoodkI = 0.0;
-        public static final double hoodkD = 0.0;
+        public static final double hoodkD = 0.6;
 
         public static final double shooterAmpVelocityRPM = 10;
         public static final double hoodAngleRadiansMargin = Math.PI / 100;
