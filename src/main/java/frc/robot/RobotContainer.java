@@ -116,7 +116,7 @@ public class RobotContainer {
         }
 
         drivetrain.registerTelemetry(driveTelemetry::telemeterize);
-        Commands.run(driveTelemetry::logDataSynchronously).schedule();
+        Commands.run(driveTelemetry::logDataSynchronously).ignoringDisable(true).schedule();
 
         tagVision.setCameraConsumer(
                 (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));

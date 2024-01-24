@@ -1,6 +1,5 @@
 package frc.robot.subsystems.localization;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -76,10 +75,7 @@ public class CameraIOPhoton implements CameraIO {
 
         photonPose.ifPresent(
                 (pose) -> {
-                    Pose2d latestFieldToRobot = pose.estimatedPose.toPose2d();
-                    inputs.latestX = latestFieldToRobot.getX();
-                    inputs.latestY = latestFieldToRobot.getY();
-                    inputs.latestTheta = latestFieldToRobot.getRotation().getRadians();
+                    inputs.latestFieldToRobot = pose.estimatedPose.toPose2d();
 
                     inputs.latestTimestampSeconds = this.latestTimestampSeconds;
                     inputs.averageTagDistanceM = calculateAverageTagDistance(pose);
