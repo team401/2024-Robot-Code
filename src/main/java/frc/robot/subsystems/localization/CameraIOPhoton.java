@@ -44,7 +44,8 @@ public class CameraIOPhoton implements CameraIO {
         return new CameraIOPhoton(params.name(), params.robotToCamera());
     }
 
-    public static CameraIOPhoton fromSimCameraParams(CameraParams params, VisionSystemSim sim) {
+    public static CameraIOPhoton fromSimCameraParams(
+            CameraParams params, VisionSystemSim sim, boolean stream) {
         PhotonCamera camera = new PhotonCamera(params.name());
 
         SimCameraProperties props = new SimCameraProperties();
@@ -53,6 +54,9 @@ public class CameraIOPhoton implements CameraIO {
 
         PhotonCameraSim cameraSim = new PhotonCameraSim(camera, props);
         sim.addCamera(cameraSim, params.robotToCamera());
+
+        cameraSim.enableRawStream(stream);
+        cameraSim.enableProcessedStream(stream);
 
         return new CameraIOPhoton(camera, params.robotToCamera());
     }

@@ -2,6 +2,7 @@ package frc.robot.subsystems.localization;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.VisionConstants.CameraParams;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +22,10 @@ public class VisionIOSim implements VisionIO {
     public VisionIOSim(List<CameraParams> params, Supplier<Pose2d> getFieldToRobot) {
         this.getFieldToRobot = getFieldToRobot;
 
+        visionSim.addAprilTags(VisionConstants.fieldLayout);
+
         for (CameraParams param : params) {
-            cameras.add(CameraIOPhoton.fromSimCameraParams(param, visionSim));
+            cameras.add(CameraIOPhoton.fromSimCameraParams(param, visionSim, true));
             inputs.add(new CameraIOInputsAutoLogged());
         }
     }
