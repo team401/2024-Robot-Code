@@ -19,9 +19,6 @@ import frc.robot.subsystems.scoring.AimerIOTalon;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ShooterIOSim;
 import frc.robot.subsystems.scoring.ShooterIOTalon;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
@@ -88,12 +85,6 @@ public class RobotContainer {
     private void configureModes() {}
 
     public void configureSubsystems() {
-        if (Constants.currentMode == Constants.Mode.SIM) {
-            drivetrain.seedFieldRelative(
-                    new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
-        }
-        drivetrain.registerTelemetry(driveTelemetry::telemeterize);
-
         switch (Constants.currentMode) {
             case REAL:
                 scoringSubsystem =
@@ -105,6 +96,9 @@ public class RobotContainer {
                 tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
                 break;
             case SIM:
+                drivetrain.seedFieldRelative(
+                        new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
+
                 scoringSubsystem =
                         new ScoringSubsystem(
                                 new ShooterIOSim(),
@@ -120,8 +114,10 @@ public class RobotContainer {
                 break;
         }
 
-        // tagVision.setCameraConsumer(
-        //         (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
-        // tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
+        drivetrain.registerTelemetry(driveTelemetry::telemeterize);
+
+        tagVision.setCameraConsumer(
+                (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
+        tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
     }
 }

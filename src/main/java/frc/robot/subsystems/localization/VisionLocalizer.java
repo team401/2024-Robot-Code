@@ -2,6 +2,7 @@ package frc.robot.subsystems.localization;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -30,7 +31,10 @@ public class VisionLocalizer extends SubsystemBase {
         for (CameraIOInputs inputs : io.getInputs()) {
             cameraConsumer.accept(
                     new CameraMeasurement(
-                            inputs.latestFieldToRobot,
+                            new Pose2d(
+                                    inputs.latestX,
+                                    inputs.latestY,
+                                    Rotation2d.fromRadians(inputs.latestTheta)),
                             inputs.latestTimestampSeconds,
                             cameraUncertainty(inputs.averageTagDistanceM)));
         }

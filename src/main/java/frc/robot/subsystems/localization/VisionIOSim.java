@@ -30,7 +30,7 @@ public class VisionIOSim implements VisionIO {
     public List<CameraIOInputsAutoLogged> getInputs() {
         visionSim.update(getFieldToRobot.get());
 
-        SmartDashboard.putData(visionSim.getDebugField());
+        SmartDashboard.putData("PhotonSimField", visionSim.getDebugField());
 
         for (int i = 0; i < cameras.size(); i++) {
             cameras.get(i).updateInputs(inputs.get(i));
