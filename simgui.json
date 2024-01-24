@@ -10,39 +10,10 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/Pose": "Field2d",
-      "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/Module 0": "Mechanism2d",
       "/SmartDashboard/Module 1": "Mechanism2d",
       "/SmartDashboard/Module 2": "Mechanism2d",
-      "/SmartDashboard/Module 3": "Mechanism2d",
-      "/SmartDashboard/PhotonSimField": "Field2d",
-      "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d"
-    },
-    "windows": {
-      "/SmartDashboard/PhotonSimField": {
-        "bottom": 1476,
-        "height": 8.210550308227539,
-        "left": 150,
-        "right": 2961,
-        "top": 79,
-        "width": 16.541748046875,
-        "window": {
-          "visible": true
-        }
-      }
-    }
-  },
-  "NetworkTables": {
-    "transitory": {
-      "AdvantageKit": {
-        "RealOutputs": {
-          "Telemetry": {
-            "open": true
-          },
-          "open": true
-        },
-        "open": true
-      }
+      "/SmartDashboard/Module 3": "Mechanism2d"
     }
   },
   "NetworkTables Info": {
