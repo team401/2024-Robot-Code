@@ -8,8 +8,17 @@ public class InterpolateDouble {
     private HashMap<Double, Double> map;
     private ArrayList<Double> sortedKeys;
 
+    private final double minValue;
+    private final double maxValue;
+
     public InterpolateDouble(HashMap<Double, Double> map) {
+        this(map, Double.MIN_VALUE, Double.MAX_VALUE);
+    }
+
+    public InterpolateDouble(HashMap<Double, Double> map, double minValue, double maxValue) {
         this.map = map;
+        this.minValue = minValue;
+        this.maxValue = maxValue;
 
         sortedKeys = new ArrayList<Double>(map.keySet());
         Collections.sort(sortedKeys);
@@ -35,6 +44,13 @@ public class InterpolateDouble {
         double upperValue = map.get(upperKey);
 
         double t = (key - lowerKey) / (upperKey - lowerKey);
-        return lowerValue * (1.0 - t) + t * upperValue;
+        double result = lowerValue * (1.0 - t) + t * upperValue;
+        if (result < minValue) {
+            return minValue;
+        } else if (result > maxValue) {
+            return maxValue;
+        } else {
+            return result;
+        }
     }
 }

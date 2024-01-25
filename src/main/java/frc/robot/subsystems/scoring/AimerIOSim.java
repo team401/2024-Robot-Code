@@ -15,11 +15,11 @@ public class AimerIOSim implements AimerIO {
     private final SingleJointedArmSim sim =
             new SingleJointedArmSim(
                     DCMotor.getNeoVortex(2),
-                    1.0,
+                    1.5,
                     SingleJointedArmSim.estimateMOI(0.5, 4.5),
                     0.5,
                     0.0,
-                    2.0,
+                    ScoringConstants.aimMaxAngleRadians,
                     false,
                     0.0);
     private final PIDController controller =
@@ -32,7 +32,7 @@ public class AimerIOSim implements AimerIO {
                     ScoringConstants.aimerkV,
                     ScoringConstants.aimerkA);
     private final TrapezoidProfile profile =
-            new TrapezoidProfile(new TrapezoidProfile.Constraints(0.8, 0.4));
+            new TrapezoidProfile(new TrapezoidProfile.Constraints(0.8, 0.5));
 
     private final Timer timer = new Timer();
 
@@ -43,8 +43,8 @@ public class AimerIOSim implements AimerIO {
     double initialVelocity = 0.0;
 
     @Override
-    public void setAimAngleRad(double angle) {
-        if (goalAngleRad != angle) {
+    public void setAimAngleRad(double angle, boolean newProfile) {
+        if (goalAngleRad != angle && newProfile) {
             timer.reset();
             timer.start();
 
@@ -67,11 +67,9 @@ public class AimerIOSim implements AimerIO {
         appliedVolts =
                 feedforward.calculate(trapezoidSetpoint.position, trapezoidSetpoint.velocity)
                         + controller.calculate(sim.getAngleRads(), trapezoidSetpoint.position);
-        // appliedVolts = controller.calculate(sim.getAngleRads(), goalAngleRad);
         sim.setInputVoltage(appliedVolts);
 
-        // inputs.aimGoalAngleRad = goalAngleRad;
-        inputs.aimGoalAngleRad = trapezoidSetpoint.position;
+        inputs.aimGoalAngleRad = goalAngleRad;
         inputs.aimAngleRad = sim.getAngleRads();
 
         inputs.aimAppliedVolts = appliedVolts;

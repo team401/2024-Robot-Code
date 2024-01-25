@@ -48,7 +48,7 @@ public class AimerIOTalon implements AimerIO {
     }
 
     @Override
-    public void setAimAngleRad(double angle) {
+    public void setAimAngleRad(double angle, boolean newProfile) {
         goalAngleRad = angle;
     }
 
