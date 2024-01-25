@@ -7,11 +7,13 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import java.io.IOException;
@@ -56,7 +58,8 @@ public final class Constants {
 
         public static final Translation2d speakerPose =
                 false // TODO: CHANGE THIS URGENT
-                        // DriverStation.getAlliance().get() == DriverStation.Alliance.Red
+                        // DriverStation.getAlliance().get() ==
+                        // DriverStation.Alliance.Red
                         ? new Translation2d(
                                 Units.inchesToMeters(652.73), Units.inchesToMeters(218.42))
                         : new Translation2d(
@@ -78,22 +81,47 @@ public final class Constants {
         // TODO: set up cameras in PhotonVision
         public static final List<CameraParams> cameras =
                 List.of(
-                        new CameraParams("FrontLeft", 640, 480, 20, new Transform3d()),
-                        new CameraParams("FrontRight", 640, 480, 20, new Transform3d()),
-                        new CameraParams("BackLeft", 640, 480, 20, new Transform3d()),
-                        new CameraParams("BackRight", 640, 480, 20, new Transform3d()));
+                        new CameraParams(
+                                "FrontLeft",
+                                640,
+                                480,
+                                20,
+                                Rotation2d.fromDegrees(70),
+                                new Transform3d()),
+                        new CameraParams(
+                                "FrontRight",
+                                640,
+                                480,
+                                20,
+                                Rotation2d.fromDegrees(70),
+                                new Transform3d()),
+                        new CameraParams(
+                                "BackLeft",
+                                640,
+                                480,
+                                20,
+                                Rotation2d.fromDegrees(70),
+                                new Transform3d()),
+                        new CameraParams(
+                                "BackRight",
+                                640,
+                                480,
+                                20,
+                                Rotation2d.fromDegrees(70),
+                                new Transform3d()));
 
         public static record CameraParams(
                 String name,
                 int xResolution,
                 int yResolution,
                 int fps,
+                Rotation2d fov,
                 Transform3d robotToCamera) {}
 
         private static AprilTagFieldLayout initLayout(String name) {
             AprilTagFieldLayout layout;
-            // AprilTagFieldLayout's constructor thows an IOException, so we must catch it in order
-            // to initialize our layout as a static constant
+            // AprilTagFieldLayout's constructor throws an IOException, so we must catch it
+            // in order to initialize our layout as a static constant
             try {
                 layout =
                         new AprilTagFieldLayout(
@@ -101,7 +129,8 @@ public final class Constants {
                                         + "/taglayout/2024-WPI"
                                         + ".json");
             } catch (IOException ioe) {
-                // TODO: print a standardized error
+                DriverStation.reportWarning(
+                        "Failed to load AprilTag Layout: " + ioe.getLocalizedMessage(), false);
                 layout = new AprilTagFieldLayout(Collections.emptyList(), 0.0, 0.0);
             }
             return layout;
