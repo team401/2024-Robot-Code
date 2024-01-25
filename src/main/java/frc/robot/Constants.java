@@ -291,15 +291,21 @@ public final class Constants {
         public static final double shooterkV = 0.0;
         public static final double shooterkA = 0.0;
 
+        public static final double hoodkP = 0.02;
+        public static final double hoodkI = 0.0;
+        public static final double hoodkD = 0.6;
+
         public static final int aimLeftMotorId = 9;
         public static final int aimRightMotorId = 10;
 
         public static final int shooterLeftMotorId = 11;
         public static final int shooterRightMotorId = 12;
 
-        public static final int aimEncoderPort = 0; // TODO: Change
-
         public static final int kickerMotorId = 13;
+
+        public static final int hoodId = 14;
+
+        public static final int aimEncoderPort = 0; // TODO: Change
 
         public static final double aimAcceleration = 1;
         public static final double aimCruiseVelocity = 1;
@@ -307,19 +313,16 @@ public final class Constants {
         public static final double shooterAcceleration = 1;
         public static final double shooterJerk = 1;
 
-        public static final double shooterVelocityRPMMargin = 10;
-        public static final double aimAngleRadiansMargin = Math.PI / 100;
+        public static final double shooterVelocityMarginRPM = 10;
+        public static final double aimAngleMarginRadians = Units.degreesToRadians(5);
+        public static final double hoodAngleMarginRadians = Units.degreesToRadians(5);
 
-        public static final int hoodId = 14;
-
-        public static final double hoodkP = 0.02;
-        public static final double hoodkI = 0.0;
-        public static final double hoodkD = 0.6;
+        public static final double intakeAngleToleranceRadians =
+                Math.PI / 2 - Units.degreesToRadians(40);
 
         public static final double shooterAmpVelocityRPM = 10;
-        public static final double hoodAngleRadiansMargin = Math.PI / 100;
 
-        public static final double intakeAngleTolerance = 0.4;
+        public static final double aimMaxAngleRadians = Math.PI / 2;
 
         // NOTE - These should be monotonically increasing
         // Key - Distance in meters

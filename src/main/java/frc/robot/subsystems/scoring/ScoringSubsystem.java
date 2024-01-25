@@ -74,7 +74,8 @@ public class ScoringSubsystem extends SubsystemBase {
         shooterInterpolated = new InterpolateDouble(ScoringConstants.getShooterMap());
 
         aimerInterpolated =
-                new InterpolateDouble(ScoringConstants.getAimerMap(), 0.0, 3 * Math.PI / 4.0);
+                new InterpolateDouble(
+                        ScoringConstants.getAimerMap(), 0.0, ScoringConstants.aimMaxAngleRadians);
     }
 
     public void setAction(ScoringAction action) {
@@ -103,11 +104,7 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private void intake() {
         if (!canIntake()) {
-            double closestAngleRad =
-                    aimerInputs.aimAngleRad < Math.PI / 2 - ScoringConstants.intakeAngleTolerance
-                            ? Math.PI / 2 - ScoringConstants.intakeAngleTolerance
-                            : Math.PI / 2 + ScoringConstants.intakeAngleTolerance;
-            aimerIo.setAimAngleRad(closestAngleRad, true);
+            aimerIo.setAimAngleRad(ScoringConstants.intakeAngleToleranceRadians, true);
         }
         shooterIo.setKickerVolts(0);
         hoodIo.setHoodAngleRad(0);
@@ -125,10 +122,10 @@ public class ScoringSubsystem extends SubsystemBase {
 
         boolean shooterReady =
                 Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM)
-                        < ScoringConstants.shooterVelocityRPMMargin; // TODO: Tune
+                        < ScoringConstants.shooterVelocityMarginRPM; // TODO: Tune
         boolean aimReady =
                 Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad)
-                        < ScoringConstants.aimAngleRadiansMargin; // TODO: Tune
+                        < ScoringConstants.aimAngleMarginRadians; // TODO: Tune
         boolean driveReady = true; // TODO: Add drive ready
         boolean notePresent = hasNote();
 
@@ -151,13 +148,13 @@ public class ScoringSubsystem extends SubsystemBase {
 
         boolean shooterReady =
                 Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM)
-                        < ScoringConstants.shooterVelocityRPMMargin; // TODO: Tune
+                        < ScoringConstants.shooterVelocityMarginRPM; // TODO: Tune
         boolean aimReady =
                 Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad)
-                        < ScoringConstants.aimAngleRadiansMargin; // TODO: Tune
+                        < ScoringConstants.aimAngleMarginRadians; // TODO: Tune
         boolean hoodReady =
                 Math.abs(hoodInputs.hoodAngleRad - hoodInputs.hoodGoalAngleRad)
-                        < ScoringConstants.hoodAngleRadiansMargin; // TODO: Tune
+                        < ScoringConstants.hoodAngleMarginRadians; // TODO: Tune
         boolean driveReady = true; // TODO: Add drive ready
         boolean notePresent = hasNote();
 
@@ -217,8 +214,7 @@ public class ScoringSubsystem extends SubsystemBase {
     }
 
     public boolean canIntake() {
-        return Math.abs(aimerInputs.aimAngleRad - Math.PI / 2)
-                < ScoringConstants.intakeAngleTolerance;
+        return aimerInputs.aimAngleRad > ScoringConstants.intakeAngleToleranceRadians;
     }
 
     @Override
