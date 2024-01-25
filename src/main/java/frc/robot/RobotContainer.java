@@ -20,6 +20,8 @@ import frc.robot.subsystems.scoring.AimerIOTalon;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ShooterIOSim;
 import frc.robot.subsystems.scoring.ShooterIOTalon;
+import frc.robot.utils.FieldFinder;
+import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
@@ -121,5 +123,13 @@ public class RobotContainer {
         tagVision.setCameraConsumer(
                 (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
         tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
+    }
+
+    public void robotPeriodic() {
+        Logger.recordOutput(
+                "localizer/whereAmI",
+                FieldFinder.whereAmI(
+                        driveTelemetry.getFieldToRobot().getTranslation().getX(),
+                        driveTelemetry.getFieldToRobot().getTranslation().getY()));
     }
 }
