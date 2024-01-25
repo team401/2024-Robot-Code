@@ -73,7 +73,8 @@ public class ScoringSubsystem extends SubsystemBase {
 
         shooterInterpolated = new InterpolateDouble(ScoringConstants.getShooterMap());
 
-        aimerInterpolated = new InterpolateDouble(ScoringConstants.getAimerMap());
+        aimerInterpolated =
+                new InterpolateDouble(ScoringConstants.getAimerMap(), 0.0, 3 * Math.PI / 4.0);
     }
 
     public void setAction(ScoringAction action) {
@@ -81,7 +82,7 @@ public class ScoringSubsystem extends SubsystemBase {
     }
 
     private void idle() {
-        aimerIo.setAimAngleRad(0);
+        aimerIo.setAimAngleRad(0, true);
         shooterIo.setShooterVelocityRPM(0);
         shooterIo.setKickerVolts(0);
         hoodIo.setHoodAngleRad(0);
@@ -92,7 +93,7 @@ public class ScoringSubsystem extends SubsystemBase {
             state = ScoringState.INTAKE;
         } else if (action == ScoringAction.AIM) {
             state = ScoringState.PRIME;
-            aimerIo.setAimAngleRad(Math.PI / 2);
+            aimerIo.setAimAngleRad(Math.PI / 2, true);
         } else if (action == ScoringAction.AMP_AIM) {
             state = ScoringState.AMP_PRIME;
         } else if (action == ScoringAction.ENDGAME) {
@@ -101,14 +102,12 @@ public class ScoringSubsystem extends SubsystemBase {
     }
 
     private void intake() {
-        if (canIntake()) {
-            aimerIo.setAimAngleRad(aimerInputs.aimAngleRad);
-        } else {
+        if (!canIntake()) {
             double closestAngleRad =
                     aimerInputs.aimAngleRad < Math.PI / 2 - ScoringConstants.intakeAngleTolerance
-                            ? Math.PI - ScoringConstants.intakeAngleTolerance
-                            : Math.PI + ScoringConstants.intakeAngleTolerance;
-            aimerIo.setAimAngleRad(closestAngleRad);
+                            ? Math.PI / 2 - ScoringConstants.intakeAngleTolerance
+                            : Math.PI / 2 + ScoringConstants.intakeAngleTolerance;
+            aimerIo.setAimAngleRad(closestAngleRad, true);
         }
         shooterIo.setKickerVolts(0);
         hoodIo.setHoodAngleRad(0);
@@ -122,7 +121,7 @@ public class ScoringSubsystem extends SubsystemBase {
         double distancetoGoal = findDistanceToGoal();
         Logger.recordOutput("scoring/aimGoal", aimerInterpolated.getValue(distancetoGoal));
         shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
-        aimerIo.followAimAngleRad(aimerInterpolated.getValue(distancetoGoal));
+        aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal), false);
 
         boolean shooterReady =
                 Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM)
@@ -147,7 +146,7 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private void ampPrime() {
         shooterIo.setShooterVelocityRPM(ScoringConstants.shooterAmpVelocityRPM);
-        aimerIo.setAimAngleRad(Math.PI / 2);
+        aimerIo.setAimAngleRad(Math.PI / 2, true);
         hoodIo.setHoodAngleRad(Math.PI / 2);
 
         boolean shooterReady =
@@ -177,7 +176,7 @@ public class ScoringSubsystem extends SubsystemBase {
     private void shoot() {
         double distancetoGoal = findDistanceToGoal();
         shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
-        aimerIo.followAimAngleRad(aimerInterpolated.getValue(distancetoGoal));
+        aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal), false);
 
         shooterIo.setKickerVolts(5);
 

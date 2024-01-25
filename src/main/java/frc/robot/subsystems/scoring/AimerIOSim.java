@@ -19,7 +19,7 @@ public class AimerIOSim implements AimerIO {
                     SingleJointedArmSim.estimateMOI(0.5, 4.5),
                     0.5,
                     0.0,
-                    2.0,
+                    3 * Math.PI / 4.0,
                     false,
                     0.0);
     private final PIDController controller =
@@ -43,24 +43,14 @@ public class AimerIOSim implements AimerIO {
     double initialVelocity = 0.0;
 
     @Override
-    public void setAimAngleRad(double angle) {
-        if (goalAngleRad != angle) {
+    public void setAimAngleRad(double angle, boolean newProfile) {
+        if (goalAngleRad != angle && newProfile) {
             timer.reset();
             timer.start();
 
             initialAngle = sim.getAngleRads();
             initialVelocity = sim.getVelocityRadPerSec();
         }
-        goalAngleRad = angle;
-    }
-
-    @Override
-    public void followAimAngleRad(double angle) {
-        if (goalAngleRad != angle) {
-            initialAngle = sim.getAngleRads();
-            initialVelocity = sim.getVelocityRadPerSec();
-        }
-
         goalAngleRad = angle;
     }
 
@@ -77,11 +67,9 @@ public class AimerIOSim implements AimerIO {
         appliedVolts =
                 feedforward.calculate(trapezoidSetpoint.position, trapezoidSetpoint.velocity)
                         + controller.calculate(sim.getAngleRads(), trapezoidSetpoint.position);
-        // appliedVolts = controller.calculate(sim.getAngleRads(), goalAngleRad);
         sim.setInputVoltage(appliedVolts);
 
         inputs.aimGoalAngleRad = goalAngleRad;
-        // inputs.aimGoalAngleRad = trapezoidSetpoint.position;
         inputs.aimAngleRad = sim.getAngleRads();
 
         inputs.aimAppliedVolts = appliedVolts;
