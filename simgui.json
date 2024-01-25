@@ -4,10 +4,21 @@
       "window": {
         "visible": true
       }
+    },
+    "Other Devices": {
+      "window": {
+        "visible": false
+      }
+    },
+    "Timing": {
+      "window": {
+        "visible": false
+      }
     }
   },
   "NTProvider": {
     "types": {
+      "/AdvantageKit/RealOutputs/scoring/mechanism2d": "Mechanism2d",
       "/FMSInfo": "FMSInfo",
       "/Pose": "Field2d",
       "/SmartDashboard/Module 0": "Mechanism2d",
@@ -18,5 +29,8 @@
   },
   "NetworkTables Info": {
     "visible": true
+  },
+  "NetworkTables View": {
+    "visible": false
   }
 }
