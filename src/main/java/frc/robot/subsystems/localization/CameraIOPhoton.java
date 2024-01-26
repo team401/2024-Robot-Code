@@ -50,6 +50,7 @@ public class CameraIOPhoton implements CameraIO {
         SimCameraProperties props = new SimCameraProperties();
         props.setCalibration(params.xResolution(), params.yResolution(), params.fov());
         props.setFPS(params.fps());
+        props.setCalibError(0.25, 0.08);
 
         PhotonCameraSim cameraSim = new PhotonCameraSim(camera, props);
         sim.addCamera(cameraSim, params.robotToCamera());
