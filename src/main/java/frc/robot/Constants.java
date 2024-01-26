@@ -7,9 +7,13 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
@@ -47,6 +51,9 @@ public final class Constants {
         public static final double MaxAngularRateRadiansPerSec = Math.PI * 2; // 2 PI is one full
         // rotation per second
         public static final double deadbandPercent = 0.16;
+
+        public static final Pose2d initialPose =
+                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90));
     }
 
     public static final class FieldConstants {
@@ -87,28 +94,34 @@ public final class Constants {
                                 480,
                                 20,
                                 Rotation2d.fromDegrees(70),
-                                new Transform3d()),
+                                new Transform3d(
+                                        new Translation3d(0.33, 0.33, 0.127), new Rotation3d())),
                         new CameraParams(
                                 "FrontRight",
                                 640,
                                 480,
                                 20,
                                 Rotation2d.fromDegrees(70),
-                                new Transform3d()),
+                                new Transform3d(
+                                        new Translation3d(0.33, -0.33, 0.127), new Rotation3d())),
                         new CameraParams(
                                 "BackLeft",
                                 640,
                                 480,
                                 20,
                                 Rotation2d.fromDegrees(70),
-                                new Transform3d()),
+                                new Transform3d(
+                                        new Translation3d(-0.33, -0.33, 0.127),
+                                        new Rotation3d(0.0, 0.0, 3.14))),
                         new CameraParams(
                                 "BackRight",
                                 640,
                                 480,
                                 20,
                                 Rotation2d.fromDegrees(70),
-                                new Transform3d()));
+                                new Transform3d(
+                                        new Translation3d(0.33, -0.33, 0.127),
+                                        new Rotation3d(0.0, 0.0, 3.14))));
 
         public static record CameraParams(
                 String name,
@@ -267,6 +280,13 @@ public final class Constants {
                         Units.inchesToMeters(kBackRightXPosInches),
                         Units.inchesToMeters(kBackRightYPosInches),
                         kInvertRightSide);
+
+        public static final SwerveDriveKinematics kinematics =
+                new SwerveDriveKinematics(
+                        new Translation2d(FrontLeft.LocationX, FrontLeft.LocationY),
+                        new Translation2d(FrontLeft.LocationX, FrontRight.LocationY),
+                        new Translation2d(BackLeft.LocationX, BackLeft.LocationY),
+                        new Translation2d(BackRight.LocationX, BackRight.LocationY));
 
         public static final CommandSwerveDrivetrain DriveTrain =
                 new CommandSwerveDrivetrain(
