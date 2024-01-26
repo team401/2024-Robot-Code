@@ -1,8 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -105,8 +102,7 @@ public class RobotContainer {
                 tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
                 break;
             case SIM:
-                drivetrain.seedFieldRelative(
-                        new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
+                drivetrain.seedFieldRelative(DriveConstants.initialPose);
 
                 scoringSubsystem =
                         new ScoringSubsystem(
@@ -118,7 +114,7 @@ public class RobotContainer {
                 tagVision =
                         new VisionLocalizer(
                                 new VisionIOSim(
-                                        VisionConstants.cameras, driveTelemetry::getFieldToRobot));
+                                        VisionConstants.cameras, driveTelemetry::getModuleStates));
                 break;
             case REPLAY:
                 break;
