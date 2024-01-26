@@ -67,8 +67,10 @@ public class CameraIOPhoton implements CameraIO {
 
         PhotonPipelineResult result = camera.getLatestResult();
         if (result.getTimestampSeconds() == latestTimestampSeconds) {
+            inputs.isNew = false;
             return;
         }
+        inputs.isNew = true;
         latestTimestampSeconds = result.getTimestampSeconds();
         Optional<EstimatedRobotPose> photonPose = poseEstimator.update(result);
 

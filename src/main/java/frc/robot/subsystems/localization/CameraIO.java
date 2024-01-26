@@ -12,6 +12,7 @@ public interface CameraIO {
         public double latestTimestampSeconds = 0.0;
         public double averageTagDistanceM = 0.0;
         public boolean connected = false;
+        public boolean isNew = false;
     }
 
     public default void updateInputs(CameraIOInputs inputs) {}
