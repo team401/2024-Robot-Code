@@ -13,7 +13,6 @@ import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.localization.VisionIOReal;
-import frc.robot.subsystems.localization.VisionIOSim;
 import frc.robot.subsystems.localization.VisionLocalizer;
 import frc.robot.subsystems.scoring.AimerIOSim;
 import frc.robot.subsystems.scoring.AimerIOTalon;
@@ -117,10 +116,11 @@ public class RobotContainer {
                                 new HoodIOSim(),
                                 driveTelemetry::getFieldToRobot);
 
-                tagVision =
-                        new VisionLocalizer(
-                                new VisionIOSim(
-                                        VisionConstants.cameras, driveTelemetry::getFieldToRobot));
+                // tagVision =
+                //         new VisionLocalizer(
+                //                 new VisionIOSim(
+                //                         VisionConstants.cameras,
+                // driveTelemetry::getFieldToRobot));
                 break;
             case REPLAY:
                 break;
@@ -129,9 +129,9 @@ public class RobotContainer {
         drivetrain.registerTelemetry(driveTelemetry::telemeterize);
         Commands.run(driveTelemetry::logDataSynchronously).ignoringDisable(true).schedule();
 
-        tagVision.setCameraConsumer(
-                (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
-        tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
+        // tagVision.setCameraConsumer(
+        //         (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
+        // tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
     }
 
     public void robotPeriodic() {
@@ -140,5 +140,19 @@ public class RobotContainer {
                 FieldFinder.whereAmI(
                         driveTelemetry.getFieldToRobot().getTranslation().getX(),
                         driveTelemetry.getFieldToRobot().getTranslation().getY()));
+        Logger.recordOutput(
+                "localizer/willIHitBlueStage",
+                FieldFinder.willIHitThis(
+                        driveTelemetry.getFieldToRobot().getTranslation().getX(),
+                        driveTelemetry.getFieldToRobot().getTranslation().getY(),
+                        driveTelemetry.getVelocityX() * 5,
+                        driveTelemetry.getVelocityY() * 5,
+                        FieldFinder.FieldLocations.BLUE_STAGE));
+        Logger.recordOutput(
+                "localizer/trajectory",
+                new Pose2d(
+                        driveTelemetry.getFieldToRobot().getX() + driveTelemetry.getVelocityX() * 5,
+                        driveTelemetry.getFieldToRobot().getY() + driveTelemetry.getVelocityY() * 5,
+                        driveTelemetry.getFieldToRobot().getRotation()));
     }
 }

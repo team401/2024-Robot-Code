@@ -42,6 +42,8 @@ public class Telemetry {
     NetworkTable driveStats = inst.getTable("Drive");
     DoublePublisher velocityX = driveStats.getDoubleTopic("Velocity X").publish();
     DoublePublisher velocityY = driveStats.getDoubleTopic("Velocity Y").publish();
+    double velocityXFieldRelative = 0.0;
+    double velocityYFieldRelative = 0.0;
     DoublePublisher speed = driveStats.getDoubleTopic("Speed").publish();
     DoublePublisher odomPeriod = driveStats.getDoubleTopic("Odometry Period").publish();
 
@@ -117,6 +119,10 @@ public class Telemetry {
         double diffTime = currentTime - lastTime;
         lastTime = currentTime;
         Translation2d distanceDiff = pose.minus(m_lastPose).getTranslation();
+
+        velocityXFieldRelative = 10 * (pose.getX() - m_lastPose.getX());
+        velocityYFieldRelative = 10 * (pose.getY() - m_lastPose.getY());
+
         m_lastPose = pose;
 
         Translation2d velocities = distanceDiff.div(diffTime);
@@ -152,5 +158,13 @@ public class Telemetry {
 
     public Pose2d getFieldToRobot() {
         return m_lastPose;
+    }
+
+    public double getVelocityX() {
+        return velocityXFieldRelative;
+    }
+
+    public double getVelocityY() {
+        return velocityYFieldRelative;
     }
 }
