@@ -14,6 +14,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.endgame.EndgameSimIO;
 
 public class RobotContainer {
     private RobotContainer robotContainer;
@@ -24,12 +25,13 @@ public class RobotContainer {
     CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain;
 
     Telemetry driveTelemetry = new Telemetry(DriveConstants.MaxSpeedMetPerSec);
-
+    
+    
     public RobotContainer() {
         configureBindings();
         configureSubsystems();
         configureModes();
-        robotContainer = new RobotContainer();
+        EndgameSimIO endgameSimIO = new EndgameSimIO();
     }
 
     private void configureBindings() {

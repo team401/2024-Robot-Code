@@ -26,7 +26,6 @@ import frc.robot.subsystems.endgame.EndgameSimIO;
  * project.
  */
 public class Robot extends LoggedRobot {
-    public EndgameSimIO simIO = new EndgameSimIO();
 
     @Override
     public void robotInit() {
@@ -44,6 +43,8 @@ public class Robot extends LoggedRobot {
         }
 
         Logger.start();
+        RobotContainer robotContainer = new RobotContainer();
+
     }
 
     @Override
