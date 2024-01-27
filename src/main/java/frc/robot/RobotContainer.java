@@ -1,13 +1,11 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.FeatureFlags;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveWithJoysticks;
@@ -22,6 +20,7 @@ import frc.robot.subsystems.scoring.HoodIOVortex;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ShooterIOSim;
 import frc.robot.subsystems.scoring.ShooterIOTalon;
+import java.util.Collections;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
@@ -105,8 +104,7 @@ public class RobotContainer {
                 tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
                 break;
             case SIM:
-                drivetrain.seedFieldRelative(
-                        new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
+                drivetrain.seedFieldRelative(DriveConstants.initialPose);
 
                 scoringSubsystem =
                         new ScoringSubsystem(
@@ -115,10 +113,19 @@ public class RobotContainer {
                                 new HoodIOSim(),
                                 driveTelemetry::getFieldToRobot);
 
-                tagVision =
-                        new VisionLocalizer(
-                                new VisionIOSim(
-                                        VisionConstants.cameras, driveTelemetry::getFieldToRobot));
+                if (FeatureFlags.simulateVision) {
+                    tagVision =
+                            new VisionLocalizer(
+                                    new VisionIOSim(
+                                            VisionConstants.cameras,
+                                            driveTelemetry::getModuleStates));
+                } else {
+                    tagVision =
+                            new VisionLocalizer(
+                                    new VisionIOSim(
+                                            Collections.emptyList(),
+                                            driveTelemetry::getModuleStates));
+                }
                 break;
             case REPLAY:
                 break;

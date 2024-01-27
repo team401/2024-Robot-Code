@@ -50,6 +50,7 @@ public class CameraIOPhoton implements CameraIO {
         SimCameraProperties props = new SimCameraProperties();
         props.setCalibration(params.xResolution(), params.yResolution(), params.fov());
         props.setFPS(params.fps());
+        props.setCalibError(0.25, 0.08);
 
         PhotonCameraSim cameraSim = new PhotonCameraSim(camera, props);
         sim.addCamera(cameraSim, params.robotToCamera());
@@ -66,8 +67,10 @@ public class CameraIOPhoton implements CameraIO {
 
         PhotonPipelineResult result = camera.getLatestResult();
         if (result.getTimestampSeconds() == latestTimestampSeconds) {
+            inputs.isNew = false;
             return;
         }
+        inputs.isNew = true;
         latestTimestampSeconds = result.getTimestampSeconds();
         Optional<EstimatedRobotPose> photonPose = poseEstimator.update(result);
 
@@ -76,6 +79,7 @@ public class CameraIOPhoton implements CameraIO {
         photonPose.ifPresent(
                 (pose) -> {
                     inputs.latestFieldToRobot = pose.estimatedPose.toPose2d();
+                    inputs.nTags = pose.targetsUsed.size();
 
                     inputs.latestTimestampSeconds = this.latestTimestampSeconds;
                     inputs.averageTagDistanceM = calculateAverageTagDistance(pose);
