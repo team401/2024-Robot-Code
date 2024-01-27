@@ -1,7 +1,14 @@
 package frc.robot.subsystems.localization;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.VisionConstants.CameraParams;
 import java.util.ArrayList;
@@ -17,12 +24,28 @@ public class VisionIOSim implements VisionIO {
     private List<CameraIO> cameras = new ArrayList<>();
     private List<CameraIOInputsAutoLogged> inputs = new ArrayList<>();
 
-    private Supplier<Pose2d> getFieldToRobot;
+    private Supplier<SwerveModuleState[]> getModuleStates;
+    private Pose2d latestOdometryPose;
+    private SwerveModulePosition[] lastModulePositions =
+            new SwerveModulePosition[] {
+                new SwerveModulePosition(),
+                new SwerveModulePosition(),
+                new SwerveModulePosition(),
+                new SwerveModulePosition()
+            };
+    private Timer dtTimer = new Timer();
 
-    public VisionIOSim(List<CameraParams> params, Supplier<Pose2d> getFieldToRobot) {
-        this.getFieldToRobot = getFieldToRobot;
+    public VisionIOSim(List<CameraParams> params, Supplier<SwerveModuleState[]> getModuleStates) {
+        this.getModuleStates = getModuleStates;
 
         visionSim.addAprilTags(VisionConstants.fieldLayout);
+
+        var pose = DriveConstants.initialPose;
+        latestOdometryPose =
+                new Pose2d(
+                        pose.getX(),
+                        pose.getY(),
+                        Rotation2d.fromRadians(pose.getRotation().getRadians()));
 
         for (CameraParams param : params) {
             cameras.add(CameraIOPhoton.fromSimCameraParams(param, visionSim, true));
@@ -31,8 +54,8 @@ public class VisionIOSim implements VisionIO {
     }
 
     public List<CameraIOInputsAutoLogged> getInputs() {
-        visionSim.update(getFieldToRobot.get());
-
+        updateOdometry();
+        visionSim.update(latestOdometryPose);
         SmartDashboard.putData("PhotonSimField", visionSim.getDebugField());
 
         for (int i = 0; i < cameras.size(); i++) {
@@ -42,5 +65,31 @@ public class VisionIOSim implements VisionIO {
         }
 
         return inputs;
+    }
+
+    private void updateOdometry() {
+        SwerveModulePosition[] deltas = new SwerveModulePosition[4];
+        SwerveModuleState[] states = getModuleStates.get();
+
+        double dt = dtTimer.get();
+        dtTimer.reset();
+        dtTimer.start();
+
+        for (int i = 0; i < states.length; i++) {
+            deltas[i] =
+                    new SwerveModulePosition(
+                            states[i].speedMetersPerSecond * dt
+                                    - lastModulePositions[i].distanceMeters,
+                            Rotation2d.fromRadians(
+                                    states[i]
+                                            .angle
+                                            .minus(lastModulePositions[i].angle)
+                                            .getRadians()));
+        }
+
+        Twist2d twist = TunerConstants.kinematics.toTwist2d(deltas);
+        latestOdometryPose = latestOdometryPose.exp(twist);
+
+        Logger.recordOutput("Vision/GroundTruth", latestOdometryPose);
     }
 }

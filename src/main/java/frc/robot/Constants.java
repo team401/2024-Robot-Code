@@ -7,9 +7,13 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
@@ -32,6 +36,10 @@ public final class Constants {
         REPLAY
     }
 
+    public static final class FeatureFlags {
+        public static final boolean simulateVision = false;
+    }
+
     public static final class ConversionConstants {
         public static final double kRadiansPerSecondToRPM = 60.0 / (2.0 * Math.PI);
     }
@@ -47,6 +55,9 @@ public final class Constants {
         public static final double MaxAngularRateRadiansPerSec = Math.PI * 2; // 2 PI is one full
         // rotation per second
         public static final double deadbandPercent = 0.16;
+
+        public static final Pose2d initialPose =
+                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90));
     }
 
     public static final class FieldConstants {
@@ -73,8 +84,11 @@ public final class Constants {
 
         public static final double singleTagAmbiguityCutoff = 0.05;
 
-        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(0.45, 0.45, 1);
-        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(1.2, 1.2, 10);
+        // 0.45 from 2023
+        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(1.2, 1.2, 2);
+        // 1.2 from 2023
+        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(3.5, 3.5, 10);
+        public static final Matrix<N3, N1> singleTagUncertainty = VecBuilder.fill(20.0, 20.0, 10);
 
         public static final Matrix<N3, N1> driveUncertainty = VecBuilder.fill(0.1, 0.1, 0.1);
 
@@ -87,28 +101,34 @@ public final class Constants {
                                 480,
                                 20,
                                 Rotation2d.fromDegrees(70),
-                                new Transform3d()),
+                                new Transform3d(
+                                        new Translation3d(0.33, 0.33, 0.127), new Rotation3d())),
                         new CameraParams(
                                 "FrontRight",
                                 640,
                                 480,
                                 20,
                                 Rotation2d.fromDegrees(70),
-                                new Transform3d()),
+                                new Transform3d(
+                                        new Translation3d(0.33, -0.33, 0.127), new Rotation3d())),
                         new CameraParams(
                                 "BackLeft",
                                 640,
                                 480,
                                 20,
                                 Rotation2d.fromDegrees(70),
-                                new Transform3d()),
+                                new Transform3d(
+                                        new Translation3d(-0.33, -0.33, 0.127),
+                                        new Rotation3d(0.0, 0.0, 3.14))),
                         new CameraParams(
                                 "BackRight",
                                 640,
                                 480,
                                 20,
                                 Rotation2d.fromDegrees(70),
-                                new Transform3d()));
+                                new Transform3d(
+                                        new Translation3d(0.33, -0.33, 0.127),
+                                        new Rotation3d(0.0, 0.0, 3.14))));
 
         public static record CameraParams(
                 String name,
@@ -267,6 +287,13 @@ public final class Constants {
                         Units.inchesToMeters(kBackRightXPosInches),
                         Units.inchesToMeters(kBackRightYPosInches),
                         kInvertRightSide);
+
+        public static final SwerveDriveKinematics kinematics =
+                new SwerveDriveKinematics(
+                        new Translation2d(FrontLeft.LocationX, FrontLeft.LocationY),
+                        new Translation2d(FrontLeft.LocationX, FrontRight.LocationY),
+                        new Translation2d(BackLeft.LocationX, BackLeft.LocationY),
+                        new Translation2d(BackRight.LocationX, BackRight.LocationY));
 
         public static final CommandSwerveDrivetrain DriveTrain =
                 new CommandSwerveDrivetrain(

@@ -3,6 +3,7 @@ package frc.robot;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
@@ -57,8 +58,10 @@ public class Telemetry {
     DoublePublisher odomPeriod = driveStats.getDoubleTopic("Odometry Period").publish();
 
     /* Keep a reference of the last pose to calculate the speeds */
-    Pose2d m_lastPose = new Pose2d();
+    Pose2d latestPose = new Pose2d();
     double lastTime = Utils.getCurrentTimeSeconds();
+
+    SwerveModuleState[] latestModuleStates = new SwerveModuleState[4];
 
     /* Mechanisms to represent the swerve module states */
     Mechanism2d[] m_moduleMechanisms =
@@ -127,12 +130,12 @@ public class Telemetry {
         double currentTime = Utils.getCurrentTimeSeconds();
         double diffTime = currentTime - lastTime;
         lastTime = currentTime;
-        Translation2d distanceDiff = pose.minus(m_lastPose).getTranslation();
+        Translation2d distanceDiff = pose.minus(latestPose).getTranslation();
 
-        velocityXFieldRelative = 10 * (pose.getX() - m_lastPose.getX());
-        velocityYFieldRelative = 10 * (pose.getY() - m_lastPose.getY());
+        velocityXFieldRelative = 10 * (pose.getX() - latestPose.getX());
+        velocityYFieldRelative = 10 * (pose.getY() - latestPose.getY());
 
-        m_lastPose = pose;
+        latestPose = pose;
 
         Translation2d velocities = distanceDiff.div(diffTime);
 
@@ -140,6 +143,8 @@ public class Telemetry {
         velocityX.set(velocities.getX());
         velocityY.set(velocities.getY());
         odomPeriod.set(state.OdometryPeriod);
+
+        latestModuleStates = state.ModuleStates;
 
         /* Telemeterize the module's states */
         for (int i = 0; i < 4; ++i) {
@@ -158,7 +163,7 @@ public class Telemetry {
      * CommandScheduler.
      */
     public void logDataSynchronously() {
-        Pose2d pose = new Pose2d(m_lastPose.getX(), m_lastPose.getY(), m_lastPose.getRotation());
+        Pose2d pose = new Pose2d(latestPose.getX(), latestPose.getY(), latestPose.getRotation());
         Logger.recordOutput("Telemetry/fieldToRobot", pose);
         Logger.recordOutput("Telemetry/moduleStates", moduleStates);
     }
@@ -168,7 +173,19 @@ public class Telemetry {
     }
 
     public Pose2d getFieldToRobot() {
-        return m_lastPose;
+        return latestPose;
+    }
+
+    public SwerveModuleState[] getModuleStates() {
+        SwerveModuleState[] states = new SwerveModuleState[4];
+        for (int i = 0; i < 4; i++) {
+            var state = latestModuleStates[i];
+            states[i] =
+                    new SwerveModuleState(
+                            state.speedMetersPerSecond,
+                            Rotation2d.fromRadians(state.angle.getRadians()));
+        }
+        return states;
     }
 
     public double getVelocityX() {
