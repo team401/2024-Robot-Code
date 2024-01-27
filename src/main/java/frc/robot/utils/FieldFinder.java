@@ -1,6 +1,9 @@
 package frc.robot.utils;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import org.littletonrobotics.junction.Logger;
 
 public class FieldFinder {
     private class FieldLocations2024 {
@@ -8,12 +11,12 @@ public class FieldFinder {
         public static final double STAGE_RED_NEAR_SIDE_Y = 4.0;
         public static final double STAGE_RED_LEFT_SIDE_X = 10.8;
         public static final double STAGE_RED_LEFT_SIDE_Y = 2.2;
-        public static final double STAGE_RED_RIGHT_SIDE_X = 10.8;
+        public static final double STAGE_RED_RIGHT_SIDE_X = 10.805;
         public static final double STAGE_RED_RIGHT_SIDE_Y = 5.8;
 
         public static final double STAGE_BLUE_NEAR_SIDE_X = 3.0;
         public static final double STAGE_BLUE_NEAR_SIDE_Y = 4.0;
-        public static final double STAGE_BLUE_LEFT_SIDE_X = 5.6;
+        public static final double STAGE_BLUE_LEFT_SIDE_X = 5.605;
         public static final double STAGE_BLUE_LEFT_SIDE_Y = 5.8;
         public static final double STAGE_BLUE_RIGHT_SIDE_X = 5.6;
         public static final double STAGE_BLUE_RIGHT_SIDE_Y = 2.2;
@@ -153,10 +156,16 @@ public class FieldFinder {
         // y - b = mx
         // (y - b) / m = x
         // (y - b) / m = (y - b1) / m1
+        // y(1/m - 1/m1) = b/m - b1/m1
+        // y = (b/m - b1/m1) / (1/m - 1/m1)
 
-        double yIntercept1 = m * (xIntercept1 - y3) + y1;
-        double yIntercept2 = m * (xIntercept2 - y1) + y2;
-        double yIntercept3 = m * (xIntercept3 - y2) + y3;
+        // double yIntercept1 = m * (xIntercept1 - x1) + y1;
+        // double yIntercept2 = m * (xIntercept2 - x2) + y2;
+        // double yIntercept3 = m * (xIntercept3 - x3) + y3;
+
+        double yIntercept1 = (b / m - b1 / m1) / (1 / m - 1 / m1);
+        double yIntercept2 = (b / m - b2 / m2) / (1 / m - 1 / m2);
+        double yIntercept3 = (b / m - b3 / m3) / (1 / m - 1 / m3);
 
         double distance = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
 
@@ -164,28 +173,47 @@ public class FieldFinder {
         double distance2 = Math.sqrt(Math.pow(xIntercept2 - x, 2) + Math.pow(yIntercept2 - y, 2));
         double distance3 = Math.sqrt(Math.pow(xIntercept3 - x, 2) + Math.pow(yIntercept3 - y, 2));
 
+        boolean distance1IsHit =
+                MathUtil.isNear(x, xIntercept1, Math.abs(dx))
+                        && MathUtil.isNear(y, yIntercept1, Math.abs(dy));
+        boolean distance2IsHit =
+                MathUtil.isNear(x, xIntercept2, Math.abs(dx))
+                        && MathUtil.isNear(y, yIntercept2, Math.abs(dy));
+        boolean distance3IsHit =
+                MathUtil.isNear(x, xIntercept3, Math.abs(dx))
+                        && MathUtil.isNear(y, yIntercept3, Math.abs(dy));
+
+        Logger.recordOutput(
+                "localizer/pose/1", new Pose2d(xIntercept1, yIntercept1, new Rotation2d(0)));
+        Logger.recordOutput(
+                "localizer/pose/2", new Pose2d(xIntercept2, yIntercept2, new Rotation2d(0)));
+        Logger.recordOutput(
+                "localizer/pose/3", new Pose2d(xIntercept3, yIntercept3, new Rotation2d(0)));
+
         return inTheTriangle(x, y, x1, y1, x2, y2, x3, y3)
-                || distance1 < distance
-                        && (((xIntercept1 > x && dx > 0) || (xIntercept1 < x && dx < 0))
-                                && ((yIntercept1 > y && dy > 0) || (yIntercept1 < y && dy < 0)))
-                        && ((xIntercept1 > x1 && xIntercept1 < x2)
-                                || (xIntercept1 < x1 && xIntercept1 > x2))
-                        && ((yIntercept1 > y1 && yIntercept1 < y2)
-                                || (yIntercept1 < y1 && yIntercept1 > y2))
-                || distance2 < distance
-                        && (((xIntercept2 > x && dx > 0) || (xIntercept2 < x && dx < 0))
-                                && ((yIntercept2 > y && dy > 0) || (yIntercept2 < y && dy < 0)))
-                        && ((xIntercept2 > x2 && xIntercept2 < x3)
-                                || (xIntercept2 < x2 && xIntercept2 > x3))
-                        && ((yIntercept2 > y2 && yIntercept2 < y3)
-                                || (yIntercept2 < y2 && yIntercept2 > y3))
-                || distance3 < distance
-                        && (((xIntercept3 > x && dx > 0) || (xIntercept3 < x && dx < 0))
-                                && ((yIntercept3 > y && dy > 0) || (yIntercept3 < y && dy < 0)))
-                        && ((xIntercept3 > x3 && xIntercept3 < x1)
-                                || (xIntercept3 < x3 && xIntercept3 > x1))
-                        && ((yIntercept3 > y3 && yIntercept3 < y1)
-                                || (yIntercept3 < y3 && yIntercept3 > y1));
+                || (distance1IsHit
+                        && isOnCorrectSide(x, xIntercept1, dx)
+                        && isOnCorrectSide(y, yIntercept1, dy)
+                        && isBetween(xIntercept1, x1, x2)
+                        && isBetween(yIntercept1, y1, y2))
+                || (distance2IsHit
+                        && isOnCorrectSide(x, xIntercept2, dx)
+                        && isOnCorrectSide(y, yIntercept2, dy)
+                        && isBetween(xIntercept2, x2, x3)
+                        && isBetween(yIntercept2, y2, y3))
+                || (distance3IsHit
+                        && isOnCorrectSide(x, xIntercept3, dx)
+                        && isOnCorrectSide(y, yIntercept3, dy)
+                        && isBetween(xIntercept3, x3, y1)
+                        && isBetween(yIntercept3, y3, y1));
+    }
+
+    private static boolean isBetween(double value, double edgeOne, double edgeTwo) {
+        return (value > edgeOne && value < edgeTwo) || (value < edgeOne && value > edgeTwo);
+    }
+
+    private static boolean isOnCorrectSide(double value, double intercept, double delta) {
+        return (intercept > value && delta > 0) || (intercept < value && delta < 0);
     }
 
     private static boolean inTheTriangle(
