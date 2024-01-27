@@ -79,6 +79,7 @@ public class CameraIOPhoton implements CameraIO {
         photonPose.ifPresent(
                 (pose) -> {
                     inputs.latestFieldToRobot = pose.estimatedPose.toPose2d();
+                    inputs.nTags = pose.targetsUsed.size();
 
                     inputs.latestTimestampSeconds = this.latestTimestampSeconds;
                     inputs.averageTagDistanceM = calculateAverageTagDistance(pose);

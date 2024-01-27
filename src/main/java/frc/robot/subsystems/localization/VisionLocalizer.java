@@ -32,7 +32,7 @@ public class VisionLocalizer extends SubsystemBase {
                     new CameraMeasurement(
                             inputs.latestFieldToRobot,
                             inputs.latestTimestampSeconds,
-                            cameraUncertainty(inputs.averageTagDistanceM)));
+                            cameraUncertainty(inputs.averageTagDistanceM, inputs.nTags)));
         }
 
         Logger.recordOutput("Vision/robotInMidField", robotInMidField());
@@ -46,13 +46,15 @@ public class VisionLocalizer extends SubsystemBase {
         this.fieldToRobotSupplier = fieldToRobotSupplier;
     }
 
-    private Matrix<N3, N1> cameraUncertainty(double averageTagDistanceM) {
+    private Matrix<N3, N1> cameraUncertainty(double averageTagDistanceM, int nTags) {
         /*
          * On this year's field, Apriltags are arranged into rough 'corridors' between the stage and
          * speaker, and a central 'desert,' where few tags can be found. It follows that we should
          * determine the variance of our camera mesurements based on that.
          */
-        if (averageTagDistanceM < 2.0 && this.robotInMidField()) {
+        if (nTags < 1) {
+            return VisionConstants.singleTagUncertainty;
+        } else if (averageTagDistanceM < 2.0 && this.robotInMidField()) {
             return VisionConstants.lowCameraUncertainty;
         } else {
             return VisionConstants.highCameraUncertainty;
