@@ -30,7 +30,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private SwerveRequest.RobotCentric driveRobotCentric = new SwerveRequest.RobotCentric();
     private SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
-    private static final double kSimLoopPeriod = 0.005; // 5 ms
+    private static final double kSimLoopPeriod = 0.02; // Original: 5 ms
     private Notifier simNotifier = null;
     private double lastSimTime;
 
@@ -95,6 +95,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                             final double currentTime = Utils.getCurrentTimeSeconds();
                             double deltaTime = currentTime - lastSimTime;
                             lastSimTime = currentTime;
+
+                            // System.out.println(System.currentTimeMillis());
 
                             /* use the measured time delta, get battery voltage from WPILib */
                             updateSimState(deltaTime, RobotController.getBatteryVoltage());

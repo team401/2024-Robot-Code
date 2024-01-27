@@ -1,9 +1,6 @@
 package frc.robot.utils;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import org.littletonrobotics.junction.Logger;
 
 public class FieldFinder {
     private class FieldLocations2024 {
@@ -21,7 +18,7 @@ public class FieldFinder {
         public static final double STAGE_BLUE_RIGHT_SIDE_X = 5.6;
         public static final double STAGE_BLUE_RIGHT_SIDE_Y = 2.2;
 
-        public static final double WING_RED_END_X = 8.8;
+        public static final double WING_RED_END_X = 10.8;
 
         public static final double WING_BLUE_END_X = 5.8;
     }
@@ -152,26 +149,9 @@ public class FieldFinder {
         double xIntercept2 = (b2 - b) / (m - m2);
         double xIntercept3 = (b3 - b) / (m - m3);
 
-        // y = mx + b
-        // y - b = mx
-        // (y - b) / m = x
-        // (y - b) / m = (y - b1) / m1
-        // y(1/m - 1/m1) = b/m - b1/m1
-        // y = (b/m - b1/m1) / (1/m - 1/m1)
-
-        // double yIntercept1 = m * (xIntercept1 - x1) + y1;
-        // double yIntercept2 = m * (xIntercept2 - x2) + y2;
-        // double yIntercept3 = m * (xIntercept3 - x3) + y3;
-
         double yIntercept1 = (b / m - b1 / m1) / (1 / m - 1 / m1);
         double yIntercept2 = (b / m - b2 / m2) / (1 / m - 1 / m2);
         double yIntercept3 = (b / m - b3 / m3) / (1 / m - 1 / m3);
-
-        double distance = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-
-        double distance1 = Math.sqrt(Math.pow(xIntercept1 - x, 2) + Math.pow(yIntercept1 - y, 2));
-        double distance2 = Math.sqrt(Math.pow(xIntercept2 - x, 2) + Math.pow(yIntercept2 - y, 2));
-        double distance3 = Math.sqrt(Math.pow(xIntercept3 - x, 2) + Math.pow(yIntercept3 - y, 2));
 
         boolean distance1IsHit =
                 MathUtil.isNear(x, xIntercept1, Math.abs(dx))
@@ -182,13 +162,6 @@ public class FieldFinder {
         boolean distance3IsHit =
                 MathUtil.isNear(x, xIntercept3, Math.abs(dx))
                         && MathUtil.isNear(y, yIntercept3, Math.abs(dy));
-
-        Logger.recordOutput(
-                "localizer/pose/1", new Pose2d(xIntercept1, yIntercept1, new Rotation2d(0)));
-        Logger.recordOutput(
-                "localizer/pose/2", new Pose2d(xIntercept2, yIntercept2, new Rotation2d(0)));
-        Logger.recordOutput(
-                "localizer/pose/3", new Pose2d(xIntercept3, yIntercept3, new Rotation2d(0)));
 
         return inTheTriangle(x, y, x1, y1, x2, y2, x3, y3)
                 || (distance1IsHit

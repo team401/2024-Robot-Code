@@ -1,7 +1,9 @@
 package frc.robot.subsystems.scoring;
 
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -11,6 +13,8 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ScoringConstants;
+import frc.robot.utils.FieldFinder;
+import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -28,14 +32,15 @@ public class ScoringSubsystem extends SubsystemBase {
     private final Timer shootTimer = new Timer();
 
     private final Supplier<Pose2d> poseSupplier;
+    private final Supplier<Vector<N2>> velocitySupplier;
 
     private final InterpolateDouble shooterInterpolated;
     private final InterpolateDouble aimerInterpolated;
 
     private final Mechanism2d mechanism = new Mechanism2d(2.2, 2.0);
-    private final MechanismRoot2d rootMechanism = mechanism.getRoot("scoring", 0.1, 0.2);
+    private final MechanismRoot2d rootMechanism = mechanism.getRoot("scoring", 0.3, 0.3);
     private final MechanismLigament2d aimMechanism =
-            rootMechanism.append(new MechanismLigament2d("aimer", 1.0, 0.0));
+            rootMechanism.append(new MechanismLigament2d("aimer", 0.5, 0.0));
     private final MechanismLigament2d hoodMechanism =
             aimMechanism.append(
                     new MechanismLigament2d("hood", 0.2, 0.0, 10.0, new Color8Bit(0, 200, 50)));
@@ -64,12 +69,17 @@ public class ScoringSubsystem extends SubsystemBase {
     private ScoringAction action = ScoringAction.WAIT;
 
     public ScoringSubsystem(
-            ShooterIO shooterIo, AimerIO aimerIo, HoodIO hoodIo, Supplier<Pose2d> poseSupplier) {
+            ShooterIO shooterIo,
+            AimerIO aimerIo,
+            HoodIO hoodIo,
+            Supplier<Pose2d> poseSupplier,
+            Supplier<Vector<N2>> velocitySupplier) {
         this.shooterIo = shooterIo;
         this.aimerIo = aimerIo;
         this.hoodIo = hoodIo;
 
         this.poseSupplier = poseSupplier;
+        this.velocitySupplier = velocitySupplier;
 
         shooterInterpolated = new InterpolateDouble(ScoringConstants.getShooterMap());
 
@@ -219,6 +229,25 @@ public class ScoringSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if (FieldFinder.willIHitThis(
+                        poseSupplier.get().getX(),
+                        poseSupplier.get().getY(),
+                        velocitySupplier.get().get(0, 0),
+                        velocitySupplier.get().get(1, 0),
+                        FieldLocations.BLUE_STAGE)
+                || FieldFinder.willIHitThis(
+                        poseSupplier.get().getX(),
+                        poseSupplier.get().getY(),
+                        velocitySupplier.get().get(0, 0),
+                        velocitySupplier.get().get(1, 0),
+                        FieldLocations.RED_STAGE)) {
+            aimerIo.setAngleClampsRad(0, 0);
+        } else {
+            aimerIo.setAngleClampsRad(0, ScoringConstants.aimMaxAngleRadians);
+        }
+
+        aimerIo.controlAimAngleRad();
+
         Logger.recordOutput("scoring/State", state.toString());
         Logger.recordOutput("scoring/Action", action.toString());
 

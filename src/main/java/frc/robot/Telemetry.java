@@ -4,6 +4,7 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -35,6 +36,14 @@ public class Telemetry {
     NetworkTable table = inst.getTable("Pose");
     DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("robotPose").publish();
     StringPublisher fieldTypePub = table.getStringTopic(".type").publish();
+
+    SwerveModuleState[] moduleStates =
+            new SwerveModuleState[] {
+                new SwerveModuleState(),
+                new SwerveModuleState(),
+                new SwerveModuleState(),
+                new SwerveModuleState()
+            };
 
     double robotRotation = 0;
 
@@ -139,6 +148,7 @@ public class Telemetry {
             m_moduleSpeeds[i].setLength(
                     state.ModuleStates[i].speedMetersPerSecond / (2 * maxSpeed));
 
+            moduleStates[i] = state.ModuleStates[i];
             SmartDashboard.putData("Module " + i, m_moduleMechanisms[i]);
         }
     }
@@ -150,6 +160,7 @@ public class Telemetry {
     public void logDataSynchronously() {
         Pose2d pose = new Pose2d(m_lastPose.getX(), m_lastPose.getY(), m_lastPose.getRotation());
         Logger.recordOutput("Telemetry/fieldToRobot", pose);
+        Logger.recordOutput("Telemetry/moduleStates", moduleStates);
     }
 
     public double getRotationRadians() {

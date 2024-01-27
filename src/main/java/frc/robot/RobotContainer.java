@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -80,7 +81,7 @@ public class RobotContainer {
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.WAIT)));
         
-        controller.povUp()
+        controller.rightBumper()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.AMP_AIM)));
@@ -89,6 +90,26 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.WAIT)));
+        
+        controller.povUp()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.seedFieldRelative(
+                        new Pose2d(new Translation2d(driveTelemetry.m_lastPose.getX(), driveTelemetry.m_lastPose.getY() + 0.1), Rotation2d.fromDegrees(90)))));
+        
+        controller.povDown()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.seedFieldRelative(
+                        new Pose2d(new Translation2d(driveTelemetry.m_lastPose.getX(), driveTelemetry.m_lastPose.getY() - 0.1), Rotation2d.fromDegrees(90)))));
+
+        controller.povLeft()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.seedFieldRelative(
+                        new Pose2d(new Translation2d(driveTelemetry.m_lastPose.getX() - 0.1, driveTelemetry.m_lastPose.getY()), Rotation2d.fromDegrees(90)))));
+
+        controller.povRight()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.seedFieldRelative(
+                        new Pose2d(new Translation2d(driveTelemetry.m_lastPose.getX() + 0.1, driveTelemetry.m_lastPose.getY()), Rotation2d.fromDegrees(90)))));
     } // spotless:on
 
     private void configureModes() {}
@@ -101,7 +122,11 @@ public class RobotContainer {
                                 new ShooterIOTalon(),
                                 new AimerIOTalon(),
                                 new HoodIOVortex(),
-                                driveTelemetry::getFieldToRobot);
+                                driveTelemetry::getFieldToRobot,
+                                () ->
+                                        VecBuilder.fill(
+                                                driveTelemetry.getVelocityX(),
+                                                driveTelemetry.getVelocityY()));
 
                 tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
                 break;
@@ -114,7 +139,11 @@ public class RobotContainer {
                                 new ShooterIOSim(),
                                 new AimerIOSim(),
                                 new HoodIOSim(),
-                                driveTelemetry::getFieldToRobot);
+                                driveTelemetry::getFieldToRobot,
+                                () ->
+                                        VecBuilder.fill(
+                                                driveTelemetry.getVelocityX(),
+                                                driveTelemetry.getVelocityY()));
 
                 // tagVision =
                 //         new VisionLocalizer(
