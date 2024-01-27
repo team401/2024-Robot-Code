@@ -1,21 +1,24 @@
 package frc.robot.subsystems.endgame;
 
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
-import frc.robot.Constants.EndgameConstants;
 
-public class EndgameSparkMaxIO implements EndgameIO {
+import frc.robot.Constants.EndgameConstants;
+import frc.robot.subsystems.endgame.EndgameSubsystem;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+public class EndgameSparkMaxIO implements EndgameIO{
 
     EndgameIOInputs endgameIOinputs = new EndgameIOInputs();
-    CANSparkMax leftEndgameMotor =
-            new CANSparkMax(EndgameConstants.leftMotorID, MotorType.kBrushless);
-    CANSparkMax rightEndgameMotor =
-            new CANSparkMax(EndgameConstants.rightMotorID, MotorType.kBrushless);
+    CANSparkMax leftEndgameMotor = new CANSparkMax(EndgameConstants.leftMotorID, MotorType.kBrushless);
+    CANSparkMax rightEndgameMotor = new CANSparkMax(EndgameConstants.rightMotorID, MotorType.kBrushless);
     /*leftMotor.follow(rightMotor, true);*/
     final double CURRENT_LIMIT = 25.0;
 
-    public void updateInputs(EndgameIOInputsAutoLogged inputs) {
+    public void updateInputs (EndgameIOInputsAutoLogged inputs) {
 
         endgameIOinputs.endgameLeftMotorCurrent = getLeftEndgameMotorAmps();
         endgameIOinputs.endgameRightMotorCurrent = getRightEndgameMotorAmps();
@@ -23,13 +26,16 @@ public class EndgameSparkMaxIO implements EndgameIO {
         endgameIOinputs.encoderRightPosition = getRightEndgameMotorAmps();
     }
 
-    public EndgameSparkMaxIO() {
+    public EndgameSparkMaxIO(){
 
-        leftEndgameMotor.setSmartCurrentLimit(80);
-        rightEndgameMotor.setSmartCurrentLimit(80);
+    
+    leftEndgameMotor.setSmartCurrentLimit(80);
+    rightEndgameMotor.setSmartCurrentLimit(80);
 
-        rightEndgameMotor.setIdleMode(IdleMode.kBrake);
-        leftEndgameMotor.setIdleMode(IdleMode.kBrake);
+    rightEndgameMotor.setIdleMode(IdleMode.kBrake);
+    leftEndgameMotor.setIdleMode(IdleMode.kBrake);
+
+    
     }
 
     public void setEndgameMotorPower(double leftPercent, double rightPercent) {
@@ -45,17 +51,16 @@ public class EndgameSparkMaxIO implements EndgameIO {
         return leftEndgameMotor.getOutputCurrent();
     }
 
-    public double getRightEndgamePosition() {
-        return rightEndgameMotor.getEncoder().getPosition() / EndgameConstants.ticksPerFoot;
+    public double getRightEndgamePosition(){
+        return rightEndgameMotor.getEncoder().getPosition()/EndgameConstants.ticksPerFoot;
     }
 
-    public double getLeftEndgamePosition() {
-        return leftEndgameMotor.getEncoder().getPosition() / EndgameConstants.ticksPerFoot;
+    public double getLeftEndgamePosition(){
+        return leftEndgameMotor.getEncoder().getPosition()/EndgameConstants.ticksPerFoot;
     }
 
     public void checkEndgameAmps() {
-        if (getLeftEndgameMotorAmps() > CURRENT_LIMIT
-                || getRightEndgameMotorAmps() > CURRENT_LIMIT) {
+        if (getLeftEndgameMotorAmps() > CURRENT_LIMIT || getRightEndgameMotorAmps() > CURRENT_LIMIT) {
             endgameIOinputs.endgameLeftMotorCurrent = 0;
             endgameIOinputs.endgameRightMotorCurrent = 0;
         }
