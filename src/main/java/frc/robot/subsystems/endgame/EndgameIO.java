@@ -12,14 +12,11 @@ public interface EndgameIO{
         public double endgameRightMotorCurrent = 0.0;
         public double encoderLeftPosition = 0.0;
         public double encoderRightPosition = 0.0;
+        public double endgameAmps = 0.0;
         //current and encoder position variables
     }
 
-    public default void updateInputs (EndgameIOInputs inputs){}
+    public default void updateInputs(EndgameIOInputs inputs){}
 
     public default void setEndgameMotorPower(double leftPercent, double rightPercent){}
-
-    public default void getEndgamePosition(double position){}
-
-    public default void checkEndgameAmps(double amps){}
 }
