@@ -10,6 +10,9 @@ import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.endgame.EndgameSimIO;
+import frc.robot.subsystems.endgame.EndgameSparkMaxIO;
+import frc.robot.subsystems.endgame.EndgameSubsystem;
 import frc.robot.subsystems.localization.VisionIOReal;
 import frc.robot.subsystems.localization.VisionIOSim;
 import frc.robot.subsystems.localization.VisionLocalizer;
@@ -21,7 +24,6 @@ import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ShooterIOSim;
 import frc.robot.subsystems.scoring.ShooterIOTalon;
 import java.util.Collections;
-import frc.robot.subsystems.endgame.EndgameSimIO;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
@@ -35,8 +37,9 @@ public class RobotContainer {
     CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain;
 
     Telemetry driveTelemetry = new Telemetry(DriveConstants.MaxSpeedMetPerSec);
-    
-    
+
+    EndgameSubsystem endgameSubsystem;
+
     public RobotContainer() {
         configureBindings();
         configureSubsystems();
@@ -105,6 +108,7 @@ public class RobotContainer {
                                 driveTelemetry::getFieldToRobot);
 
                 tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
+                endgameSubsystem = new EndgameSubsystem(new EndgameSparkMaxIO());
                 break;
             case SIM:
                 drivetrain.seedFieldRelative(DriveConstants.initialPose);
@@ -129,6 +133,7 @@ public class RobotContainer {
                                             Collections.emptyList(),
                                             driveTelemetry::getModuleStates));
                 }
+                endgameSubsystem = new EndgameSubsystem(new EndgameSimIO());
                 break;
             case REPLAY:
                 break;

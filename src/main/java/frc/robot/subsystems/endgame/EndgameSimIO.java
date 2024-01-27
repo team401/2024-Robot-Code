@@ -1,11 +1,7 @@
 package frc.robot.subsystems.endgame;
 
 import com.revrobotics.CANSparkMax;
-
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.EndgameConstants;
-
 
 public class EndgameSimIO implements EndgameIO {
     private CANSparkMax leftEndgameMotor, rightEndgameMotor;
@@ -13,13 +9,12 @@ public class EndgameSimIO implements EndgameIO {
     private int leftEndgameEncoder;
     private int encoderIndex;
     EndgameIOInputs endgameIOinputs = new EndgameIOInputs();
-  
 
-    public void EncoderSim​(Encoder encoder){
-        encoderIndex = encoder.getFPGAIndex();
-    }
+    // public void EncoderSim​(Encoder encoder){
+    //  encoderIndex = encoder.getFPGAIndex();
+    // }
 
-    public void updateInputs (EndgameIOInputsAutoLogged inputs) {
+    public void updateInputs(EndgameIOInputsAutoLogged inputs) {
 
         endgameIOinputs.endgameLeftMotorCurrent = getLeftEndgameMotorAmps();
         endgameIOinputs.endgameRightMotorCurrent = getRightEndgameMotorAmps();
@@ -40,16 +35,17 @@ public class EndgameSimIO implements EndgameIO {
         return leftEndgameMotor.getOutputCurrent();
     }
 
-    public double getRightEndgamePosition(){
-        return rightEndgameMotor.getEncoder().getPosition()/EndgameConstants.ticksPerFoot;
+    public double getRightEndgamePosition() {
+        return rightEndgameMotor.getEncoder().getPosition() / EndgameConstants.ticksPerFoot;
     }
 
-    public double getLeftEndgamePosition(){
-        return leftEndgameMotor.getEncoder().getPosition()/EndgameConstants.ticksPerFoot;
+    public double getLeftEndgamePosition() {
+        return leftEndgameMotor.getEncoder().getPosition() / EndgameConstants.ticksPerFoot;
     }
 
     public void checkEndgameAmps() {
-        if (getLeftEndgameMotorAmps() > CURRENT_LIMIT || getRightEndgameMotorAmps() > CURRENT_LIMIT) {
+        if (getLeftEndgameMotorAmps() > CURRENT_LIMIT
+                || getRightEndgameMotorAmps() > CURRENT_LIMIT) {
             endgameIOinputs.endgameLeftMotorCurrent = 0;
             endgameIOinputs.endgameRightMotorCurrent = 0;
         }

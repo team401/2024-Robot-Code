@@ -23,7 +23,6 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
     @SuppressWarnings("unused")
     private RobotContainer robotContainer;
-    public EndgameSimIO simIO = new EndgameSimIO();
 
     @SuppressWarnings("unused")
     private PowerDistribution pdh;
@@ -35,7 +34,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotInit() {
         Logger.recordMetadata("ProjectName", "2024 - 401 Comp Robot"); // TODO: Name the robot!
-        
+
         if (Constants.currentMode == Constants.Mode.REAL) {
             // Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs") TODO:
             // Add back later
@@ -60,7 +59,6 @@ public class Robot extends LoggedRobot {
 
         Logger.start();
         RobotContainer robotContainer = new RobotContainer();
-
     }
 
     @Override
