@@ -48,11 +48,11 @@ public class VisionLocalizer extends SubsystemBase {
 
     private Matrix<N3, N1> cameraUncertainty(double averageTagDistanceM, int nTags) {
         /*
-         * On this year's field, Apriltags are arranged into rough 'corridors' between the stage and
+         * On this year's field, AprilTags are arranged into rough 'corridors' between the stage and
          * speaker, and a central 'desert,' where few tags can be found. It follows that we should
-         * determine the variance of our camera mesurements based on that.
+         * determine the variance of our camera measurements based on that.
          */
-        if (nTags < 1) {
+        if (nTags < 2) {
             return VisionConstants.singleTagUncertainty;
         } else if (averageTagDistanceM < 2.0 && this.robotInMidField()) {
             return VisionConstants.lowCameraUncertainty;
