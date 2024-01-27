@@ -1,9 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -25,8 +22,8 @@ import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ShooterIOSim;
 import frc.robot.subsystems.scoring.ShooterIOTalon;
 import frc.robot.utils.FieldFinder;
-import org.littletonrobotics.junction.Logger;
 import java.util.Collections;
+import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
