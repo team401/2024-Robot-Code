@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.FeatureFlags;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveWithJoysticks;
@@ -19,6 +20,7 @@ import frc.robot.subsystems.scoring.HoodIOVortex;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ShooterIOSim;
 import frc.robot.subsystems.scoring.ShooterIOTalon;
+import java.util.Collections;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
@@ -111,10 +113,19 @@ public class RobotContainer {
                                 new HoodIOSim(),
                                 driveTelemetry::getFieldToRobot);
 
-                tagVision =
-                        new VisionLocalizer(
-                                new VisionIOSim(
-                                        VisionConstants.cameras, driveTelemetry::getModuleStates));
+                if (FeatureFlags.simulateVision) {
+                    tagVision =
+                            new VisionLocalizer(
+                                    new VisionIOSim(
+                                            VisionConstants.cameras,
+                                            driveTelemetry::getModuleStates));
+                } else {
+                    tagVision =
+                            new VisionLocalizer(
+                                    new VisionIOSim(
+                                            Collections.emptyList(),
+                                            driveTelemetry::getModuleStates));
+                }
                 break;
             case REPLAY:
                 break;

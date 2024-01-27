@@ -36,6 +36,10 @@ public final class Constants {
         REPLAY
     }
 
+    public static final class FeatureFlags {
+        public static final boolean simulateVision = false;
+    }
+
     public static final class ConversionConstants {
         public static final double kRadiansPerSecondToRPM = 60.0 / (2.0 * Math.PI);
     }
