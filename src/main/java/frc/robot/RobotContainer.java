@@ -90,26 +90,6 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.WAIT)));
-        
-        controller.povUp()
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.seedFieldRelative(
-                        new Pose2d(new Translation2d(driveTelemetry.m_lastPose.getX(), driveTelemetry.m_lastPose.getY() + 0.1), Rotation2d.fromDegrees(90)))));
-        
-        controller.povDown()
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.seedFieldRelative(
-                        new Pose2d(new Translation2d(driveTelemetry.m_lastPose.getX(), driveTelemetry.m_lastPose.getY() - 0.1), Rotation2d.fromDegrees(90)))));
-
-        controller.povLeft()
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.seedFieldRelative(
-                        new Pose2d(new Translation2d(driveTelemetry.m_lastPose.getX() - 0.1, driveTelemetry.m_lastPose.getY()), Rotation2d.fromDegrees(90)))));
-
-        controller.povRight()
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.seedFieldRelative(
-                        new Pose2d(new Translation2d(driveTelemetry.m_lastPose.getX() + 0.1, driveTelemetry.m_lastPose.getY()), Rotation2d.fromDegrees(90)))));
     } // spotless:on
 
     private void configureModes() {}
@@ -144,12 +124,6 @@ public class RobotContainer {
                                         VecBuilder.fill(
                                                 driveTelemetry.getVelocityX(),
                                                 driveTelemetry.getVelocityY()));
-
-                // tagVision =
-                //         new VisionLocalizer(
-                //                 new VisionIOSim(
-                //                         VisionConstants.cameras,
-                // driveTelemetry::getFieldToRobot));
                 break;
             case REPLAY:
                 break;
@@ -157,10 +131,6 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(driveTelemetry::telemeterize);
         Commands.run(driveTelemetry::logDataSynchronously).ignoringDisable(true).schedule();
-
-        // tagVision.setCameraConsumer(
-        //         (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
-        // tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
     }
 
     public void robotPeriodic() {
@@ -169,19 +139,5 @@ public class RobotContainer {
                 FieldFinder.whereAmI(
                         driveTelemetry.getFieldToRobot().getTranslation().getX(),
                         driveTelemetry.getFieldToRobot().getTranslation().getY()));
-        Logger.recordOutput(
-                "localizer/willIHitBlueStage",
-                FieldFinder.willIHitThis(
-                        driveTelemetry.getFieldToRobot().getTranslation().getX(),
-                        driveTelemetry.getFieldToRobot().getTranslation().getY(),
-                        driveTelemetry.getVelocityX() * 5,
-                        driveTelemetry.getVelocityY() * 5,
-                        FieldFinder.FieldLocations.BLUE_STAGE));
-        Logger.recordOutput(
-                "localizer/trajectory",
-                new Pose2d(
-                        driveTelemetry.getFieldToRobot().getX() + driveTelemetry.getVelocityX() * 5,
-                        driveTelemetry.getFieldToRobot().getY() + driveTelemetry.getVelocityY() * 5,
-                        driveTelemetry.getFieldToRobot().getRotation()));
     }
 }
