@@ -21,6 +21,7 @@ import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ShooterIOSim;
 import frc.robot.subsystems.scoring.ShooterIOTalon;
 import java.util.Collections;
+import frc.robot.subsystems.endgame.EndgameSimIO;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
@@ -34,12 +35,13 @@ public class RobotContainer {
     CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain;
 
     Telemetry driveTelemetry = new Telemetry(DriveConstants.MaxSpeedMetPerSec);
-
+    
+    
     public RobotContainer() {
         configureBindings();
         configureSubsystems();
         configureModes();
-        robotContainer = new RobotContainer();
+        EndgameSimIO endgameSimIO = new EndgameSimIO();
     }
 
     // spotless:off

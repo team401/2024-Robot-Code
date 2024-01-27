@@ -59,6 +59,8 @@ public class Robot extends LoggedRobot {
         }
 
         Logger.start();
+        RobotContainer robotContainer = new RobotContainer();
+
     }
 
     @Override
