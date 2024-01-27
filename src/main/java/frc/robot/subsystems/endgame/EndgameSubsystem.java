@@ -20,6 +20,7 @@ public class EndgameSubsystem extends SubsystemBase{
     private double endgamekI = 0.0;
     private double endgamekD = 0.0;
     EndgameIO endgameIO;
+    EndgameIOInputsAutoLogged endgameInputs = new EndgameIOInputsAutoLogged();
 
     // SmartDashboard 
     private double leftEndgameMotorPower = 0.5;
@@ -46,14 +47,15 @@ public class EndgameSubsystem extends SubsystemBase{
     }
 
     public void endgameControl() {
-        double leftOutput = endgameController.calculate(endgameIO.getLeftEndgamePosition(), endgameGoalPosition);
-        double rightOutput = endgameController.calculate(endgameIO.getRightEndgamePosition(), endgameGoalPosition);
+        double leftOutput = endgameController.calculate(endgameInputs.encoderLeftPosition, endgameGoalPosition);
+        double rightOutput = endgameController.calculate(endgameInputs.encoderRightPosition, endgameGoalPosition);
         endgameIO.setEndgameMotorPower(leftOutput, rightOutput);
-        endgameIO.checkEndgameAmps();
+        double amps = endgameInputs.endgameAmps;
     }
 
   @Override
   public void periodic(){
+    endgameIO.updateInputs(endgameInputs);
     endgameController.setPID(endgamekP, endgamekI, endgamekD);
     SmartDashboard.putNumber("left endgame motor power", leftEndgameMotorPower);
     SmartDashboard.putNumber("right endgame motor power", rightEndgameMotorPower);
