@@ -89,7 +89,6 @@ public final class Constants {
         public static final Matrix<N3, N1> driveUncertainty = VecBuilder.fill(0.1, 0.1, 0.1);
 
         // TODO: set up cameras in PhotonVision
-        // spotless:off
         public static final List<CameraParams> cameras =
                 List.of(
                         new CameraParams(
@@ -99,34 +98,33 @@ public final class Constants {
                                 20,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
-                                        new Translation3d(0.33, 0.33, 0.127), new Rotation3d())));
-                        // new CameraParams(
-                        //         "FrontRight",
-                        //         640,
-                        //         480,
-                        //         20,
-                        //         Rotation2d.fromDegrees(70),
-                        //         new Transform3d(
-                        //                 new Translation3d(0.33, -0.33, 0.127), new Rotation3d())),
-                        // new CameraParams(
-                        //         "BackLeft",
-                        //         640,
-                        //         480,
-                        //         20,
-                        //         Rotation2d.fromDegrees(70),
-                        //         new Transform3d(
-                        //                 new Translation3d(-0.33, -0.33, 0.127),
-                        //                 new Rotation3d(0.0, 0.0, 3.14))),
-                        // new CameraParams(
-                        //         "BackRight",
-                        //         640,
-                        //         480,
-                        //         20,
-                        //         Rotation2d.fromDegrees(70),
-                        //         new Transform3d(
-                        //                 new Translation3d(0.33, -0.33, 0.127),
-                        //                 new Rotation3d(0.0, 0.0, 3.14))));
-                    // spotless:on
+                                        new Translation3d(0.33, 0.33, 0.127), new Rotation3d())),
+                        new CameraParams(
+                                "FrontRight",
+                                640,
+                                480,
+                                20,
+                                Rotation2d.fromDegrees(70),
+                                new Transform3d(
+                                        new Translation3d(0.33, -0.33, 0.127), new Rotation3d())),
+                        new CameraParams(
+                                "BackLeft",
+                                640,
+                                480,
+                                20,
+                                Rotation2d.fromDegrees(70),
+                                new Transform3d(
+                                        new Translation3d(-0.33, -0.33, 0.127),
+                                        new Rotation3d(0.0, 0.0, 3.14))),
+                        new CameraParams(
+                                "BackRight",
+                                640,
+                                480,
+                                20,
+                                Rotation2d.fromDegrees(70),
+                                new Transform3d(
+                                        new Translation3d(0.33, -0.33, 0.127),
+                                        new Rotation3d(0.0, 0.0, 3.14))));
 
         public static record CameraParams(
                 String name,
