@@ -232,14 +232,14 @@ public class ScoringSubsystem extends SubsystemBase {
         if (FieldFinder.willIHitThis(
                         poseSupplier.get().getX(),
                         poseSupplier.get().getY(),
-                        velocitySupplier.get().get(0, 0),
-                        velocitySupplier.get().get(1, 0),
+                        velocitySupplier.get().get(0, 0) * ScoringConstants.timeToPutAimDown,
+                        velocitySupplier.get().get(1, 0) * ScoringConstants.timeToPutAimDown,
                         FieldLocations.BLUE_STAGE)
                 || FieldFinder.willIHitThis(
                         poseSupplier.get().getX(),
                         poseSupplier.get().getY(),
-                        velocitySupplier.get().get(0, 0),
-                        velocitySupplier.get().get(1, 0),
+                        velocitySupplier.get().get(0, 0) * ScoringConstants.timeToPutAimDown,
+                        velocitySupplier.get().get(1, 0) * ScoringConstants.timeToPutAimDown,
                         FieldLocations.RED_STAGE)) {
             aimerIo.setAngleClampsRad(0, 0);
         } else {

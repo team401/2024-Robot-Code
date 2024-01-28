@@ -351,6 +351,8 @@ public final class Constants {
 
         public static final double aimMaxAngleRadians = Math.PI / 2;
 
+        public static final double timeToPutAimDown = 2;
+
         // NOTE - These should be monotonically increasing
         // Key - Distance in meters
         // Value - Aimer angle in radians
