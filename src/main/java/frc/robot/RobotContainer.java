@@ -53,7 +53,8 @@ public class RobotContainer {
                         () -> -controller.getLeftX(),
                         () -> -controller.getRightX(),
                         () -> true,
-                        () -> false));
+                        () -> false,
+                        () -> controller.getHID().getRightBumper()));
 
         controller.a()
                 .onTrue(new InstantCommand(
@@ -143,6 +144,7 @@ public class RobotContainer {
         }
 
         drivetrain.registerTelemetry(driveTelemetry::telemeterize);
+        drivetrain.setPoseSupplier(driveTelemetry::getFieldToRobot);
         Commands.run(driveTelemetry::logDataSynchronously).ignoringDisable(true).schedule();
     }
 
