@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -37,8 +38,10 @@ public class ScoringSubsystem extends SubsystemBase {
     private final InterpolateDouble shooterInterpolated;
     private final InterpolateDouble aimerInterpolated;
 
-    private final Mechanism2d mechanism = new Mechanism2d(2.2, 2.0);
-    private final MechanismRoot2d rootMechanism = mechanism.getRoot("scoring", 0.6, 0.3);
+    private Translation2d fieldToSpeaker = FieldConstants.fieldToRedSpeaker;
+
+    private final Mechanism2d mechanism = new Mechanism2d(2.2, 1.2);
+    private final MechanismRoot2d rootMechanism = mechanism.getRoot("scoring", 1.1, 0.1);
     private final MechanismLigament2d aimMechanism =
             rootMechanism.append(new MechanismLigament2d("aimer", 0.5, 0.0));
     private final MechanismLigament2d hoodMechanism =
@@ -209,7 +212,7 @@ public class ScoringSubsystem extends SubsystemBase {
     }
 
     private double findDistanceToGoal() {
-        Translation2d speakerPose = FieldConstants.speakerPose;
+        Translation2d speakerPose = fieldToSpeaker;
         Pose2d robotPose = poseSupplier.get();
         double distancetoGoal =
                 Math.sqrt(
@@ -262,6 +265,20 @@ public class ScoringSubsystem extends SubsystemBase {
         aimMechanism.setAngle(Units.radiansToDegrees(aimerInputs.aimAngleRad));
         hoodMechanism.setAngle(Units.radiansToDegrees(hoodInputs.hoodAngleRad));
         Logger.recordOutput("scoring/mechanism2d", mechanism);
+
+        if (DriverStation.isDisabled()) {
+            DriverStation.getAlliance()
+                    .ifPresent(
+                            (a) -> {
+                                switch (a) {
+                                    case Blue:
+                                        fieldToSpeaker = FieldConstants.fieldToBlueSpeaker;
+                                        break;
+                                    case Red:
+                                        fieldToSpeaker = FieldConstants.fieldToRedSpeaker;
+                                }
+                            });
+        }
 
         switch (state) {
             case IDLE:
