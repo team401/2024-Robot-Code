@@ -132,8 +132,8 @@ public class Telemetry {
         lastTime = currentTime;
         Translation2d distanceDiff = pose.minus(latestPose).getTranslation();
 
-        velocityXFieldRelative = 10 * (pose.getX() - latestPose.getX());
-        velocityYFieldRelative = 10 * (pose.getY() - latestPose.getY());
+        velocityXFieldRelative = (pose.getX() - latestPose.getX()) / diffTime;
+        velocityYFieldRelative = (pose.getY() - latestPose.getY()) / diffTime;
 
         latestPose = pose;
 
