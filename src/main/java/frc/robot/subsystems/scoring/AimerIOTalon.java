@@ -6,6 +6,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.robot.Constants.ScoringConstants;
 
@@ -21,6 +22,9 @@ public class AimerIOTalon implements AimerIO {
     private final DutyCycleEncoder encoder = new DutyCycleEncoder(ScoringConstants.aimEncoderPort);
 
     double goalAngleRad = 0.0;
+
+    double minAngleClamp = 0.0;
+    double maxAngleClamp = 0.0;
 
     public AimerIOTalon() {
         aimerRight.setControl(new Follower(ScoringConstants.aimLeftMotorId, true));
@@ -48,8 +52,19 @@ public class AimerIOTalon implements AimerIO {
     }
 
     @Override
-    public void setAimAngleRad(double angle, boolean newProfile) {
-        goalAngleRad = angle;
+    public void setAimAngleRad(double goalAngleRad, boolean newProfile) {
+        this.goalAngleRad = goalAngleRad;
+    }
+
+    @Override
+    public void controlAimAngleRad() {
+        goalAngleRad = MathUtil.clamp(goalAngleRad, minAngleClamp, maxAngleClamp);
+    }
+
+    @Override
+    public void setAngleClampsRad(double minAngleClamp, double maxAngleClamp) {
+        this.minAngleClamp = minAngleClamp;
+        this.maxAngleClamp = maxAngleClamp;
     }
 
     @Override

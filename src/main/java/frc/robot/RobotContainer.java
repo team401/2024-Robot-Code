@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -20,7 +21,9 @@ import frc.robot.subsystems.scoring.HoodIOVortex;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ShooterIOSim;
 import frc.robot.subsystems.scoring.ShooterIOTalon;
+import frc.robot.utils.FieldFinder;
 import java.util.Collections;
+import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
@@ -78,7 +81,7 @@ public class RobotContainer {
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.WAIT)));
         
-        controller.povUp()
+        controller.rightBumper()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.AMP_AIM)));
@@ -99,7 +102,11 @@ public class RobotContainer {
                                 new ShooterIOTalon(),
                                 new AimerIOTalon(),
                                 new HoodIOVortex(),
-                                driveTelemetry::getFieldToRobot);
+                                driveTelemetry::getFieldToRobot,
+                                () ->
+                                        VecBuilder.fill(
+                                                driveTelemetry.getVelocityX(),
+                                                driveTelemetry.getVelocityY()));
 
                 tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
                 break;
@@ -111,7 +118,11 @@ public class RobotContainer {
                                 new ShooterIOSim(),
                                 new AimerIOSim(),
                                 new HoodIOSim(),
-                                driveTelemetry::getFieldToRobot);
+                                driveTelemetry::getFieldToRobot,
+                                () ->
+                                        VecBuilder.fill(
+                                                driveTelemetry.getVelocityX(),
+                                                driveTelemetry.getVelocityY()));
 
                 if (FeatureFlags.simulateVision) {
                     tagVision =
@@ -133,9 +144,13 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(driveTelemetry::telemeterize);
         Commands.run(driveTelemetry::logDataSynchronously).ignoringDisable(true).schedule();
+    }
 
-        tagVision.setCameraConsumer(
-                (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
-        tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
+    public void robotPeriodic() {
+        Logger.recordOutput(
+                "localizer/whereAmI",
+                FieldFinder.whereAmI(
+                        driveTelemetry.getFieldToRobot().getTranslation().getX(),
+                        driveTelemetry.getFieldToRobot().getTranslation().getY()));
     }
 }
