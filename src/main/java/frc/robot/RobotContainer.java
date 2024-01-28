@@ -1,5 +1,9 @@
 package frc.robot;
 
+import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -35,10 +39,13 @@ public class RobotContainer {
 
     Telemetry driveTelemetry = new Telemetry(DriveConstants.MaxSpeedMetPerSec);
 
+    SendableChooser<String> autoChooser = new SendableChooser<String>();
+
     public RobotContainer() {
         configureBindings();
         configureSubsystems();
         configureModes();
+        configureAutonomous();
     }
 
     // spotless:off
@@ -137,5 +144,33 @@ public class RobotContainer {
         tagVision.setCameraConsumer(
                 (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
         tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
+    }
+
+    public Command getAutonomousCommand() {
+        return drivetrain.getAutoPath(autoChooser.getSelected());
+    }
+
+    private void configureAutonomous() {
+        autoChooser.setDefaultOption("Default", "NewAuto");
+        autoChooser.addOption("New Auto", "NewAuto");
+
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+
+        NamedCommands.registerCommand(
+                "Shoot Scoring",
+                new InstantCommand(
+                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT)));
+        NamedCommands.registerCommand(
+                "Aim Scoring",
+                new InstantCommand(
+                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.AIM)));
+        NamedCommands.registerCommand(
+                "Intake Scoring",
+                new InstantCommand(
+                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.INTAKE)));
+        NamedCommands.registerCommand(
+                "Wait Scoring",
+                new InstantCommand(
+                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
     }
 }
