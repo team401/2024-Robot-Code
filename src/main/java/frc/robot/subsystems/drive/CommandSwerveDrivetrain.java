@@ -10,13 +10,22 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.TunerConstants;
+import frc.robot.utils.GeomUtil;
+import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Class that extends the Phoenix SwerveDrivetrain class and implements subsystem so it can be used
@@ -25,6 +34,12 @@ import frc.robot.Constants.TunerConstants;
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
     private double vx, vy, omega = 0.0;
     private boolean fieldCentric = true;
+    private boolean aligning = false;
+
+    private Supplier<Pose2d> getFieldToRobot = () -> new Pose2d();
+    private Translation2d fieldToSpeaker = FieldConstants.fieldToRedSpeaker;
+
+    private PIDController thetaController = new PIDController(.5, 0, 0);
 
     private SwerveRequest.FieldCentric driveFieldCentric = new SwerveRequest.FieldCentric();
     private SwerveRequest.RobotCentric driveRobotCentric = new SwerveRequest.RobotCentric();
@@ -43,6 +58,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         if (Constants.currentMode == Constants.Mode.SIM) {
             startSimThread();
         }
+
+        thetaController.enableContinuousInput(-180, 180);
     }
 
     public CommandSwerveDrivetrain(
@@ -52,6 +69,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         if (Constants.currentMode == Constants.Mode.SIM) {
             startSimThread();
         }
+        thetaController.enableContinuousInput(-180, 180);
+    }
+
+    public void setPoseSupplier(Supplier<Pose2d> getFieldToRobot) {
+        this.getFieldToRobot = getFieldToRobot;
     }
 
     private void configurePathPlanner() {
@@ -66,7 +88,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 this::getCurrentRobotChassisSpeeds,
                 (speeds) ->
                         this.setGoalChassisSpeeds(
-                                speeds, true), // Consumer of ChassisSpeeds to drive the robot
+                                speeds), // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
                         new PIDConstants(10, 0, 0),
                         new PIDConstants(10, 0, 0),
@@ -104,14 +126,29 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         simNotifier.startPeriodic(kSimLoopPeriod);
     }
 
-    public void setGoalChassisSpeeds(ChassisSpeeds chassisSpeeds, boolean fieldCen) {
+    public void setGoalChassisSpeeds(ChassisSpeeds chassisSpeeds, boolean fieldCen, boolean align) {
         vx = chassisSpeeds.vxMetersPerSecond;
         vy = chassisSpeeds.vyMetersPerSecond;
         omega = chassisSpeeds.omegaRadiansPerSecond;
         fieldCentric = fieldCen;
+        this.aligning = align;
+    }
+
+    public void setGoalChassisSpeeds(ChassisSpeeds chassisSpeeds) {
+        setGoalChassisSpeeds(chassisSpeeds, true, false);
     }
 
     private void controlDrivetrain() {
+        if (aligning) {
+            Pose2d pose = getFieldToRobot.get();
+            Rotation2d desiredHeading =
+                    calculateDesiredHeading(pose, new Pose2d(fieldToSpeaker, new Rotation2d()));
+
+            omega =
+                    thetaController.calculate(
+                            pose.getRotation().getDegrees(), desiredHeading.getDegrees());
+        }
+
         if (vx == 0 && vy == 0 && omega == 0) {
             setControl(brake);
         } else if (!fieldCentric) {
@@ -129,8 +166,48 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         }
     }
 
+    private static Rotation2d calculateDesiredHeading(Pose2d current, Pose2d target) {
+        // I hope this is all inlined
+        Pose2d robotToTarget = GeomUtil.transformToPose(current.minus(target));
+
+        Rotation2d angle =
+                Rotation2d.fromRadians(
+                        Math.atan(Math.abs(robotToTarget.getY()) / Math.abs(robotToTarget.getX())));
+
+        if (robotToTarget.getX() < 0 && robotToTarget.getY() < 0) {
+            angle = angle.plus(Rotation2d.fromDegrees(180));
+        } else if (robotToTarget.getX() < 0 && robotToTarget.getY() > 0) {
+            angle = Rotation2d.fromDegrees(180).minus(angle);
+        } else if (robotToTarget.getX() > 0 && robotToTarget.getY() < 0) {
+            angle = Rotation2d.fromDegrees(360).minus(angle);
+        }
+        angle = angle.plus(Rotation2d.fromDegrees(180));
+
+        return angle;
+    }
+
     @Override
     public void periodic() {
+        if (DriverStation.isDisabled()) {
+            DriverStation.getAlliance()
+                    .ifPresent(
+                            (a) -> {
+                                switch (a) {
+                                    case Blue:
+                                        fieldToSpeaker = FieldConstants.fieldToBlueSpeaker;
+                                        Logger.recordOutput(
+                                                "Drive/testSpeakerPose",
+                                                GeomUtil.translationToPose(fieldToSpeaker));
+                                        break;
+                                    case Red:
+                                        fieldToSpeaker = FieldConstants.fieldToRedSpeaker;
+                                        Logger.recordOutput(
+                                                "Drive/testSpeakerPose",
+                                                GeomUtil.translationToPose(fieldToSpeaker));
+                                        break;
+                                }
+                            });
+        }
         controlDrivetrain();
     }
 }
