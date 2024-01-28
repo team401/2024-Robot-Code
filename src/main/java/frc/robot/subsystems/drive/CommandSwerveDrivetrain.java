@@ -171,16 +171,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         Pose2d robotToTarget = GeomUtil.transformToPose(current.minus(target));
 
         Rotation2d angle =
-                Rotation2d.fromRadians(
-                        Math.atan(Math.abs(robotToTarget.getY()) / Math.abs(robotToTarget.getX())));
+                Rotation2d.fromRadians(Math.atan2(robotToTarget.getY(), robotToTarget.getX()));
 
-        if (robotToTarget.getX() < 0 && robotToTarget.getY() < 0) {
-            angle = angle.plus(Rotation2d.fromDegrees(180));
-        } else if (robotToTarget.getX() < 0 && robotToTarget.getY() > 0) {
-            angle = Rotation2d.fromDegrees(180).minus(angle);
-        } else if (robotToTarget.getX() > 0 && robotToTarget.getY() < 0) {
-            angle = Rotation2d.fromDegrees(360).minus(angle);
-        }
         angle = angle.plus(Rotation2d.fromDegrees(180));
 
         return angle;
