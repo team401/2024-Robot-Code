@@ -1,5 +1,9 @@
 package frc.robot;
 
+import java.util.Collections;
+
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -19,11 +23,10 @@ import frc.robot.subsystems.scoring.AimerIOTalon;
 import frc.robot.subsystems.scoring.HoodIOSim;
 import frc.robot.subsystems.scoring.HoodIOVortex;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringAction;
 import frc.robot.subsystems.scoring.ShooterIOSim;
 import frc.robot.subsystems.scoring.ShooterIOTalon;
 import frc.robot.utils.FieldFinder;
-import java.util.Collections;
-import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
@@ -57,85 +60,80 @@ public class RobotContainer {
 
         controller.a()
                 .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.INTAKE)));
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.INTAKE)));
 
         controller.b()
                 .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AIM)));
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.AIM)));
 
         controller.x()
                 .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.SHOOT)))
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.SHOOT)))
                 .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AIM)));
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.AIM)));
 
         controller.y()
                 .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.ENDGAME)))
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.ENDGAME)))
                 .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)));
-        
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.WAIT)));
+
         controller.rightBumper()
                 .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AMP_AIM)));
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.AMP_AIM)));
 
         controller.start()
                 .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)));
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.WAIT)));
     } // spotless:on
 
-    private void configureModes() {}
+    private void configureModes() {
+    }
 
     public void configureSubsystems() {
         switch (Constants.currentMode) {
             case REAL:
-                scoringSubsystem =
-                        new ScoringSubsystem(
-                                new ShooterIOTalon(),
-                                new AimerIOTalon(),
-                                new HoodIOVortex(),
-                                driveTelemetry::getFieldToRobot,
-                                () ->
-                                        VecBuilder.fill(
-                                                driveTelemetry.getVelocityX(),
-                                                driveTelemetry.getVelocityY()));
+                scoringSubsystem = new ScoringSubsystem(
+                        new ShooterIOTalon(),
+                        new AimerIOTalon(),
+                        new HoodIOVortex(),
+                        driveTelemetry::getFieldToRobot,
+                        () -> VecBuilder.fill(
+                                driveTelemetry.getVelocityX(),
+                                driveTelemetry.getVelocityY()));
 
                 tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
                 break;
             case SIM:
                 drivetrain.seedFieldRelative(DriveConstants.initialPose);
 
-                scoringSubsystem =
-                        new ScoringSubsystem(
-                                new ShooterIOSim(),
-                                new AimerIOSim(),
-                                new HoodIOSim(),
-                                driveTelemetry::getFieldToRobot,
-                                () ->
-                                        VecBuilder.fill(
-                                                driveTelemetry.getVelocityX(),
-                                                driveTelemetry.getVelocityY()));
+                scoringSubsystem = new ScoringSubsystem(
+                        new ShooterIOSim(),
+                        new AimerIOSim(),
+                        new HoodIOSim(),
+                        driveTelemetry::getFieldToRobot,
+                        () -> VecBuilder.fill(
+                                driveTelemetry.getVelocityX(),
+                                driveTelemetry.getVelocityY()));
 
                 if (FeatureFlags.simulateVision) {
-                    tagVision =
-                            new VisionLocalizer(
-                                    new VisionIOSim(
-                                            VisionConstants.cameras,
-                                            driveTelemetry::getModuleStates));
+                    tagVision = new VisionLocalizer(
+                            new VisionIOSim(
+                                    VisionConstants.cameras,
+                                    driveTelemetry::getModuleStates));
                 } else {
-                    tagVision =
-                            new VisionLocalizer(
-                                    new VisionIOSim(
-                                            Collections.emptyList(),
-                                            driveTelemetry::getModuleStates));
+                    tagVision = new VisionLocalizer(
+                            new VisionIOSim(
+                                    Collections.emptyList(),
+                                    driveTelemetry::getModuleStates));
                 }
                 break;
             case REPLAY:
@@ -144,6 +142,40 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(driveTelemetry::telemeterize);
         Commands.run(driveTelemetry::logDataSynchronously).ignoringDisable(true).schedule();
+    }
+
+    public void enabledInit() {
+        scoringSubsystem.setAction(ScoringAction.WAIT);
+    }
+
+    public void testInit(String choice) {
+        switch (choice) {
+            case "tuning":
+                break;
+            case "tuning-speaker":
+                drivetrain.seedFieldRelative();
+                scoringSubsystem.setAction(ScoringAction.TUNING);
+                controller.a()
+                        .onTrue(new InstantCommand(() -> scoringSubsystem
+                                .setTuningShooterGoalVelocityRPM(scoringSubsystem.getShooterVelocityRPM() + 10)));
+
+                controller.b()
+                        .onTrue(new InstantCommand(() -> scoringSubsystem
+                                .setTuningAimerGoalAngleRad(scoringSubsystem.getAimAngleRad() + 0.1)));
+
+                controller.x()
+                        .onTrue(new InstantCommand(() -> scoringSubsystem
+                                .setTuningAimerGoalAngleRad(scoringSubsystem.getAimAngleRad() - 0.1)));
+
+                controller.y()
+                        .onTrue(new InstantCommand(() -> scoringSubsystem
+                                .setTuningShooterGoalVelocityRPM(scoringSubsystem.getShooterVelocityRPM() - 10)));
+
+                controller.rightBumper()
+                        .onTrue(new InstantCommand(() -> scoringSubsystem.setTuningKickerVolts(5)))
+                        .onFalse(new InstantCommand(() -> scoringSubsystem.setTuningKickerVolts(0)));
+                break;
+        }
     }
 
     public void robotPeriodic() {

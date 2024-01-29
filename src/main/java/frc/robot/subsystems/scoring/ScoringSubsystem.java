@@ -1,5 +1,9 @@
 package frc.robot.subsystems.scoring;
 
+import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -16,8 +20,6 @@ import frc.robot.Constants.ScoringConstants;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
-import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 
 public class ScoringSubsystem extends SubsystemBase {
     private final ShooterIO shooterIo;
@@ -37,6 +39,10 @@ public class ScoringSubsystem extends SubsystemBase {
     private final InterpolateDouble shooterInterpolated;
     private final InterpolateDouble aimerInterpolated;
 
+    private double shooterGoalVelocityRPMTuning = 0.0;
+    private double aimerGoalAngleRadTuning = 0.0;
+    private double kickerVoltsTuning = 0.0;
+
     private final Mechanism2d mechanism = new Mechanism2d(2.2, 2.0);
     private final MechanismRoot2d rootMechanism = mechanism.getRoot("scoring", 0.6, 0.3);
     private final MechanismLigament2d aimMechanism =
@@ -52,7 +58,8 @@ public class ScoringSubsystem extends SubsystemBase {
         AMP_PRIME,
         SHOOT,
         AMP_SHOOT,
-        ENDGAME
+        ENDGAME,
+        TUNING
     }
 
     public enum ScoringAction {
@@ -61,7 +68,8 @@ public class ScoringSubsystem extends SubsystemBase {
         AIM,
         AMP_AIM,
         SHOOT,
-        ENDGAME
+        ENDGAME,
+        TUNING
     }
 
     private ScoringState state = ScoringState.IDLE;
@@ -109,6 +117,8 @@ public class ScoringSubsystem extends SubsystemBase {
             state = ScoringState.AMP_PRIME;
         } else if (action == ScoringAction.ENDGAME) {
             // state = ScoringState.ENDGAME; TODO: Later
+        } else if (action == ScoringAction.TUNING) {
+            state = ScoringState.TUNING;
         }
     }
 
@@ -208,6 +218,17 @@ public class ScoringSubsystem extends SubsystemBase {
         state = ScoringState.IDLE;
     }
 
+    private void tuning() {
+        shooterIo.setShooterVelocityRPM(shooterGoalVelocityRPMTuning);
+        aimerIo.setAimAngleRad(aimerGoalAngleRadTuning, false);
+        hoodIo.setHoodAngleRad(0.0);
+        shooterIo.setKickerVolts(kickerVoltsTuning);
+
+        if (action != ScoringAction.TUNING) {
+            state = ScoringState.IDLE;
+        }
+    }
+
     private double findDistanceToGoal() {
         Translation2d speakerPose = FieldConstants.speakerPose;
         Pose2d robotPose = poseSupplier.get();
@@ -229,7 +250,7 @@ public class ScoringSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (FieldFinder.willIHitThis(
+        if (state != ScoringState.TUNING && (FieldFinder.willIHitThis(
                         poseSupplier.get().getX(),
                         poseSupplier.get().getY(),
                         velocitySupplier.get().get(0, 0) * ScoringConstants.timeToPutAimDown,
@@ -240,7 +261,7 @@ public class ScoringSubsystem extends SubsystemBase {
                         poseSupplier.get().getY(),
                         velocitySupplier.get().get(0, 0) * ScoringConstants.timeToPutAimDown,
                         velocitySupplier.get().get(1, 0) * ScoringConstants.timeToPutAimDown,
-                        FieldLocations.RED_STAGE)) {
+                        FieldLocations.RED_STAGE))) {
             aimerIo.setAngleClampsRad(0, 0);
         } else {
             aimerIo.setAngleClampsRad(0, ScoringConstants.aimMaxAngleRadians);
@@ -258,6 +279,7 @@ public class ScoringSubsystem extends SubsystemBase {
         Logger.processInputs("scoring/shooter", shooterInputs);
         Logger.processInputs("scoring/aimer", aimerInputs);
         Logger.processInputs("scoring/hood", hoodInputs);
+
 
         aimMechanism.setAngle(Units.radiansToDegrees(aimerInputs.aimAngleRad));
         hoodMechanism.setAngle(Units.radiansToDegrees(hoodInputs.hoodAngleRad));
@@ -285,6 +307,29 @@ public class ScoringSubsystem extends SubsystemBase {
             case ENDGAME:
                 endgame(); // TODO: Later
                 break;
+            case TUNING:
+                tuning();
+                break;
         }
+    }
+
+    public double getAimAngleRad() {
+        return aimerInputs.aimAngleRad;
+    }
+
+    public double getShooterVelocityRPM() {
+        return shooterInputs.shooterVelocityRPM;
+    }
+
+    public void setTuningShooterGoalVelocityRPM(double shooterGoalVelocityRPMTuning) {
+        this.shooterGoalVelocityRPMTuning = shooterGoalVelocityRPMTuning;
+    }
+
+    public void setTuningAimerGoalAngleRad(double aimerGoalAngleRadTuning) {
+        this.aimerGoalAngleRadTuning = aimerGoalAngleRadTuning;
+    }
+
+    public void setTuningKickerVolts(double kickerVoltsTuning) {
+        this.kickerVoltsTuning = kickerVoltsTuning;
     }
 }
