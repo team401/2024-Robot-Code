@@ -1,5 +1,8 @@
 package frc.robot;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -24,6 +27,8 @@ import frc.robot.subsystems.scoring.ShooterIOTalon;
 import frc.robot.utils.FieldFinder;
 import java.util.Collections;
 import org.littletonrobotics.junction.Logger;
+
+import com.pathplanner.lib.auto.NamedCommands;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
@@ -163,7 +168,7 @@ public class RobotContainer {
 
     private void configureAutonomous() {
         autoChooser.setDefaultOption("Default", "NewAuto");
-        autoChooser.addOption("New Auto", "NewAuto");
+        autoChooser.addOption("New Auto", "5-Note");
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
