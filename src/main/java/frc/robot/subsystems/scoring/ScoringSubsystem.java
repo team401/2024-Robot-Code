@@ -1,9 +1,5 @@
 package frc.robot.subsystems.scoring;
 
-import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -20,6 +16,8 @@ import frc.robot.Constants.ScoringConstants;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
+import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class ScoringSubsystem extends SubsystemBase {
     private final ShooterIO shooterIo;
@@ -250,18 +248,23 @@ public class ScoringSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (state != ScoringState.TUNING && (FieldFinder.willIHitThis(
-                        poseSupplier.get().getX(),
-                        poseSupplier.get().getY(),
-                        velocitySupplier.get().get(0, 0) * ScoringConstants.timeToPutAimDown,
-                        velocitySupplier.get().get(1, 0) * ScoringConstants.timeToPutAimDown,
-                        FieldLocations.BLUE_STAGE)
-                || FieldFinder.willIHitThis(
-                        poseSupplier.get().getX(),
-                        poseSupplier.get().getY(),
-                        velocitySupplier.get().get(0, 0) * ScoringConstants.timeToPutAimDown,
-                        velocitySupplier.get().get(1, 0) * ScoringConstants.timeToPutAimDown,
-                        FieldLocations.RED_STAGE))) {
+        if (state != ScoringState.TUNING
+                && (FieldFinder.willIHitThis(
+                                poseSupplier.get().getX(),
+                                poseSupplier.get().getY(),
+                                velocitySupplier.get().get(0, 0)
+                                        * ScoringConstants.timeToPutAimDown,
+                                velocitySupplier.get().get(1, 0)
+                                        * ScoringConstants.timeToPutAimDown,
+                                FieldLocations.BLUE_STAGE)
+                        || FieldFinder.willIHitThis(
+                                poseSupplier.get().getX(),
+                                poseSupplier.get().getY(),
+                                velocitySupplier.get().get(0, 0)
+                                        * ScoringConstants.timeToPutAimDown,
+                                velocitySupplier.get().get(1, 0)
+                                        * ScoringConstants.timeToPutAimDown,
+                                FieldLocations.RED_STAGE))) {
             aimerIo.setAngleClampsRad(0, 0);
         } else {
             aimerIo.setAngleClampsRad(0, ScoringConstants.aimMaxAngleRadians);
@@ -279,7 +282,6 @@ public class ScoringSubsystem extends SubsystemBase {
         Logger.processInputs("scoring/shooter", shooterInputs);
         Logger.processInputs("scoring/aimer", aimerInputs);
         Logger.processInputs("scoring/hood", hoodInputs);
-
 
         aimMechanism.setAngle(Units.radiansToDegrees(aimerInputs.aimAngleRad));
         hoodMechanism.setAngle(Units.radiansToDegrees(hoodInputs.hoodAngleRad));
