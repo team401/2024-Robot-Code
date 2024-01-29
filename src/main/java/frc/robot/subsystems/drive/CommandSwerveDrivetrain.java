@@ -144,9 +144,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             Rotation2d desiredHeading =
                     calculateDesiredHeading(pose, new Pose2d(fieldToSpeaker, new Rotation2d()));
 
+            Logger.recordOutput("Drive/desiredHeading", desiredHeading);
+            Logger.recordOutput("Drive/fieldToSpeaker", fieldToSpeaker);
+
             omega =
                     thetaController.calculate(
                             pose.getRotation().getDegrees(), desiredHeading.getDegrees());
+            Logger.recordOutput("Drive/rotationError", thetaController.getPositionError());
         }
 
         if (vx == 0 && vy == 0 && omega == 0) {
