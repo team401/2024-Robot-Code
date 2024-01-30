@@ -12,21 +12,63 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Blue-1"
+            "name": "Shoot Scoring"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 4.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Blue-2"
+            "pathName": "Blue-S1-1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Blue-3"
+            "pathName": "Blue-1-2"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Blue-2-3"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Blue-3-4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Blue-4-E"
           }
         }
       ]
