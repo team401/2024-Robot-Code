@@ -1,12 +1,15 @@
 package frc.robot;
 
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FeatureFlags;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveWithJoysticks;
@@ -53,43 +56,44 @@ public class RobotContainer {
                         () -> -controller.getLeftX(),
                         () -> -controller.getRightX(),
                         () -> true,
-                        () -> false));
+                        () -> false,
+                        () -> controller.getHID().getRightBumper()));
 
         controller.a()
                 .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.INTAKE)));
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.INTAKE)));
 
         controller.b()
                 .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AIM)));
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.AIM)));
 
         controller.x()
                 .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.SHOOT)))
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.SHOOT)))
                 .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AIM)));
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.AIM)));
 
         controller.y()
                 .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.ENDGAME)))
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.ENDGAME)))
                 .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)));
-        
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.WAIT)));
+
         controller.rightBumper()
                 .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AMP_AIM)));
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.AMP_AIM)));
 
         controller.start()
                 .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)));
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.WAIT)));
     } // spotless:on
 
     private void configureModes() {}
@@ -106,7 +110,8 @@ public class RobotContainer {
                                 () ->
                                         VecBuilder.fill(
                                                 driveTelemetry.getVelocityX(),
-                                                driveTelemetry.getVelocityY()));
+                                                driveTelemetry.getVelocityY()),
+                                this::getFieldToSpeaker);
 
                 tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
                 break;
@@ -122,7 +127,8 @@ public class RobotContainer {
                                 () ->
                                         VecBuilder.fill(
                                                 driveTelemetry.getVelocityX(),
-                                                driveTelemetry.getVelocityY()));
+                                                driveTelemetry.getVelocityY()),
+                                this::getFieldToSpeaker);
 
                 if (FeatureFlags.simulateVision) {
                     tagVision =
@@ -143,7 +149,25 @@ public class RobotContainer {
         }
 
         drivetrain.registerTelemetry(driveTelemetry::telemeterize);
+        drivetrain.setPoseSupplier(driveTelemetry::getFieldToRobot);
+        drivetrain.setSpeakerSupplier(this::getFieldToSpeaker);
         Commands.run(driveTelemetry::logDataSynchronously).ignoringDisable(true).schedule();
+    }
+
+    private Translation2d getFieldToSpeaker() {
+        if (DriverStation.getAlliance().isEmpty()) {
+            return FieldConstants.fieldToRedSpeaker;
+        } else {
+            switch (DriverStation.getAlliance().get()) {
+                case Blue:
+                    Logger.recordOutput("Field/speaker", FieldConstants.fieldToBlueSpeaker);
+                    return FieldConstants.fieldToBlueSpeaker;
+                case Red:
+                    Logger.recordOutput("Field/speaker", FieldConstants.fieldToRedSpeaker);
+                    return FieldConstants.fieldToRedSpeaker;
+            }
+        }
+        throw new RuntimeException("Unreachable branch of switch expression");
     }
 
     public void robotPeriodic() {
