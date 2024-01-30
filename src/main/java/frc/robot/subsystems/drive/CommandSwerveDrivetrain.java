@@ -15,13 +15,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.utils.GeomUtil;
 import java.util.function.Supplier;
@@ -37,7 +35,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private boolean aligning = false;
 
     private Supplier<Pose2d> getFieldToRobot = () -> new Pose2d();
-    private Translation2d fieldToSpeaker = FieldConstants.fieldToRedSpeaker;
+    private Supplier<Translation2d> getFieldToSpeaker = () -> new Translation2d();
 
     private PIDController thetaController = new PIDController(.5, 0, 0);
 
@@ -74,6 +72,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public void setPoseSupplier(Supplier<Pose2d> getFieldToRobot) {
         this.getFieldToRobot = getFieldToRobot;
+    }
+
+    public void setSpeakerSupplier(Supplier<Translation2d> getFieldToSpeaker) {
+        this.getFieldToSpeaker = getFieldToSpeaker;
     }
 
     private void configurePathPlanner() {
@@ -142,10 +144,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         if (aligning) {
             Pose2d pose = getFieldToRobot.get();
             Rotation2d desiredHeading =
-                    calculateDesiredHeading(pose, new Pose2d(fieldToSpeaker, new Rotation2d()));
+                    calculateDesiredHeading(
+                            pose, new Pose2d(getFieldToSpeaker.get(), new Rotation2d()));
 
             Logger.recordOutput("Drive/desiredHeading", desiredHeading);
-            Logger.recordOutput("Drive/fieldToSpeaker", fieldToSpeaker);
+            Logger.recordOutput("Drive/fieldToSpeaker", getFieldToSpeaker.get());
 
             omega =
                     thetaController.calculate(
@@ -184,26 +187,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     @Override
     public void periodic() {
-        if (DriverStation.isDisabled()) {
-            DriverStation.getAlliance()
-                    .ifPresent(
-                            (a) -> {
-                                switch (a) {
-                                    case Blue:
-                                        fieldToSpeaker = FieldConstants.fieldToBlueSpeaker;
-                                        Logger.recordOutput(
-                                                "Drive/testSpeakerPose",
-                                                GeomUtil.translationToPose(fieldToSpeaker));
-                                        break;
-                                    case Red:
-                                        fieldToSpeaker = FieldConstants.fieldToRedSpeaker;
-                                        Logger.recordOutput(
-                                                "Drive/testSpeakerPose",
-                                                GeomUtil.translationToPose(fieldToSpeaker));
-                                        break;
-                                }
-                            });
-        }
         controlDrivetrain();
     }
 }

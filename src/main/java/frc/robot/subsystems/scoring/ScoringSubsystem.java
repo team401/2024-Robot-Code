@@ -5,14 +5,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
@@ -38,7 +36,7 @@ public class ScoringSubsystem extends SubsystemBase {
     private final InterpolateDouble shooterInterpolated;
     private final InterpolateDouble aimerInterpolated;
 
-    private Translation2d fieldToSpeaker = FieldConstants.fieldToRedSpeaker;
+    private final Supplier<Translation2d> speakerSupplier;
 
     private final Mechanism2d mechanism = new Mechanism2d(2.2, 2.0);
     private final MechanismRoot2d rootMechanism = mechanism.getRoot("scoring", 0.6, 0.3);
@@ -76,13 +74,16 @@ public class ScoringSubsystem extends SubsystemBase {
             AimerIO aimerIo,
             HoodIO hoodIo,
             Supplier<Pose2d> poseSupplier,
-            Supplier<Vector<N2>> velocitySupplier) {
+            Supplier<Vector<N2>> velocitySupplier,
+            Supplier<Translation2d> speakerSupplier) {
         this.shooterIo = shooterIo;
         this.aimerIo = aimerIo;
         this.hoodIo = hoodIo;
 
         this.poseSupplier = poseSupplier;
         this.velocitySupplier = velocitySupplier;
+
+        this.speakerSupplier = speakerSupplier;
 
         shooterInterpolated = new InterpolateDouble(ScoringConstants.getShooterMap());
 
@@ -212,7 +213,7 @@ public class ScoringSubsystem extends SubsystemBase {
     }
 
     private double findDistanceToGoal() {
-        Translation2d speakerPose = fieldToSpeaker;
+        Translation2d speakerPose = speakerSupplier.get();
         Pose2d robotPose = poseSupplier.get();
         double distancetoGoal =
                 Math.sqrt(
@@ -265,20 +266,6 @@ public class ScoringSubsystem extends SubsystemBase {
         aimMechanism.setAngle(Units.radiansToDegrees(aimerInputs.aimAngleRad));
         hoodMechanism.setAngle(Units.radiansToDegrees(hoodInputs.hoodAngleRad));
         Logger.recordOutput("scoring/mechanism2d", mechanism);
-
-        if (DriverStation.isDisabled()) {
-            DriverStation.getAlliance()
-                    .ifPresent(
-                            (a) -> {
-                                switch (a) {
-                                    case Blue:
-                                        fieldToSpeaker = FieldConstants.fieldToBlueSpeaker;
-                                        break;
-                                    case Red:
-                                        fieldToSpeaker = FieldConstants.fieldToRedSpeaker;
-                                }
-                            });
-        }
 
         switch (state) {
             case IDLE:
