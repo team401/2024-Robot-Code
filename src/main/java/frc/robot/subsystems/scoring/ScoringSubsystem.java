@@ -40,8 +40,8 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private Translation2d fieldToSpeaker = FieldConstants.fieldToRedSpeaker;
 
-    private final Mechanism2d mechanism = new Mechanism2d(2.2, 1.2);
-    private final MechanismRoot2d rootMechanism = mechanism.getRoot("scoring", 1.1, 0.1);
+    private final Mechanism2d mechanism = new Mechanism2d(2.2, 2.0);
+    private final MechanismRoot2d rootMechanism = mechanism.getRoot("scoring", 0.6, 0.3);
     private final MechanismLigament2d aimMechanism =
             rootMechanism.append(new MechanismLigament2d("aimer", 0.5, 0.0));
     private final MechanismLigament2d hoodMechanism =
