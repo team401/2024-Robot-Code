@@ -53,7 +53,6 @@ public class EndgameSubsystem extends SubsystemBase{
         endgameIO.setEndgameMotorPower(leftOutput, rightOutput);
         double amps = endgameInputs.endgameAmps;
     }
-}
   @Override
   public void periodic(){
     endgameIO.updateInputs(endgameInputs);
