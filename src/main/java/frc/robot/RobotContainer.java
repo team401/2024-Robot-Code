@@ -176,7 +176,7 @@ public class RobotContainer {
                 // spotless:on
         }
     }
-      
+
     private Translation2d getFieldToSpeaker() {
         if (DriverStation.getAlliance().isEmpty()) {
             return FieldConstants.fieldToRedSpeaker;
