@@ -74,7 +74,7 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().cancelAll();
 
         robotContainer.enabledInit();
-      
+
         if (robotContainer.getAutonomousCommand() != null) {
             robotContainer.getAutonomousCommand().schedule();
         }
