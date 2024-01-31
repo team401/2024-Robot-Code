@@ -14,11 +14,6 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.endgame.EndgameSimIO;
-
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -39,7 +34,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotInit() {
         Logger.recordMetadata("ProjectName", "2024 - 401 Comp Robot"); // TODO: Name the robot!
-        
+
         if (Constants.currentMode == Constants.Mode.REAL) {
             // Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs") TODO:
             // Add back later
@@ -63,7 +58,7 @@ public class Robot extends LoggedRobot {
         }
 
         Logger.start();
-        RobotContainer robotContainer = new RobotContainer();
+        robotContainer = new RobotContainer();
     }
 
     @Override

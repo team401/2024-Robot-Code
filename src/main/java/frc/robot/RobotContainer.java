@@ -44,7 +44,6 @@ public class RobotContainer {
         configureBindings();
         configureSubsystems();
         configureModes();
-        EndgameSimIO endgameSimIO = new EndgameSimIO();
     }
 
     // spotless:off
