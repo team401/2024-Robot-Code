@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
@@ -41,6 +40,8 @@ public class ScoringSubsystem extends SubsystemBase {
     private double shooterGoalVelocityRPMTuning = 0.0;
     private double aimerGoalAngleRadTuning = 0.0;
     private double kickerVoltsTuning = 0.0;
+
+    private final Supplier<Translation2d> speakerSupplier;
 
     private final Mechanism2d mechanism = new Mechanism2d(2.2, 2.0);
     private final MechanismRoot2d rootMechanism = mechanism.getRoot("scoring", 0.6, 0.3);
@@ -80,13 +81,16 @@ public class ScoringSubsystem extends SubsystemBase {
             AimerIO aimerIo,
             HoodIO hoodIo,
             Supplier<Pose2d> poseSupplier,
-            Supplier<Vector<N2>> velocitySupplier) {
+            Supplier<Vector<N2>> velocitySupplier,
+            Supplier<Translation2d> speakerSupplier) {
         this.shooterIo = shooterIo;
         this.aimerIo = aimerIo;
         this.hoodIo = hoodIo;
 
         this.poseSupplier = poseSupplier;
         this.velocitySupplier = velocitySupplier;
+
+        this.speakerSupplier = speakerSupplier;
 
         shooterInterpolated = new InterpolateDouble(ScoringConstants.getShooterMap());
 
@@ -233,7 +237,7 @@ public class ScoringSubsystem extends SubsystemBase {
     }
 
     private double findDistanceToGoal() {
-        Translation2d speakerPose = FieldConstants.speakerPose;
+        Translation2d speakerPose = speakerSupplier.get();
         Pose2d robotPose = poseSupplier.get();
         double distancetoGoal =
                 Math.sqrt(
