@@ -166,7 +166,7 @@ public class RobotContainer {
     }
 
     private void configureAutonomous() {
-        autoChooser.setDefaultOption("Default", "NewAuto");
+        autoChooser.setDefaultOption("Default", "5-Note");
         autoChooser.addOption("New Auto", "5-Note");
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
