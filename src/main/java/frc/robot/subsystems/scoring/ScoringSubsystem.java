@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FieldConstants;
@@ -117,6 +118,8 @@ public class ScoringSubsystem extends SubsystemBase {
             // state = ScoringState.ENDGAME; TODO: Later
         } else if (action == ScoringAction.TUNING) {
             state = ScoringState.TUNING;
+            SmartDashboard.putNumber("Tuning/AimerGoal", aimerGoalAngleRadTuning);
+            SmartDashboard.putNumber("Tuning/ShooterGoal", shooterGoalVelocityRPMTuning);
         }
     }
 
@@ -217,6 +220,8 @@ public class ScoringSubsystem extends SubsystemBase {
     }
 
     private void tuning() {
+        shooterGoalVelocityRPMTuning = SmartDashboard.getNumber("Tuning/ShooterGoal", 0.0);
+        aimerGoalAngleRadTuning = SmartDashboard.getNumber("Tuning/AimerGoal", 0.0);
         shooterIo.setShooterVelocityRPM(shooterGoalVelocityRPMTuning);
         aimerIo.setAimAngleRad(aimerGoalAngleRadTuning, false);
         hoodIo.setHoodAngleRad(0.0);
@@ -321,14 +326,6 @@ public class ScoringSubsystem extends SubsystemBase {
 
     public double getShooterVelocityRPM() {
         return shooterInputs.shooterVelocityRPM;
-    }
-
-    public void setTuningShooterGoalVelocityRPM(double shooterGoalVelocityRPMTuning) {
-        this.shooterGoalVelocityRPMTuning = shooterGoalVelocityRPMTuning;
-    }
-
-    public void setTuningAimerGoalAngleRad(double aimerGoalAngleRadTuning) {
-        this.aimerGoalAngleRadTuning = aimerGoalAngleRadTuning;
     }
 
     public void setTuningKickerVolts(double kickerVoltsTuning) {

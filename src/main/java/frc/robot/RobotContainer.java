@@ -159,26 +159,6 @@ public class RobotContainer {
                 drivetrain.seedFieldRelative();
                 scoringSubsystem.setAction(ScoringAction.TUNING);
                 // spotless:off
-                controller.a()
-                        .onTrue(new InstantCommand(
-                            () -> scoringSubsystem.setTuningShooterGoalVelocityRPM(
-                                scoringSubsystem.getShooterVelocityRPM() + 10)));
-
-                controller.b()
-                        .onTrue(new InstantCommand(
-                            () -> scoringSubsystem.setTuningAimerGoalAngleRad(
-                                scoringSubsystem.getAimAngleRad() + 0.1)));
-
-                controller.x()
-                        .onTrue(new InstantCommand(
-                            () -> scoringSubsystem.setTuningAimerGoalAngleRad(
-                                scoringSubsystem.getAimAngleRad() - 0.1)));
-
-                controller.y()
-                        .onTrue(new InstantCommand(
-                            () -> scoringSubsystem.setTuningShooterGoalVelocityRPM(
-                                scoringSubsystem.getShooterVelocityRPM() - 10)));
-
                 controller.rightBumper()
                         .onTrue(new InstantCommand(
                             () -> scoringSubsystem.setTuningKickerVolts(5)))
