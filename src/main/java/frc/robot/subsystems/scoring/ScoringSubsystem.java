@@ -1,7 +1,13 @@
 package frc.robot.subsystems.scoring;
 
+import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.util.Units;
@@ -9,6 +15,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FieldConstants;
@@ -16,8 +23,6 @@ import frc.robot.Constants.ScoringConstants;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
-import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 
 public class ScoringSubsystem extends SubsystemBase {
     private final ShooterIO shooterIo;
@@ -81,6 +86,13 @@ public class ScoringSubsystem extends SubsystemBase {
         this.poseSupplier = poseSupplier;
         this.velocitySupplier = velocitySupplier;
 
+        SmartDashboard.putNumber("Aimer_X", -0.51);
+        SmartDashboard.putNumber("Aimer_Y", -0.245);
+        SmartDashboard.putNumber("Aimer_Z", 0);
+        SmartDashboard.putNumber("Hood_X", -0.5);
+        SmartDashboard.putNumber("Hood_Y", 0.3);
+        SmartDashboard.putNumber("Hood_Z", -0.2);
+
         shooterInterpolated = new InterpolateDouble(ScoringConstants.getShooterMap());
 
         aimerInterpolated =
@@ -102,7 +114,7 @@ public class ScoringSubsystem extends SubsystemBase {
 
         if (!hasNote() && action == ScoringAction.INTAKE) {
             state = ScoringState.INTAKE;
-        } else if (action == ScoringAction.AIM) {
+        } else if (action == ScoringAction.AIM || action == ScoringAction.SHOOT) {
             state = ScoringState.PRIME;
             aimerIo.setAimAngleRad(Math.PI / 2, true);
         } else if (action == ScoringAction.AMP_AIM) {
@@ -258,6 +270,24 @@ public class ScoringSubsystem extends SubsystemBase {
         Logger.processInputs("scoring/shooter", shooterInputs);
         Logger.processInputs("scoring/aimer", aimerInputs);
         Logger.processInputs("scoring/hood", hoodInputs);
+
+        Logger.recordOutput(
+                "scoring/Aimer3d",
+                new Pose3d(
+                        SmartDashboard.getNumber("Aimer_X", -0.51),
+                        SmartDashboard.getNumber("Aimer_Y", -0.245),
+                        SmartDashboard.getNumber("Aimer_Z", 0),
+                        new Rotation3d(0, aimerInputs.aimAngleRad, 0)));
+        // -0.51, -0.245, 0, new Rotation3d(0, aimerInputs.aimAngleRad, 0)));
+        Logger.recordOutput(
+                "scoring/Hood3d",
+                new Pose3d(
+                        SmartDashboard.getNumber("Hood_X", -0.5),
+                        SmartDashboard.getNumber("Hood_Y", 0.3),
+                        SmartDashboard.getNumber("Hood_Z", -0.2),
+                        new Rotation3d(0, hoodInputs.hoodAngleRad + aimerInputs.aimAngleRad, 0)));
+        // -0.5, 0.3, -0.2, new Rotation3d(0, 0, hoodInputs.hoodAngleRad +
+        // aimerInputs.aimAngleRad)));
 
         aimMechanism.setAngle(Units.radiansToDegrees(aimerInputs.aimAngleRad));
         hoodMechanism.setAngle(Units.radiansToDegrees(hoodInputs.hoodAngleRad));
