@@ -320,14 +320,6 @@ public class ScoringSubsystem extends SubsystemBase {
         }
     }
 
-    public double getAimAngleRad() {
-        return aimerInputs.aimAngleRad;
-    }
-
-    public double getShooterVelocityRPM() {
-        return shooterInputs.shooterVelocityRPM;
-    }
-
     public void setTuningKickerVolts(double kickerVoltsTuning) {
         this.kickerVoltsTuning = kickerVoltsTuning;
     }
