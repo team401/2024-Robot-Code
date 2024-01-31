@@ -1,12 +1,16 @@
 package frc.robot;
 
+import java.util.Collections;
+
+import org.littletonrobotics.junction.Logger;
+
 import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -29,8 +33,6 @@ import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ShooterIOSim;
 import frc.robot.subsystems.scoring.ShooterIOTalon;
 import frc.robot.utils.FieldFinder;
-import java.util.Collections;
-import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
@@ -162,19 +164,20 @@ public class RobotContainer {
     }
 
     private Translation2d getFieldToSpeaker() {
-        if (DriverStation.getAlliance().isEmpty()) {
-            return FieldConstants.fieldToRedSpeaker;
-        } else {
-            switch (DriverStation.getAlliance().get()) {
-                case Blue:
-                    Logger.recordOutput("Field/speaker", FieldConstants.fieldToBlueSpeaker);
-                    return FieldConstants.fieldToBlueSpeaker;
-                case Red:
-                    Logger.recordOutput("Field/speaker", FieldConstants.fieldToRedSpeaker);
-                    return FieldConstants.fieldToRedSpeaker;
-            }
-        }
-        throw new RuntimeException("Unreachable branch of switch expression");
+        return FieldConstants.fieldToBlueSpeaker;
+        // if (DriverStation.getAlliance().isEmpty()) {
+        //     return FieldConstants.fieldToBlueSpeaker;
+        // } else {
+        //     switch (DriverStation.getAlliance().get()) {
+        //         case Blue:
+        //             Logger.recordOutput("Field/speaker", FieldConstants.fieldToBlueSpeaker);
+        //             return FieldConstants.fieldToBlueSpeaker;
+        //         case Red:
+        //             Logger.recordOutput("Field/speaker", FieldConstants.fieldToRedSpeaker);
+        //             return FieldConstants.fieldToRedSpeaker;
+        //     }
+        // }
+        // throw new RuntimeException("Unreachable branch of switch expression");
     }
 
     public void robotPeriodic() {
@@ -190,8 +193,12 @@ public class RobotContainer {
     }
 
     private void configureAutonomous() {
-        autoChooser.setDefaultOption("Default", "5-Note");
-        autoChooser.addOption("New Auto", "5-Note");
+        autoChooser.setDefaultOption("Default (Blue-S1 5-Note)", "Blue-S1-1-2-3-4");
+        autoChooser.addOption("Blue-S1 4-Note", "Blue-S1-1-2-3");
+        autoChooser.addOption("Blue-S1 3-Note", "Blue-S1-1-2");
+
+        autoChooser.addOption("Blue-S2 4-Note", "Blue-S2-2-3-4");
+        autoChooser.addOption("Blue-S2 3-Note", "Blue-S2-2-3");
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
 

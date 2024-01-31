@@ -90,10 +90,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 this::getCurrentRobotChassisSpeeds,
                 (speeds) ->
                         this.setGoalChassisSpeeds(
-                                speeds), // Consumer of ChassisSpeeds to drive the robot
+                                speeds, true, true), // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
                         new PIDConstants(10, 0, 0),
-                        new PIDConstants(10, 0, 0),
+                        new PIDConstants(0, 0, 0),
                         TunerConstants.kSpeedAt12VoltsMps,
                         driveBaseRadius,
                         new ReplanningConfig()),
