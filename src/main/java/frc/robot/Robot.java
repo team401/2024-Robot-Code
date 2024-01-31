@@ -71,6 +71,10 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousInit() {
+        CommandScheduler.getInstance().cancelAll();
+
+        robotContainer.enabledInit();
+      
         if (robotContainer.getAutonomousCommand() != null) {
             robotContainer.getAutonomousCommand().schedule();
         }
@@ -80,7 +84,11 @@ public class Robot extends LoggedRobot {
     public void autonomousPeriodic() {}
 
     @Override
-    public void teleopInit() {}
+    public void teleopInit() {
+        CommandScheduler.getInstance().cancelAll();
+
+        robotContainer.enabledInit();
+    }
 
     @Override
     public void teleopPeriodic() {}
@@ -92,7 +100,11 @@ public class Robot extends LoggedRobot {
     public void disabledPeriodic() {}
 
     @Override
-    public void testInit() {}
+    public void testInit() {
+        CommandScheduler.getInstance().cancelAll();
+
+        robotContainer.testInit("tuning-speaker");
+    }
 
     @Override
     public void testPeriodic() {}

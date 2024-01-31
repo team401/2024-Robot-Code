@@ -25,6 +25,7 @@ import frc.robot.subsystems.scoring.AimerIOTalon;
 import frc.robot.subsystems.scoring.HoodIOSim;
 import frc.robot.subsystems.scoring.HoodIOVortex;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringAction;
 import frc.robot.subsystems.scoring.ShooterIOSim;
 import frc.robot.subsystems.scoring.ShooterIOTalon;
 import frc.robot.utils.FieldFinder;
@@ -158,6 +159,28 @@ public class RobotContainer {
         drivetrain.setPoseSupplier(driveTelemetry::getFieldToRobot);
         drivetrain.setSpeakerSupplier(this::getFieldToSpeaker);
         Commands.run(driveTelemetry::logDataSynchronously).ignoringDisable(true).schedule();
+    }
+
+    public void enabledInit() {
+        scoringSubsystem.setAction(ScoringAction.WAIT);
+    }
+
+    public void testInit(String choice) {
+        switch (choice) {
+            case "tuning":
+                break;
+            case "tuning-speaker":
+                drivetrain.seedFieldRelative();
+                scoringSubsystem.setAction(ScoringAction.TUNING);
+                // spotless:off
+                controller.rightBumper()
+                        .onTrue(new InstantCommand(
+                            () -> scoringSubsystem.setTuningKickerVolts(5)))
+                        .onFalse(new InstantCommand(
+                            () -> scoringSubsystem.setTuningKickerVolts(0)));
+                break;
+                // spotless:on
+        }
     }
 
     private Translation2d getFieldToSpeaker() {
