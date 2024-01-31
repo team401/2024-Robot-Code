@@ -1,11 +1,6 @@
 package frc.robot;
 
-import java.util.Collections;
-
-import org.littletonrobotics.junction.Logger;
-
 import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -33,6 +28,8 @@ import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ShooterIOSim;
 import frc.robot.subsystems.scoring.ShooterIOTalon;
 import frc.robot.utils.FieldFinder;
+import java.util.Collections;
+import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
