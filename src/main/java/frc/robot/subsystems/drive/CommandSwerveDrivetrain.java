@@ -7,6 +7,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -23,8 +24,8 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.utils.GeomUtil;
+import java.util.Optional;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * Class that extends the Phoenix SwerveDrivetrain class and implements subsystem so it can be used
@@ -59,6 +60,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         }
 
         thetaController.enableContinuousInput(-180, 180);
+        PPHolonomicDriveController.setRotationTargetOverride(() -> calculateDesiredHeading());
     }
 
     public CommandSwerveDrivetrain(
@@ -153,7 +155,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     private void controlDrivetrain() {
-        if (aligning) {
+        /*if (aligning) {
             Pose2d pose = getFieldToRobot.get();
             Rotation2d desiredHeading =
                     calculateDesiredHeading(
@@ -166,7 +168,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     thetaController.calculate(
                             pose.getRotation().getDegrees(), desiredHeading.getDegrees());
             Logger.recordOutput("Drive/rotationError", thetaController.getPositionError());
-        }
+        }*/
 
         if (vx == 0 && vy == 0 && omega == 0) {
             setControl(brake);
@@ -185,7 +187,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         }
     }
 
-    private static Rotation2d calculateDesiredHeading(Pose2d current, Pose2d target) {
+    /*private static Rotation2d calculateDesiredHeading(Pose2d current, Pose2d target) {
         // I hope this is all inlined
         Pose2d robotToTarget = GeomUtil.transformToPose(current.minus(target));
 
@@ -195,6 +197,25 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         angle = angle.plus(Rotation2d.fromDegrees(180));
 
         return angle;
+    }*/
+
+    private Optional<Rotation2d> calculateDesiredHeading() {
+
+        Pose2d current = getFieldToRobot.get();
+        Pose2d target = new Pose2d(getFieldToSpeaker.get(), new Rotation2d());
+
+        if (aligning) {
+            Pose2d robotToTarget = GeomUtil.transformToPose(current.minus(target));
+
+            Rotation2d angle =
+                    Rotation2d.fromRadians(Math.atan2(robotToTarget.getY(), robotToTarget.getX()));
+
+            angle = angle.plus(Rotation2d.fromDegrees(180));
+
+            return Optional.of(angle);
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override
