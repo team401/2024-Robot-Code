@@ -10,7 +10,7 @@ public class HoodIOSim implements HoodIO {
     private final SingleJointedArmSim sim =
             new SingleJointedArmSim(
                     DCMotor.getNeoVortex(1),
-                    0.2,
+                    0.1,
                     SingleJointedArmSim.estimateMOI(0.1, 2),
                     0.1,
                     0.0,

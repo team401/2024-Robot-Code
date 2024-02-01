@@ -24,6 +24,13 @@ public class InterpolateDouble {
         Collections.sort(sortedKeys);
     }
 
+    /**
+     * Returns the interpolated value for the given key. If the key is not in the map, it will
+     * return the value for the closest key.
+     *
+     * @param key The key to interpolate
+     * @return The interpolated value
+     */
     public double getValue(double key) {
         if (map.containsKey(key)) {
             return map.get(key);

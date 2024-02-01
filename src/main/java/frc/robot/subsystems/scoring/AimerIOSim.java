@@ -1,5 +1,6 @@
 package frc.robot.subsystems.scoring;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -36,6 +37,12 @@ public class AimerIOSim implements AimerIO {
 
     private final Timer timer = new Timer();
 
+    boolean newProfile = false;
+    double previousGoalAngle = 0.0;
+
+    double minAngleClamp = 0.0;
+    double maxAngleClamp = 0.0;
+
     double goalAngleRad = 0.0;
     double appliedVolts = 0.0;
 
@@ -43,15 +50,29 @@ public class AimerIOSim implements AimerIO {
     double initialVelocity = 0.0;
 
     @Override
-    public void setAimAngleRad(double angle, boolean newProfile) {
-        if (goalAngleRad != angle && newProfile) {
+    public void setAimAngleRad(double goalAngleRad, boolean newProfile) {
+        this.goalAngleRad = goalAngleRad;
+        this.newProfile = newProfile;
+    }
+
+    @Override
+    public void controlAimAngleRad() {
+        if (goalAngleRad != previousGoalAngle && newProfile) {
             timer.reset();
             timer.start();
 
             initialAngle = sim.getAngleRads();
             initialVelocity = sim.getVelocityRadPerSec();
+
+            previousGoalAngle = goalAngleRad;
         }
-        goalAngleRad = angle;
+        goalAngleRad = MathUtil.clamp(goalAngleRad, minAngleClamp, maxAngleClamp);
+    }
+
+    @Override
+    public void setAngleClampsRad(double minAngleClamp, double maxAngleClamp) {
+        this.minAngleClamp = minAngleClamp;
+        this.maxAngleClamp = maxAngleClamp;
     }
 
     @Override

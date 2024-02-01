@@ -38,12 +38,22 @@ public class Telemetry {
     DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("robotPose").publish();
     StringPublisher fieldTypePub = table.getStringTopic(".type").publish();
 
+    SwerveModuleState[] moduleStates =
+            new SwerveModuleState[] {
+                new SwerveModuleState(),
+                new SwerveModuleState(),
+                new SwerveModuleState(),
+                new SwerveModuleState()
+            };
+
     double robotRotation = 0;
 
     /* Robot speeds for general checking */
     NetworkTable driveStats = inst.getTable("Drive");
     DoublePublisher velocityX = driveStats.getDoubleTopic("Velocity X").publish();
     DoublePublisher velocityY = driveStats.getDoubleTopic("Velocity Y").publish();
+    double velocityXFieldRelative = 0.0;
+    double velocityYFieldRelative = 0.0;
     DoublePublisher speed = driveStats.getDoubleTopic("Speed").publish();
     DoublePublisher odomPeriod = driveStats.getDoubleTopic("Odometry Period").publish();
 
@@ -121,6 +131,10 @@ public class Telemetry {
         double diffTime = currentTime - lastTime;
         lastTime = currentTime;
         Translation2d distanceDiff = pose.minus(latestPose).getTranslation();
+
+        velocityXFieldRelative = (pose.getX() - latestPose.getX()) / diffTime;
+        velocityYFieldRelative = (pose.getY() - latestPose.getY()) / diffTime;
+
         latestPose = pose;
 
         Translation2d velocities = distanceDiff.div(diffTime);
@@ -139,6 +153,7 @@ public class Telemetry {
             m_moduleSpeeds[i].setLength(
                     state.ModuleStates[i].speedMetersPerSecond / (2 * maxSpeed));
 
+            moduleStates[i] = state.ModuleStates[i];
             SmartDashboard.putData("Module " + i, m_moduleMechanisms[i]);
         }
     }
@@ -150,6 +165,7 @@ public class Telemetry {
     public void logDataSynchronously() {
         Pose2d pose = new Pose2d(latestPose.getX(), latestPose.getY(), latestPose.getRotation());
         Logger.recordOutput("Telemetry/fieldToRobot", pose);
+        Logger.recordOutput("Telemetry/moduleStates", moduleStates);
     }
 
     public double getRotationRadians() {
@@ -170,5 +186,13 @@ public class Telemetry {
                             Rotation2d.fromRadians(state.angle.getRadians()));
         }
         return states;
+    }
+
+    public double getVelocityX() {
+        return velocityXFieldRelative;
+    }
+
+    public double getVelocityY() {
+        return velocityYFieldRelative;
     }
 }

@@ -1,16 +1,20 @@
 package frc.robot.subsystems.scoring;
 
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ScoringConstants;
+import frc.robot.utils.FieldFinder;
+import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -28,17 +32,24 @@ public class ScoringSubsystem extends SubsystemBase {
     private final Timer shootTimer = new Timer();
 
     private final Supplier<Pose2d> poseSupplier;
+    private final Supplier<Vector<N2>> velocitySupplier;
 
     private final InterpolateDouble shooterInterpolated;
     private final InterpolateDouble aimerInterpolated;
 
-    private final Mechanism2d mechanism = new Mechanism2d(2.2, 1.2);
-    private final MechanismRoot2d rootMechanism = mechanism.getRoot("scoring", 1.1, 0.1);
+    private double shooterGoalVelocityRPMTuning = 0.0;
+    private double aimerGoalAngleRadTuning = 0.0;
+    private double kickerVoltsTuning = 0.0;
+
+    private final Supplier<Translation2d> speakerSupplier;
+
+    private final Mechanism2d mechanism = new Mechanism2d(2.2, 2.0);
+    private final MechanismRoot2d rootMechanism = mechanism.getRoot("scoring", 0.6, 0.3);
     private final MechanismLigament2d aimMechanism =
-            rootMechanism.append(new MechanismLigament2d("aimer", 1.0, 0.0));
+            rootMechanism.append(new MechanismLigament2d("aimer", 0.5, 0.0));
     private final MechanismLigament2d hoodMechanism =
             aimMechanism.append(
-                    new MechanismLigament2d("hood", 0.1, 0.0, 10.0, new Color8Bit(0, 200, 50)));
+                    new MechanismLigament2d("hood", 0.2, 0.0, 10.0, new Color8Bit(0, 200, 50)));
 
     private enum ScoringState {
         IDLE,
@@ -47,7 +58,8 @@ public class ScoringSubsystem extends SubsystemBase {
         AMP_PRIME,
         SHOOT,
         AMP_SHOOT,
-        ENDGAME
+        ENDGAME,
+        TUNING
     }
 
     public enum ScoringAction {
@@ -56,7 +68,8 @@ public class ScoringSubsystem extends SubsystemBase {
         AIM,
         AMP_AIM,
         SHOOT,
-        ENDGAME
+        ENDGAME,
+        TUNING
     }
 
     private ScoringState state = ScoringState.IDLE;
@@ -64,12 +77,20 @@ public class ScoringSubsystem extends SubsystemBase {
     private ScoringAction action = ScoringAction.WAIT;
 
     public ScoringSubsystem(
-            ShooterIO shooterIo, AimerIO aimerIo, HoodIO hoodIo, Supplier<Pose2d> poseSupplier) {
+            ShooterIO shooterIo,
+            AimerIO aimerIo,
+            HoodIO hoodIo,
+            Supplier<Pose2d> poseSupplier,
+            Supplier<Vector<N2>> velocitySupplier,
+            Supplier<Translation2d> speakerSupplier) {
         this.shooterIo = shooterIo;
         this.aimerIo = aimerIo;
         this.hoodIo = hoodIo;
 
         this.poseSupplier = poseSupplier;
+        this.velocitySupplier = velocitySupplier;
+
+        this.speakerSupplier = speakerSupplier;
 
         shooterInterpolated = new InterpolateDouble(ScoringConstants.getShooterMap());
 
@@ -99,6 +120,10 @@ public class ScoringSubsystem extends SubsystemBase {
             state = ScoringState.AMP_PRIME;
         } else if (action == ScoringAction.ENDGAME) {
             // state = ScoringState.ENDGAME; TODO: Later
+        } else if (action == ScoringAction.TUNING) {
+            state = ScoringState.TUNING;
+            SmartDashboard.putNumber("Tuning/AimerGoal", aimerGoalAngleRadTuning);
+            SmartDashboard.putNumber("Tuning/ShooterGoal", shooterGoalVelocityRPMTuning);
         }
     }
 
@@ -198,8 +223,21 @@ public class ScoringSubsystem extends SubsystemBase {
         state = ScoringState.IDLE;
     }
 
+    private void tuning() {
+        shooterGoalVelocityRPMTuning = SmartDashboard.getNumber("Tuning/ShooterGoal", 0.0);
+        aimerGoalAngleRadTuning = SmartDashboard.getNumber("Tuning/AimerGoal", 0.0);
+        shooterIo.setShooterVelocityRPM(shooterGoalVelocityRPMTuning);
+        aimerIo.setAimAngleRad(aimerGoalAngleRadTuning, false);
+        hoodIo.setHoodAngleRad(0.0);
+        shooterIo.setKickerVolts(kickerVoltsTuning);
+
+        if (action != ScoringAction.TUNING) {
+            state = ScoringState.IDLE;
+        }
+    }
+
     private double findDistanceToGoal() {
-        Translation2d speakerPose = FieldConstants.speakerPose;
+        Translation2d speakerPose = speakerSupplier.get();
         Pose2d robotPose = poseSupplier.get();
         double distancetoGoal =
                 Math.sqrt(
@@ -219,6 +257,30 @@ public class ScoringSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if (state != ScoringState.TUNING
+                && (FieldFinder.willIHitThis(
+                                poseSupplier.get().getX(),
+                                poseSupplier.get().getY(),
+                                velocitySupplier.get().get(0, 0)
+                                        * ScoringConstants.timeToPutAimDown,
+                                velocitySupplier.get().get(1, 0)
+                                        * ScoringConstants.timeToPutAimDown,
+                                FieldLocations.BLUE_STAGE)
+                        || FieldFinder.willIHitThis(
+                                poseSupplier.get().getX(),
+                                poseSupplier.get().getY(),
+                                velocitySupplier.get().get(0, 0)
+                                        * ScoringConstants.timeToPutAimDown,
+                                velocitySupplier.get().get(1, 0)
+                                        * ScoringConstants.timeToPutAimDown,
+                                FieldLocations.RED_STAGE))) {
+            aimerIo.setAngleClampsRad(0, 0);
+        } else {
+            aimerIo.setAngleClampsRad(0, ScoringConstants.aimMaxAngleRadians);
+        }
+
+        aimerIo.controlAimAngleRad();
+
         Logger.recordOutput("scoring/State", state.toString());
         Logger.recordOutput("scoring/Action", action.toString());
 
@@ -256,6 +318,13 @@ public class ScoringSubsystem extends SubsystemBase {
             case ENDGAME:
                 endgame(); // TODO: Later
                 break;
+            case TUNING:
+                tuning();
+                break;
         }
+    }
+
+    public void setTuningKickerVolts(double kickerVoltsTuning) {
+        this.kickerVoltsTuning = kickerVoltsTuning;
     }
 }
