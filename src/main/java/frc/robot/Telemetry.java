@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -132,9 +133,6 @@ public class Telemetry {
         lastTime = currentTime;
         Translation2d distanceDiff = pose.minus(latestPose).getTranslation();
 
-        velocityXFieldRelative = (pose.getX() - latestPose.getX()) / diffTime;
-        velocityYFieldRelative = (pose.getY() - latestPose.getY()) / diffTime;
-
         latestPose = pose;
 
         Translation2d velocities = distanceDiff.div(diffTime);
@@ -142,6 +140,8 @@ public class Telemetry {
         speed.set(velocities.getNorm());
         velocityX.set(velocities.getX());
         velocityY.set(velocities.getY());
+        velocityXFieldRelative = MathUtil.clamp(velocities.getX() * 0.2, -1.5, 1.5);
+        velocityYFieldRelative = MathUtil.clamp(velocities.getY() * 0.2, -1.5, 1.5);
         odomPeriod.set(state.OdometryPeriod);
 
         latestModuleStates = state.ModuleStates;
@@ -174,6 +174,13 @@ public class Telemetry {
 
     public Pose2d getFieldToRobot() {
         return latestPose;
+    }
+
+    public Translation2d getVelocity() {
+        // return new Translation2d(
+        //         velocityFilter.filter(velocityXFieldRelative),
+        //         velocityFilter.filter(velocityYFieldRelative));
+        return new Translation2d(velocityXFieldRelative, velocityYFieldRelative);
     }
 
     public SwerveModuleState[] getModuleStates() {

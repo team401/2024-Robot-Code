@@ -359,7 +359,7 @@ public final class Constants {
 
         public static final double timeToPutAimDown = 2;
 
-        // NOTE - These should be monotonically increasing
+        // NOTE - This should be monotonically increasing
         // Key - Distance in meters
         // Value - Aimer angle in radians
         public static HashMap<Double, Double> getAimerMap() { // TODO: Find this
@@ -379,6 +379,7 @@ public final class Constants {
             return map;
         }
 
+        // NOTE - This should be monotonically increasing
         // Key - Distance in meters
         // Value - Shooter RPM
         public static HashMap<Double, Double> getShooterMap() { // TODO: Find this
@@ -394,6 +395,26 @@ public final class Constants {
             map.put(8.0, 180.0);
             map.put(9.0, 190.0);
             map.put(10.0, 200.0);
+
+            return map;
+        }
+
+        // NOTE - This should be monotonically increasing
+        // Key - Distance in meters
+        // Value - Time in seconds
+        public static HashMap<Double, Double> timeToGoalMap() { // TODO: Find this
+            HashMap<Double, Double> map = new HashMap<Double, Double>();
+            map.put(0.0, 0.2);
+            map.put(1.0, 0.4);
+            map.put(2.0, 0.6);
+            map.put(3.0, 0.8);
+            map.put(4.0, 1.0);
+            map.put(5.0, 1.2);
+            map.put(6.0, 1.4);
+            map.put(7.0, 1.6);
+            map.put(8.0, 1.8);
+            map.put(9.0, 2.0);
+            map.put(10.0, 2.2);
 
             return map;
         }
