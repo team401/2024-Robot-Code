@@ -3,6 +3,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -184,20 +185,20 @@ public class RobotContainer {
     }
 
     private Translation2d getFieldToSpeaker() {
-        return FieldConstants.fieldToRedSpeaker;
-        // if (DriverStation.getAlliance().isEmpty()) {
-        //     return FieldConstants.fieldToBlueSpeaker;
-        // } else {
-        //     switch (DriverStation.getAlliance().get()) {
-        //         case Blue:
-        //             Logger.recordOutput("Field/speaker", FieldConstants.fieldToBlueSpeaker);
-        //             return FieldConstants.fieldToBlueSpeaker;
-        //         case Red:
-        //             Logger.recordOutput("Field/speaker", FieldConstants.fieldToRedSpeaker);
-        //             return FieldConstants.fieldToRedSpeaker;
-        //     }
-        // }
-        // throw new RuntimeException("Unreachable branch of switch expression");
+        // return FieldConstants.fieldToRedSpeaker;
+        if (DriverStation.getAlliance().isEmpty()) {
+            return FieldConstants.fieldToBlueSpeaker;
+        } else {
+            switch (DriverStation.getAlliance().get()) {
+                case Blue:
+                    Logger.recordOutput("Field/speaker", FieldConstants.fieldToBlueSpeaker);
+                    return FieldConstants.fieldToBlueSpeaker;
+                case Red:
+                    Logger.recordOutput("Field/speaker", FieldConstants.fieldToRedSpeaker);
+                    return FieldConstants.fieldToRedSpeaker;
+            }
+        }
+        throw new RuntimeException("Unreachable branch of switch expression");
     }
 
     public void robotPeriodic() {
