@@ -13,7 +13,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private BooleanSupplier scorerWantsNote = () -> false;
 
-    private boolean shouldBeRunning = false;
+    private IntakeAction action = IntakeAction.NONE;
 
     public IntakeSubsystem(IntakeIO io) {
         this.io = io;
@@ -31,11 +31,11 @@ public class IntakeSubsystem extends SubsystemBase {
             case SEEKING:
                 seeking();
                 break;
-            case FEEDING:
-                feeding();
-                break;
             case PASSING:
                 passing();
+                break;
+            case REVERSING:
+                reversing();
                 break;
         }
 
@@ -49,55 +49,82 @@ public class IntakeSubsystem extends SubsystemBase {
         this.scorerWantsNote = scorerWantsNote;
     }
 
-    public void run(boolean shouldBeRunning) {
-        this.shouldBeRunning = shouldBeRunning;
+    public void run(IntakeAction action) {
+        this.action = action;
     }
 
     public void toggle() {
-        shouldBeRunning = !shouldBeRunning;
+        if (action == IntakeAction.NONE) {
+            action = IntakeAction.INTAKE;
+        } else {
+            action = IntakeAction.NONE;
+        }
     }
 
     public boolean hasNote() {
-        return state == State.FEEDING;
+        return inputs.noteSensed;
     }
 
     private void idle() {
-        if (shouldBeRunning) {
+        if (action == IntakeAction.INTAKE) {
             state = State.SEEKING;
             io.setIntakeVoltage(5);
+            io.setBeltVoltage(5);
+        } else if (action == IntakeAction.REVERSE) {
+            state = State.REVERSING;
+            io.setIntakeVoltage(-5);
+            io.setBeltVoltage(-5);
         }
     }
 
     private void seeking() {
-        if (inputs.backMotorCurrent > 20) {
-            state = State.FEEDING;
-            io.setIntakeVoltage(2);
-            io.setBeltVoltage(2);
-        }
-    }
-
-    private void feeding() {
-        if (inputs.backMotorCurrent < 5) {
+        if (inputs.noteSensed) {
             state = State.PASSING;
-            io.setIntakeVoltage(0);
-            io.setBeltVoltage(0);
+        }
+
+        if (action == IntakeAction.REVERSE) {
+            io.setBeltVoltage(-5);
+            io.setIntakeVoltage(-5);
+            state = State.REVERSING;
         }
     }
 
     private void passing() {
         if (scorerWantsNote.getAsBoolean()) {
             io.setBeltVoltage(2);
+        } else {
+            io.setBeltVoltage(0);
         }
-        if (inputs.beltMotorCurrent < 5) {
+        if (!inputs.noteSensed && inputs.beltMotorCurrent < 2.0) {
             state = State.IDLE;
             io.setBeltVoltage(0);
+        }
+
+        if (action == IntakeAction.REVERSE) {
+            io.setBeltVoltage(-5);
+            io.setIntakeVoltage(-5);
+            state = State.REVERSING;
+        }
+    }
+
+    private void reversing() {
+        if (action != IntakeAction.REVERSE) {
+            io.setBeltVoltage(0);
+            io.setIntakeVoltage(0);
+            state = State.IDLE;
         }
     }
 
     private enum State {
         IDLE, // do nothing
-        SEEKING, // running intake wheels in search of a note
-        FEEDING, // taking in a note and passing it to the belt
-        PASSING // move the belt to pass the note to the shooter when its ready
+        SEEKING, // run intake wheels until a note is taken in
+        PASSING, // move the belt to pass the note to the shooter when its ready
+        REVERSING // whole intake backwards
+    }
+
+    public enum IntakeAction {
+        NONE, // do nothing
+        INTAKE, // Try to intake a note if you don't have one
+        REVERSE // run backwards
     }
 }

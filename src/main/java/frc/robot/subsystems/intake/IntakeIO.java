@@ -14,6 +14,8 @@ public interface IntakeIO {
 
         public double beltMotorVoltage = 0.0;
         public double beltMotorCurrent = 0.0;
+
+        public boolean noteSensed = false;
     }
 
     public default void updateInputs(IntakeIOInputs inputs) {}
