@@ -163,6 +163,14 @@ public final class Constants {
         }
     }
 
+    public static final class EndgameConstants {
+        public static final int leftMotorID = 1;
+        public static final int rightMotorID = 2;
+        public static final int endgameUp = 3;
+        public static final int endgameDown = 0;
+        public static final int ticksPerFoot = 10;
+    }
+
     public static final class TunerConstants {
         // Both sets of gains need to be tuned to your individual robot
         // The steer motor uses MotionMagicVoltage control
