@@ -18,12 +18,6 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.0
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Blue-S1-1"
@@ -38,7 +32,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Blue-1-2"
+            "pathName": "Blue-1-4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Blue-4-E"
           }
         },
         {
@@ -50,29 +50,30 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Blue-2-3"
+            "pathName": "Blue-E-5"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Blue-5-E"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.0
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Blue-3-4"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Blue-4-E"
+            "pathName": "Blue-E-2"
           }
         }
       ]
     }
   },
-  "folder": null
+  "folder": null,
+  "choreoAuto": false
 }

@@ -214,11 +214,11 @@ public class RobotContainer {
     }
 
     private void configureAutonomous() {
-        autoChooser.setDefaultOption("Default (Blue-S1 5-Note)", "Blue-S1-1-2-3-4");
+        autoChooser.setDefaultOption("Default (Blue-S1 5-Note)", "Blue-S1-1-2-3-8");
         autoChooser.addOption("Blue-S1 4-Note", "Blue-S1-1-2-3");
         autoChooser.addOption("Blue-S1 3-Note", "Blue-S1-1-2");
 
-        autoChooser.addOption("Blue-S2 4-Note", "Blue-S2-2-3-4");
+        autoChooser.addOption("Blue-S2 4-Note", "Blue-S2-2-3-8");
         autoChooser.addOption("Blue-S2 3-Note", "Blue-S2-2-3");
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
