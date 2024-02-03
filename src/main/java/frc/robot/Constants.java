@@ -178,6 +178,13 @@ public final class Constants {
     }
 
     public static final class IntakeConstants {
+        public static final int leftIntakeMotorID = 0;
+        public static final int rightIntakeMotorID = 0;
+        public static final int frontBeltMotorID = 0;
+        public static final int backBeltMotorID = 0;
+
+        public static final int bannerSensorID = 0;
+
         public static final double intakePower = 5.0;
         public static final double beltPower = 5.0;
     }
