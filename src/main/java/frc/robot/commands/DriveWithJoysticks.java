@@ -4,18 +4,23 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignTarget;
 import frc.robot.utils.Deadband;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
 
 public class DriveWithJoysticks extends Command {
     CommandSwerveDrivetrain drivetrain;
     DoubleSupplier x;
     DoubleSupplier y;
     DoubleSupplier rot;
+    IntSupplier POV;
     BooleanSupplier fieldCentric;
     BooleanSupplier babyMode;
-    BooleanSupplier align;
+    BooleanSupplier toggleAlign;
+
+    boolean lastToggleAlign;
 
     double xMpS;
     double yMpS;
@@ -26,16 +31,20 @@ public class DriveWithJoysticks extends Command {
             DoubleSupplier x,
             DoubleSupplier y,
             DoubleSupplier rot,
+            IntSupplier POV,
             BooleanSupplier fieldCentric,
             BooleanSupplier babyMode,
-            BooleanSupplier align) {
+            BooleanSupplier toggleAlign) {
         this.drivetrain = drivetrain;
         this.x = x;
         this.y = y;
+        this.POV = POV;
         this.rot = rot;
         this.fieldCentric = fieldCentric;
         this.babyMode = babyMode;
-        this.align = align;
+        this.toggleAlign = toggleAlign;
+
+        this.lastToggleAlign = toggleAlign.getAsBoolean();
 
         addRequirements(drivetrain);
     }
@@ -61,10 +70,29 @@ public class DriveWithJoysticks extends Command {
             rotRadpS *= 0.5;
         }
 
+        AlignTarget target = AlignTarget.NONE;
+        switch (POV.getAsInt()) {
+            case 0:
+                target = AlignTarget.SPEAKER;
+                break;
+            case 90:
+                target = AlignTarget.AMP;
+                break;
+            case 180:
+                target = AlignTarget.NONE;
+                break;
+            case 270:
+                target = AlignTarget.SOURCE;
+                break;
+            default:
+                break;
+        }
+
         drivetrain.setGoalChassisSpeeds(
                 new ChassisSpeeds(xMpS, yMpS, rotRadpS),
                 fieldCentric.getAsBoolean(),
-                align.getAsBoolean());
+                POV.getAsInt(),
+                toggleAlign.getAsBoolean());
     }
 
     @Override

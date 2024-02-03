@@ -32,10 +32,26 @@ import org.littletonrobotics.junction.Logger;
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
     private double vx, vy, omega = 0.0;
     private boolean fieldCentric = true;
-    private boolean aligning = false;
+
+    public enum AlignTarget {
+        NONE,
+        AMP,
+        SPEAKER,
+        SOURCE
+    }
+
+    public enum DriveState {
+        MANUAL,
+        ALIGNING,
+    }
+
+    private AlignTarget alignTarget = AlignTarget.NONE;
+    private DriveState state = DriveState.MANUAL;
 
     private Supplier<Pose2d> getFieldToRobot = () -> new Pose2d();
     private Supplier<Translation2d> getFieldToSpeaker = () -> new Translation2d();
+    private Supplier<Rotation2d> getFieldToAmp = () -> new Rotation2d();
+    private Supplier<Rotation2d> getFieldToSource = () -> new Rotation2d();
 
     private PIDController thetaController = new PIDController(.5, 0, 0);
 
@@ -76,6 +92,14 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public void setSpeakerSupplier(Supplier<Translation2d> getFieldToSpeaker) {
         this.getFieldToSpeaker = getFieldToSpeaker;
+    }
+
+    public void setAmpSupplier(Supplier<Rotation2d> getFieldToAmp) {
+        this.getFieldToAmp = getFieldToAmp;
+    }
+
+    public void setSourceSupplier(Supplier<Rotation2d> getFieldToSource) {
+        this.getFieldToSource = getFieldToSource;
     }
 
     private void configurePathPlanner() {
@@ -128,24 +152,39 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         simNotifier.startPeriodic(kSimLoopPeriod);
     }
 
-    public void setGoalChassisSpeeds(ChassisSpeeds chassisSpeeds, boolean fieldCen, boolean align) {
+    public void setGoalChassisSpeeds(
+            ChassisSpeeds chassisSpeeds, boolean fieldCen, AlignTarget alignTarget) {
         vx = chassisSpeeds.vxMetersPerSecond;
         vy = chassisSpeeds.vyMetersPerSecond;
         omega = chassisSpeeds.omegaRadiansPerSecond;
         fieldCentric = fieldCen;
-        this.aligning = align;
+        this.alignTarget = alignTarget;
     }
 
     public void setGoalChassisSpeeds(ChassisSpeeds chassisSpeeds) {
-        setGoalChassisSpeeds(chassisSpeeds, true, false);
+        setGoalChassisSpeeds(chassisSpeeds, true, alignTarget);
     }
 
     private void controlDrivetrain() {
-        if (aligning) {
+        if (state == DriveState.ALIGNING) {
             Pose2d pose = getFieldToRobot.get();
-            Rotation2d desiredHeading =
-                    calculateDesiredHeading(
-                            pose, new Pose2d(getFieldToSpeaker.get(), new Rotation2d()));
+            Rotation2d desiredHeading = pose.getRotation();
+            switch (alignTarget) {
+                case AMP:
+                    desiredHeading = getFieldToAmp.get();
+                    break;
+                case SPEAKER:
+                    desiredHeading =
+                            calculateDesiredHeading(
+                                    pose, new Pose2d(getFieldToSpeaker.get(), new Rotation2d()));
+                    break;
+                case SOURCE:
+                    desiredHeading = getFieldToSource.get();
+                    break;
+                case NONE:
+                default:
+                    break;
+            }
 
             Logger.recordOutput("Drive/desiredHeading", desiredHeading);
             Logger.recordOutput("Drive/fieldToSpeaker", getFieldToSpeaker.get());
