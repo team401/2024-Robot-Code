@@ -59,8 +59,7 @@ public class RobotContainer {
                         () -> -controller.getRightX(),
                         () -> true,
                         () -> false,
-                        // () -> controller.getHID().getRightBumper()));
-                        () -> controller.x().getAsBoolean()));
+                        () -> controller.getHID().getRightBumper()));
 
         controller.a()
                 .onTrue(new InstantCommand(
@@ -112,8 +111,8 @@ public class RobotContainer {
                                 driveTelemetry::getFieldToRobot,
                                 () ->
                                         VecBuilder.fill(
-                                                driveTelemetry.getVelocityX() * 0.5,
-                                                driveTelemetry.getVelocityY() * 0.5),
+                                                driveTelemetry.getVelocityX(),
+                                                driveTelemetry.getVelocityY()),
                                 this::getFieldToSpeaker);
 
                 tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
@@ -129,8 +128,8 @@ public class RobotContainer {
                                 driveTelemetry::getFieldToRobot,
                                 () ->
                                         VecBuilder.fill(
-                                                driveTelemetry.getVelocityX() * 0.5,
-                                                driveTelemetry.getVelocityY() * 0.5),
+                                                driveTelemetry.getVelocityX(),
+                                                driveTelemetry.getVelocityY()),
                                 this::getFieldToSpeaker);
 
                 if (FeatureFlags.simulateVision) {

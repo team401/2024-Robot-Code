@@ -148,8 +148,6 @@ public class Telemetry {
         velocityX.set(velocities.getX());
         velocityY.set(velocities.getY());
 
-        // velocityXFiltered = velocityFilter.calculate(MathUtil.clamp(velocities.getX(), -2, 2));
-        // velocityYFiltered = velocityFilter.calculate(MathUtil.clamp(velocities.getY(), -2, 2));
         velocityXFiltered = velocityXFilter.calculate(velocityFieldRelative.getX());
         velocityYFiltered = velocityYFilter.calculate(velocityFieldRelative.getY());
         odomPeriod.set(state.OdometryPeriod);
@@ -203,10 +201,10 @@ public class Telemetry {
     }
 
     public double getVelocityX() {
-        return velocityXFiltered;
+        return velocityXFiltered * 0.5;
     }
 
     public double getVelocityY() {
-        return velocityYFiltered;
+        return velocityYFiltered * 0.5;
     }
 }
