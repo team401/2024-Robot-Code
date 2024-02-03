@@ -1,6 +1,7 @@
 package frc.robot.subsystems.intake;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.IntakeConstants;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -68,12 +69,12 @@ public class IntakeSubsystem extends SubsystemBase {
     private void idle() {
         if (action == IntakeAction.INTAKE) {
             state = State.SEEKING;
-            io.setIntakeVoltage(5);
-            io.setBeltVoltage(5);
+            io.setIntakeVoltage(IntakeConstants.intakePower);
+            io.setBeltVoltage(IntakeConstants.beltPower);
         } else if (action == IntakeAction.REVERSE) {
             state = State.REVERSING;
-            io.setIntakeVoltage(-5);
-            io.setBeltVoltage(-5);
+            io.setIntakeVoltage(-IntakeConstants.intakePower);
+            io.setBeltVoltage(-IntakeConstants.beltPower);
         }
     }
 
@@ -83,15 +84,15 @@ public class IntakeSubsystem extends SubsystemBase {
         }
 
         if (action == IntakeAction.REVERSE) {
-            io.setBeltVoltage(-5);
-            io.setIntakeVoltage(-5);
+            io.setIntakeVoltage(-IntakeConstants.intakePower);
+            io.setBeltVoltage(-IntakeConstants.beltPower);
             state = State.REVERSING;
         }
     }
 
     private void passing() {
         if (scorerWantsNote.getAsBoolean()) {
-            io.setBeltVoltage(2);
+            io.setBeltVoltage(IntakeConstants.beltPower);
         } else {
             io.setBeltVoltage(0);
         }
@@ -101,8 +102,8 @@ public class IntakeSubsystem extends SubsystemBase {
         }
 
         if (action == IntakeAction.REVERSE) {
-            io.setBeltVoltage(-5);
-            io.setIntakeVoltage(-5);
+            io.setIntakeVoltage(-IntakeConstants.intakePower);
+            io.setBeltVoltage(-IntakeConstants.beltPower);
             state = State.REVERSING;
         }
     }

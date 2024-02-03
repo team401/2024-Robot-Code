@@ -163,6 +163,11 @@ public final class Constants {
         }
     }
 
+    public static final class IntakeConstants {
+        public static final double intakePower = 5.0;
+        public static final double beltPower = 5.0;
+    }
+
     public static final class EndgameConstants {
         public static final int leftMotorID = 1;
         public static final int rightMotorID = 2;
