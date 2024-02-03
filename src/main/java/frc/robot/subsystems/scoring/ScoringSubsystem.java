@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
@@ -40,6 +39,12 @@ public class ScoringSubsystem extends SubsystemBase {
     private final InterpolateDouble shooterInterpolated;
     private final InterpolateDouble aimerInterpolated;
 
+    private double shooterGoalVelocityRPMTuning = 0.0;
+    private double aimerGoalAngleRadTuning = 0.0;
+    private double kickerVoltsTuning = 0.0;
+
+    private final Supplier<Translation2d> speakerSupplier;
+
     private final Mechanism2d mechanism = new Mechanism2d(2.2, 2.0);
     private final MechanismRoot2d rootMechanism = mechanism.getRoot("scoring", 0.6, 0.3);
     private final MechanismLigament2d aimMechanism =
@@ -55,7 +60,8 @@ public class ScoringSubsystem extends SubsystemBase {
         AMP_PRIME,
         SHOOT,
         AMP_SHOOT,
-        ENDGAME
+        ENDGAME,
+        TUNING
     }
 
     public enum ScoringAction {
@@ -64,7 +70,8 @@ public class ScoringSubsystem extends SubsystemBase {
         AIM,
         AMP_AIM,
         SHOOT,
-        ENDGAME
+        ENDGAME,
+        TUNING
     }
 
     private ScoringState state = ScoringState.IDLE;
@@ -76,13 +83,15 @@ public class ScoringSubsystem extends SubsystemBase {
             AimerIO aimerIo,
             HoodIO hoodIo,
             Supplier<Pose2d> poseSupplier,
-            Supplier<Vector<N2>> velocitySupplier) {
+            Supplier<Vector<N2>> velocitySupplier,
+            Supplier<Translation2d> speakerSupplier) {
         this.shooterIo = shooterIo;
         this.aimerIo = aimerIo;
         this.hoodIo = hoodIo;
 
         this.poseSupplier = poseSupplier;
         this.velocitySupplier = velocitySupplier;
+        this.speakerSupplier = speakerSupplier;
 
         // SmartDashboard.putNumber("Aimer_X", -0.51);
         // SmartDashboard.putNumber("Aimer_Y", -0.245);
@@ -90,6 +99,7 @@ public class ScoringSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Hood_X", -0.5);
         SmartDashboard.putNumber("Hood_Y", 0.3);
         SmartDashboard.putNumber("Hood_Z", -0.2);
+    
 
         shooterInterpolated = new InterpolateDouble(ScoringConstants.getShooterMap());
 
@@ -119,6 +129,10 @@ public class ScoringSubsystem extends SubsystemBase {
             state = ScoringState.AMP_PRIME;
         } else if (action == ScoringAction.ENDGAME) {
             // state = ScoringState.ENDGAME; TODO: Later
+        } else if (action == ScoringAction.TUNING) {
+            state = ScoringState.TUNING;
+            SmartDashboard.putNumber("Tuning/AimerGoal", aimerGoalAngleRadTuning);
+            SmartDashboard.putNumber("Tuning/ShooterGoal", shooterGoalVelocityRPMTuning);
         }
     }
 
@@ -218,8 +232,21 @@ public class ScoringSubsystem extends SubsystemBase {
         state = ScoringState.IDLE;
     }
 
+    private void tuning() {
+        shooterGoalVelocityRPMTuning = SmartDashboard.getNumber("Tuning/ShooterGoal", 0.0);
+        aimerGoalAngleRadTuning = SmartDashboard.getNumber("Tuning/AimerGoal", 0.0);
+        shooterIo.setShooterVelocityRPM(shooterGoalVelocityRPMTuning);
+        aimerIo.setAimAngleRad(aimerGoalAngleRadTuning, false);
+        hoodIo.setHoodAngleRad(0.0);
+        shooterIo.setKickerVolts(kickerVoltsTuning);
+
+        if (action != ScoringAction.TUNING) {
+            state = ScoringState.IDLE;
+        }
+    }
+
     private double findDistanceToGoal() {
-        Translation2d speakerPose = FieldConstants.speakerPose;
+        Translation2d speakerPose = speakerSupplier.get();
         Pose2d robotPose = poseSupplier.get();
         double distancetoGoal =
                 Math.sqrt(
@@ -239,18 +266,23 @@ public class ScoringSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (FieldFinder.willIHitThis(
-                        poseSupplier.get().getX(),
-                        poseSupplier.get().getY(),
-                        velocitySupplier.get().get(0, 0) * ScoringConstants.timeToPutAimDown,
-                        velocitySupplier.get().get(1, 0) * ScoringConstants.timeToPutAimDown,
-                        FieldLocations.BLUE_STAGE)
-                || FieldFinder.willIHitThis(
-                        poseSupplier.get().getX(),
-                        poseSupplier.get().getY(),
-                        velocitySupplier.get().get(0, 0) * ScoringConstants.timeToPutAimDown,
-                        velocitySupplier.get().get(1, 0) * ScoringConstants.timeToPutAimDown,
-                        FieldLocations.RED_STAGE)) {
+        if (state != ScoringState.TUNING
+                && (FieldFinder.willIHitThis(
+                                poseSupplier.get().getX(),
+                                poseSupplier.get().getY(),
+                                velocitySupplier.get().get(0, 0)
+                                        * ScoringConstants.timeToPutAimDown,
+                                velocitySupplier.get().get(1, 0)
+                                        * ScoringConstants.timeToPutAimDown,
+                                FieldLocations.BLUE_STAGE)
+                        || FieldFinder.willIHitThis(
+                                poseSupplier.get().getX(),
+                                poseSupplier.get().getY(),
+                                velocitySupplier.get().get(0, 0)
+                                        * ScoringConstants.timeToPutAimDown,
+                                velocitySupplier.get().get(1, 0)
+                                        * ScoringConstants.timeToPutAimDown,
+                                FieldLocations.RED_STAGE))) {
             aimerIo.setAngleClampsRad(0, 0);
         } else {
             aimerIo.setAngleClampsRad(0, ScoringConstants.aimMaxAngleRadians);
@@ -313,6 +345,13 @@ public class ScoringSubsystem extends SubsystemBase {
             case ENDGAME:
                 endgame(); // TODO: Later
                 break;
+            case TUNING:
+                tuning();
+                break;
         }
+    }
+
+    public void setTuningKickerVolts(double kickerVoltsTuning) {
+        this.kickerVoltsTuning = kickerVoltsTuning;
     }
 }

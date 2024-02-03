@@ -1,16 +1,24 @@
 package frc.robot;
 
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FeatureFlags;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.endgame.EndgameSimIO;
+import frc.robot.subsystems.endgame.EndgameSparkMaxIO;
+import frc.robot.subsystems.endgame.EndgameSubsystem;
+import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.localization.VisionIOReal;
 import frc.robot.subsystems.localization.VisionIOSim;
 import frc.robot.subsystems.localization.VisionLocalizer;
@@ -19,6 +27,7 @@ import frc.robot.subsystems.scoring.AimerIOTalon;
 import frc.robot.subsystems.scoring.HoodIOSim;
 import frc.robot.subsystems.scoring.HoodIOVortex;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringAction;
 import frc.robot.subsystems.scoring.ShooterIOSim;
 import frc.robot.subsystems.scoring.ShooterIOTalon;
 import frc.robot.utils.FieldFinder;
@@ -27,6 +36,8 @@ import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
+
+    IntakeSubsystem intake;
 
     CommandJoystick leftJoystick = new CommandJoystick(0);
     CommandJoystick rightJoystick = new CommandJoystick(1);
@@ -37,6 +48,8 @@ public class RobotContainer {
     CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain;
 
     Telemetry driveTelemetry = new Telemetry(DriveConstants.MaxSpeedMetPerSec);
+
+    EndgameSubsystem endgameSubsystem;
 
     public RobotContainer() {
         configureBindings();
@@ -53,43 +66,47 @@ public class RobotContainer {
                         () -> -controller.getLeftX(),
                         () -> -controller.getRightX(),
                         () -> true,
-                        () -> false));
+                        () -> false,
+                        () -> controller.getHID().getRightBumper()));
 
         controller.a()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.INTAKE)));
+                        ScoringSubsystem.ScoringAction.INTAKE)))
+                .onTrue(new InstantCommand(
+                    () -> intake.toggle()
+                ));
 
         controller.b()
                 .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AIM)));
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.AIM)));
 
         controller.x()
                 .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.SHOOT)))
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.SHOOT)))
                 .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AIM)));
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.AIM)));
 
         controller.y()
                 .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.ENDGAME)))
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.ENDGAME)))
                 .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)));
-        
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.WAIT)));
+
         controller.rightBumper()
                 .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AMP_AIM)));
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.AMP_AIM)));
 
         controller.start()
                 .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)));
+                        () -> scoringSubsystem.setAction(
+                                ScoringSubsystem.ScoringAction.WAIT)));
     } // spotless:on
 
     private void configureModes() {}
@@ -106,9 +123,11 @@ public class RobotContainer {
                                 () ->
                                         VecBuilder.fill(
                                                 driveTelemetry.getVelocityX(),
-                                                driveTelemetry.getVelocityY()));
+                                                driveTelemetry.getVelocityY()),
+                                this::getFieldToSpeaker);
 
                 tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
+                endgameSubsystem = new EndgameSubsystem(new EndgameSparkMaxIO());
                 break;
             case SIM:
                 drivetrain.seedFieldRelative(DriveConstants.initialPose);
@@ -122,7 +141,8 @@ public class RobotContainer {
                                 () ->
                                         VecBuilder.fill(
                                                 driveTelemetry.getVelocityX(),
-                                                driveTelemetry.getVelocityY()));
+                                                driveTelemetry.getVelocityY()),
+                                this::getFieldToSpeaker);
 
                 if (FeatureFlags.simulateVision) {
                     tagVision =
@@ -137,13 +157,62 @@ public class RobotContainer {
                                             Collections.emptyList(),
                                             driveTelemetry::getModuleStates));
                 }
+                endgameSubsystem = new EndgameSubsystem(new EndgameSimIO());
+
+                intake = new IntakeSubsystem(new IntakeIOSim());
                 break;
             case REPLAY:
                 break;
         }
 
         drivetrain.registerTelemetry(driveTelemetry::telemeterize);
+        drivetrain.setPoseSupplier(driveTelemetry::getFieldToRobot);
+        drivetrain.setSpeakerSupplier(this::getFieldToSpeaker);
         Commands.run(driveTelemetry::logDataSynchronously).ignoringDisable(true).schedule();
+
+        intake.setScoringSupplier(scoringSubsystem::canIntake);
+
+        tagVision.setCameraConsumer(
+                (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
+        tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
+    }
+
+    public void enabledInit() {
+        scoringSubsystem.setAction(ScoringAction.WAIT);
+    }
+
+    public void testInit(String choice) {
+        switch (choice) {
+            case "tuning":
+                break;
+            case "tuning-speaker":
+                drivetrain.seedFieldRelative();
+                scoringSubsystem.setAction(ScoringAction.TUNING);
+                // spotless:off
+                controller.rightBumper()
+                        .onTrue(new InstantCommand(
+                            () -> scoringSubsystem.setTuningKickerVolts(5)))
+                        .onFalse(new InstantCommand(
+                            () -> scoringSubsystem.setTuningKickerVolts(0)));
+                break;
+                // spotless:on
+        }
+    }
+
+    private Translation2d getFieldToSpeaker() {
+        if (DriverStation.getAlliance().isEmpty()) {
+            return FieldConstants.fieldToRedSpeaker;
+        } else {
+            switch (DriverStation.getAlliance().get()) {
+                case Blue:
+                    Logger.recordOutput("Field/speaker", FieldConstants.fieldToBlueSpeaker);
+                    return FieldConstants.fieldToBlueSpeaker;
+                case Red:
+                    Logger.recordOutput("Field/speaker", FieldConstants.fieldToRedSpeaker);
+                    return FieldConstants.fieldToRedSpeaker;
+            }
+        }
+        throw new RuntimeException("Unreachable branch of switch expression");
     }
 
     public void robotPeriodic() {
