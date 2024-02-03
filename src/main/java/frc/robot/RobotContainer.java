@@ -1,9 +1,9 @@
 package frc.robot;
 
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -14,6 +14,11 @@ import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.endgame.EndgameSimIO;
+import frc.robot.subsystems.endgame.EndgameSparkMaxIO;
+import frc.robot.subsystems.endgame.EndgameSubsystem;
+import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.localization.VisionIOReal;
 import frc.robot.subsystems.localization.VisionIOSim;
 import frc.robot.subsystems.localization.VisionLocalizer;
@@ -32,6 +37,8 @@ import org.littletonrobotics.junction.Logger;
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
 
+    IntakeSubsystem intake;
+
     CommandJoystick leftJoystick = new CommandJoystick(0);
     CommandJoystick rightJoystick = new CommandJoystick(1);
     CommandXboxController controller = new CommandXboxController(2);
@@ -41,6 +48,8 @@ public class RobotContainer {
     CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain;
 
     Telemetry driveTelemetry = new Telemetry(DriveConstants.MaxSpeedMetPerSec);
+
+    EndgameSubsystem endgameSubsystem;
 
     public RobotContainer() {
         configureBindings();
@@ -62,8 +71,11 @@ public class RobotContainer {
 
         controller.a()
                 .onTrue(new InstantCommand(
-                        () -> scoringSubsystem.setAction(
-                                ScoringSubsystem.ScoringAction.INTAKE)));
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.INTAKE)))
+                .onTrue(new InstantCommand(
+                    () -> intake.toggle()
+                ));
 
         controller.b()
                 .onTrue(new InstantCommand(
@@ -86,7 +98,7 @@ public class RobotContainer {
                         () -> scoringSubsystem.setAction(
                                 ScoringSubsystem.ScoringAction.WAIT)));
 
-        controller.rightBumper()
+        controller.leftBumper()
                 .onTrue(new InstantCommand(
                         () -> scoringSubsystem.setAction(
                                 ScoringSubsystem.ScoringAction.AMP_AIM)));
@@ -115,6 +127,7 @@ public class RobotContainer {
                                 this::getFieldToSpeaker);
 
                 tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
+                endgameSubsystem = new EndgameSubsystem(new EndgameSparkMaxIO());
                 break;
             case SIM:
                 drivetrain.seedFieldRelative(DriveConstants.initialPose);
@@ -144,6 +157,9 @@ public class RobotContainer {
                                             Collections.emptyList(),
                                             driveTelemetry::getModuleStates));
                 }
+                endgameSubsystem = new EndgameSubsystem(new EndgameSimIO());
+
+                intake = new IntakeSubsystem(new IntakeIOSim());
                 break;
             case REPLAY:
                 break;
@@ -151,8 +167,14 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(driveTelemetry::telemeterize);
         drivetrain.setPoseSupplier(driveTelemetry::getFieldToRobot);
+        drivetrain.setVelocitySupplier(driveTelemetry::getVelocity);
         drivetrain.setSpeakerSupplier(this::getFieldToSpeaker);
-        Commands.run(driveTelemetry::logDataSynchronously).ignoringDisable(true).schedule();
+
+        intake.setScoringSupplier(scoringSubsystem::canIntake);
+
+        tagVision.setCameraConsumer(
+                (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
+        tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
     }
 
     public void enabledInit() {
@@ -167,7 +189,7 @@ public class RobotContainer {
                 drivetrain.seedFieldRelative();
                 scoringSubsystem.setAction(ScoringAction.TUNING);
                 // spotless:off
-                controller.rightBumper()
+                controller.leftBumper()
                         .onTrue(new InstantCommand(
                             () -> scoringSubsystem.setTuningKickerVolts(5)))
                         .onFalse(new InstantCommand(
@@ -199,5 +221,19 @@ public class RobotContainer {
                 FieldFinder.whereAmI(
                         driveTelemetry.getFieldToRobot().getTranslation().getX(),
                         driveTelemetry.getFieldToRobot().getTranslation().getY()));
+
+        Logger.recordOutput("localizer/RobotPose", driveTelemetry.getFieldToRobot());
+        Logger.recordOutput(
+                "localizer/RobotVelocity",
+                new Pose2d(
+                        driveTelemetry.getFieldToRobot().getX()
+                                + (driveTelemetry.getVelocity().getX()
+                                        * DriveConstants.anticipationTime),
+                        driveTelemetry.getFieldToRobot().getY()
+                                + (driveTelemetry.getVelocity().getY()
+                                        * DriveConstants.anticipationTime),
+                        driveTelemetry.getFieldToRobot().getRotation()));
+
+        driveTelemetry.logDataSynchronously();
     }
 }
