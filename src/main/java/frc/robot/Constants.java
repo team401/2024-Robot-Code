@@ -67,6 +67,12 @@ public final class Constants {
         public static final double midfieldLowThresholdM = 5.87;
         public static final double midfieldHighThresholdM = 10.72;
 
+        // TODO: Double check speaker coordinates
+        public static final Translation2d fieldToRedSpeaker =
+                new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42));
+        public static final Translation2d fieldToBlueSpeaker =
+                new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42));
+
         public static final Translation2d speakerPose =
                 false // TODO: CHANGE THIS URGENT
                         // DriverStation.getAlliance().get() ==
@@ -155,6 +161,19 @@ public final class Constants {
             }
             return layout;
         }
+    }
+
+    public static final class IntakeConstants {
+        public static final double intakePower = 5.0;
+        public static final double beltPower = 5.0;
+    }
+
+    public static final class EndgameConstants {
+        public static final int leftMotorID = 1;
+        public static final int rightMotorID = 2;
+        public static final int endgameUp = 3;
+        public static final int endgameDown = 0;
+        public static final int ticksPerFoot = 10;
     }
 
     public static final class TunerConstants {
@@ -352,6 +371,8 @@ public final class Constants {
         public static final double aimMaxAngleRadians = Math.PI / 2;
 
         public static final double timeToPutAimDown = 2;
+        public static final double maxAimIntake = 0.0;
+        public static final double minAimIntake = 0.0;
 
         // NOTE - These should be monotonically increasing
         // Key - Distance in meters

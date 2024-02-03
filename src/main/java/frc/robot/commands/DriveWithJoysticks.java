@@ -15,6 +15,7 @@ public class DriveWithJoysticks extends Command {
     DoubleSupplier rot;
     BooleanSupplier fieldCentric;
     BooleanSupplier babyMode;
+    BooleanSupplier align;
 
     double xMpS;
     double yMpS;
@@ -26,13 +27,15 @@ public class DriveWithJoysticks extends Command {
             DoubleSupplier y,
             DoubleSupplier rot,
             BooleanSupplier fieldCentric,
-            BooleanSupplier babyMode) {
+            BooleanSupplier babyMode,
+            BooleanSupplier align) {
         this.drivetrain = drivetrain;
         this.x = x;
         this.y = y;
         this.rot = rot;
         this.fieldCentric = fieldCentric;
         this.babyMode = babyMode;
+        this.align = align;
 
         addRequirements(drivetrain);
     }
@@ -59,7 +62,9 @@ public class DriveWithJoysticks extends Command {
         }
 
         drivetrain.setGoalChassisSpeeds(
-                new ChassisSpeeds(xMpS, yMpS, rotRadpS), fieldCentric.getAsBoolean());
+                new ChassisSpeeds(xMpS, yMpS, rotRadpS),
+                fieldCentric.getAsBoolean(),
+                align.getAsBoolean());
     }
 
     @Override
