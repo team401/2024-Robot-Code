@@ -58,6 +58,8 @@ public final class Constants {
 
         public static final Pose2d initialPose =
                 new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90));
+
+        public static final double velocityScalar = 1.0;
     }
 
     public static final class FieldConstants {
@@ -357,7 +359,7 @@ public final class Constants {
 
         public static final double aimMaxAngleRadians = Math.PI / 2;
 
-        public static final double timeToPutAimDown = 2;
+        public static final double timeToPutAimDown = 1;
 
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters

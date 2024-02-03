@@ -113,9 +113,9 @@ public class ScoringSubsystem extends SubsystemBase {
 
         if (!hasNote() && action == ScoringAction.INTAKE) {
             state = ScoringState.INTAKE;
-        } else if (action == ScoringAction.AIM) {
+        } else if (action == ScoringAction.AIM || action == ScoringAction.SHOOT) {
             state = ScoringState.PRIME;
-            aimerIo.setAimAngleRad(Math.PI / 2, true);
+            aimerIo.setAimAngleRad(Math.PI / 4, true);
         } else if (action == ScoringAction.AMP_AIM) {
             state = ScoringState.AMP_PRIME;
         } else if (action == ScoringAction.ENDGAME) {

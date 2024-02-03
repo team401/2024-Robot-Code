@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.utils.GeomUtil;
@@ -195,10 +196,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 new Translation2d(
                         robotToTarget.getX()
                                 + (getRobotVelocity.get().getX()
-                                        * noteTimeToGoal.getValue(distanceToTarget)),
+                                        * noteTimeToGoal.getValue(distanceToTarget)
+                                        * DriveConstants.velocityScalar),
                         robotToTarget.getY()
                                 + (getRobotVelocity.get().getY()
-                                        * noteTimeToGoal.getValue(distanceToTarget)));
+                                        * noteTimeToGoal.getValue(distanceToTarget)
+                                        * DriveConstants.velocityScalar));
 
         Rotation2d angle =
                 Rotation2d.fromRadians(

@@ -1,7 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -112,8 +112,8 @@ public class RobotContainer {
                                 driveTelemetry::getFieldToRobot,
                                 () ->
                                         VecBuilder.fill(
-                                                driveTelemetry.getVelocityX(),
-                                                driveTelemetry.getVelocityY()),
+                                                driveTelemetry.getVelocityX() * 0.5,
+                                                driveTelemetry.getVelocityY() * 0.5),
                                 this::getFieldToSpeaker);
 
                 tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
@@ -129,8 +129,8 @@ public class RobotContainer {
                                 driveTelemetry::getFieldToRobot,
                                 () ->
                                         VecBuilder.fill(
-                                                driveTelemetry.getVelocityX(),
-                                                driveTelemetry.getVelocityY()),
+                                                driveTelemetry.getVelocityX() * 0.5,
+                                                driveTelemetry.getVelocityY() * 0.5),
                                 this::getFieldToSpeaker);
 
                 if (FeatureFlags.simulateVision) {
@@ -205,12 +205,11 @@ public class RobotContainer {
         Logger.recordOutput("localizer/RobotPose", driveTelemetry.getFieldToRobot());
         Logger.recordOutput(
                 "localizer/RobotVelocity",
-                driveTelemetry
-                        .getFieldToRobot()
-                        .plus(
-                                new Transform2d(
-                                        driveTelemetry.getVelocity().getX(),
-                                        driveTelemetry.getVelocity().getY(),
-                                        driveTelemetry.getFieldToRobot().getRotation())));
+                new Pose2d(
+                        driveTelemetry.getFieldToRobot().getX()
+                                + driveTelemetry.getVelocity().getX() * 0.5,
+                        driveTelemetry.getFieldToRobot().getY()
+                                + driveTelemetry.getVelocity().getY() * 0.5,
+                        driveTelemetry.getFieldToRobot().getRotation()));
     }
 }
