@@ -3,7 +3,6 @@ package frc.robot;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -168,7 +167,6 @@ public class RobotContainer {
         drivetrain.registerTelemetry(driveTelemetry::telemeterize);
         drivetrain.setPoseSupplier(driveTelemetry::getFieldToRobot);
         drivetrain.setSpeakerSupplier(this::getFieldToSpeaker);
-        Commands.run(driveTelemetry::logDataSynchronously).ignoringDisable(true).schedule();
 
         intake.setScoringSupplier(scoringSubsystem::canIntake);
 
@@ -221,5 +219,7 @@ public class RobotContainer {
                 FieldFinder.whereAmI(
                         driveTelemetry.getFieldToRobot().getTranslation().getX(),
                         driveTelemetry.getFieldToRobot().getTranslation().getY()));
+
+        driveTelemetry.logDataSynchronously();
     }
 }
