@@ -1,62 +1,76 @@
 # Scoring Subsystem
-
 ```mermaid
-flowchart
+flowchart TD
 
 classDef state font-size:40px,padding:10px
 
-IDLE:::state
-INTAKE:::state
-PRIME:::state
-AMP_PRIME:::state
-SHOOT:::state
-AMP_SHOOT:::state
-ENDGAME:::state
-
-notes_0{notes == 0}
-IDLE --> notes_0
-notes_0 -->|yes| action_intake
-notes_0 -->|no| IDLE
-action_intake{action == INTAKE}
-action_intake -->|yes| INTAKE
-action_intake -->|no| IDLE
-IDLE --> action_aim
-IDLE --> action_shoot
-action_aim{action == AIM}
-action_shoot{action == SHOOT}
-action_aim -->|yes| PRIME
-action_aim -->|no| IDLE
-action_shoot -->|yes| PRIME
-action_shoot -->|no| IDLE
-
-IDLE --> action_amp_aim
-action_amp_aim{action == AMP_AIM}
-action_amp_aim -->|yes| AMP_PRIME
-action_amp_aim -->|no| IDLE
-
-IDLE -->|TBD| ENDGAME
-
-INTAKE --> notes_1
-INTAKE --> action_abort
-notes_1{notes == 1}
-notes_1 -->|yes| IDLE
-notes_1 -->|no| INTAKE
-action_abort{action == ABORT}
-action_abort -->|yes| IDLE
-action_abort -->|no| INTAKE
-
-PRIME --> action_abort2
-action_abort2{action == ABORT}
-action_abort2 -->|yes| IDLE
-action_abort2 -->|no| PRIME
-PRIME -->|action == SHOOT && primed == true| SHOOT
-
-AMP_PRIME -->|action == ABORT| IDLE
-AMP_PRIME -->|action == SHOOT && primed == true| AMP_SHOOT
-
-SHOOT -->|timer >= 0.5s| PRIME
-
-AMP_SHOOT -->|timer >= 0.5s| AMP_PRIME
-
-ENDGAME -->|action == ABORT| IDLE
+node0:::state
+node0([<font size=11>IDLE])
+node1:::state
+node1([<font size=11>INTAKE])
+node2:::state
+node2([<font size=11>PRIME])
+node3:::state
+node3([<font size=11>AMP_PRIME])
+node4:::state
+node4([<font size=11>SHOOT])
+node5:::state
+node5([<font size=11>AMP_SHOOT])
+node6:::state
+node6([<font size=11>ENDGAME])
+node0 --> node7
+node7{"notes == 0"}
+node7 -.->|true| node9
+node7 -.->|false| node8 
+node9{"action == INTAKE"}
+node9 -.->|true| node1
+node9 -.->|false| node8 
+node8{"action == AIM"}
+node8 -.->|true| node2
+node8 -.->|false| node11 
+node11{"action == SHOOT"}
+node11 -.->|true| node2
+node11 -.->|false| node10 
+node10{"action == AMP_AIM"}
+node10 -.->|true| node3
+node10 -.->|false| node0
+node1 --> node12
+node12{"notes == 1"}
+node12 -.->|true| node0
+node12 -.->|false| node13 
+node13{"action == ABORT"}
+node13 -.->|true| node0
+node13 -.->|false| node1 
+node2 --> node14
+node14{"action == ABORT"}
+node14 -.->|true| node0
+node14 -.->|false| node15
+node15{"action == SHOOT"}
+node15 -.->|true| node16
+node15 -.->|false| node2 
+node16{"primed == true"}
+node16 -.->|true| node4
+node16 -.->|false| node2 
+node3 --> node17
+node17{"action == ABORT"}
+node17 -.->|true| node0
+node17 -.->|false| node18
+node18{"action == SHOOT"}
+node18 -.->|true| node19
+node18 -.->|false| node3 
+node19{"primed == true"}
+node19 -.->|true| node5
+node19 -.->|false| node3 
+node4 --> node20
+node20{"timer >= 0.5s"}
+node20 -.->|true| node2
+node20 -.->|false| node4
+node5 --> node21
+node21{"timer >= 0.5s"}
+node21 -.->|true| node3
+node21 -.->|false| node5
+node6 --> node22
+node22{"action == ABORT"}
+node22 -.->|true| node0
+node22 -.->|false| node6
 ```

@@ -1,0 +1,5 @@
+↓ Prev | Next → ,IDLE,SEEKING,PASSING,REVERSING
+IDLE,N/A,action == INTAKE,not possible,action == REVERSE
+SEEKING,not possible,N/A,note sensed,action == REVERSE
+PASSING,no note sensed & belt current < 2 amps,not possible,N/A,action == REVERSE
+REVERSING,action == INTAKE,action == INTAKE,not possible,N/A
