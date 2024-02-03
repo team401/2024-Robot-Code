@@ -163,6 +163,11 @@ public final class Constants {
         }
     }
 
+    public static final class IntakeConstants {
+        public static final double intakePower = 5.0;
+        public static final double beltPower = 5.0;
+    }
+
     public static final class EndgameConstants {
         public static final int leftMotorID = 1;
         public static final int rightMotorID = 2;
@@ -366,6 +371,8 @@ public final class Constants {
         public static final double aimMaxAngleRadians = Math.PI / 2;
 
         public static final double timeToPutAimDown = 2;
+        public static final double maxAimIntake = 0.0;
+        public static final double minAimIntake = 0.0;
 
         // NOTE - These should be monotonically increasing
         // Key - Distance in meters
