@@ -189,9 +189,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         Pose2d robotToTarget = GeomUtil.transformToPose(current.minus(target));
 
         double distanceToTarget =
-                Math.sqrt(
-                        Math.pow(robotToTarget.getTranslation().getX(), 2)
-                                + Math.pow(robotToTarget.getTranslation().getY(), 2));
+                Math.hypot(
+                        robotToTarget.getTranslation().getX(),
+                        robotToTarget.getTranslation().getY());
         Translation2d robotToTargetAnticipated =
                 new Translation2d(
                         robotToTarget.getX()
