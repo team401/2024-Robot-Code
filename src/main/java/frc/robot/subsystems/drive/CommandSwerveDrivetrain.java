@@ -210,6 +210,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         double timeToGoal = noteTimeToGoal.getValue(distanceToTarget);
         double noteVelocity = distanceToTarget / timeToGoal;
 
+        // Correction angle accounting for robot velocity
         double phi = (Math.PI / 2) - Math.acos(getRobotVelocity.get().getY() / noteVelocity);
 
         return angle.minus(new Rotation2d(phi));

@@ -227,9 +227,11 @@ public class RobotContainer {
                 "localizer/RobotVelocity",
                 new Pose2d(
                         driveTelemetry.getFieldToRobot().getX()
-                                + driveTelemetry.getVelocity().getX() * 0.5,
+                                + (driveTelemetry.getVelocity().getX()
+                                        * DriveConstants.anticipationTime),
                         driveTelemetry.getFieldToRobot().getY()
-                                + driveTelemetry.getVelocity().getY() * 0.5,
+                                + (driveTelemetry.getVelocity().getY()
+                                        * DriveConstants.anticipationTime),
                         driveTelemetry.getFieldToRobot().getRotation()));
 
         driveTelemetry.logDataSynchronously();
