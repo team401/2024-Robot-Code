@@ -20,8 +20,11 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.utils.GeomUtil;
+import frc.robot.utils.InterpolateDouble;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -34,8 +37,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private boolean fieldCentric = true;
     private boolean aligning = false;
 
+    private static InterpolateDouble noteTimeToGoal =
+            new InterpolateDouble(ScoringConstants.timeToGoalMap(), 0.0, 2.0);
+
     private Supplier<Pose2d> getFieldToRobot = () -> new Pose2d();
     private Supplier<Translation2d> getFieldToSpeaker = () -> new Translation2d();
+    private Supplier<Translation2d> getRobotVelocity = () -> new Translation2d();
 
     private PIDController thetaController = new PIDController(.5, 0, 0);
 
@@ -76,6 +83,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public void setSpeakerSupplier(Supplier<Translation2d> getFieldToSpeaker) {
         this.getFieldToSpeaker = getFieldToSpeaker;
+    }
+
+    public void setVelocitySupplier(Supplier<Translation2d> getRobotVelocity) {
+        this.getRobotVelocity = getRobotVelocity;
     }
 
     private void configurePathPlanner() {
@@ -173,16 +184,36 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         }
     }
 
-    private static Rotation2d calculateDesiredHeading(Pose2d current, Pose2d target) {
-        // I hope this is all inlined
-        Pose2d robotToTarget = GeomUtil.transformToPose(current.minus(target));
+    private Rotation2d calculateDesiredHeading(Pose2d current, Pose2d target) {
+        double robotXAnticipated =
+                current.getX() + (getRobotVelocity.get().getX() * DriveConstants.anticipationTime);
+
+        double robotYAnticipated =
+                current.getY() + (getRobotVelocity.get().getY() * DriveConstants.anticipationTime);
+
+        Pose2d robotAnticipated =
+                new Pose2d(robotXAnticipated, robotYAnticipated, current.getRotation());
+
+        Pose2d robotToTargetAnticipated = GeomUtil.transformToPose(robotAnticipated.minus(target));
+
+        double distanceToTarget =
+                Math.hypot(
+                        robotToTargetAnticipated.getTranslation().getX(),
+                        robotToTargetAnticipated.getTranslation().getY());
 
         Rotation2d angle =
-                Rotation2d.fromRadians(Math.atan2(robotToTarget.getY(), robotToTarget.getX()));
-
+                Rotation2d.fromRadians(
+                        Math.atan2(
+                                robotToTargetAnticipated.getY(), robotToTargetAnticipated.getX()));
         angle = angle.plus(Rotation2d.fromDegrees(180));
 
-        return angle;
+        double timeToGoal = noteTimeToGoal.getValue(distanceToTarget);
+        double noteVelocity = distanceToTarget / timeToGoal;
+
+        // Correction angle accounting for robot velocity
+        double phi = (Math.PI / 2) - Math.acos(getRobotVelocity.get().getY() / noteVelocity);
+
+        return angle.minus(new Rotation2d(phi));
     }
 
     @Override
