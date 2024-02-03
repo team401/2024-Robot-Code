@@ -64,7 +64,7 @@ public final class Constants {
         public static final Pose2d initialPose =
                 new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90));
 
-        public static final double anticipationTime = 1.0;
+        public static final double anticipationTime = 0.1;
     }
 
     public static final class FieldConstants {
@@ -427,17 +427,17 @@ public final class Constants {
         // Value - Time in seconds
         public static HashMap<Double, Double> timeToGoalMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
-            map.put(0.0, 0.2);
-            map.put(1.0, 0.4);
-            map.put(2.0, 0.6);
-            map.put(3.0, 0.8);
-            map.put(4.0, 1.0);
-            map.put(5.0, 1.2);
-            map.put(6.0, 1.4);
-            map.put(7.0, 1.6);
-            map.put(8.0, 1.8);
-            map.put(9.0, 2.0);
-            map.put(10.0, 2.2);
+            map.put(0.0, 0.01);
+            map.put(1.0, 0.02);
+            map.put(2.0, 0.03);
+            map.put(3.0, 0.04);
+            map.put(4.0, 0.05);
+            map.put(5.0, 0.06);
+            map.put(6.0, 0.07);
+            map.put(7.0, 0.1);
+            map.put(8.0, 0.15);
+            map.put(9.0, 0.2);
+            map.put(10.0, 0.3);
 
             return map;
         }

@@ -38,7 +38,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private boolean aligning = false;
 
     private static InterpolateDouble noteTimeToGoal =
-            new InterpolateDouble(ScoringConstants.timeToGoalMap(), 0.0, 60.0);
+            new InterpolateDouble(ScoringConstants.timeToGoalMap(), 0.0, 2.0);
 
     private Supplier<Pose2d> getFieldToRobot = () -> new Pose2d();
     private Supplier<Translation2d> getFieldToSpeaker = () -> new Translation2d();
@@ -210,9 +210,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         double timeToGoal = noteTimeToGoal.getValue(distanceToTarget);
         double noteVelocity = distanceToTarget / timeToGoal;
 
-        double phi = (Math.PI / 2) - Math.acos(noteVelocity / getRobotVelocity.get().getY());
+        double phi = (Math.PI / 2) - Math.acos(getRobotVelocity.get().getY() / noteVelocity);
 
-        return angle.plus(new Rotation2d(phi));
+        return angle.minus(new Rotation2d(phi));
     }
 
     @Override

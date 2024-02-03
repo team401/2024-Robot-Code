@@ -221,7 +221,7 @@ public class RobotContainer {
                 FieldFinder.whereAmI(
                         driveTelemetry.getFieldToRobot().getTranslation().getX(),
                         driveTelemetry.getFieldToRobot().getTranslation().getY()));
-      
+
         Logger.recordOutput("localizer/RobotPose", driveTelemetry.getFieldToRobot());
         Logger.recordOutput(
                 "localizer/RobotVelocity",
@@ -231,7 +231,7 @@ public class RobotContainer {
                         driveTelemetry.getFieldToRobot().getY()
                                 + driveTelemetry.getVelocity().getY() * 0.5,
                         driveTelemetry.getFieldToRobot().getRotation()));
-      
+
         driveTelemetry.logDataSynchronously();
     }
 }
