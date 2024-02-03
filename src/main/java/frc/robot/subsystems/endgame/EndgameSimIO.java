@@ -1,7 +1,6 @@
 package frc.robot.subsystems.endgame;
 
 import com.revrobotics.CANSparkMax;
-import frc.robot.Constants.EndgameConstants;
 
 public class EndgameSimIO implements EndgameIO {
     private CANSparkMax leftEndgameMotor, rightEndgameMotor;
@@ -23,24 +22,35 @@ public class EndgameSimIO implements EndgameIO {
     }
 
     public void setEndgameMotorPower(double leftPercent, double rightPercent) {
-        rightEndgameMotor.set(-rightPercent);
-        leftEndgameMotor.set(-leftPercent);
+        // no-op to avoid a crash until an ElevatorSim is implemented
+
+        // rightEndgameMotor.set(-rightPercent);
+        // leftEndgameMotor.set(-leftPercent);
     }
 
     public double getRightEndgameMotorAmps() {
-        return rightEndgameMotor.getOutputCurrent();
+        // no-op to avoid a crash until an ElevatorSim is implemented
+
+        // return rightEndgameMotor.getOutputCurrent();
+        return 0;
     }
 
     public double getLeftEndgameMotorAmps() {
-        return leftEndgameMotor.getOutputCurrent();
+        // return leftEndgameMotor.getOutputCurrent();
+        // no-op to avoid a crash until an ElevatorSim is implemented
+        return 0;
     }
 
     public double getRightEndgamePosition() {
-        return rightEndgameMotor.getEncoder().getPosition() / EndgameConstants.ticksPerFoot;
+        // return rightEndgameMotor.getEncoder().getPosition() / EndgameConstants.ticksPerFoot;
+        // no-op to avoid a crash until an ElevatorSim is implemented
+        return 0;
     }
 
     public double getLeftEndgamePosition() {
-        return leftEndgameMotor.getEncoder().getPosition() / EndgameConstants.ticksPerFoot;
+        // return leftEndgameMotor.getEncoder().getPosition() / EndgameConstants.ticksPerFoot;
+        // no-op to avoid a crash until an ElevatorSim is implemented
+        return 0;
     }
 
     public void checkEndgameAmps() {
