@@ -185,7 +185,7 @@ public class Telemetry {
     }
 
     public Translation2d getVelocity() {
-        return new Translation2d(velocityXFiltered * 0.5, velocityYFiltered * 0.5);
+        return new Translation2d(velocityXFiltered, velocityYFiltered);
     }
 
     public SwerveModuleState[] getModuleStates() {
@@ -201,10 +201,10 @@ public class Telemetry {
     }
 
     public double getVelocityX() {
-        return velocityXFiltered * 0.5;
+        return velocityXFiltered;
     }
 
     public double getVelocityY() {
-        return velocityYFiltered * 0.5;
+        return velocityYFiltered;
     }
 }
