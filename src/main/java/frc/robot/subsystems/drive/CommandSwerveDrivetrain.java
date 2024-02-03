@@ -185,32 +185,34 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     private Rotation2d calculateDesiredHeading(Pose2d current, Pose2d target) {
-        // I hope this is all inlined
-        Pose2d robotToTarget = GeomUtil.transformToPose(current.minus(target));
+        double robotXAnticipated =
+                current.getX() + (getRobotVelocity.get().getX() * DriveConstants.anticipationTime);
+
+        double robotYAnticipated =
+                current.getY() + (getRobotVelocity.get().getY() * DriveConstants.anticipationTime);
+
+        Pose2d robotAnticipated =
+                new Pose2d(robotXAnticipated, robotYAnticipated, current.getRotation());
+
+        Pose2d robotToTargetAnticipated = GeomUtil.transformToPose(robotAnticipated.minus(target));
 
         double distanceToTarget =
                 Math.hypot(
-                        robotToTarget.getTranslation().getX(),
-                        robotToTarget.getTranslation().getY());
-        Translation2d robotToTargetAnticipated =
-                new Translation2d(
-                        robotToTarget.getX()
-                                + (getRobotVelocity.get().getX()
-                                        * noteTimeToGoal.getValue(distanceToTarget)
-                                        * DriveConstants.velocityScalar),
-                        robotToTarget.getY()
-                                + (getRobotVelocity.get().getY()
-                                        * noteTimeToGoal.getValue(distanceToTarget)
-                                        * DriveConstants.velocityScalar));
+                        robotToTargetAnticipated.getTranslation().getX(),
+                        robotToTargetAnticipated.getTranslation().getY());
 
         Rotation2d angle =
                 Rotation2d.fromRadians(
                         Math.atan2(
                                 robotToTargetAnticipated.getY(), robotToTargetAnticipated.getX()));
-
         angle = angle.plus(Rotation2d.fromDegrees(180));
 
-        return angle;
+        double timeToGoal = noteTimeToGoal.getValue(distanceToTarget);
+        double noteVelocity = distanceToTarget / timeToGoal;
+
+        double phi = (Math.PI / 2) - Math.acos(noteVelocity / getRobotVelocity.get().getY());
+
+        return angle.plus(new Rotation2d(phi));
     }
 
     @Override

@@ -25,6 +25,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+// Time is in seconds
+// Distance is in meters
+// Angle is in radians
+// Speed is in meters per second
+
 public final class Constants {
     public static final double loopTime = 0.02;
 
@@ -59,7 +64,7 @@ public final class Constants {
         public static final Pose2d initialPose =
                 new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90));
 
-        public static final double velocityScalar = 1.0;
+        public static final double anticipationTime = 1.0;
     }
 
     public static final class FieldConstants {
@@ -367,7 +372,6 @@ public final class Constants {
 
         public static final double aimMaxAngleRadians = Math.PI / 2;
 
-        // NOTE: This is unitless (not in seconds)
         public static final double timeToPutAimDown = 0.5;
 
         // NOTE - This should be monotonically increasing
