@@ -40,8 +40,8 @@ public class IntakeSubsystem extends SubsystemBase {
                 break;
         }
 
-        Logger.recordOutput("intake/running", inputs.backMotorVoltage != 0.0);
-        Logger.recordOutput("intake/belting", inputs.beltMotorVoltage != 0.0);
+        Logger.recordOutput("intake/running", inputs.leftIntakeVoltage != 0.0);
+        Logger.recordOutput("intake/belting", inputs.frontBeltVoltage != 0.0);
 
         Logger.recordOutput("intake/state", state.toString());
     }
@@ -96,7 +96,7 @@ public class IntakeSubsystem extends SubsystemBase {
         } else {
             io.setBeltVoltage(0);
         }
-        if (!inputs.noteSensed && inputs.beltMotorCurrent < 2.0) {
+        if (!inputs.noteSensed && inputs.backBeltCurrent < 2.0) {
             state = State.IDLE;
             io.setBeltVoltage(0);
         }
