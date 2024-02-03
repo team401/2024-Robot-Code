@@ -1,9 +1,5 @@
 package frc.robot.subsystems.scoring;
 
-import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -23,6 +19,8 @@ import frc.robot.Constants.ScoringConstants;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
+import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class ScoringSubsystem extends SubsystemBase {
     private final ShooterIO shooterIo;
@@ -86,9 +84,9 @@ public class ScoringSubsystem extends SubsystemBase {
         this.poseSupplier = poseSupplier;
         this.velocitySupplier = velocitySupplier;
 
-        SmartDashboard.putNumber("Aimer_X", -0.51);
-        SmartDashboard.putNumber("Aimer_Y", -0.245);
-        SmartDashboard.putNumber("Aimer_Z", 0);
+        // SmartDashboard.putNumber("Aimer_X", -0.51);
+        // SmartDashboard.putNumber("Aimer_Y", -0.245);
+        // SmartDashboard.putNumber("Aimer_Z", 0);
         SmartDashboard.putNumber("Hood_X", -0.5);
         SmartDashboard.putNumber("Hood_Y", 0.3);
         SmartDashboard.putNumber("Hood_Z", -0.2);
@@ -274,10 +272,10 @@ public class ScoringSubsystem extends SubsystemBase {
         Logger.recordOutput(
                 "scoring/Aimer3d",
                 new Pose3d(
-                        SmartDashboard.getNumber("Aimer_X", -0.51),
-                        SmartDashboard.getNumber("Aimer_Y", -0.245),
-                        SmartDashboard.getNumber("Aimer_Z", 0),
-                        new Rotation3d(0, aimerInputs.aimAngleRad, 0)));
+                        -0.263, // SmartDashboard.getNumber("Aimer_X", -0.263),
+                        -0.23, // SmartDashboard.getNumber("Aimer_Y", -0.23), // -0.245
+                        0.485, // SmartDashboard.getNumber("Aimer_Z", 0.485), // -0.4826
+                        new Rotation3d(0, -aimerInputs.aimAngleRad, 0)));
         // -0.51, -0.245, 0, new Rotation3d(0, aimerInputs.aimAngleRad, 0)));
         Logger.recordOutput(
                 "scoring/Hood3d",
@@ -285,7 +283,7 @@ public class ScoringSubsystem extends SubsystemBase {
                         SmartDashboard.getNumber("Hood_X", -0.5),
                         SmartDashboard.getNumber("Hood_Y", 0.3),
                         SmartDashboard.getNumber("Hood_Z", -0.2),
-                        new Rotation3d(0, hoodInputs.hoodAngleRad + aimerInputs.aimAngleRad, 0)));
+                        new Rotation3d(0, -hoodInputs.hoodAngleRad - aimerInputs.aimAngleRad, 0)));
         // -0.5, 0.3, -0.2, new Rotation3d(0, 0, hoodInputs.hoodAngleRad +
         // aimerInputs.aimAngleRad)));
 
