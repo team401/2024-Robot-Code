@@ -79,8 +79,10 @@ public final class Constants {
 
         // TODO: Update source headings with actual values, right now they are random sentinel
         // values
-        public static final Rotation2d fieldToRedSourceHeading = new Rotation2d(Math.PI);
-        public static final Rotation2d fieldToBlueSourceHeading = new Rotation2d(Math.PI * 2);
+        public static final Rotation2d fieldToRedSourceHeading =
+                new Rotation2d(Math.PI * 4 / 3); // 240 degrees
+        public static final Rotation2d fieldToBlueSourceHeading =
+                new Rotation2d(Math.PI * 5 / 3); // 300 degrees
 
         public static final Translation2d speakerPose =
                 false // TODO: CHANGE THIS URGENT
