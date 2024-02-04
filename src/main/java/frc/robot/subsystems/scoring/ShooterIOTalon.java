@@ -2,7 +2,6 @@ package frc.robot.subsystems.scoring;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -63,7 +62,9 @@ public class ShooterIOTalon implements ShooterIO {
     @Override
     public void updateInputs(ShooterIOInputs inputs) {
         shooterLeft.setControl(leftController.withVelocity(goalVelocityRPM));
-        shooterRight.setControl(rightController.withVelocity(goalVelocityRPM * ScoringConstants.shooterOffsetAdjustment));
+        shooterRight.setControl(
+                rightController.withVelocity(
+                        goalVelocityRPM * ScoringConstants.shooterOffsetAdjustment));
 
         inputs.shooterVelocityRPM = shooterLeft.getVelocity().getValueAsDouble() * 60;
         inputs.shooterGoalVelocityRPM = goalVelocityRPM;
