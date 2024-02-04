@@ -93,14 +93,6 @@ public class ScoringSubsystem extends SubsystemBase {
         this.velocitySupplier = velocitySupplier;
         this.speakerSupplier = speakerSupplier;
 
-        // SmartDashboard.putNumber("Aimer_X", -0.51);
-        // SmartDashboard.putNumber("Aimer_Y", -0.245);
-        // SmartDashboard.putNumber("Aimer_Z", 0);
-        SmartDashboard.putNumber("Hood_X", -0.5);
-        SmartDashboard.putNumber("Hood_Y", 0.3);
-        SmartDashboard.putNumber("Hood_Z", -0.2);
-    
-
         shooterInterpolated = new InterpolateDouble(ScoringConstants.getShooterMap());
 
         aimerInterpolated =
@@ -303,21 +295,14 @@ public class ScoringSubsystem extends SubsystemBase {
 
         Logger.recordOutput(
                 "scoring/Aimer3d",
-                new Pose3d(
-                        -0.263, // SmartDashboard.getNumber("Aimer_X", -0.263),
-                        -0.23, // SmartDashboard.getNumber("Aimer_Y", -0.23), // -0.245
-                        0.485, // SmartDashboard.getNumber("Aimer_Z", 0.485), // -0.4826
-                        new Rotation3d(0, -aimerInputs.aimAngleRad, 0)));
-        // -0.51, -0.245, 0, new Rotation3d(0, aimerInputs.aimAngleRad, 0)));
+                new Pose3d(-0.255, 0.2, 0.502, new Rotation3d(0, -aimerInputs.aimAngleRad, 0)));
         Logger.recordOutput(
                 "scoring/Hood3d",
                 new Pose3d(
-                        SmartDashboard.getNumber("Hood_X", -0.5),
-                        SmartDashboard.getNumber("Hood_Y", 0.3),
-                        SmartDashboard.getNumber("Hood_Z", -0.2),
+                        0.501 * Math.cos(-aimerInputs.aimAngleRad) + 0.246, // 0.246,
+                        0.193,
+                        0.019 * Math.sin(-aimerInputs.aimAngleRad) + 0.483, // 0.483,
                         new Rotation3d(0, -hoodInputs.hoodAngleRad - aimerInputs.aimAngleRad, 0)));
-        // -0.5, 0.3, -0.2, new Rotation3d(0, 0, hoodInputs.hoodAngleRad +
-        // aimerInputs.aimAngleRad)));
 
         aimMechanism.setAngle(Units.radiansToDegrees(aimerInputs.aimAngleRad));
         hoodMechanism.setAngle(Units.radiansToDegrees(hoodInputs.hoodAngleRad));
