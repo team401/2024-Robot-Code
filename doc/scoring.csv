@@ -1,0 +1,8 @@
+↓ Prev | Next → ,IDLE,INTAKE,PRIME,AMP_PRIME,SHOOT,AMP_SHOOT,ENDGAME
+IDLE,default,notes == 0 && action == INTAKE,action == AIM || action == SHOOT,action == AMP_AIM,Not allowed,Not allowed,TBD
+INTAKE,notes == 1 || action == ABORT,default,Not allowed,Not allowed,Not allowed,Not allowed,Not allowed
+PRIME,action == ABORT,Not allowed,default,Not allowed,action == SHOOT && primed == true,Not allowed,Not allowed
+AMP_PRIME,action == ABORT,Not allowed,Not allowed,default,Not allowed,action == SHOOT && primed == true,Not allowed
+SHOOT,Not allowed,Not allowed,timer >= 0.5s,Not allowed,default,Not allowed,Not allowed
+AMP_SHOOT,Not allowed,Not allowed,Not allowed,timer >= 0.5s,Not allowed,default,Not allowed
+ENDGAME,action == ABORT,Not allowed,Not allowed,Not allowed,Not allowed,Not allowed,default
