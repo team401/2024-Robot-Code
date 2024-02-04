@@ -25,6 +25,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+// Time is in seconds
+// Distance is in meters
+// Angle is in radians
+// Speed is in meters per second
+
 public final class Constants {
     public static final double loopTime = 0.02;
 
@@ -58,6 +63,8 @@ public final class Constants {
 
         public static final Pose2d initialPose =
                 new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90));
+
+        public static final double anticipationTime = 0.1;
     }
 
     public static final class FieldConstants {
@@ -151,6 +158,19 @@ public final class Constants {
             }
             return layout;
         }
+    }
+
+    public static final class IntakeConstants {
+        public static final double intakePower = 5.0;
+        public static final double beltPower = 5.0;
+    }
+
+    public static final class EndgameConstants {
+        public static final int leftMotorID = 1;
+        public static final int rightMotorID = 2;
+        public static final int endgameUp = 3;
+        public static final int endgameDown = 0;
+        public static final int ticksPerFoot = 10;
     }
 
     public static final class TunerConstants {
@@ -347,9 +367,12 @@ public final class Constants {
 
         public static final double aimMaxAngleRadians = Math.PI / 2;
 
-        public static final double timeToPutAimDown = 2;
+        public static final double timeToPutAimDown = 0.5;
 
-        // NOTE - These should be monotonically increasing
+        public static final double maxAimIntake = 0.0;
+        public static final double minAimIntake = 0.0;
+
+        // NOTE - This should be monotonically increasing
         // Key - Distance in meters
         // Value - Aimer angle in radians
         public static HashMap<Double, Double> getAimerMap() { // TODO: Find this
@@ -369,6 +392,7 @@ public final class Constants {
             return map;
         }
 
+        // NOTE - This should be monotonically increasing
         // Key - Distance in meters
         // Value - Shooter RPM
         public static HashMap<Double, Double> getShooterMap() { // TODO: Find this
@@ -384,6 +408,26 @@ public final class Constants {
             map.put(8.0, 180.0);
             map.put(9.0, 190.0);
             map.put(10.0, 200.0);
+
+            return map;
+        }
+
+        // NOTE - This should be monotonically increasing
+        // Key - Distance in meters
+        // Value - Time in seconds
+        public static HashMap<Double, Double> timeToGoalMap() { // TODO: Find this
+            HashMap<Double, Double> map = new HashMap<Double, Double>();
+            map.put(0.0, 0.01);
+            map.put(1.0, 0.02);
+            map.put(2.0, 0.03);
+            map.put(3.0, 0.04);
+            map.put(4.0, 0.05);
+            map.put(5.0, 0.06);
+            map.put(6.0, 0.07);
+            map.put(7.0, 0.1);
+            map.put(8.0, 0.15);
+            map.put(9.0, 0.2);
+            map.put(10.0, 0.3);
 
             return map;
         }
