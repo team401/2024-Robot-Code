@@ -46,7 +46,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     private AlignTarget alignTarget = AlignTarget.NONE;
-    private AlignState alignState = AlignState.ALIGNING;
+    private AlignState alignState = AlignState.MANUAL;
 
     private Supplier<Pose2d> getFieldToRobot = () -> new Pose2d();
     private Supplier<Translation2d> getFieldToSpeaker = () -> new Translation2d();
