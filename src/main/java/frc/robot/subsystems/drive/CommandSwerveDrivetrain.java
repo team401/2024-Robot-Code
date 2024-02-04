@@ -40,13 +40,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         SOURCE
     }
 
-    public enum DriveState {
+    public enum AlignState {
         MANUAL,
         ALIGNING,
     }
 
     private AlignTarget alignTarget = AlignTarget.NONE;
-    private DriveState state = DriveState.MANUAL;
+    private AlignState alignState = AlignState.ALIGNING;
 
     private Supplier<Pose2d> getFieldToRobot = () -> new Pose2d();
     private Supplier<Translation2d> getFieldToSpeaker = () -> new Translation2d();
@@ -102,6 +102,18 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         this.getFieldToSource = getFieldToSource;
     }
 
+    public void setAlignTarget(AlignTarget alignTarget) {
+        this.alignTarget = alignTarget;
+    }
+
+    public void setAlignState(AlignState state) {
+        this.alignState = state;
+    }
+
+    public AlignState getAlignState() {
+        return alignState;
+    }
+
     private void configurePathPlanner() {
         double driveBaseRadius = 0;
         for (var moduleLocation : m_moduleLocations) {
@@ -152,23 +164,21 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         simNotifier.startPeriodic(kSimLoopPeriod);
     }
 
-    public void setGoalChassisSpeeds(
-            ChassisSpeeds chassisSpeeds, boolean fieldCen, AlignTarget alignTarget) {
+    public void setGoalChassisSpeeds(ChassisSpeeds chassisSpeeds, boolean fieldCen) {
         vx = chassisSpeeds.vxMetersPerSecond;
         vy = chassisSpeeds.vyMetersPerSecond;
         omega = chassisSpeeds.omegaRadiansPerSecond;
         fieldCentric = fieldCen;
-        this.alignTarget = alignTarget;
     }
 
     public void setGoalChassisSpeeds(ChassisSpeeds chassisSpeeds) {
-        setGoalChassisSpeeds(chassisSpeeds, true, alignTarget);
+        setGoalChassisSpeeds(chassisSpeeds, true);
     }
 
     private void controlDrivetrain() {
-        if (state == DriveState.ALIGNING) {
-            Pose2d pose = getFieldToRobot.get();
-            Rotation2d desiredHeading = pose.getRotation();
+        Pose2d pose = getFieldToRobot.get();
+        Rotation2d desiredHeading = pose.getRotation();
+        if (alignState == AlignState.ALIGNING) {
             switch (alignTarget) {
                 case AMP:
                     desiredHeading = getFieldToAmp.get();
@@ -185,15 +195,17 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 default:
                     break;
             }
-
-            Logger.recordOutput("Drive/desiredHeading", desiredHeading);
-            Logger.recordOutput("Drive/fieldToSpeaker", getFieldToSpeaker.get());
-
-            omega =
-                    thetaController.calculate(
-                            pose.getRotation().getDegrees(), desiredHeading.getDegrees());
-            Logger.recordOutput("Drive/rotationError", thetaController.getPositionError());
         }
+
+        Logger.recordOutput("Drive/alignState", alignState);
+        Logger.recordOutput("Drive/alignTarget", alignTarget);
+        Logger.recordOutput("Drive/desiredHeading", desiredHeading);
+        Logger.recordOutput("Drive/fieldToSpeaker", getFieldToSpeaker.get());
+
+        omega =
+                thetaController.calculate(
+                        pose.getRotation().getDegrees(), desiredHeading.getDegrees());
+        Logger.recordOutput("Drive/rotationError", thetaController.getPositionError());
 
         if (vx == 0 && vy == 0 && omega == 0) {
             setControl(brake);

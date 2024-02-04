@@ -4,6 +4,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignState;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignTarget;
 import frc.robot.utils.Deadband;
 import java.util.function.BooleanSupplier;
@@ -70,29 +71,39 @@ public class DriveWithJoysticks extends Command {
             rotRadpS *= 0.5;
         }
 
-        AlignTarget target = AlignTarget.NONE;
+        if (toggleAlign.getAsBoolean() && !lastToggleAlign) {
+            switch (drivetrain.getAlignState()) {
+                case ALIGNING:
+                    drivetrain.setAlignState(AlignState.MANUAL);
+                    break;
+                case MANUAL:
+                    drivetrain.setAlignState(AlignState.ALIGNING);
+                    break;
+                default:
+                    break;
+            }
+        }
+        lastToggleAlign = toggleAlign.getAsBoolean();
+
         switch (POV.getAsInt()) {
             case 0:
-                target = AlignTarget.SPEAKER;
+                drivetrain.setAlignTarget(AlignTarget.SPEAKER);
                 break;
             case 90:
-                target = AlignTarget.AMP;
+                drivetrain.setAlignTarget(AlignTarget.AMP);
                 break;
             case 180:
-                target = AlignTarget.NONE;
+                drivetrain.setAlignTarget(AlignTarget.NONE);
                 break;
             case 270:
-                target = AlignTarget.SOURCE;
+                drivetrain.setAlignTarget(AlignTarget.SOURCE);
                 break;
             default:
                 break;
         }
 
         drivetrain.setGoalChassisSpeeds(
-                new ChassisSpeeds(xMpS, yMpS, rotRadpS),
-                fieldCentric.getAsBoolean(),
-                POV.getAsInt(),
-                toggleAlign.getAsBoolean());
+                new ChassisSpeeds(xMpS, yMpS, rotRadpS), fieldCentric.getAsBoolean());
     }
 
     @Override
