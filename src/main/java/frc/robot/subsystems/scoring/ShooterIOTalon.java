@@ -16,7 +16,9 @@ public class ShooterIOTalon implements ShooterIO {
     private final TalonFX shooterLeft = new TalonFX(ScoringConstants.shooterLeftMotorId);
     private final TalonFX shooterRight = new TalonFX(ScoringConstants.shooterRightMotorId);
 
-    MotionMagicVelocityVoltage controller = new MotionMagicVelocityVoltage(0).withSlot(0);
+    MotionMagicVelocityVoltage leftController = new MotionMagicVelocityVoltage(0).withSlot(0);
+    MotionMagicVelocityVoltage rightController = new MotionMagicVelocityVoltage(0).withSlot(0);
+
     private final MotionMagicConfigs configs = new MotionMagicConfigs();
     private final Slot0Configs slot0 = new Slot0Configs();
 
@@ -25,7 +27,7 @@ public class ShooterIOTalon implements ShooterIO {
     double goalVelocityRPM = 0.0;
 
     public ShooterIOTalon() {
-        shooterRight.setControl(new Follower(ScoringConstants.shooterLeftMotorId, true));
+        shooterRight.setInverted(true);
 
         shooterLeft.setNeutralMode(NeutralModeValue.Coast);
         shooterRight.setNeutralMode(NeutralModeValue.Coast);
@@ -60,7 +62,8 @@ public class ShooterIOTalon implements ShooterIO {
 
     @Override
     public void updateInputs(ShooterIOInputs inputs) {
-        shooterLeft.setControl(controller.withVelocity(goalVelocityRPM));
+        shooterLeft.setControl(leftController.withVelocity(goalVelocityRPM));
+        shooterRight.setControl(rightController.withVelocity(goalVelocityRPM * ScoringConstants.shooterOffsetAdjustment));
 
         inputs.shooterVelocityRPM = shooterLeft.getVelocity().getValueAsDouble() * 60;
         inputs.shooterGoalVelocityRPM = goalVelocityRPM;

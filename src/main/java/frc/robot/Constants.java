@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
@@ -381,6 +382,8 @@ public final class Constants {
 
         public static final double maxAimIntake = 0.0;
         public static final double minAimIntake = 0.0;
+
+        public static final double shooterOffsetAdjustment = 0.6;
 
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters
