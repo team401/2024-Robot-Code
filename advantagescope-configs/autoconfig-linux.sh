@@ -1,2 +1,2 @@
 #! /bin/bash
-cp ./Robot_Bob ~/.config/AdvantageScope/userAssets/Robot_Bob
+cp -r ./advantagescope-configs/Robot_Bob ~/.config/AdvantageScope/userAssets/Robot_Bob
