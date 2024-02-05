@@ -31,11 +31,8 @@ public class IntakeIOSim implements IntakeIO {
         inputs.rightIntakeVoltage = intakeWheelsAppliedVolts;
         inputs.rightIntakeCurrent = noteInIntakeWheels ? 100000 : 0;
 
-        inputs.backBeltVoltage = beltAppliedVolts;
-        inputs.backBeltCurrent = noteInBelts ? 100000 : 0;
-
-        inputs.frontBeltVoltage = beltAppliedVolts;
-        inputs.frontBeltCurrent = noteInBelts ? 100000 : 0;
+        inputs.beltVoltage = beltAppliedVolts;
+        inputs.beltCurrent = noteInBelts ? 100000 : 0;
 
         inputs.noteSensed = noteInBelts;
     }

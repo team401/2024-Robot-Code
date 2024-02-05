@@ -12,11 +12,8 @@ public interface IntakeIO {
         public double rightIntakeVoltage = 0.0;
         public double rightIntakeCurrent = 0.0;
 
-        public double frontBeltVoltage = 0.0;
-        public double frontBeltCurrent = 0.0;
-
-        public double backBeltVoltage = 0.0;
-        public double backBeltCurrent = 0.0;
+        public double beltVoltage = 0.0;
+        public double beltCurrent = 0.0;
 
         public boolean noteSensed = false;
     }

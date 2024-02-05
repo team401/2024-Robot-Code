@@ -15,13 +15,9 @@ public class IntakeIOSparkMax implements IntakeIO {
     private CANSparkMax rightIntake =
             new CANSparkMax(IntakeConstants.rightIntakeMotorID, MotorType.kBrushless);
 
-    private TalonFX frontBelt = new TalonFX(IntakeConstants.frontBeltMotorID);
-    private StatusSignal<Double> frontBeltVoltage = frontBelt.getMotorVoltage();
-    private StatusSignal<Double> frontBeltCurrent = frontBelt.getStatorCurrent();
-
-    private TalonFX backBelt = new TalonFX(IntakeConstants.backBeltMotorID);
-    private StatusSignal<Double> backBeltVoltage = backBelt.getMotorVoltage();
-    private StatusSignal<Double> backBeltCurrent = backBelt.getStatorCurrent();
+    private TalonFX belt = new TalonFX(IntakeConstants.frontBeltMotorID);
+    private StatusSignal<Double> beltVoltage = belt.getMotorVoltage();
+    private StatusSignal<Double> beltCurrent = belt.getStatorCurrent();
 
     private DigitalInput bannerSensor = new DigitalInput(IntakeConstants.bannerSensorID);
 
@@ -37,11 +33,8 @@ public class IntakeIOSparkMax implements IntakeIO {
         inputs.rightIntakeVoltage = rightIntake.getAppliedOutput() * 12;
         inputs.rightIntakeCurrent = rightIntake.getOutputCurrent();
 
-        inputs.frontBeltVoltage = frontBeltVoltage.getValueAsDouble();
-        inputs.frontBeltCurrent = frontBeltCurrent.getValueAsDouble();
-
-        inputs.backBeltVoltage = backBeltVoltage.getValueAsDouble();
-        inputs.backBeltCurrent = backBeltCurrent.getValueAsDouble();
+        inputs.beltVoltage = beltVoltage.getValueAsDouble();
+        inputs.beltCurrent = beltCurrent.getValueAsDouble();
 
         inputs.noteSensed = bannerSensor.get();
     }
@@ -54,7 +47,6 @@ public class IntakeIOSparkMax implements IntakeIO {
 
     @Override
     public void setBeltVoltage(double volts) {
-        frontBelt.setControl(new VoltageOut(volts));
-        backBelt.setControl(new VoltageOut(volts));
+        belt.setControl(new VoltageOut(volts));
     }
 }
