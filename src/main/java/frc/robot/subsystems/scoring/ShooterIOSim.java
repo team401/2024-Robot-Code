@@ -11,12 +11,20 @@ import frc.robot.Constants.ScoringConstants;
 
 public class ShooterIOSim implements ShooterIO {
     // TODO: Tune this later
-    private final FlywheelSim shooterSim = new FlywheelSim(DCMotor.getNeoVortex(1), 1.0, 0.1);
-    private final PIDController shooterController =
+    private final FlywheelSim shooterLeftSim = new FlywheelSim(DCMotor.getNeoVortex(1), 1.0, 0.1);
+    private final FlywheelSim shooterRightSim = new FlywheelSim(DCMotor.getNeoVortex(1), 1.0, 0.1);
+
+    private final PIDController shooterLeftController =
             new PIDController(
                     ScoringConstants.shooterkP,
                     ScoringConstants.shooterkI,
                     ScoringConstants.shooterkD);
+    private final PIDController shooterRightController =
+            new PIDController(
+                    ScoringConstants.shooterkP,
+                    ScoringConstants.shooterkI,
+                    ScoringConstants.shooterkD);
+
     private final SimpleMotorFeedforward shooterFeedforward =
             new SimpleMotorFeedforward(
                     ScoringConstants.shooterkS,
@@ -25,13 +33,18 @@ public class ShooterIOSim implements ShooterIO {
 
     DigitalInput bannerSensor = new DigitalInput(Constants.SensorConstants.bannerPort);
 
-    double shooterAppliedVolts = 0.0;
-    double shooterGoalVelRPM = 0.0;
+    double shooterLeftGoalVelRPM = 0.0;
+    double shooterLeftAppliedVolts = 0.0;
+
+    double shooterRightGoalVelRPM = 0.0;
+    double shooterRightAppliedVolts = 0.0;
+
     double kickerVolts = 0.0;
 
     @Override
     public void setShooterVelocityRPM(double velocity) {
-        shooterGoalVelRPM = velocity;
+        shooterLeftGoalVelRPM = velocity;
+        shooterRightGoalVelRPM = velocity * ScoringConstants.shooterOffsetAdjustment;
     }
 
     @Override
@@ -41,21 +54,36 @@ public class ShooterIOSim implements ShooterIO {
 
     @Override
     public void updateInputs(ShooterIOInputs inputs) {
-        shooterSim.update(Constants.loopTime);
+        shooterLeftSim.update(Constants.loopTime);
+        shooterRightSim.update(Constants.loopTime);
 
-        shooterAppliedVolts =
-                shooterFeedforward.calculate(shooterSim.getAngularVelocityRadPerSec())
-                        + shooterController.calculate(
-                                shooterSim.getAngularVelocityRadPerSec(),
-                                shooterGoalVelRPM * 2.0 * Math.PI / 60.0);
-        shooterSim.setInputVoltage(shooterAppliedVolts);
+        shooterLeftAppliedVolts =
+                shooterFeedforward.calculate(shooterLeftSim.getAngularVelocityRadPerSec())
+                        + shooterLeftController.calculate(
+                                shooterLeftSim.getAngularVelocityRadPerSec(),
+                                shooterLeftGoalVelRPM * 2.0 * Math.PI / 60.0);
+        shooterRightAppliedVolts =
+                shooterFeedforward.calculate(shooterRightSim.getAngularVelocityRadPerSec())
+                        + shooterRightController.calculate(
+                                shooterRightSim.getAngularVelocityRadPerSec(),
+                                shooterRightGoalVelRPM * 2.0 * Math.PI / 60.0);
 
-        inputs.shooterVelocityRPM =
-                shooterSim.getAngularVelocityRadPerSec()
+        shooterLeftSim.setInputVoltage(shooterLeftAppliedVolts);
+        shooterRightSim.setInputVoltage(shooterRightAppliedVolts);
+
+        inputs.shooterLeftVelocityRPM =
+                shooterLeftSim.getAngularVelocityRadPerSec()
                         * ConversionConstants.kRadiansPerSecondToRPM;
-        inputs.shooterGoalVelocityRPM = shooterGoalVelRPM;
-        inputs.shooterAppliedVolts = shooterAppliedVolts;
-        inputs.shooterCurrentAmps = shooterSim.getCurrentDrawAmps();
+        inputs.shooterLeftGoalVelocityRPM = shooterLeftGoalVelRPM;
+        inputs.shooterLeftAppliedVolts = shooterLeftAppliedVolts;
+        inputs.shooterLeftCurrentAmps = shooterLeftSim.getCurrentDrawAmps();
+
+        inputs.shooterRightVelocityRPM =
+                shooterRightSim.getAngularVelocityRadPerSec()
+                        * ConversionConstants.kRadiansPerSecondToRPM;
+        inputs.shooterRightGoalVelocityRPM = shooterRightGoalVelRPM;
+        inputs.shooterRightAppliedVolts = shooterRightAppliedVolts;
+        inputs.shooterRightCurrentAmps = shooterRightSim.getCurrentDrawAmps();
 
         inputs.kickerAppliedVolts = kickerVolts;
         inputs.kickerCurrentAmps = 0.0;

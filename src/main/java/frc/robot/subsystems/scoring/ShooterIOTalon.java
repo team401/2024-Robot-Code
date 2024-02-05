@@ -23,7 +23,8 @@ public class ShooterIOTalon implements ShooterIO {
 
     DigitalInput bannerSensor = new DigitalInput(Constants.SensorConstants.bannerPort);
 
-    double goalVelocityRPM = 0.0;
+    double goalLeftVelocityRPM = 0.0;
+    double goalRightVelocityRPM = 0.0;
 
     public ShooterIOTalon() {
         shooterRight.setInverted(true);
@@ -51,7 +52,8 @@ public class ShooterIOTalon implements ShooterIO {
 
     @Override
     public void setShooterVelocityRPM(double velocity) {
-        goalVelocityRPM = velocity;
+        goalLeftVelocityRPM = velocity;
+        goalRightVelocityRPM = velocity * ScoringConstants.shooterOffsetAdjustment;
     }
 
     @Override
@@ -61,15 +63,18 @@ public class ShooterIOTalon implements ShooterIO {
 
     @Override
     public void updateInputs(ShooterIOInputs inputs) {
-        shooterLeft.setControl(leftController.withVelocity(goalVelocityRPM));
-        shooterRight.setControl(
-                rightController.withVelocity(
-                        goalVelocityRPM * ScoringConstants.shooterOffsetAdjustment));
+        shooterLeft.setControl(leftController.withVelocity(goalLeftVelocityRPM));
+        shooterRight.setControl(rightController.withVelocity(goalRightVelocityRPM));
 
-        inputs.shooterVelocityRPM = shooterLeft.getVelocity().getValueAsDouble() * 60;
-        inputs.shooterGoalVelocityRPM = goalVelocityRPM;
-        inputs.shooterAppliedVolts = shooterLeft.getMotorVoltage().getValueAsDouble();
-        inputs.shooterCurrentAmps = shooterLeft.getSupplyCurrent().getValueAsDouble();
+        inputs.shooterLeftVelocityRPM = shooterLeft.getVelocity().getValueAsDouble() * 60;
+        inputs.shooterLeftGoalVelocityRPM = goalLeftVelocityRPM;
+        inputs.shooterLeftAppliedVolts = shooterLeft.getMotorVoltage().getValueAsDouble();
+        inputs.shooterLeftCurrentAmps = shooterLeft.getSupplyCurrent().getValueAsDouble();
+
+        inputs.shooterRightVelocityRPM = shooterRight.getVelocity().getValueAsDouble() * 60;
+        inputs.shooterRightGoalVelocityRPM = goalRightVelocityRPM;
+        inputs.shooterRightAppliedVolts = shooterRight.getMotorVoltage().getValueAsDouble();
+        inputs.shooterRightCurrentAmps = shooterRight.getSupplyCurrent().getValueAsDouble();
 
         inputs.kickerAppliedVolts = kicker.getMotorVoltage().getValueAsDouble();
         inputs.kickerCurrentAmps = kicker.getSupplyCurrent().getValueAsDouble();
