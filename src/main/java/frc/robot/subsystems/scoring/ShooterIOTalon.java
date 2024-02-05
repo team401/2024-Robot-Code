@@ -7,6 +7,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants;
+import frc.robot.Constants.ConversionConstants;
 import frc.robot.Constants.ScoringConstants;
 
 public class ShooterIOTalon implements ShooterIO {
@@ -66,12 +67,16 @@ public class ShooterIOTalon implements ShooterIO {
         shooterLeft.setControl(leftController.withVelocity(goalLeftVelocityRPM));
         shooterRight.setControl(rightController.withVelocity(goalRightVelocityRPM));
 
-        inputs.shooterLeftVelocityRPM = shooterLeft.getVelocity().getValueAsDouble() * 60;
+        inputs.shooterLeftVelocityRPM =
+                shooterLeft.getVelocity().getValueAsDouble()
+                        * ConversionConstants.kSecondsToMinutes;
         inputs.shooterLeftGoalVelocityRPM = goalLeftVelocityRPM;
         inputs.shooterLeftAppliedVolts = shooterLeft.getMotorVoltage().getValueAsDouble();
         inputs.shooterLeftCurrentAmps = shooterLeft.getSupplyCurrent().getValueAsDouble();
 
-        inputs.shooterRightVelocityRPM = shooterRight.getVelocity().getValueAsDouble() * 60;
+        inputs.shooterRightVelocityRPM =
+                shooterRight.getVelocity().getValueAsDouble()
+                        * ConversionConstants.kSecondsToMinutes;
         inputs.shooterRightGoalVelocityRPM = goalRightVelocityRPM;
         inputs.shooterRightAppliedVolts = shooterRight.getMotorVoltage().getValueAsDouble();
         inputs.shooterRightCurrentAmps = shooterRight.getSupplyCurrent().getValueAsDouble();

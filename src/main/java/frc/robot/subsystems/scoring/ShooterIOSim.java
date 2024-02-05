@@ -11,8 +11,8 @@ import frc.robot.Constants.ScoringConstants;
 
 public class ShooterIOSim implements ShooterIO {
     // TODO: Tune this later
-    private final FlywheelSim shooterLeftSim = new FlywheelSim(DCMotor.getNeoVortex(1), 1.0, 0.1);
-    private final FlywheelSim shooterRightSim = new FlywheelSim(DCMotor.getNeoVortex(1), 1.0, 0.1);
+    private final FlywheelSim shooterLeftSim = new FlywheelSim(DCMotor.getKrakenX60(1), 1.0, 0.1);
+    private final FlywheelSim shooterRightSim = new FlywheelSim(DCMotor.getKrakenX60(1), 1.0, 0.1);
 
     private final PIDController shooterLeftController =
             new PIDController(
@@ -61,12 +61,13 @@ public class ShooterIOSim implements ShooterIO {
                 shooterFeedforward.calculate(shooterLeftSim.getAngularVelocityRadPerSec())
                         + shooterLeftController.calculate(
                                 shooterLeftSim.getAngularVelocityRadPerSec(),
-                                shooterLeftGoalVelRPM * 2.0 * Math.PI / 60.0);
+                                shooterLeftGoalVelRPM * ConversionConstants.kRPMToRadiansPerSecond);
         shooterRightAppliedVolts =
                 shooterFeedforward.calculate(shooterRightSim.getAngularVelocityRadPerSec())
                         + shooterRightController.calculate(
                                 shooterRightSim.getAngularVelocityRadPerSec(),
-                                shooterRightGoalVelRPM * 2.0 * Math.PI / 60.0);
+                                shooterRightGoalVelRPM
+                                        * ConversionConstants.kRPMToRadiansPerSecond);
 
         shooterLeftSim.setInputVoltage(shooterLeftAppliedVolts);
         shooterRightSim.setInputVoltage(shooterRightAppliedVolts);
