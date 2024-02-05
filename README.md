@@ -44,7 +44,7 @@ X
 
 ## AdvantageScope Model
 ### How to configure locally
-1. Run `advantagescope-configs\autoconfig-windows.bat` (`advantagescope-configs\autoconfig-linux.bat` for linux) to automagically copy robot models and config files.
+1. Run `advantagescope-configs\autoconfig-windows.bat` (`advantagescope-configs\autoconfig-linux.sh` for linux) to automagically copy robot models and config files.
 2. Click `File -> Import Layout...` and open `advantagescope-configs\scope-layout\config.json`.
 
 ### How to push your updates to the scope configuration
