@@ -73,12 +73,8 @@ public final class Constants {
         public static final Translation2d fieldToBlueSpeaker =
                 new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42));
 
-        // TODO: Double check source and amp headings
-        public static final Rotation2d fieldToRedAmpHeading = new Rotation2d(Math.PI / 2);
-        public static final Rotation2d fieldToBlueAmpHeading = new Rotation2d(0);
+        public static final Rotation2d fieldToAmpHeading = new Rotation2d(Math.PI / 2);
 
-        // TODO: Update source headings with actual values, right now they are random sentinel
-        // values
         public static final Rotation2d fieldToRedSourceHeading =
                 new Rotation2d(Math.PI * 4 / 3); // 240 degrees
         public static final Rotation2d fieldToBlueSourceHeading =

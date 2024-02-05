@@ -218,19 +218,8 @@ public class RobotContainer {
     }
 
     private Rotation2d getFieldToAmpHeading() {
-        if (DriverStation.getAlliance().isEmpty()) {
-            return FieldConstants.fieldToRedAmpHeading;
-        } else {
-            switch (DriverStation.getAlliance().get()) {
-                case Blue:
-                    Logger.recordOutput("Field/amp", FieldConstants.fieldToBlueAmpHeading);
-                    return FieldConstants.fieldToBlueAmpHeading;
-                case Red:
-                    Logger.recordOutput("Field/amp", FieldConstants.fieldToRedAmpHeading);
-                    return FieldConstants.fieldToRedAmpHeading;
-            }
-        }
-        throw new RuntimeException("Unreachable branch of switch expression");
+        Logger.recordOutput("Field/amp", FieldConstants.fieldToAmpHeading);
+        return FieldConstants.fieldToAmpHeading;
     }
 
     private Rotation2d getFieldToSourceHeading() {
