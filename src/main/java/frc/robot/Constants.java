@@ -377,8 +377,6 @@ public final class Constants {
 
         public static final double aimMaxAngleRadians = Math.PI / 2;
 
-        public static final double timeToPutAimDown = 0.5;
-
         public static final double maxAimIntake = 0.0;
         public static final double minAimIntake = 0.0;
 
@@ -438,6 +436,20 @@ public final class Constants {
             map.put(8.0, 0.15);
             map.put(9.0, 0.2);
             map.put(10.0, 0.3);
+
+            return map;
+        }
+
+        // NOTE - This should be monotonically increasing
+        // Key - Angle in radians
+        // Value - Time in seconds
+        public static HashMap<Double, Double> timeToPutAimDownMap() { // TODO: Find this
+            HashMap<Double, Double> map = new HashMap<Double, Double>();
+            map.put(0.0, 0.0);
+            map.put(Math.PI / 6, 0.2);
+            map.put(Math.PI / 4, 0.5);
+            map.put(Math.PI / 3, 0.7);
+            map.put(Math.PI / 2, 1.0);
 
             return map;
         }

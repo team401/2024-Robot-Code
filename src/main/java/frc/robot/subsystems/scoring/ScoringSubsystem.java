@@ -38,6 +38,7 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private final InterpolateDouble shooterInterpolated;
     private final InterpolateDouble aimerInterpolated;
+    private final InterpolateDouble timeToPutAimDown;
 
     private double shooterGoalVelocityRPMTuning = 0.0;
     private double aimerGoalAngleRadTuning = 0.0;
@@ -98,6 +99,8 @@ public class ScoringSubsystem extends SubsystemBase {
         aimerInterpolated =
                 new InterpolateDouble(
                         ScoringConstants.getAimerMap(), 0.0, ScoringConstants.aimMaxAngleRadians);
+
+        timeToPutAimDown = new InterpolateDouble(ScoringConstants.timeToPutAimDownMap(), 0.0, 2.0);
     }
 
     public void setAction(ScoringAction action) {
@@ -263,17 +266,17 @@ public class ScoringSubsystem extends SubsystemBase {
                                 poseSupplier.get().getX(),
                                 poseSupplier.get().getY(),
                                 velocitySupplier.get().get(0, 0)
-                                        * ScoringConstants.timeToPutAimDown,
+                                        * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
                                 velocitySupplier.get().get(1, 0)
-                                        * ScoringConstants.timeToPutAimDown,
+                                        * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
                                 FieldLocations.BLUE_STAGE)
                         || FieldFinder.willIHitThis(
                                 poseSupplier.get().getX(),
                                 poseSupplier.get().getY(),
                                 velocitySupplier.get().get(0, 0)
-                                        * ScoringConstants.timeToPutAimDown,
+                                        * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
                                 velocitySupplier.get().get(1, 0)
-                                        * ScoringConstants.timeToPutAimDown,
+                                        * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
                                 FieldLocations.RED_STAGE))) {
             aimerIo.setAngleClampsRad(0, 0);
         } else {
