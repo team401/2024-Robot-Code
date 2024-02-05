@@ -149,7 +149,9 @@ public class ScoringSubsystem extends SubsystemBase {
         aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal), false);
 
         boolean shooterReady =
-                Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM)
+                Math.abs(
+                                shooterInputs.shooterLeftVelocityRPM
+                                        - shooterInputs.shooterLeftGoalVelocityRPM)
                         < ScoringConstants.shooterVelocityMarginRPM; // TODO: Tune
         boolean aimReady =
                 Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad)
@@ -175,7 +177,9 @@ public class ScoringSubsystem extends SubsystemBase {
         hoodIo.setHoodAngleRad(Math.PI / 2);
 
         boolean shooterReady =
-                Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM)
+                Math.abs(
+                                shooterInputs.shooterLeftVelocityRPM
+                                        - shooterInputs.shooterLeftGoalVelocityRPM)
                         < ScoringConstants.shooterVelocityMarginRPM; // TODO: Tune
         boolean aimReady =
                 Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad)
