@@ -299,9 +299,11 @@ public class ScoringSubsystem extends SubsystemBase {
         Logger.recordOutput(
                 "scoring/Hood3d",
                 new Pose3d(
-                        0.501 * Math.cos(-aimerInputs.aimAngleRad) + 0.246, // 0.246,
+                        0.501360149992 * Math.cos(aimerInputs.aimAngleRad) - 0.255,
+                        // Independent position: 0.246 (leave for now, might be used later)
                         0.193,
-                        0.019 * Math.sin(-aimerInputs.aimAngleRad) + 0.483, // 0.483,
+                        0.501360149992 * Math.sin(aimerInputs.aimAngleRad) + 0.483,
+                        // Independent position: 0.483 (leave for now, might be used later)
                         new Rotation3d(0, -hoodInputs.hoodAngleRad - aimerInputs.aimAngleRad, 0)));
 
         aimMechanism.setAngle(Units.radiansToDegrees(aimerInputs.aimAngleRad));
