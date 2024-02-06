@@ -2,7 +2,9 @@ package frc.robot;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.ClosedLoopOutputType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants.SteerFeedbackType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Matrix;
@@ -43,10 +45,24 @@ public final class Constants {
 
     public static final class FeatureFlags {
         public static final boolean simulateVision = false;
+        public static final boolean runVision = false;
+        public static final boolean runLocalizer = true;
+
+        public static final boolean runIntake = false;
+        public static final boolean runScoring = false;
+        public static final boolean runEndgame = false;
+        public static final boolean runDrive = true;
     }
 
     public static final class ConversionConstants {
         public static final double kRadiansPerSecondToRPM = 60.0 / (2.0 * Math.PI);
+        public static final double kRPMToRadiansPerSecond = 1.0 / kRadiansPerSecondToRPM;
+
+        public static final double kSecondsToMinutes = 1.0 / 60.0;
+        public static final double kMinutesToSeconds = 60.0;
+
+        public static final double kDegreesToRadians = Math.PI / 180.0;
+        public static final double kRadiansToDegrees = 180.0 / Math.PI;
     }
 
     public static final class CANDevices {}
@@ -74,11 +90,22 @@ public final class Constants {
         public static final double midfieldLowThresholdM = 5.87;
         public static final double midfieldHighThresholdM = 10.72;
 
-        // TODO: Double check speaker coordinates
-        public static final Translation2d fieldToRedSpeaker =
-                new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42));
-        public static final Translation2d fieldToBlueSpeaker =
-                new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42));
+        public static final Rotation2d fieldToAmpHeading = new Rotation2d(-Math.PI / 2);
+
+        public static final Rotation2d fieldToRedSourceHeading =
+                new Rotation2d(Math.PI / 3); // 60 degrees
+        public static final Rotation2d fieldToBlueSourceHeading =
+                new Rotation2d(Math.PI * 2 / 3); // 120 degrees
+
+        public static final Translation2d speakerPose =
+                false // TODO: CHANGE THIS URGENT
+                        // DriverStation.getAlliance().get() ==
+                        // DriverStation.Alliance.Red
+                        ? new Translation2d(
+                                Units.inchesToMeters(652.73), Units.inchesToMeters(218.42))
+                        : new Translation2d(
+                                Units.inchesToMeters(-1.5),
+                                Units.inchesToMeters(218.42)); // TODO: Might have to change these
     }
 
     public static final class VisionConstants {
@@ -161,6 +188,13 @@ public final class Constants {
     }
 
     public static final class IntakeConstants {
+        public static final int leftIntakeMotorID = 0;
+        public static final int rightIntakeMotorID = 0;
+        public static final int frontBeltMotorID = 0;
+        public static final int backBeltMotorID = 0;
+
+        public static final int bannerSensorID = 0;
+
         public static final double intakePower = 5.0;
         public static final double beltPower = 5.0;
     }
@@ -174,15 +208,31 @@ public final class Constants {
     }
 
     public static final class TunerConstants {
-        // Both sets of gains need to be tuned to your individual robot
-        // The steer motor uses MotionMagicVoltage control
+        // Both sets of gains need to be tuned to your individual robot.
+
+        // The steer motor uses any SwerveModule.SteerRequestType control request with the
+        // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
         private static final Slot0Configs steerGains =
-                new Slot0Configs().withKP(7).withKI(0).withKD(0).withKS(0).withKV(1.5).withKA(0);
-        // When using closed-loop control, the drive motor uses:
-        // - VelocityVoltage, if DrivetrainConstants.SupportsPro is false (default)
-        // - VelocityTorqueCurrentFOC, if DrivetrainConstants.SupportsPro is true
+                new Slot0Configs()
+                        .withKP(100)
+                        .withKI(0)
+                        .withKD(0.2)
+                        .withKS(0)
+                        .withKV(1.5)
+                        .withKA(0);
+        // When using closed-loop control, the drive motor uses the control
+        // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
         private static final Slot0Configs driveGains =
-                new Slot0Configs().withKP(0.7).withKI(0).withKD(3.5).withKS(0).withKV(0).withKA(0);
+                new Slot0Configs().withKP(3).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
+
+        // The closed-loop output type to use for the steer motors;
+        // This affects the PID/FF gains for the steer motors
+        private static final ClosedLoopOutputType steerClosedLoopOutput =
+                ClosedLoopOutputType.Voltage;
+        // The closed-loop output type to use for the drive motors;
+        // This affects the PID/FF gains for the drive motors
+        private static final ClosedLoopOutputType driveClosedLoopOutput =
+                ClosedLoopOutputType.Voltage;
 
         // The stator current at which the wheels start to slip;
         // This needs to be tuned to your individual robot
@@ -190,26 +240,29 @@ public final class Constants {
 
         // Theoretical free speed (m/s) at 12v applied output;
         // This needs to be tuned to your individual robot
-        public static final double kSpeedAt12VoltsMps = 6.0;
+        public static final double kSpeedAt12VoltsMps = 5.21;
 
         // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
         // This may need to be tuned to your individual robot
         private static final double kCoupleRatio = 3.5714285714285716;
 
-        private static final double kDriveGearRatio = 6.746031746031747;
+        private static final double kDriveGearRatio = 6.122448979591837;
         private static final double kSteerGearRatio = 21.428571428571427;
-        private static final double kWheelRadiusInches = 2.02;
+        private static final double kWheelRadiusInches = 2;
 
         private static final boolean kSteerMotorReversed = true;
         private static final boolean kInvertLeftSide = false;
         private static final boolean kInvertRightSide = true;
 
         private static final String kCANbusName = "Canivore";
-        private static final int kPigeonId = 20;
+        private static final int kPigeonId = 1;
 
         // These are only used for simulation
         private static final double kSteerInertia = 0.00001;
         private static final double kDriveInertia = 0.001;
+        // Simulated voltage necessary to overcome friction
+        private static final double kSteerFrictionVoltage = 0.25;
+        private static final double kDriveFrictionVoltage = 0.25;
 
         private static final SwerveDrivetrainConstants DrivetrainConstants =
                 new SwerveDrivetrainConstants()
@@ -224,48 +277,52 @@ public final class Constants {
                         .withSlipCurrent(kSlipCurrentA)
                         .withSteerMotorGains(steerGains)
                         .withDriveMotorGains(driveGains)
+                        .withSteerMotorClosedLoopOutput(steerClosedLoopOutput)
+                        .withDriveMotorClosedLoopOutput(driveClosedLoopOutput)
                         .withSpeedAt12VoltsMps(kSpeedAt12VoltsMps)
                         .withSteerInertia(kSteerInertia)
                         .withDriveInertia(kDriveInertia)
-                        .withFeedbackSource(SwerveModuleConstants.SteerFeedbackType.FusedCANcoder)
+                        .withSteerFrictionVoltage(kSteerFrictionVoltage)
+                        .withDriveFrictionVoltage(kDriveFrictionVoltage)
+                        .withFeedbackSource(SteerFeedbackType.FusedCANcoder)
                         .withCouplingGearRatio(kCoupleRatio)
                         .withSteerMotorInverted(kSteerMotorReversed);
 
         // Front Left
         private static final int kFrontLeftDriveMotorId = 2;
         private static final int kFrontLeftSteerMotorId = 1;
-        private static final int kFrontLeftEncoderId = 9;
-        private static final double kFrontLeftEncoderOffset = -0.4609375;
+        private static final int kFrontLeftEncoderId = 1;
+        private static final double kFrontLeftEncoderOffset = 0.3486328125;
 
-        private static final double kFrontLeftXPosInches = 11.875;
-        private static final double kFrontLeftYPosInches = 8.875;
+        private static final double kFrontLeftXPosInches = 10.375;
+        private static final double kFrontLeftYPosInches = 10.375;
 
         // Front Right
         private static final int kFrontRightDriveMotorId = 4;
         private static final int kFrontRightSteerMotorId = 3;
-        private static final int kFrontRightEncoderId = 10;
-        private static final double kFrontRightEncoderOffset = -0.70751953125;
+        private static final int kFrontRightEncoderId = 2;
+        private static final double kFrontRightEncoderOffset = 0.096435546875;
 
-        private static final double kFrontRightXPosInches = 11.875;
-        private static final double kFrontRightYPosInches = -8.875;
+        private static final double kFrontRightXPosInches = 10.375;
+        private static final double kFrontRightYPosInches = -10.375;
 
         // Back Left
         private static final int kBackLeftDriveMotorId = 8;
         private static final int kBackLeftSteerMotorId = 7;
-        private static final int kBackLeftEncoderId = 12;
-        private static final double kBackLeftEncoderOffset = -0.265380859375;
+        private static final int kBackLeftEncoderId = 4;
+        private static final double kBackLeftEncoderOffset = 0.130859375;
 
-        private static final double kBackLeftXPosInches = -11.875;
-        private static final double kBackLeftYPosInches = 8.875;
+        private static final double kBackLeftXPosInches = -10.375;
+        private static final double kBackLeftYPosInches = 10.375;
 
         // Back Right
         private static final int kBackRightDriveMotorId = 6;
         private static final int kBackRightSteerMotorId = 5;
-        private static final int kBackRightEncoderId = 11;
-        private static final double kBackRightEncoderOffset = -0.17724609375;
+        private static final int kBackRightEncoderId = 3;
+        private static final double kBackRightEncoderOffset = -0.372802734375;
 
-        private static final double kBackRightXPosInches = -11.875;
-        private static final double kBackRightYPosInches = -8.875;
+        private static final double kBackRightXPosInches = -10.375;
+        private static final double kBackRightYPosInches = -10.375;
 
         private static final SwerveModuleConstants FrontLeft =
                 ConstantCreator.createModuleConstants(
@@ -367,10 +424,10 @@ public final class Constants {
 
         public static final double aimMaxAngleRadians = Math.PI / 2;
 
-        public static final double timeToPutAimDown = 0.5;
-
         public static final double maxAimIntake = 0.0;
         public static final double minAimIntake = 0.0;
+
+        public static final double shooterOffsetAdjustment = 0.6;
 
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters
@@ -428,6 +485,20 @@ public final class Constants {
             map.put(8.0, 0.15);
             map.put(9.0, 0.2);
             map.put(10.0, 0.3);
+
+            return map;
+        }
+
+        // NOTE - This should be monotonically increasing
+        // Key - Angle in radians
+        // Value - Time in seconds
+        public static HashMap<Double, Double> timeToPutAimDownMap() { // TODO: Find this
+            HashMap<Double, Double> map = new HashMap<Double, Double>();
+            map.put(0.0, 0.0);
+            map.put(Math.PI / 6, 0.2);
+            map.put(Math.PI / 4, 0.5);
+            map.put(Math.PI / 3, 0.7);
+            map.put(Math.PI / 2, 1.0);
 
             return map;
         }

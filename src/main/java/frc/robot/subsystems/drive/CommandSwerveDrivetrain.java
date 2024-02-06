@@ -38,13 +38,31 @@ import org.littletonrobotics.junction.Logger;
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
     private double vx, vy, omega = 0.0;
     private boolean fieldCentric = true;
-    private boolean aligning = false;
+
+    public enum AlignTarget {
+        NONE,
+        AMP,
+        SPEAKER,
+        SOURCE
+    }
+
+    public enum AlignState {
+        MANUAL,
+        ALIGNING,
+    }
+
+    private AlignTarget alignTarget = AlignTarget.NONE;
+    private AlignState alignState = AlignState.MANUAL;
 
     private static InterpolateDouble noteTimeToGoal =
             new InterpolateDouble(ScoringConstants.timeToGoalMap(), 0.0, 2.0);
 
     private Supplier<Pose2d> getFieldToRobot = () -> new Pose2d();
     private Supplier<Translation2d> getFieldToSpeaker = () -> new Translation2d();
+
+    private Supplier<Rotation2d> getFieldToAmp = () -> new Rotation2d();
+    private Supplier<Rotation2d> getFieldToSource = () -> new Rotation2d();
+
     private Supplier<Translation2d> getRobotVelocity = () -> new Translation2d();
 
     private PIDController thetaController = new PIDController(.5, 0, 0);
@@ -86,6 +104,26 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public void setSpeakerSupplier(Supplier<Translation2d> getFieldToSpeaker) {
         this.getFieldToSpeaker = getFieldToSpeaker;
+    }
+
+    public void setAmpSupplier(Supplier<Rotation2d> getFieldToAmp) {
+        this.getFieldToAmp = getFieldToAmp;
+    }
+
+    public void setSourceSupplier(Supplier<Rotation2d> getFieldToSource) {
+        this.getFieldToSource = getFieldToSource;
+    }
+
+    public void setAlignTarget(AlignTarget alignTarget) {
+        this.alignTarget = alignTarget;
+    }
+
+    public void setAlignState(AlignState state) {
+        this.alignState = state;
+    }
+
+    public AlignState getAlignState() {
+        return alignState;
     }
 
     public void setVelocitySupplier(Supplier<Translation2d> getRobotVelocity) {
@@ -156,33 +194,48 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         simNotifier.startPeriodic(kSimLoopPeriod);
     }
 
-    public void setGoalChassisSpeeds(ChassisSpeeds chassisSpeeds, boolean fieldCen, boolean align) {
+    public void setGoalChassisSpeeds(ChassisSpeeds chassisSpeeds, boolean fieldCen) {
         vx = chassisSpeeds.vxMetersPerSecond;
         vy = chassisSpeeds.vyMetersPerSecond;
         omega = chassisSpeeds.omegaRadiansPerSecond;
         fieldCentric = fieldCen;
-        this.aligning = align;
     }
 
     public void setGoalChassisSpeeds(ChassisSpeeds chassisSpeeds) {
-        setGoalChassisSpeeds(chassisSpeeds, true, false);
+        setGoalChassisSpeeds(chassisSpeeds, true);
     }
 
     private void controlDrivetrain() {
-        if (aligning) {
-            Pose2d pose = getFieldToRobot.get();
-            Rotation2d desiredHeading =
-                    calculateDesiredHeading(
-                            pose, new Pose2d(getFieldToSpeaker.get(), new Rotation2d()));
-
-            Logger.recordOutput("Drive/desiredHeading", desiredHeading);
-            Logger.recordOutput("Drive/fieldToSpeaker", getFieldToSpeaker.get());
-
-            omega =
-                    thetaController.calculate(
-                            pose.getRotation().getDegrees(), desiredHeading.getDegrees());
-            Logger.recordOutput("Drive/rotationError", thetaController.getPositionError());
+        Pose2d pose = getFieldToRobot.get();
+        Rotation2d desiredHeading = pose.getRotation();
+        if (alignState == AlignState.ALIGNING) {
+            switch (alignTarget) {
+                case AMP:
+                    desiredHeading = getFieldToAmp.get();
+                    break;
+                case SPEAKER:
+                    desiredHeading =
+                            calculateDesiredHeading(
+                                    pose, new Pose2d(getFieldToSpeaker.get(), new Rotation2d()));
+                    break;
+                case SOURCE:
+                    desiredHeading = getFieldToSource.get();
+                    break;
+                case NONE:
+                default:
+                    break;
+            }
         }
+
+        Logger.recordOutput("Drive/alignState", alignState);
+        Logger.recordOutput("Drive/alignTarget", alignTarget);
+        Logger.recordOutput("Drive/desiredHeading", desiredHeading);
+        Logger.recordOutput("Drive/fieldToSpeaker", getFieldToSpeaker.get());
+
+        omega =
+                thetaController.calculate(
+                        pose.getRotation().getDegrees(), desiredHeading.getDegrees());
+        Logger.recordOutput("Drive/rotationError", thetaController.getPositionError());
 
         if (vx == 0 && vy == 0 && omega == 0) {
             setControl(brake);

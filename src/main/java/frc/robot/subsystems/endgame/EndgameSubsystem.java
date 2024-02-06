@@ -1,9 +1,12 @@
 package frc.robot.subsystems.endgame;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.EndgameConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class EndgameSubsystem extends SubsystemBase {
     private PIDController endgameController = new PIDController(0, 0, 0);
@@ -55,5 +58,13 @@ public class EndgameSubsystem extends SubsystemBase {
         endgameIO.updateInputs(endgameInputs);
         endgameController.setPID(endgamekP, endgamekI, endgamekD);
         endgameControl();
+
+        Logger.recordOutput(
+                "endgame/Elevator3d",
+                new Pose3d(
+                        0.0,
+                        0.0,
+                        endgameInputs.encoderLeftPosition + 0.1,
+                        new Rotation3d(0, 0, 0)));
     }
 }

@@ -6,14 +6,14 @@ public interface IntakeIO {
 
     @AutoLog
     public static class IntakeIOInputs {
-        public double frontMotorVoltage = 0.0;
-        public double frontMotorCurrent = 0.0;
+        public double leftIntakeVoltage = 0.0;
+        public double leftIntakeCurrent = 0.0;
 
-        public double backMotorVoltage = 0.0;
-        public double backMotorCurrent = 0.0;
+        public double rightIntakeVoltage = 0.0;
+        public double rightIntakeCurrent = 0.0;
 
-        public double beltMotorVoltage = 0.0;
-        public double beltMotorCurrent = 0.0;
+        public double beltVoltage = 0.0;
+        public double beltCurrent = 0.0;
 
         public boolean noteSensed = false;
     }
