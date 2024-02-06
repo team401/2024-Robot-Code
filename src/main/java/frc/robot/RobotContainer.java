@@ -19,6 +19,7 @@ import frc.robot.subsystems.endgame.EndgameSimIO;
 import frc.robot.subsystems.endgame.EndgameSparkMaxIO;
 import frc.robot.subsystems.endgame.EndgameSubsystem;
 import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.localization.VisionIOReal;
 import frc.robot.subsystems.localization.VisionIOSim;
@@ -37,8 +38,8 @@ import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
-
-    IntakeSubsystem intake;
+    IntakeSubsystem intakeSubsystem;
+    EndgameSubsystem endgameSubsystem;
 
     CommandJoystick leftJoystick = new CommandJoystick(0);
     CommandJoystick rightJoystick = new CommandJoystick(1);
@@ -47,10 +48,7 @@ public class RobotContainer {
     VisionLocalizer tagVision;
 
     CommandSwerveDrivetrain drivetrain = FeatureFlags.runDrive ? TunerConstants.DriveTrain : null;
-
     Telemetry driveTelemetry = new Telemetry(DriveConstants.MaxSpeedMetPerSec);
-
-    EndgameSubsystem endgameSubsystem;
 
     public RobotContainer() {
         configureSubsystems();
@@ -79,7 +77,7 @@ public class RobotContainer {
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.INTAKE)))
                 .onTrue(new InstantCommand(
-                    () -> intake.toggle()
+                    () -> intakeSubsystem.toggle()
                 ));
 
             controller.b()
@@ -134,6 +132,10 @@ public class RobotContainer {
                                     this::getFieldToSpeaker);
                 }
 
+                if (FeatureFlags.runIntake) {
+                    intakeSubsystem = new IntakeSubsystem(new IntakeIOSparkMax());
+                }
+
                 tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
 
                 if (FeatureFlags.runEndgame) {
@@ -141,19 +143,23 @@ public class RobotContainer {
                 }
                 break;
             case SIM:
-                drivetrain.seedFieldRelative(DriveConstants.initialPose);
+                if (FeatureFlags.runDrive) {
+                    drivetrain.seedFieldRelative(DriveConstants.initialPose);
+                }
 
-                scoringSubsystem =
-                        new ScoringSubsystem(
-                                new ShooterIOSim(),
-                                new AimerIOSim(),
-                                new HoodIOSim(),
-                                driveTelemetry::getFieldToRobot,
-                                () ->
-                                        VecBuilder.fill(
-                                                driveTelemetry.getVelocityX(),
-                                                driveTelemetry.getVelocityY()),
-                                this::getFieldToSpeaker);
+                if (FeatureFlags.runScoring) {
+                    scoringSubsystem =
+                            new ScoringSubsystem(
+                                    new ShooterIOSim(),
+                                    new AimerIOSim(),
+                                    new HoodIOSim(),
+                                    driveTelemetry::getFieldToRobot,
+                                    () ->
+                                            VecBuilder.fill(
+                                                    driveTelemetry.getVelocityX(),
+                                                    driveTelemetry.getVelocityY()),
+                                    this::getFieldToSpeaker);
+                }
 
                 if (FeatureFlags.simulateVision) {
                     tagVision =
@@ -168,10 +174,13 @@ public class RobotContainer {
                                             Collections.emptyList(),
                                             driveTelemetry::getModuleStates));
                 }
-                endgameSubsystem = new EndgameSubsystem(new EndgameSimIO());
+
+                if (FeatureFlags.runEndgame) {
+                    endgameSubsystem = new EndgameSubsystem(new EndgameSimIO());
+                }
 
                 if (FeatureFlags.runIntake) {
-                    intake = new IntakeSubsystem(new IntakeIOSim());
+                    intakeSubsystem = new IntakeSubsystem(new IntakeIOSim());
                 }
                 break;
             case REPLAY:
@@ -192,7 +201,7 @@ public class RobotContainer {
         }
 
         if (FeatureFlags.runIntake) {
-            intake.setScoringSupplier(scoringSubsystem::canIntake);
+            intakeSubsystem.setScoringSupplier(scoringSubsystem::canIntake);
         }
     }
 
@@ -258,24 +267,26 @@ public class RobotContainer {
     }
 
     public void robotPeriodic() {
-        Logger.recordOutput(
-                "localizer/whereAmI",
-                FieldFinder.whereAmI(
-                        driveTelemetry.getFieldToRobot().getTranslation().getX(),
-                        driveTelemetry.getFieldToRobot().getTranslation().getY()));
+        if (FeatureFlags.runDrive) {
+            Logger.recordOutput(
+                    "localizer/whereAmI",
+                    FieldFinder.whereAmI(
+                            driveTelemetry.getFieldToRobot().getTranslation().getX(),
+                            driveTelemetry.getFieldToRobot().getTranslation().getY()));
 
-        Logger.recordOutput("localizer/RobotPose", driveTelemetry.getFieldToRobot());
-        Logger.recordOutput(
-                "localizer/RobotVelocity",
-                new Pose2d(
-                        driveTelemetry.getFieldToRobot().getX()
-                                + (driveTelemetry.getVelocity().getX()
-                                        * DriveConstants.anticipationTime),
-                        driveTelemetry.getFieldToRobot().getY()
-                                + (driveTelemetry.getVelocity().getY()
-                                        * DriveConstants.anticipationTime),
-                        driveTelemetry.getFieldToRobot().getRotation()));
+            Logger.recordOutput("localizer/RobotPose", driveTelemetry.getFieldToRobot());
+            Logger.recordOutput(
+                    "localizer/RobotVelocity",
+                    new Pose2d(
+                            driveTelemetry.getFieldToRobot().getX()
+                                    + (driveTelemetry.getVelocity().getX()
+                                            * DriveConstants.anticipationTime),
+                            driveTelemetry.getFieldToRobot().getY()
+                                    + (driveTelemetry.getVelocity().getY()
+                                            * DriveConstants.anticipationTime),
+                            driveTelemetry.getFieldToRobot().getRotation()));
 
-        driveTelemetry.logDataSynchronously();
+            driveTelemetry.logDataSynchronously();
+        }
     }
 }
