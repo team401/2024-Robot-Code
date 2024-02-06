@@ -87,6 +87,13 @@ public final class Constants {
         public static final Translation2d fieldToBlueSpeaker =
                 new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42));
 
+        public static final Rotation2d fieldToAmpHeading = new Rotation2d(-Math.PI / 2);
+
+        public static final Rotation2d fieldToRedSourceHeading =
+                new Rotation2d(Math.PI / 3); // 60 degrees
+        public static final Rotation2d fieldToBlueSourceHeading =
+                new Rotation2d(Math.PI * 2 / 3); // 120 degrees
+
         public static final Translation2d speakerPose =
                 false // TODO: CHANGE THIS URGENT
                         // DriverStation.getAlliance().get() ==

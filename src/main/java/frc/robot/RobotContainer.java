@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -65,6 +66,7 @@ public class RobotContainer {
                         () -> -controller.getLeftY(),
                         () -> -controller.getLeftX(),
                         () -> -controller.getRightX(),
+                        () -> controller.getHID().getPOV(),
                         () -> true,
                         () -> false,
                         () -> controller.getHID().getRightBumper()));
@@ -169,6 +171,8 @@ public class RobotContainer {
         drivetrain.setPoseSupplier(driveTelemetry::getFieldToRobot);
         drivetrain.setVelocitySupplier(driveTelemetry::getVelocity);
         drivetrain.setSpeakerSupplier(this::getFieldToSpeaker);
+        drivetrain.setAmpSupplier(this::getFieldToAmpHeading);
+        drivetrain.setSourceSupplier(this::getFieldToSourceHeading);
 
         intake.setScoringSupplier(scoringSubsystem::canIntake);
 
@@ -210,6 +214,27 @@ public class RobotContainer {
                 case Red:
                     Logger.recordOutput("Field/speaker", FieldConstants.fieldToRedSpeaker);
                     return FieldConstants.fieldToRedSpeaker;
+            }
+        }
+        throw new RuntimeException("Unreachable branch of switch expression");
+    }
+
+    private Rotation2d getFieldToAmpHeading() {
+        Logger.recordOutput("Field/amp", FieldConstants.fieldToAmpHeading);
+        return FieldConstants.fieldToAmpHeading;
+    }
+
+    private Rotation2d getFieldToSourceHeading() {
+        if (DriverStation.getAlliance().isEmpty()) {
+            return FieldConstants.fieldToRedSourceHeading;
+        } else {
+            switch (DriverStation.getAlliance().get()) {
+                case Blue:
+                    Logger.recordOutput("Field/source", FieldConstants.fieldToBlueSourceHeading);
+                    return FieldConstants.fieldToBlueSourceHeading;
+                case Red:
+                    Logger.recordOutput("Field/source", FieldConstants.fieldToRedSourceHeading);
+                    return FieldConstants.fieldToRedSourceHeading;
             }
         }
         throw new RuntimeException("Unreachable branch of switch expression");
