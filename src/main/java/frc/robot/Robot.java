@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.pathfinding.LocalADStar;
-import com.pathplanner.lib.pathfinding.Pathfinding;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -35,7 +33,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotInit() {
-        Pathfinding.setPathfinder(new LocalADStar());
+
         Logger.recordMetadata("ProjectName", "2024 - 401 Comp Robot"); // TODO: Name the robot!
 
         if (Constants.currentMode == Constants.Mode.REAL) {

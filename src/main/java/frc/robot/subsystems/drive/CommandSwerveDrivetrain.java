@@ -7,6 +7,8 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.pathfinding.LocalADStar;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -66,7 +68,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         }
 
         thetaController.enableContinuousInput(-180, 180);
-        // PPHolonomicDriveController.setRotationTargetOverride(() -> calculateDesiredHeading());
     }
 
     public CommandSwerveDrivetrain(
@@ -96,6 +97,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         for (var moduleLocation : m_moduleLocations) {
             driveBaseRadius = Math.max(driveBaseRadius, moduleLocation.getNorm());
         }
+
+        Pathfinding.setPathfinder(new LocalADStar());
 
         AutoBuilder.configureHolonomic(
                 () -> this.getState().Pose, // Supplier of current robot pose
@@ -229,25 +232,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
         return angle.minus(new Rotation2d(phi));
     }
-
-    /*private Optional<Rotation2d> calculateDesiredHeading() {
-
-        Pose2d current = getFieldToRobot.get();
-        Pose2d target = new Pose2d(getFieldToSpeaker.get(), new Rotation2d());
-
-        if (aligning) {
-            Pose2d robotToTarget = GeomUtil.transformToPose(current.minus(target));
-
-            Rotation2d angle =
-                    Rotation2d.fromRadians(Math.atan2(robotToTarget.getY(), robotToTarget.getX()));
-
-            angle = angle.plus(Rotation2d.fromDegrees(180));
-
-            return Optional.of(angle);
-        } else {
-            return Optional.empty();
-        }
-    }*/
 
     @Override
     public void periodic() {

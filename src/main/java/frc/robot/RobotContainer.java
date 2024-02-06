@@ -207,7 +207,6 @@ public class RobotContainer {
     }
 
     private Translation2d getFieldToSpeaker() {
-        // return FieldConstants.fieldToRedSpeaker;
         if (DriverStation.getAlliance().isEmpty()) {
             return FieldConstants.fieldToBlueSpeaker;
         } else {
