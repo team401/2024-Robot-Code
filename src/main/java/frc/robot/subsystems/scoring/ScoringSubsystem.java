@@ -2,6 +2,8 @@ package frc.robot.subsystems.scoring;
 
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.util.Units;
@@ -90,7 +92,6 @@ public class ScoringSubsystem extends SubsystemBase {
 
         this.poseSupplier = poseSupplier;
         this.velocitySupplier = velocitySupplier;
-
         this.speakerSupplier = speakerSupplier;
 
         shooterInterpolated = new InterpolateDouble(ScoringConstants.getShooterMap());
@@ -298,6 +299,19 @@ public class ScoringSubsystem extends SubsystemBase {
         Logger.processInputs("scoring/shooter", shooterInputs);
         Logger.processInputs("scoring/aimer", aimerInputs);
         Logger.processInputs("scoring/hood", hoodInputs);
+
+        Logger.recordOutput(
+                "scoring/Aimer3d",
+                new Pose3d(-0.255, 0.2, 0.502, new Rotation3d(0, -aimerInputs.aimAngleRad, 0)));
+        Logger.recordOutput(
+                "scoring/Hood3d",
+                new Pose3d(
+                        0.501360149992 * Math.cos(aimerInputs.aimAngleRad) - 0.255,
+                        // Independent position: 0.246 (leave for now, might be used later)
+                        0.193,
+                        0.501360149992 * Math.sin(aimerInputs.aimAngleRad) + 0.483,
+                        // Independent position: 0.483 (leave for now, might be used later)
+                        new Rotation3d(0, -hoodInputs.hoodAngleRad - aimerInputs.aimAngleRad, 0)));
 
         aimMechanism.setAngle(Units.radiansToDegrees(aimerInputs.aimAngleRad));
         hoodMechanism.setAngle(Units.radiansToDegrees(hoodInputs.hoodAngleRad));
