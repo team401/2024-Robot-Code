@@ -1,0 +1,75 @@
+{
+    "version": "3.0.2",
+    "layout": [
+      {
+        "type": 1,
+        "legends": {
+          "left": {
+            "lockedRange": null,
+            "unitConversion": {
+              "type": null,
+              "factor": 1
+            },
+            "fields": []
+          },
+          "discrete": {
+            "fields": []
+          },
+          "right": {
+            "lockedRange": null,
+            "unitConversion": {
+              "type": null,
+              "factor": 1
+            },
+            "fields": []
+          }
+        },
+        "title": "Line Graph"
+      },
+      {
+        "type": 6,
+        "fields": [],
+        "listFields": [
+          [
+            {
+              "type": "Robot",
+              "key": "NT:/AdvantageKit/RealOutputs/Telemetry/fieldToRobot3d",
+              "sourceTypeIndex": 1,
+              "sourceType": "Pose3d"
+            },
+            {
+              "type": "Component (Robot)",
+              "key": "NT:/AdvantageKit/RealOutputs/scoring/Aimer3d",
+              "sourceTypeIndex": 1,
+              "sourceType": "Pose3d"
+            },
+            {
+              "type": "Component (Robot)",
+              "key": "NT:/AdvantageKit/RealOutputs/scoring/Hood3d",
+              "sourceTypeIndex": 1,
+              "sourceType": "Pose3d"
+            },
+            {
+              "type": "Component (Robot)",
+              "key": "NT:/AdvantageKit/RealOutputs/endgame/Elevator3d",
+              "sourceTypeIndex": 1,
+              "sourceType": "Pose3d"
+            }
+          ],
+          []
+        ],
+        "options": {
+          "field": "2024 Field",
+          "alliance": "blue",
+          "robot": "Bob",
+          "unitDistance": "meters",
+          "unitRotation": "radians",
+          "cameraIndex": -1,
+          "fov": 50
+        },
+        "configHidden": false,
+        "title": "3D Field"
+      }
+    ]
+  }
+  
