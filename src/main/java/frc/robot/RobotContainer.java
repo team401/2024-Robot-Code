@@ -46,15 +46,15 @@ public class RobotContainer {
 
     VisionLocalizer tagVision;
 
-    CommandSwerveDrivetrain drivetrain;
+    CommandSwerveDrivetrain drivetrain = FeatureFlags.runDrive ? TunerConstants.DriveTrain : null;
 
     Telemetry driveTelemetry = new Telemetry(DriveConstants.MaxSpeedMetPerSec);
 
     EndgameSubsystem endgameSubsystem;
 
     public RobotContainer() {
-        configureBindings();
         configureSubsystems();
+        configureBindings();
         configureModes();
     }
 
@@ -118,10 +118,6 @@ public class RobotContainer {
     private void configureModes() {}
 
     public void configureSubsystems() {
-        if (FeatureFlags.runDrive) {
-            drivetrain = TunerConstants.DriveTrain;
-        }
-
         switch (Constants.currentMode) {
             case REAL:
                 if (FeatureFlags.runScoring) {
