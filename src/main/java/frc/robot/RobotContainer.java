@@ -136,7 +136,9 @@ public class RobotContainer {
                     intakeSubsystem = new IntakeSubsystem(new IntakeIOSparkMax());
                 }
 
-                tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
+                if (FeatureFlags.runVision) {
+                    tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
+                }
 
                 if (FeatureFlags.runEndgame) {
                     endgameSubsystem = new EndgameSubsystem(new EndgameSparkMaxIO());
@@ -167,7 +169,7 @@ public class RobotContainer {
                                     new VisionIOSim(
                                             VisionConstants.cameras,
                                             driveTelemetry::getModuleStates));
-                } else {
+                } else if (FeatureFlags.runVision) {
                     tagVision =
                             new VisionLocalizer(
                                     new VisionIOSim(
@@ -195,9 +197,13 @@ public class RobotContainer {
             drivetrain.setAmpSupplier(this::getFieldToAmpHeading);
             drivetrain.setSourceSupplier(this::getFieldToSourceHeading);
 
-            tagVision.setCameraConsumer(
-                    (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
-            tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
+            if (FeatureFlags.runVision) {
+                tagVision.setCameraConsumer(
+                        (m) ->
+                                drivetrain.addVisionMeasurement(
+                                        m.pose(), m.timestamp(), m.variance()));
+                tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
+            }
         }
 
         if (FeatureFlags.runIntake) {
