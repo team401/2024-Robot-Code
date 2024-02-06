@@ -61,16 +61,16 @@ public class RobotContainer {
     // spotless:off
     private void configureBindings() {
         if (FeatureFlags.runDrive) {
-        drivetrain.setDefaultCommand(
-                new DriveWithJoysticks(
-                        drivetrain,
-                        () -> -controller.getLeftY(),
-                        () -> -controller.getLeftX(),
-                        () -> -controller.getRightX(),
-                        () -> controller.getHID().getPOV(),
-                        () -> true,
-                        () -> false,
-                        () -> controller.getHID().getRightBumper()));
+            drivetrain.setDefaultCommand(
+                    new DriveWithJoysticks(
+                            drivetrain,
+                            () -> -controller.getLeftY(),
+                            () -> -controller.getLeftX(),
+                            () -> -controller.getRightX(),
+                            () -> controller.getHID().getPOV(),
+                            () -> true,
+                            () -> false,
+                            () -> controller.getHID().getRightBumper()));
         }
 
         if (FeatureFlags.runScoring) {
@@ -82,12 +82,12 @@ public class RobotContainer {
                     () -> intake.toggle()
                 ));
 
-        controller.b()
+            controller.b()
                 .onTrue(new InstantCommand(
                         () -> scoringSubsystem.setAction(
                                 ScoringSubsystem.ScoringAction.AIM)));
 
-        controller.x()
+            controller.x()
                 .onTrue(new InstantCommand(
                         () -> scoringSubsystem.setAction(
                                 ScoringSubsystem.ScoringAction.SHOOT)))
@@ -95,7 +95,7 @@ public class RobotContainer {
                         () -> scoringSubsystem.setAction(
                                 ScoringSubsystem.ScoringAction.AIM)));
 
-        controller.y()
+            controller.y()
                 .onTrue(new InstantCommand(
                         () -> scoringSubsystem.setAction(
                                 ScoringSubsystem.ScoringAction.ENDGAME)))
@@ -103,12 +103,12 @@ public class RobotContainer {
                         () -> scoringSubsystem.setAction(
                                 ScoringSubsystem.ScoringAction.WAIT)));
 
-        controller.leftBumper()
+            controller.leftBumper()
                 .onTrue(new InstantCommand(
                         () -> scoringSubsystem.setAction(
                                 ScoringSubsystem.ScoringAction.AMP_AIM)));
 
-        controller.start()
+            controller.start()
                 .onTrue(new InstantCommand(
                         () -> scoringSubsystem.setAction(
                                 ScoringSubsystem.ScoringAction.WAIT)));
@@ -174,7 +174,9 @@ public class RobotContainer {
                 }
                 endgameSubsystem = new EndgameSubsystem(new EndgameSimIO());
 
-                intake = new IntakeSubsystem(new IntakeIOSim());
+                if (FeatureFlags.runIntake) {
+                    intake = new IntakeSubsystem(new IntakeIOSim());
+                }
                 break;
             case REPLAY:
                 break;
