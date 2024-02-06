@@ -36,6 +36,7 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private final InterpolateDouble shooterInterpolated;
     private final InterpolateDouble aimerInterpolated;
+    private final InterpolateDouble timeToPutAimDown;
 
     private double shooterGoalVelocityRPMTuning = 0.0;
     private double aimerGoalAngleRadTuning = 0.0;
@@ -97,6 +98,8 @@ public class ScoringSubsystem extends SubsystemBase {
         aimerInterpolated =
                 new InterpolateDouble(
                         ScoringConstants.getAimerMap(), 0.0, ScoringConstants.aimMaxAngleRadians);
+
+        timeToPutAimDown = new InterpolateDouble(ScoringConstants.timeToPutAimDownMap(), 0.0, 2.0);
     }
 
     public void setAction(ScoringAction action) {
@@ -113,9 +116,9 @@ public class ScoringSubsystem extends SubsystemBase {
 
         if (!hasNote() && action == ScoringAction.INTAKE) {
             state = ScoringState.INTAKE;
-        } else if (action == ScoringAction.AIM) {
+        } else if (action == ScoringAction.AIM || action == ScoringAction.SHOOT) {
             state = ScoringState.PRIME;
-            aimerIo.setAimAngleRad(Math.PI / 2, true);
+            aimerIo.setAimAngleRad(Math.PI / 4, true);
         } else if (action == ScoringAction.AMP_AIM) {
             state = ScoringState.AMP_PRIME;
         } else if (action == ScoringAction.ENDGAME) {
@@ -146,7 +149,9 @@ public class ScoringSubsystem extends SubsystemBase {
         aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal), false);
 
         boolean shooterReady =
-                Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM)
+                Math.abs(
+                                shooterInputs.shooterLeftVelocityRPM
+                                        - shooterInputs.shooterLeftGoalVelocityRPM)
                         < ScoringConstants.shooterVelocityMarginRPM; // TODO: Tune
         boolean aimReady =
                 Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad)
@@ -172,7 +177,9 @@ public class ScoringSubsystem extends SubsystemBase {
         hoodIo.setHoodAngleRad(Math.PI / 2);
 
         boolean shooterReady =
-                Math.abs(shooterInputs.shooterVelocityRPM - shooterInputs.shooterGoalVelocityRPM)
+                Math.abs(
+                                shooterInputs.shooterLeftVelocityRPM
+                                        - shooterInputs.shooterLeftGoalVelocityRPM)
                         < ScoringConstants.shooterVelocityMarginRPM; // TODO: Tune
         boolean aimReady =
                 Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad)
@@ -262,17 +269,17 @@ public class ScoringSubsystem extends SubsystemBase {
                                 poseSupplier.get().getX(),
                                 poseSupplier.get().getY(),
                                 velocitySupplier.get().get(0, 0)
-                                        * ScoringConstants.timeToPutAimDown,
+                                        * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
                                 velocitySupplier.get().get(1, 0)
-                                        * ScoringConstants.timeToPutAimDown,
+                                        * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
                                 FieldLocations.BLUE_STAGE)
                         || FieldFinder.willIHitThis(
                                 poseSupplier.get().getX(),
                                 poseSupplier.get().getY(),
                                 velocitySupplier.get().get(0, 0)
-                                        * ScoringConstants.timeToPutAimDown,
+                                        * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
                                 velocitySupplier.get().get(1, 0)
-                                        * ScoringConstants.timeToPutAimDown,
+                                        * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
                                 FieldLocations.RED_STAGE))) {
             aimerIo.setAngleClampsRad(0, 0);
         } else {

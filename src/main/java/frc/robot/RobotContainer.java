@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -99,7 +100,7 @@ public class RobotContainer {
                         () -> scoringSubsystem.setAction(
                                 ScoringSubsystem.ScoringAction.WAIT)));
 
-        controller.rightBumper()
+        controller.leftBumper()
                 .onTrue(new InstantCommand(
                         () -> scoringSubsystem.setAction(
                                 ScoringSubsystem.ScoringAction.AMP_AIM)));
@@ -168,6 +169,7 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(driveTelemetry::telemeterize);
         drivetrain.setPoseSupplier(driveTelemetry::getFieldToRobot);
+        drivetrain.setVelocitySupplier(driveTelemetry::getVelocity);
         drivetrain.setSpeakerSupplier(this::getFieldToSpeaker);
         drivetrain.setAmpSupplier(this::getFieldToAmpHeading);
         drivetrain.setSourceSupplier(this::getFieldToSourceHeading);
@@ -191,7 +193,7 @@ public class RobotContainer {
                 drivetrain.seedFieldRelative();
                 scoringSubsystem.setAction(ScoringAction.TUNING);
                 // spotless:off
-                controller.rightBumper()
+                controller.leftBumper()
                         .onTrue(new InstantCommand(
                             () -> scoringSubsystem.setTuningKickerVolts(5)))
                         .onFalse(new InstantCommand(
@@ -244,6 +246,18 @@ public class RobotContainer {
                 FieldFinder.whereAmI(
                         driveTelemetry.getFieldToRobot().getTranslation().getX(),
                         driveTelemetry.getFieldToRobot().getTranslation().getY()));
+
+        Logger.recordOutput("localizer/RobotPose", driveTelemetry.getFieldToRobot());
+        Logger.recordOutput(
+                "localizer/RobotVelocity",
+                new Pose2d(
+                        driveTelemetry.getFieldToRobot().getX()
+                                + (driveTelemetry.getVelocity().getX()
+                                        * DriveConstants.anticipationTime),
+                        driveTelemetry.getFieldToRobot().getY()
+                                + (driveTelemetry.getVelocity().getY()
+                                        * DriveConstants.anticipationTime),
+                        driveTelemetry.getFieldToRobot().getRotation()));
 
         driveTelemetry.logDataSynchronously();
     }

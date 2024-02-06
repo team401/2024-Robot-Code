@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -52,10 +53,13 @@ public class Telemetry {
     NetworkTable driveStats = inst.getTable("Drive");
     DoublePublisher velocityX = driveStats.getDoubleTopic("Velocity X").publish();
     DoublePublisher velocityY = driveStats.getDoubleTopic("Velocity Y").publish();
-    double velocityXFieldRelative = 0.0;
-    double velocityYFieldRelative = 0.0;
     DoublePublisher speed = driveStats.getDoubleTopic("Speed").publish();
     DoublePublisher odomPeriod = driveStats.getDoubleTopic("Odometry Period").publish();
+
+    double velocityXFiltered = 0.0;
+    double velocityYFiltered = 0.0;
+    LinearFilter velocityXFilter = LinearFilter.singlePoleIIR(0.1, Constants.loopTime);
+    LinearFilter velocityYFilter = LinearFilter.singlePoleIIR(0.1, Constants.loopTime);
 
     /* Keep a reference of the last pose to calculate the speeds */
     Pose2d latestPose = new Pose2d();
@@ -132,8 +136,9 @@ public class Telemetry {
         lastTime = currentTime;
         Translation2d distanceDiff = pose.minus(latestPose).getTranslation();
 
-        velocityXFieldRelative = (pose.getX() - latestPose.getX()) / diffTime;
-        velocityYFieldRelative = (pose.getY() - latestPose.getY()) / diffTime;
+        Translation2d velocityFieldRelative =
+                new Translation2d(pose.getX() - latestPose.getX(), pose.getY() - latestPose.getY())
+                        .div(diffTime);
 
         latestPose = pose;
 
@@ -142,6 +147,9 @@ public class Telemetry {
         speed.set(velocities.getNorm());
         velocityX.set(velocities.getX());
         velocityY.set(velocities.getY());
+
+        velocityXFiltered = velocityXFilter.calculate(velocityFieldRelative.getX());
+        velocityYFiltered = velocityYFilter.calculate(velocityFieldRelative.getY());
         odomPeriod.set(state.OdometryPeriod);
 
         latestModuleStates = state.ModuleStates;
@@ -176,6 +184,10 @@ public class Telemetry {
         return latestPose;
     }
 
+    public Translation2d getVelocity() {
+        return new Translation2d(velocityXFiltered, velocityYFiltered);
+    }
+
     public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
         for (int i = 0; i < 4; i++) {
@@ -189,10 +201,10 @@ public class Telemetry {
     }
 
     public double getVelocityX() {
-        return velocityXFieldRelative;
+        return velocityXFiltered;
     }
 
     public double getVelocityY() {
-        return velocityYFieldRelative;
+        return velocityYFiltered;
     }
 }
