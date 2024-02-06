@@ -46,7 +46,7 @@ public class RobotContainer {
 
     VisionLocalizer tagVision;
 
-    CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain;
+    CommandSwerveDrivetrain drivetrain;
 
     Telemetry driveTelemetry = new Telemetry(DriveConstants.MaxSpeedMetPerSec);
 
@@ -60,6 +60,7 @@ public class RobotContainer {
 
     // spotless:off
     private void configureBindings() {
+        if (FeatureFlags.runDrive) {
         drivetrain.setDefaultCommand(
                 new DriveWithJoysticks(
                         drivetrain,
@@ -70,8 +71,10 @@ public class RobotContainer {
                         () -> true,
                         () -> false,
                         () -> controller.getHID().getRightBumper()));
+        }
 
-        controller.a()
+        if (FeatureFlags.runScoring) {
+            controller.a()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.INTAKE)))
@@ -109,27 +112,37 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                         () -> scoringSubsystem.setAction(
                                 ScoringSubsystem.ScoringAction.WAIT)));
+        }
     } // spotless:on
 
     private void configureModes() {}
 
     public void configureSubsystems() {
+        if (FeatureFlags.runDrive) {
+            drivetrain = TunerConstants.DriveTrain;
+        }
+
         switch (Constants.currentMode) {
             case REAL:
-                scoringSubsystem =
-                        new ScoringSubsystem(
-                                new ShooterIOTalon(),
-                                new AimerIOTalon(),
-                                new HoodIOVortex(),
-                                driveTelemetry::getFieldToRobot,
-                                () ->
-                                        VecBuilder.fill(
-                                                driveTelemetry.getVelocityX(),
-                                                driveTelemetry.getVelocityY()),
-                                this::getFieldToSpeaker);
+                if (FeatureFlags.runScoring) {
+                    scoringSubsystem =
+                            new ScoringSubsystem(
+                                    new ShooterIOTalon(),
+                                    new AimerIOTalon(),
+                                    new HoodIOVortex(),
+                                    driveTelemetry::getFieldToRobot,
+                                    () ->
+                                            VecBuilder.fill(
+                                                    driveTelemetry.getVelocityX(),
+                                                    driveTelemetry.getVelocityY()),
+                                    this::getFieldToSpeaker);
+                }
 
                 tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
-                endgameSubsystem = new EndgameSubsystem(new EndgameSparkMaxIO());
+
+                if (FeatureFlags.runEndgame) {
+                    endgameSubsystem = new EndgameSubsystem(new EndgameSparkMaxIO());
+                }
                 break;
             case SIM:
                 drivetrain.seedFieldRelative(DriveConstants.initialPose);
@@ -167,22 +180,28 @@ public class RobotContainer {
                 break;
         }
 
-        drivetrain.registerTelemetry(driveTelemetry::telemeterize);
-        drivetrain.setPoseSupplier(driveTelemetry::getFieldToRobot);
-        drivetrain.setVelocitySupplier(driveTelemetry::getVelocity);
-        drivetrain.setSpeakerSupplier(this::getFieldToSpeaker);
-        drivetrain.setAmpSupplier(this::getFieldToAmpHeading);
-        drivetrain.setSourceSupplier(this::getFieldToSourceHeading);
+        if (FeatureFlags.runDrive) {
+            drivetrain.registerTelemetry(driveTelemetry::telemeterize);
+            drivetrain.setPoseSupplier(driveTelemetry::getFieldToRobot);
+            drivetrain.setVelocitySupplier(driveTelemetry::getVelocity);
+            drivetrain.setSpeakerSupplier(this::getFieldToSpeaker);
+            drivetrain.setAmpSupplier(this::getFieldToAmpHeading);
+            drivetrain.setSourceSupplier(this::getFieldToSourceHeading);
 
-        intake.setScoringSupplier(scoringSubsystem::canIntake);
+            tagVision.setCameraConsumer(
+                    (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
+            tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
+        }
 
-        tagVision.setCameraConsumer(
-                (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
-        tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
+        if (FeatureFlags.runIntake) {
+            intake.setScoringSupplier(scoringSubsystem::canIntake);
+        }
     }
 
     public void enabledInit() {
-        scoringSubsystem.setAction(ScoringAction.WAIT);
+        if (FeatureFlags.runScoring) {
+            scoringSubsystem.setAction(ScoringAction.WAIT);
+        }
     }
 
     public void testInit(String choice) {
