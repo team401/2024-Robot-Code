@@ -47,6 +47,13 @@ public final class Constants {
 
     public static final class ConversionConstants {
         public static final double kRadiansPerSecondToRPM = 60.0 / (2.0 * Math.PI);
+        public static final double kRPMToRadiansPerSecond = 1.0 / kRadiansPerSecondToRPM;
+
+        public static final double kSecondsToMinutes = 1.0 / 60.0;
+        public static final double kMinutesToSeconds = 60.0;
+
+        public static final double kDegreesToRadians = Math.PI / 180.0;
+        public static final double kRadiansToDegrees = 180.0 / Math.PI;
     }
 
     public static final class CANDevices {}
@@ -79,6 +86,13 @@ public final class Constants {
                 new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42));
         public static final Translation2d fieldToBlueSpeaker =
                 new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42));
+
+        public static final Rotation2d fieldToAmpHeading = new Rotation2d(-Math.PI / 2);
+
+        public static final Rotation2d fieldToRedSourceHeading =
+                new Rotation2d(Math.PI / 3); // 60 degrees
+        public static final Rotation2d fieldToBlueSourceHeading =
+                new Rotation2d(Math.PI * 2 / 3); // 120 degrees
 
         public static final Translation2d speakerPose =
                 false // TODO: CHANGE THIS URGENT
@@ -171,6 +185,13 @@ public final class Constants {
     }
 
     public static final class IntakeConstants {
+        public static final int leftIntakeMotorID = 0;
+        public static final int rightIntakeMotorID = 0;
+        public static final int frontBeltMotorID = 0;
+        public static final int backBeltMotorID = 0;
+
+        public static final int bannerSensorID = 0;
+
         public static final double intakePower = 5.0;
         public static final double beltPower = 5.0;
     }
@@ -379,6 +400,8 @@ public final class Constants {
 
         public static final double maxAimIntake = 0.0;
         public static final double minAimIntake = 0.0;
+
+        public static final double shooterOffsetAdjustment = 0.6;
 
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters

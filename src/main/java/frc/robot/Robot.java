@@ -34,14 +34,17 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotInit() {
         Logger.recordMetadata("ProjectName", "2024 - 401 Comp Robot"); // TODO: Name the robot!
+        Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+        Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+        Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
 
         if (Constants.currentMode == Constants.Mode.REAL) {
-            // Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs") TODO:
-            // Add back later
+            // TODO: Log data to a USB drive on the RIO
+            // Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
             Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
             pdh = new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
         } else if (Constants.currentMode == Constants.Mode.SIM) {
-            // Logger.addDataReceiver(new WPILOGWriter("logs/")); TODO: Add back later
+            Logger.addDataReceiver(new WPILOGWriter("logs/")); // This folder is gitignored
             Logger.addDataReceiver(new NT4Publisher());
         } else {
             setUseTiming(false); // Run as fast as possible
