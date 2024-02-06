@@ -366,16 +366,16 @@ public final class Constants {
                         Units.inchesToMeters(kBackRightYPosInches),
                         kInvertRightSide);
 
-        public static final CommandSwerveDrivetrain DriveTrain =
-                new CommandSwerveDrivetrain(
-                        DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight);
-
         public static final SwerveDriveKinematics kinematics =
                 new SwerveDriveKinematics(
                         new Translation2d(FrontLeft.LocationX, FrontLeft.LocationY),
                         new Translation2d(FrontLeft.LocationX, FrontRight.LocationY),
                         new Translation2d(BackLeft.LocationX, BackLeft.LocationY),
                         new Translation2d(BackRight.LocationX, BackRight.LocationY));
+
+        public static final CommandSwerveDrivetrain DriveTrain =
+                new CommandSwerveDrivetrain(
+                        DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight);
     }
 
     public static final class ScoringConstants {
