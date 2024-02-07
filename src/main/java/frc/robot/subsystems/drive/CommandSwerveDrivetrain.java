@@ -260,8 +260,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         Translation2d robotVelocityAdjusted =
                 getRobotVelocity.get().times(DriveConstants.anticipationTime);
 
-        if (Math.abs(robotVelocityAdjusted.getNorm())
-                < DriveConstants.minimumAnticipationVelocity) {
+        if (robotVelocityAdjusted.getNorm() < DriveConstants.minimumAnticipationVelocity) {
             robotVelocityAdjusted = new Translation2d(0, 0);
         }
 
