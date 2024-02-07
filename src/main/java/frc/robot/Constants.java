@@ -48,9 +48,9 @@ public final class Constants {
         public static final boolean runVision = false;
         public static final boolean runLocalizer = true;
 
-        public static final boolean runIntake = false;
-        public static final boolean runScoring = false;
-        public static final boolean runEndgame = false;
+        public static final boolean runIntake = true;
+        public static final boolean runScoring = true;
+        public static final boolean runEndgame = true;
         public static final boolean runDrive = true;
     }
 
@@ -81,6 +81,7 @@ public final class Constants {
                 new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90));
 
         public static final double anticipationTime = 0.1;
+        public static final double minimumAnticipationVelocity = 0.0;
     }
 
     public static final class FieldConstants {
@@ -90,12 +91,6 @@ public final class Constants {
         public static final double midfieldLowThresholdM = 5.87;
         public static final double midfieldHighThresholdM = 10.72;
 
-        // TODO: Double check speaker coordinates
-        public static final Translation2d fieldToRedSpeaker =
-                new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42));
-        public static final Translation2d fieldToBlueSpeaker =
-                new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42));
-
         public static final Rotation2d fieldToAmpHeading = new Rotation2d(-Math.PI / 2);
 
         public static final Rotation2d fieldToRedSourceHeading =
@@ -103,15 +98,11 @@ public final class Constants {
         public static final Rotation2d fieldToBlueSourceHeading =
                 new Rotation2d(Math.PI * 2 / 3); // 120 degrees
 
-        public static final Translation2d speakerPose =
-                false // TODO: CHANGE THIS URGENT
-                        // DriverStation.getAlliance().get() ==
-                        // DriverStation.Alliance.Red
-                        ? new Translation2d(
-                                Units.inchesToMeters(652.73), Units.inchesToMeters(218.42))
-                        : new Translation2d(
-                                Units.inchesToMeters(-1.5),
-                                Units.inchesToMeters(218.42)); // TODO: Might have to change these
+        public static final Translation2d fieldToRedSpeaker =
+                new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42));
+
+        public static final Translation2d fieldToBlueSpeaker =
+                new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42));
     }
 
     public static final class VisionConstants {

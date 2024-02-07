@@ -1,10 +1,14 @@
 package frc.robot;
 
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -15,12 +19,15 @@ import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignState;
+import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignTarget;
 import frc.robot.subsystems.endgame.EndgameSimIO;
 import frc.robot.subsystems.endgame.EndgameSparkMaxIO;
 import frc.robot.subsystems.endgame.EndgameSubsystem;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem.IntakeAction;
 import frc.robot.subsystems.localization.VisionIOReal;
 import frc.robot.subsystems.localization.VisionIOSim;
 import frc.robot.subsystems.localization.VisionLocalizer;
@@ -50,10 +57,13 @@ public class RobotContainer {
     CommandSwerveDrivetrain drivetrain = FeatureFlags.runDrive ? TunerConstants.DriveTrain : null;
     Telemetry driveTelemetry = new Telemetry(DriveConstants.MaxSpeedMetPerSec);
 
+    SendableChooser<String> autoChooser = new SendableChooser<String>();
+
     public RobotContainer() {
         configureSubsystems();
         configureBindings();
         configureModes();
+        configureAutonomous();
     }
 
     // spotless:off
@@ -77,13 +87,19 @@ public class RobotContainer {
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.INTAKE)))
                 .onTrue(new InstantCommand(
+                        () -> drivetrain.setAlignState(AlignState.MANUAL)))
+                .onTrue(new InstantCommand(
                     () -> intakeSubsystem.toggle()
                 ));
 
             controller.b()
                 .onTrue(new InstantCommand(
                         () -> scoringSubsystem.setAction(
-                                ScoringSubsystem.ScoringAction.AIM)));
+                                ScoringSubsystem.ScoringAction.AIM)))
+                .onTrue(new InstantCommand(
+                        () -> drivetrain.setAlignState(AlignState.ALIGNING)))
+                .onTrue(new InstantCommand(
+                        () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
 
             controller.x()
                 .onTrue(new InstantCommand(
@@ -91,12 +107,18 @@ public class RobotContainer {
                                 ScoringSubsystem.ScoringAction.SHOOT)))
                 .onFalse(new InstantCommand(
                         () -> scoringSubsystem.setAction(
-                                ScoringSubsystem.ScoringAction.AIM)));
+                                ScoringSubsystem.ScoringAction.AIM)))
+                .onFalse(new InstantCommand(
+                        () -> drivetrain.setAlignState(AlignState.ALIGNING)))
+                .onFalse(new InstantCommand(
+                        () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
 
             controller.y()
                 .onTrue(new InstantCommand(
                         () -> scoringSubsystem.setAction(
                                 ScoringSubsystem.ScoringAction.ENDGAME)))
+                .onTrue(new InstantCommand(
+                        () -> drivetrain.setAlignState(AlignState.MANUAL)))
                 .onFalse(new InstantCommand(
                         () -> scoringSubsystem.setAction(
                                 ScoringSubsystem.ScoringAction.WAIT)));
@@ -104,12 +126,18 @@ public class RobotContainer {
             controller.leftBumper()
                 .onTrue(new InstantCommand(
                         () -> scoringSubsystem.setAction(
-                                ScoringSubsystem.ScoringAction.AMP_AIM)));
+                                ScoringSubsystem.ScoringAction.AMP_AIM)))
+                .onTrue(new InstantCommand(
+                        () -> drivetrain.setAlignState(AlignState.ALIGNING)))
+                .onTrue(new InstantCommand(
+                        () -> drivetrain.setAlignTarget(AlignTarget.AMP)));
 
             controller.start()
                 .onTrue(new InstantCommand(
                         () -> scoringSubsystem.setAction(
-                                ScoringSubsystem.ScoringAction.WAIT)));
+                                ScoringSubsystem.ScoringAction.WAIT)))
+                .onTrue(new InstantCommand(
+                        () -> drivetrain.setAlignState(AlignState.MANUAL)));
         }
     } // spotless:on
 
@@ -237,7 +265,7 @@ public class RobotContainer {
 
     private Translation2d getFieldToSpeaker() {
         if (DriverStation.getAlliance().isEmpty()) {
-            return FieldConstants.fieldToRedSpeaker;
+            return FieldConstants.fieldToBlueSpeaker;
         } else {
             switch (DriverStation.getAlliance().get()) {
                 case Blue:
@@ -294,5 +322,40 @@ public class RobotContainer {
 
             driveTelemetry.logDataSynchronously();
         }
+    }
+
+    public Command getAutonomousCommand() {
+        return drivetrain.getAutoPath(autoChooser.getSelected());
+    }
+
+    private void configureAutonomous() {
+        autoChooser.setDefaultOption("Default (S3 6-Note)", "S3-W3-W2-W1-C1-C2");
+
+        autoChooser.addOption("S1 5-Note", "S1-W1-W2-W3-C5");
+        autoChooser.addOption("S1 4-Note", "S1-W1-W2-W3");
+
+        autoChooser.addOption("S2 4-Note", "S1-W1-W2-W3");
+
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+
+        NamedCommands.registerCommand(
+                "Shoot Scoring",
+                new InstantCommand(
+                        () -> {
+                            scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT);
+                            intakeSubsystem.run(IntakeAction.INTAKE);
+                        }));
+        NamedCommands.registerCommand(
+                "Aim Scoring",
+                new InstantCommand(
+                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.AIM)));
+        NamedCommands.registerCommand(
+                "Intake Scoring",
+                new InstantCommand(
+                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.INTAKE)));
+        NamedCommands.registerCommand(
+                "Wait Scoring",
+                new InstantCommand(
+                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
     }
 }

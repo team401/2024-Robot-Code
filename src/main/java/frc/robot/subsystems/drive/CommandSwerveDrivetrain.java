@@ -7,6 +7,8 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.pathfinding.LocalADStar;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -15,6 +17,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -62,7 +65,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private Supplier<Translation2d> getRobotVelocity = () -> new Translation2d();
 
-    private PIDController thetaController = new PIDController(.5, 0, 0);
+    private PIDController thetaController = new PIDController(0.13, 0.0, 0.0);
 
     private SwerveRequest.FieldCentric driveFieldCentric = new SwerveRequest.FieldCentric();
     private SwerveRequest.RobotCentric driveRobotCentric = new SwerveRequest.RobotCentric();
@@ -133,20 +136,35 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             driveBaseRadius = Math.max(driveBaseRadius, moduleLocation.getNorm());
         }
 
+        Pathfinding.setPathfinder(new LocalADStar());
+
         AutoBuilder.configureHolonomic(
                 () -> this.getState().Pose, // Supplier of current robot pose
                 this::seedFieldRelative, // Consumer for seeding pose against auto
                 this::getCurrentRobotChassisSpeeds,
-                (speeds) ->
-                        this.setGoalChassisSpeeds(
-                                speeds), // Consumer of ChassisSpeeds to drive the robot
+                (speeds) -> {
+                    this.setGoalChassisSpeeds(speeds, false);
+                    this.setAlignState(AlignState.ALIGNING);
+                    this.setAlignTarget(AlignTarget.SPEAKER);
+                }, // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
                         new PIDConstants(10, 0, 0),
                         new PIDConstants(10, 0, 0),
                         TunerConstants.kSpeedAt12VoltsMps,
                         driveBaseRadius,
                         new ReplanningConfig()),
-                () -> false, // Change this if the path needs to be flipped on red vs blue
+                () -> {
+                    // Boolean supplier that controls when the path will be mirrored for the red
+                    // alliance
+                    // This will flip the path being followed to the red side of the field.
+                    // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+                    var alliance = DriverStation.getAlliance();
+                    if (alliance.isPresent()) {
+                        return alliance.get() == DriverStation.Alliance.Red;
+                    }
+                    return false;
+                }, // Change this if the path needs to be flipped on red vs blue
                 this); // Subsystem for requirements
     }
 
@@ -205,20 +223,21 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     desiredHeading = getFieldToSource.get();
                     break;
                 case NONE:
+                    break;
                 default:
                     break;
             }
+
+            omega =
+                    thetaController.calculate(
+                            pose.getRotation().getDegrees(), desiredHeading.getDegrees());
+            Logger.recordOutput("Drive/rotationError", thetaController.getPositionError());
         }
 
         Logger.recordOutput("Drive/alignState", alignState);
         Logger.recordOutput("Drive/alignTarget", alignTarget);
         Logger.recordOutput("Drive/desiredHeading", desiredHeading);
         Logger.recordOutput("Drive/fieldToSpeaker", getFieldToSpeaker.get());
-
-        omega =
-                thetaController.calculate(
-                        pose.getRotation().getDegrees(), desiredHeading.getDegrees());
-        Logger.recordOutput("Drive/rotationError", thetaController.getPositionError());
 
         if (vx == 0 && vy == 0 && omega == 0) {
             setControl(brake);
@@ -238,11 +257,15 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     private Rotation2d calculateDesiredHeading(Pose2d current, Pose2d target) {
-        double robotXAnticipated =
-                current.getX() + (getRobotVelocity.get().getX() * DriveConstants.anticipationTime);
+        Translation2d robotVelocityAdjusted =
+                getRobotVelocity.get().times(DriveConstants.anticipationTime);
 
-        double robotYAnticipated =
-                current.getY() + (getRobotVelocity.get().getY() * DriveConstants.anticipationTime);
+        if (robotVelocityAdjusted.getNorm() < DriveConstants.minimumAnticipationVelocity) {
+            robotVelocityAdjusted = new Translation2d(0, 0);
+        }
+
+        double robotXAnticipated = current.getX() + robotVelocityAdjusted.getX();
+        double robotYAnticipated = current.getY() + robotVelocityAdjusted.getY();
 
         Pose2d robotAnticipated =
                 new Pose2d(robotXAnticipated, robotYAnticipated, current.getRotation());
