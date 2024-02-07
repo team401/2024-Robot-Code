@@ -49,9 +49,9 @@ public class InterpolateDouble {
 
         // Ensure that key is within the bounds of the HashMap
         if (key < minKey) {
-            return minValue;
+            return map.get(minKey);
         } else if (key > maxKey) {
-            return maxValue;
+            return map.get(maxKey);
         }
 
         double lowerKey = 0;
