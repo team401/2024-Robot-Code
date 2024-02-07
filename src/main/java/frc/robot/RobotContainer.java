@@ -27,6 +27,7 @@ import frc.robot.subsystems.endgame.EndgameSubsystem;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem.IntakeAction;
 import frc.robot.subsystems.localization.VisionIOReal;
 import frc.robot.subsystems.localization.VisionIOSim;
 import frc.robot.subsystems.localization.VisionLocalizer;
@@ -328,15 +329,22 @@ public class RobotContainer {
     }
 
     private void configureAutonomous() {
-        autoChooser.setDefaultOption("Default (S1 5-Note)", "S1-W1-W2-W3-C5");
+        autoChooser.setDefaultOption("Default (S3 6-Note)", "S3-W3-W2-W1-C1-C2");
+
+        autoChooser.addOption("S1 5-Note", "S1-W1-W2-W3-C5");
         autoChooser.addOption("S1 4-Note", "S1-W1-W2-W3");
+
+        autoChooser.addOption("S2 4-Note", "S1-W1-W2-W3");
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         NamedCommands.registerCommand(
                 "Shoot Scoring",
                 new InstantCommand(
-                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT)));
+                        () -> {
+                            scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT);
+                            intakeSubsystem.run(IntakeAction.INTAKE);
+                        }));
         NamedCommands.registerCommand(
                 "Aim Scoring",
                 new InstantCommand(

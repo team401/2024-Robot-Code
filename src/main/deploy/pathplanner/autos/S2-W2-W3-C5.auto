@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.2064433431192452,
-      "y": 4.567247202472939
+      "x": 1.441414260288271,
+      "y": 5.463073824179848
     },
     "rotation": 0
   },
@@ -20,19 +20,31 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 2.0
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "S3-W3"
+            "pathName": "S2-W2"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "W2-W3"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         },
         {
@@ -44,7 +56,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "C5-E"
+            "pathName": "C5-E2"
           }
         }
       ]

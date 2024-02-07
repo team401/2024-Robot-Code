@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.8399433941725025,
-        "y": 5.981058819260496
+        "x": 8.005914258697928,
+        "y": 0.7636554807993345
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.781305562611125,
-        "y": 4.207264414528829
+        "x": 6.919173766791183,
+        "y": 0.7489697984762702
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.152980877390325,
-        "y": 4.104648209296419
+        "x": 2.968725221886938,
+        "y": 2.5846800888592836
       },
       "prevControl": {
-        "x": 6.349867556877971,
-        "y": 4.002032004064009
+        "x": 4.070151396116753,
+        "y": 2.1734809838134894
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,8 +32,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "atNote",
-      "waypointRelativePos": 1.0,
+      "name": "shoot",
+      "waypointRelativePos": 0,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Intake Note"
+                "name": "Shoot Scoring"
               }
             }
           ]
@@ -50,8 +50,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 5.0,
+    "maxAcceleration": 5.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
@@ -63,5 +63,5 @@
   "reversed": false,
   "folder": null,
   "previewStartingState": null,
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

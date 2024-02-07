@@ -38,37 +38,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "C1-E"
+            "pathName": "C1-E1"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.5
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Blue-E-5"
+            "pathName": "E1-C2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C2-E"
+            "pathName": "C2-E1"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.5
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Blue-E-2"
+            "pathName": "E1-W2"
           }
         }
       ]

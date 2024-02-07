@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.2064433431192452,
-      "y": 4.567247202472939
+      "x": 1.323928801703758,
+      "y": 6.417643175179016
     },
     "rotation": 0
   },
@@ -20,13 +20,25 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 2.0
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "S3-W3"
+            "pathName": "S1-W1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "W1-W2"
           }
         }
       ]
