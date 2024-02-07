@@ -78,7 +78,13 @@ public class RobotContainer {
                             () -> controller.getHID().getPOV(),
                             () -> true,
                             () -> false,
-                            () -> controller.getHID().getRightBumper()));
+                            () -> controller.getHID().getLeftBumper()));
+                
+            controller.rightBumper()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignState(AlignState.ALIGNING)))
+                .onFalse(new InstantCommand(
+                    () -> drivetrain.setAlignState(AlignState.MANUAL)));
         }
 
         if (FeatureFlags.runScoring) {
@@ -87,57 +93,48 @@ public class RobotContainer {
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.INTAKE)))
                 .onTrue(new InstantCommand(
-                        () -> drivetrain.setAlignState(AlignState.MANUAL)))
+                    () -> drivetrain.setAlignState(AlignState.MANUAL)))
                 .onTrue(new InstantCommand(
-                    () -> intakeSubsystem.toggle()
-                ));
+                    () -> intakeSubsystem.toggle()));
 
             controller.b()
                 .onTrue(new InstantCommand(
-                        () -> scoringSubsystem.setAction(
-                                ScoringSubsystem.ScoringAction.AIM)))
+                    () -> scoringSubsystem.setAction(
+                         ScoringSubsystem.ScoringAction.AIM)))
                 .onTrue(new InstantCommand(
-                        () -> drivetrain.setAlignState(AlignState.ALIGNING)))
-                .onTrue(new InstantCommand(
-                        () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
+                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
 
             controller.x()
                 .onTrue(new InstantCommand(
-                        () -> scoringSubsystem.setAction(
-                                ScoringSubsystem.ScoringAction.SHOOT)))
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.SHOOT)))
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)))
                 .onFalse(new InstantCommand(
-                        () -> scoringSubsystem.setAction(
-                                ScoringSubsystem.ScoringAction.AIM)))
-                .onFalse(new InstantCommand(
-                        () -> drivetrain.setAlignState(AlignState.ALIGNING)))
-                .onFalse(new InstantCommand(
-                        () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.AIM)));
 
             controller.y()
                 .onTrue(new InstantCommand(
-                        () -> scoringSubsystem.setAction(
-                                ScoringSubsystem.ScoringAction.ENDGAME)))
-                .onTrue(new InstantCommand(
-                        () -> drivetrain.setAlignState(AlignState.MANUAL)))
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.ENDGAME)))
                 .onFalse(new InstantCommand(
-                        () -> scoringSubsystem.setAction(
-                                ScoringSubsystem.ScoringAction.WAIT)));
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.WAIT)));
 
-            controller.leftBumper()
+            controller.back()
                 .onTrue(new InstantCommand(
-                        () -> scoringSubsystem.setAction(
-                                ScoringSubsystem.ScoringAction.AMP_AIM)))
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.AMP_AIM)))
                 .onTrue(new InstantCommand(
-                        () -> drivetrain.setAlignState(AlignState.ALIGNING)))
-                .onTrue(new InstantCommand(
-                        () -> drivetrain.setAlignTarget(AlignTarget.AMP)));
+                    () -> drivetrain.setAlignTarget(AlignTarget.AMP)));
 
             controller.start()
                 .onTrue(new InstantCommand(
-                        () -> scoringSubsystem.setAction(
-                                ScoringSubsystem.ScoringAction.WAIT)))
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.WAIT)))
                 .onTrue(new InstantCommand(
-                        () -> drivetrain.setAlignState(AlignState.MANUAL)));
+                    () -> drivetrain.setAlignState(AlignState.MANUAL)));
         }
     } // spotless:on
 
