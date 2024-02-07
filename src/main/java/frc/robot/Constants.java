@@ -81,6 +81,7 @@ public final class Constants {
                 new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90));
 
         public static final double anticipationTime = 0.1;
+        public static final double minimumAnticipationVelocity = 0.0;
     }
 
     public static final class FieldConstants {

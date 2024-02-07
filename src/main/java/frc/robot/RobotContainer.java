@@ -20,6 +20,7 @@ import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignState;
+import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignTarget;
 import frc.robot.subsystems.endgame.EndgameSimIO;
 import frc.robot.subsystems.endgame.EndgameSparkMaxIO;
 import frc.robot.subsystems.endgame.EndgameSubsystem;
@@ -85,23 +86,31 @@ public class RobotContainer {
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.INTAKE)))
                 .onTrue(new InstantCommand(
+                        () -> drivetrain.setAlignState(AlignState.MANUAL)))
+                .onTrue(new InstantCommand(
                     () -> intakeSubsystem.toggle()
                 ));
 
             controller.b()
                 .onTrue(new InstantCommand(
                         () -> scoringSubsystem.setAction(
-                                ScoringSubsystem.ScoringAction.AIM)));
+                                ScoringSubsystem.ScoringAction.AIM)))
+                .onTrue(new InstantCommand(
+                        () -> drivetrain.setAlignState(AlignState.ALIGNING)))
+                .onTrue(new InstantCommand(
+                        () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
 
             controller.x()
                 .onTrue(new InstantCommand(
                         () -> scoringSubsystem.setAction(
                                 ScoringSubsystem.ScoringAction.SHOOT)))
-                .onTrue(new InstantCommand(
-                        () -> drivetrain.setAlignState(AlignState.ALIGNING)))
                 .onFalse(new InstantCommand(
                         () -> scoringSubsystem.setAction(
-                                ScoringSubsystem.ScoringAction.AIM)));
+                                ScoringSubsystem.ScoringAction.AIM)))
+                .onFalse(new InstantCommand(
+                        () -> drivetrain.setAlignState(AlignState.ALIGNING)))
+                .onFalse(new InstantCommand(
+                        () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
 
             controller.y()
                 .onTrue(new InstantCommand(
@@ -116,12 +125,18 @@ public class RobotContainer {
             controller.leftBumper()
                 .onTrue(new InstantCommand(
                         () -> scoringSubsystem.setAction(
-                                ScoringSubsystem.ScoringAction.AMP_AIM)));
+                                ScoringSubsystem.ScoringAction.AMP_AIM)))
+                .onTrue(new InstantCommand(
+                        () -> drivetrain.setAlignState(AlignState.ALIGNING)))
+                .onTrue(new InstantCommand(
+                        () -> drivetrain.setAlignTarget(AlignTarget.AMP)));
 
             controller.start()
                 .onTrue(new InstantCommand(
                         () -> scoringSubsystem.setAction(
-                                ScoringSubsystem.ScoringAction.WAIT)));
+                                ScoringSubsystem.ScoringAction.WAIT)))
+                .onTrue(new InstantCommand(
+                        () -> drivetrain.setAlignState(AlignState.MANUAL)));
         }
     } // spotless:on
 
@@ -313,12 +328,8 @@ public class RobotContainer {
     }
 
     private void configureAutonomous() {
-        autoChooser.setDefaultOption("Default (Blue-S1 5-Note)", "Blue-S1-1-2-3-8");
-        autoChooser.addOption("Blue-S1 4-Note", "Blue-S1-1-2-3");
-        autoChooser.addOption("Blue-S1 3-Note", "Blue-S1-1-2");
-
-        autoChooser.addOption("Blue-S2 4-Note", "Blue-S2-2-3-8");
-        autoChooser.addOption("Blue-S2 3-Note", "Blue-S2-2-3");
+        autoChooser.setDefaultOption("Default (S1 5-Note)", "S1-W1-W2-W3-C5");
+        autoChooser.addOption("S1 4-Note", "S1-W1-W2-W3");
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
 

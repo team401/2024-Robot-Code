@@ -10,6 +10,11 @@
         "visible": false
       }
     },
+    "RoboRIO": {
+      "6V Rail": {
+        "open": true
+      }
+    },
     "Timing": {
       "window": {
         "visible": false

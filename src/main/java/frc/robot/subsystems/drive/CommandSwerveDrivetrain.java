@@ -65,7 +65,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private Supplier<Translation2d> getRobotVelocity = () -> new Translation2d();
 
-    private PIDController thetaController = new PIDController(0.5, 0.0, 0.0);
+    private PIDController thetaController = new PIDController(0.13, 0.0, 0.0);
 
     private SwerveRequest.FieldCentric driveFieldCentric = new SwerveRequest.FieldCentric();
     private SwerveRequest.RobotCentric driveRobotCentric = new SwerveRequest.RobotCentric();
@@ -144,7 +144,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 this::getCurrentRobotChassisSpeeds,
                 (speeds) -> {
                     this.setGoalChassisSpeeds(speeds, false);
-                    // this.setAlignState(AlignState.ALIGNING);
+                    this.setAlignState(AlignState.ALIGNING);
                     this.setAlignTarget(AlignTarget.SPEAKER);
                 }, // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
@@ -257,11 +257,16 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     private Rotation2d calculateDesiredHeading(Pose2d current, Pose2d target) {
-        double robotXAnticipated =
-                current.getX() + (getRobotVelocity.get().getX() * DriveConstants.anticipationTime);
+        Translation2d robotVelocityAdjusted =
+                getRobotVelocity.get().times(DriveConstants.anticipationTime);
 
-        double robotYAnticipated =
-                current.getY() + (getRobotVelocity.get().getY() * DriveConstants.anticipationTime);
+        if (Math.abs(robotVelocityAdjusted.getNorm())
+                < DriveConstants.minimumAnticipationVelocity) {
+            robotVelocityAdjusted = new Translation2d(0, 0);
+        }
+
+        double robotXAnticipated = current.getX() + robotVelocityAdjusted.getX();
+        double robotYAnticipated = current.getY() + robotVelocityAdjusted.getY();
 
         Pose2d robotAnticipated =
                 new Pose2d(robotXAnticipated, robotYAnticipated, current.getRotation());
