@@ -142,13 +142,14 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 () -> this.getState().Pose, // Supplier of current robot pose
                 this::seedFieldRelative, // Consumer for seeding pose against auto
                 this::getCurrentRobotChassisSpeeds,
-                (speeds) ->
-                        this.setGoalChassisSpeeds(
-                                speeds, false,
-                                true), // Consumer of ChassisSpeeds to drive the robot
+                (speeds) -> {
+                    this.setGoalChassisSpeeds(speeds, false);
+                    this.setAlignState(AlignState.ALIGNING);
+                    this.setAlignTarget(AlignTarget.SPEAKER);
+                }, // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
-                        new PIDConstants(10, 0, 0),
-                        new PIDConstants(10, 0, 0),
+                        new PIDConstants(1, 0, 0),
+                        new PIDConstants(1, 0, 0),
                         TunerConstants.kSpeedAt12VoltsMps,
                         driveBaseRadius,
                         new ReplanningConfig()),

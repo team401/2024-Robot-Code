@@ -97,15 +97,20 @@ public final class Constants {
         public static final Rotation2d fieldToBlueSourceHeading =
                 new Rotation2d(Math.PI * 2 / 3); // 120 degrees
 
-        public static final Translation2d speakerPose =
-                false // TODO: CHANGE THIS URGENT
-                        // DriverStation.getAlliance().get() ==
-                        // DriverStation.Alliance.Red
-                        ? new Translation2d(
-                                Units.inchesToMeters(652.73), Units.inchesToMeters(218.42))
-                        : new Translation2d(
-                                Units.inchesToMeters(-1.5),
-                                Units.inchesToMeters(218.42)); // TODO: Might have to change these
+        public static final Translation2d fieldToRedSpeaker =
+                new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42));
+
+        public static final Translation2d fieldToBlueSpeaker =
+                new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42));
+
+        /*public static Translation2d speakerPose =
+        DriverStation.getAlliance().isEmpty()
+                        || DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
+                ? new Translation2d(
+                        Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42))
+                : new Translation2d(
+                        Units.inchesToMeters(652.73),
+                        Units.inchesToMeters(218.42)); // TODO: Might have to change these*/
     }
 
     public static final class VisionConstants {

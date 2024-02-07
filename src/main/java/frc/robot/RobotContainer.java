@@ -1,6 +1,5 @@
 package frc.robot;
 
-import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -40,6 +39,8 @@ import frc.robot.utils.FieldFinder;
 import java.util.Collections;
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.auto.NamedCommands;
+
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
     IntakeSubsystem intakeSubsystem;
@@ -55,8 +56,6 @@ public class RobotContainer {
     Telemetry driveTelemetry = new Telemetry(DriveConstants.MaxSpeedMetPerSec);
 
     SendableChooser<String> autoChooser = new SendableChooser<String>();
-
-    EndgameSubsystem endgameSubsystem;
 
     public RobotContainer() {
         configureSubsystems();
