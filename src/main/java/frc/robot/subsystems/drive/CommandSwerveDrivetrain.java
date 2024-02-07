@@ -65,7 +65,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private Supplier<Translation2d> getRobotVelocity = () -> new Translation2d();
 
-    private PIDController thetaController = new PIDController(.5, 0, 0);
+    private PIDController thetaController = new PIDController(0.5, 0.0, 0.0);
 
     private SwerveRequest.FieldCentric driveFieldCentric = new SwerveRequest.FieldCentric();
     private SwerveRequest.RobotCentric driveRobotCentric = new SwerveRequest.RobotCentric();
@@ -144,12 +144,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 this::getCurrentRobotChassisSpeeds,
                 (speeds) -> {
                     this.setGoalChassisSpeeds(speeds, false);
-                    this.setAlignState(AlignState.ALIGNING);
+                    // this.setAlignState(AlignState.ALIGNING);
                     this.setAlignTarget(AlignTarget.SPEAKER);
                 }, // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
-                        new PIDConstants(1, 0, 0),
-                        new PIDConstants(1, 0, 0),
+                        new PIDConstants(100, 0, 0),
+                        new PIDConstants(10, 0, 0),
                         TunerConstants.kSpeedAt12VoltsMps,
                         driveBaseRadius,
                         new ReplanningConfig()),
@@ -223,20 +223,21 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     desiredHeading = getFieldToSource.get();
                     break;
                 case NONE:
+                    break;
                 default:
                     break;
             }
+
+            omega =
+                    thetaController.calculate(
+                            pose.getRotation().getDegrees(), desiredHeading.getDegrees());
+            Logger.recordOutput("Drive/rotationError", thetaController.getPositionError());
         }
 
         Logger.recordOutput("Drive/alignState", alignState);
         Logger.recordOutput("Drive/alignTarget", alignTarget);
         Logger.recordOutput("Drive/desiredHeading", desiredHeading);
         Logger.recordOutput("Drive/fieldToSpeaker", getFieldToSpeaker.get());
-
-        omega =
-                thetaController.calculate(
-                        pose.getRotation().getDegrees(), desiredHeading.getDegrees());
-        Logger.recordOutput("Drive/rotationError", thetaController.getPositionError());
 
         if (vx == 0 && vy == 0 && omega == 0) {
             setControl(brake);

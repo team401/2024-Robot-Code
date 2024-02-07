@@ -20,7 +20,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Blue-S1-1"
+            "pathName": "S1-W1"
           }
         },
         {
@@ -32,13 +32,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Blue-1-4"
+            "pathName": "W1-C1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Blue-4-E"
+            "pathName": "C1-E"
           }
         },
         {
@@ -56,7 +56,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Blue-5-E"
+            "pathName": "C2-E"
           }
         }
       ]

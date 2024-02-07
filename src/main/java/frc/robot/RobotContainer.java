@@ -19,6 +19,7 @@ import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignState;
 import frc.robot.subsystems.endgame.EndgameSimIO;
 import frc.robot.subsystems.endgame.EndgameSparkMaxIO;
 import frc.robot.subsystems.endgame.EndgameSubsystem;
@@ -96,6 +97,8 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                         () -> scoringSubsystem.setAction(
                                 ScoringSubsystem.ScoringAction.SHOOT)))
+                .onTrue(new InstantCommand(
+                        () -> drivetrain.setAlignState(AlignState.ALIGNING)))
                 .onFalse(new InstantCommand(
                         () -> scoringSubsystem.setAction(
                                 ScoringSubsystem.ScoringAction.AIM)));
@@ -104,6 +107,8 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                         () -> scoringSubsystem.setAction(
                                 ScoringSubsystem.ScoringAction.ENDGAME)))
+                .onTrue(new InstantCommand(
+                        () -> drivetrain.setAlignState(AlignState.MANUAL)))
                 .onFalse(new InstantCommand(
                         () -> scoringSubsystem.setAction(
                                 ScoringSubsystem.ScoringAction.WAIT)));

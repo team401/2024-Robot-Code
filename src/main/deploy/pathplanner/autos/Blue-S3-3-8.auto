@@ -26,7 +26,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Blue-S3-3"
+            "pathName": "S3-W3"
           }
         },
         {
@@ -38,13 +38,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Blue-3-8"
+            "pathName": "W3-C5"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Blue-8-E"
+            "pathName": "C5-E"
           }
         }
       ]
