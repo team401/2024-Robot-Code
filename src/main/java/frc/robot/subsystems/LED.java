@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Robot;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
@@ -42,14 +43,17 @@ public class LED implements Subsystem {
                 //idle
                 if (scoringSubsystem.getCurrentAction() == ScoringAction.WAIT && scoringSubsystem.getCurrentState() == ScoringState.IDLE){
                     setFlashingColorSection(0, ledcount, new int[] {105, 29, 16}, new int[] {255, 123, 0});
+                    SmartDashboard.putString("current task", "idle");
                 }
 
                 //intake
                 if (scoringSubsystem.getCurrentState() == ScoringState.INTAKE) {
                     if (scoringSubsystem.hasNote()) {
                         setSolidColorSection(0, ledcount, new int[] {255, 174, 0});
+                        SmartDashboard.putString("current task", "intake, has note");
                     } else {
                         setFlashingColorSection(0, ledcount, new int[] {255, 174, 0}, new int[] {0,0,0});
+                        SmartDashboard.putString("current task", "intake");
                     }
                     
                 }
@@ -58,8 +62,10 @@ public class LED implements Subsystem {
                 if (scoringSubsystem.getCurrentState() == ScoringState.AMP_PRIME) {
                     if (scoringSubsystem.readyToShoot) {
                         setSolidColorSection(0, ledcount, new int[] {32, 227, 64});
+                        SmartDashboard.putString("current task", "amp, ready to shoot");
                     } else {
                         setFlashingColorSection(0, ledcount, new int[] {32, 227, 64}, new int[] {0,0,0});
+                        SmartDashboard.putString("current task", "amp, preparing");
                     }
                 }
 
@@ -74,14 +80,17 @@ public class LED implements Subsystem {
 
                     if (scoringSubsystem.readyToShoot) {
                         setSolidColorSection(0, ledcount, rgbCode);
+                        SmartDashboard.putString("current task", "speaker, ready to shoot");
                     } else {
                         setFlashingColorSection(0, ledcount, rgbCode, new int[] {0,0,0});
+                        SmartDashboard.putString("current task", "speaker, preparing");
                     }
                 }
 
                 //endgame
                 if (scoringSubsystem.getCurrentState() == ScoringState.ENDGAME) {
                     setSolidColorSection(0, ledcount, new int[] {140, 0, 255});
+                    SmartDashboard.putString("current task", "endgame");
                 }
                 
                 }
