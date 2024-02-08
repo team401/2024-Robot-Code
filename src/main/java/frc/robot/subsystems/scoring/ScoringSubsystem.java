@@ -54,7 +54,7 @@ public class ScoringSubsystem extends SubsystemBase {
             aimMechanism.append(
                     new MechanismLigament2d("hood", 0.2, 0.0, 10.0, new Color8Bit(0, 200, 50)));
 
-    private enum ScoringState {
+    public enum ScoringState {
         IDLE,
         INTAKE,
         PRIME,
@@ -78,6 +78,8 @@ public class ScoringSubsystem extends SubsystemBase {
     private ScoringState state = ScoringState.IDLE;
 
     private ScoringAction action = ScoringAction.WAIT;
+
+    public boolean readyToShoot = false;
 
     public ScoringSubsystem(
             ShooterIO shooterIo,
@@ -161,6 +163,7 @@ public class ScoringSubsystem extends SubsystemBase {
         boolean notePresent = hasNote();
 
         boolean primeReady = shooterReady && aimReady && driveReady && notePresent;
+        readyToShoot = primeReady;
 
         if (action != ScoringAction.SHOOT && action != ScoringAction.AIM) {
             state = ScoringState.IDLE;
@@ -169,6 +172,7 @@ public class ScoringSubsystem extends SubsystemBase {
 
             shootTimer.reset();
             shootTimer.start();
+            readyToShoot = false;
         }
     }
 
@@ -192,6 +196,7 @@ public class ScoringSubsystem extends SubsystemBase {
         boolean notePresent = hasNote();
 
         boolean primeReady = shooterReady && aimReady && hoodReady && driveReady && notePresent;
+        readyToShoot = primeReady;
 
         if (action != ScoringAction.SHOOT && action != ScoringAction.AMP_AIM) {
             state = ScoringState.IDLE;
@@ -200,6 +205,7 @@ public class ScoringSubsystem extends SubsystemBase {
 
             shootTimer.reset();
             shootTimer.start();
+            readyToShoot = false;
         }
     }
 
@@ -347,5 +353,13 @@ public class ScoringSubsystem extends SubsystemBase {
 
     public void setTuningKickerVolts(double kickerVoltsTuning) {
         this.kickerVoltsTuning = kickerVoltsTuning;
+    }
+
+    public ScoringAction getCurrentAction() {
+        return action;
+    }
+
+    public ScoringState getCurrentState() {
+        return state;
     }
 }
