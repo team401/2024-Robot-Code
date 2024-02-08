@@ -21,9 +21,10 @@ import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignState;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignTarget;
-import frc.robot.subsystems.endgame.EndgameSimIO;
-import frc.robot.subsystems.endgame.EndgameSparkMaxIO;
+import frc.robot.subsystems.endgame.EndgameIOSim;
+import frc.robot.subsystems.endgame.EndgameIOSparkFlex;
 import frc.robot.subsystems.endgame.EndgameSubsystem;
+import frc.robot.subsystems.endgame.EndgameSubsystem.EndgameAction;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -34,7 +35,7 @@ import frc.robot.subsystems.localization.VisionLocalizer;
 import frc.robot.subsystems.scoring.AimerIOSim;
 import frc.robot.subsystems.scoring.AimerIOTalon;
 import frc.robot.subsystems.scoring.HoodIOSim;
-import frc.robot.subsystems.scoring.HoodIOVortex;
+import frc.robot.subsystems.scoring.HoodIOSparkFlex;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringAction;
 import frc.robot.subsystems.scoring.ShooterIOSim;
@@ -104,23 +105,35 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
 
+            // controller.x()
+            //     .onTrue(new InstantCommand(
+            //         () -> scoringSubsystem.setAction(
+            //             ScoringSubsystem.ScoringAction.SHOOT)))
+            //     .onTrue(new InstantCommand(
+            //         () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)))
+            //     .onFalse(new InstantCommand(
+            //         () -> scoringSubsystem.setAction(
+            //             ScoringSubsystem.ScoringAction.AIM)));
+
+            // controller.y()
+            //     .onTrue(new InstantCommand(
+            //         () -> scoringSubsystem.setAction(
+            //             ScoringSubsystem.ScoringAction.ENDGAME)))
+            //     .onFalse(new InstantCommand(
+            //         () -> scoringSubsystem.setAction(
+            //             ScoringSubsystem.ScoringAction.WAIT)));
+
             controller.x()
                 .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.SHOOT)))
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)))
+                    () -> endgameSubsystem.setAction(EndgameAction.GO_UP)))
                 .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AIM)));
+                    () -> endgameSubsystem.setAction(EndgameAction.CANCEL)));
 
             controller.y()
                 .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.ENDGAME)))
+                    () -> endgameSubsystem.setAction(EndgameAction.GO_DOWN)))
                 .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)));
+                    () -> endgameSubsystem.setAction(EndgameAction.CANCEL)));
 
             controller.back()
                 .onTrue(new InstantCommand(
@@ -144,17 +157,22 @@ public class RobotContainer {
         switch (Constants.currentMode) {
             case REAL:
                 if (FeatureFlags.runScoring) {
+                    if (FeatureFlags.runEndgame) {
+                        endgameSubsystem = new EndgameSubsystem(new EndgameIOSparkFlex());
+                    }
+
                     scoringSubsystem =
                             new ScoringSubsystem(
                                     new ShooterIOTalon(),
                                     new AimerIOTalon(),
-                                    new HoodIOVortex(),
+                                    new HoodIOSparkFlex(),
                                     driveTelemetry::getFieldToRobot,
                                     () ->
                                             VecBuilder.fill(
                                                     driveTelemetry.getVelocityX(),
                                                     driveTelemetry.getVelocityY()),
-                                    this::getFieldToSpeaker);
+                                    this::getFieldToSpeaker,
+                                    endgameSubsystem::getPosition);
                 }
 
                 if (FeatureFlags.runIntake) {
@@ -164,14 +182,14 @@ public class RobotContainer {
                 if (FeatureFlags.runVision) {
                     tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
                 }
-
-                if (FeatureFlags.runEndgame) {
-                    endgameSubsystem = new EndgameSubsystem(new EndgameSparkMaxIO());
-                }
                 break;
             case SIM:
                 if (FeatureFlags.runDrive) {
                     drivetrain.seedFieldRelative(DriveConstants.initialPose);
+                }
+
+                if (FeatureFlags.runEndgame) {
+                    endgameSubsystem = new EndgameSubsystem(new EndgameIOSim());
                 }
 
                 if (FeatureFlags.runScoring) {
@@ -185,7 +203,8 @@ public class RobotContainer {
                                             VecBuilder.fill(
                                                     driveTelemetry.getVelocityX(),
                                                     driveTelemetry.getVelocityY()),
-                                    this::getFieldToSpeaker);
+                                    this::getFieldToSpeaker,
+                                    endgameSubsystem::getPosition);
                 }
 
                 if (FeatureFlags.simulateVision) {
@@ -200,10 +219,6 @@ public class RobotContainer {
                                     new VisionIOSim(
                                             Collections.emptyList(),
                                             driveTelemetry::getModuleStates));
-                }
-
-                if (FeatureFlags.runEndgame) {
-                    endgameSubsystem = new EndgameSubsystem(new EndgameSimIO());
                 }
 
                 if (FeatureFlags.runIntake) {

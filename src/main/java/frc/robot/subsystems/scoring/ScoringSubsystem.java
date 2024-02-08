@@ -35,6 +35,7 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private final Supplier<Pose2d> poseSupplier;
     private final Supplier<Vector<N2>> velocitySupplier;
+    private final Supplier<Double> elevatorPositionSupplier;
 
     private final InterpolateDouble shooterInterpolated;
     private final InterpolateDouble aimerInterpolated;
@@ -85,7 +86,8 @@ public class ScoringSubsystem extends SubsystemBase {
             HoodIO hoodIo,
             Supplier<Pose2d> poseSupplier,
             Supplier<Vector<N2>> velocitySupplier,
-            Supplier<Translation2d> speakerSupplier) {
+            Supplier<Translation2d> speakerSupplier,
+            Supplier<Double> elevatorPositionSupplier) {
         this.shooterIo = shooterIo;
         this.aimerIo = aimerIo;
         this.hoodIo = hoodIo;
@@ -93,6 +95,7 @@ public class ScoringSubsystem extends SubsystemBase {
         this.poseSupplier = poseSupplier;
         this.velocitySupplier = velocitySupplier;
         this.speakerSupplier = speakerSupplier;
+        this.elevatorPositionSupplier = elevatorPositionSupplier;
 
         shooterInterpolated = new InterpolateDouble(ScoringConstants.getShooterMap());
 
@@ -175,7 +178,7 @@ public class ScoringSubsystem extends SubsystemBase {
     private void ampPrime() {
         shooterIo.setShooterVelocityRPM(ScoringConstants.shooterAmpVelocityRPM);
         aimerIo.setAimAngleRad(Math.PI / 2, true);
-        hoodIo.setHoodAngleRad(Math.PI / 2);
+        hoodIo.setHoodAngleRad(Math.PI);
 
         boolean shooterReady =
                 Math.abs(
@@ -284,7 +287,10 @@ public class ScoringSubsystem extends SubsystemBase {
                                 FieldLocations.RED_STAGE))) {
             aimerIo.setAngleClampsRad(0, 0);
         } else {
-            aimerIo.setAngleClampsRad(0, ScoringConstants.aimMaxAngleRadians);
+            double elevatorLimit =
+                    (Math.PI / 2 / 0.45) * (elevatorPositionSupplier.get() - 0.45) + Math.PI / 2; // TODO: Tune
+            aimerIo.setAngleClampsRad(
+                    0, Math.min(ScoringConstants.aimMaxAngleRadians, elevatorLimit));
         }
 
         aimerIo.controlAimAngleRad();

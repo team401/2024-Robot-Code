@@ -4,13 +4,13 @@ package frc.robot.subsystems.scoring;
 import com.revrobotics.CANSparkFlex;
 import frc.robot.Constants.ScoringConstants;
 
-public class HoodIOVortex implements HoodIO {
+public class HoodIOSparkFlex implements HoodIO {
     private final CANSparkFlex hoodMotor =
             new CANSparkFlex(ScoringConstants.hoodId, CANSparkFlex.MotorType.kBrushless);
 
     double goalAngleRad = 0.0;
 
-    public HoodIOVortex() {
+    public HoodIOSparkFlex() {
         hoodMotor.setSmartCurrentLimit(10);
 
         hoodMotor.getPIDController().setP(ScoringConstants.hoodkP);
