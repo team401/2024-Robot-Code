@@ -66,6 +66,7 @@ public class Telemetry {
     LinearFilter velocityYFilter = LinearFilter.singlePoleIIR(0.1, Constants.loopTime);
 
     double accelFiltered = 0.0;
+    double prevVelocityNorm = 0.0;
 
     /* Keep a reference of the last pose to calculate the speeds */
     Pose2d latestPose = new Pose2d();
@@ -150,15 +151,18 @@ public class Telemetry {
 
         Translation2d velocities = distanceDiff.div(diffTime);
 
+
         speed.set(velocities.getNorm());
         velocityX.set(velocities.getX());
         velocityY.set(velocities.getY());
-        accel.set(velocities.getNorm() / diffTime);
+        accel.set((velocities.getNorm() - prevVelocityNorm) / diffTime);
 
         velocityXFiltered = velocityXFilter.calculate(velocityFieldRelative.getX());
         velocityYFiltered = velocityYFilter.calculate(velocityFieldRelative.getY());
-        accelFiltered = velocities.getNorm() / diffTime;
+        accelFiltered = (velocities.getNorm() - prevVelocityNorm) / diffTime;
         odomPeriod.set(state.OdometryPeriod);
+
+        prevVelocityNorm = velocities.getNorm();
 
         latestModuleStates = state.ModuleStates;
 
