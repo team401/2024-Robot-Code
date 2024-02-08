@@ -255,6 +255,19 @@ public class ScoringSubsystem extends SubsystemBase {
         return distancetoGoal;
     }
 
+    private double findVelocityToGoal() {
+        Translation2d speakerPose = speakerSupplier.get();
+        Pose2d robotPose = poseSupplier.get();
+        double dx = robotPose.getX() - speakerPose.getX();
+        double dy = robotPose.getY() - speakerPose.getY();
+
+        double velocityToGoal =
+                (dx * velocitySupplier.get().get(0, 0) + dy * velocitySupplier.get().get(0, 1))
+                        / (Math.sqrt(
+                                Math.pow(dx, 2) + Math.pow(dy, 2)));
+        return velocityToGoal;
+    }
+
     public boolean hasNote() {
         return shooterInputs.bannerSensor;
     }
