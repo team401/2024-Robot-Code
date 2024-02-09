@@ -11,6 +11,9 @@ public class InterpolateDouble {
     private final double minValue;
     private final double maxValue;
 
+    private final double minKey;
+    private final double maxKey;
+
     public InterpolateDouble(HashMap<Double, Double> map) {
         this(map, Double.MIN_VALUE, Double.MAX_VALUE);
     }
@@ -22,6 +25,14 @@ public class InterpolateDouble {
 
         sortedKeys = new ArrayList<Double>(map.keySet());
         Collections.sort(sortedKeys);
+
+        // Get lowest and highest keys of the HashMap
+        if (sortedKeys.size() > 0) {
+            minKey = sortedKeys.get(0);
+            maxKey = sortedKeys.get(sortedKeys.size() - 1);
+        } else {
+            throw new RuntimeException("Empty HashMap passed to InterpolateDouble");
+        }
     }
 
     /**
@@ -34,6 +45,13 @@ public class InterpolateDouble {
     public double getValue(double key) {
         if (map.containsKey(key)) {
             return map.get(key);
+        }
+
+        // Ensure that key is within the bounds of the HashMap
+        if (key < minKey) {
+            return map.get(minKey);
+        } else if (key > maxKey) {
+            return map.get(maxKey);
         }
 
         double lowerKey = 0;
