@@ -33,6 +33,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotInit() {
+
         Logger.recordMetadata("ProjectName", "2024 - 401 Comp Robot"); // TODO: Name the robot!
         Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
         Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -76,6 +77,10 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().cancelAll();
 
         robotContainer.enabledInit();
+
+        if (robotContainer.getAutonomousCommand() != null) {
+            robotContainer.getAutonomousCommand().schedule();
+        }
     }
 
     @Override
