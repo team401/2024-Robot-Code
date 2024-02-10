@@ -18,6 +18,7 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveWithJoysticks;
+import frc.robot.subsystems.LED;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignState;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignTarget;
@@ -58,6 +59,8 @@ public class RobotContainer {
     Telemetry driveTelemetry = new Telemetry(DriveConstants.MaxSpeedMetPerSec);
 
     SendableChooser<String> autoChooser = new SendableChooser<String>();
+
+    LED leds;
 
     public RobotContainer() {
         configureSubsystems();
@@ -237,6 +240,8 @@ public class RobotContainer {
         if (FeatureFlags.runIntake) {
             intakeSubsystem.setScoringSupplier(scoringSubsystem::canIntake);
         }
+
+        leds = new LED(scoringSubsystem);
     }
 
     public void enabledInit() {

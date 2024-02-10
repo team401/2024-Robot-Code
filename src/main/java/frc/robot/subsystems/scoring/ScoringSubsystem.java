@@ -326,12 +326,15 @@ public class ScoringSubsystem extends SubsystemBase {
         switch (state) {
             case IDLE:
                 idle();
+                SmartDashboard.putString("shoot", "idle");
                 break;
             case INTAKE:
                 intake();
+                SmartDashboard.putString("shoot", "intake");
                 break;
             case PRIME:
                 prime();
+                SmartDashboard.putString("shoot", "prime");
                 break;
             case AMP_PRIME:
                 ampPrime();

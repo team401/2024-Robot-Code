@@ -5,12 +5,13 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
-import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringAction;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringState;
 
-public class LED implements Subsystem {
+public class LED extends SubsystemBase {
 
     private final AddressableLED led;
     private final AddressableLEDBuffer ledBuffer;
@@ -34,38 +35,44 @@ public class LED implements Subsystem {
         clear();
 
         if (DriverStation.isDisabled()) {
-            rainbow();
+            if (Constants.currentMode == Mode.REAL) rainbow();
+            else SmartDashboard.putString("current task", "rainbow!");
 
         } else {
+
             // idle
-            if (scoringSubsystem.getCurrentAction() == ScoringAction.WAIT
-                    && scoringSubsystem.getCurrentState() == ScoringState.IDLE) {
-                setFlashingColorSection(
-                        0, ledcount, new int[] {105, 29, 16}, new int[] {255, 123, 0});
-                SmartDashboard.putString("current task", "idle");
+            if (scoringSubsystem.getCurrentState() == ScoringState.IDLE) {
+                if (Constants.currentMode == Mode.REAL)
+                    setFlashingColorSection(
+                            0, ledcount, new int[] {105, 29, 16}, new int[] {255, 123, 0});
+                else SmartDashboard.putString("current task", "idle");
             }
 
             // intake
             if (scoringSubsystem.getCurrentState() == ScoringState.INTAKE) {
                 if (scoringSubsystem.hasNote()) {
-                    setSolidColorSection(0, ledcount, new int[] {255, 174, 0});
-                    SmartDashboard.putString("current task", "intake, has note");
+                    if (Constants.currentMode == Mode.REAL)
+                        setSolidColorSection(0, ledcount, new int[] {255, 174, 0});
+                    else SmartDashboard.putString("current task", "intake, has note");
                 } else {
-                    setFlashingColorSection(
-                            0, ledcount, new int[] {255, 174, 0}, new int[] {0, 0, 0});
-                    SmartDashboard.putString("current task", "intake");
+                    if (Constants.currentMode == Mode.REAL)
+                        setFlashingColorSection(
+                                0, ledcount, new int[] {255, 174, 0}, new int[] {0, 0, 0});
+                    else SmartDashboard.putString("current task", "intake");
                 }
             }
 
             // shooting amp
             if (scoringSubsystem.getCurrentState() == ScoringState.AMP_PRIME) {
                 if (scoringSubsystem.readyToShoot) {
-                    setSolidColorSection(0, ledcount, new int[] {32, 227, 64});
-                    SmartDashboard.putString("current task", "amp, ready to shoot");
+                    if (Constants.currentMode == Mode.REAL)
+                        setSolidColorSection(0, ledcount, new int[] {32, 227, 64});
+                    else SmartDashboard.putString("current task", "amp, ready to shoot");
                 } else {
-                    setFlashingColorSection(
-                            0, ledcount, new int[] {32, 227, 64}, new int[] {0, 0, 0});
-                    SmartDashboard.putString("current task", "amp, preparing");
+                    if (Constants.currentMode == Mode.REAL)
+                        setFlashingColorSection(
+                                0, ledcount, new int[] {32, 227, 64}, new int[] {0, 0, 0});
+                    else SmartDashboard.putString("current task", "amp, preparing");
                 }
             }
 
@@ -84,21 +91,26 @@ public class LED implements Subsystem {
                 }
 
                 if (scoringSubsystem.readyToShoot) {
-                    setSolidColorSection(0, ledcount, rgbCode);
-                    SmartDashboard.putString("current task", "speaker, ready to shoot");
+                    if (Constants.currentMode == Mode.REAL)
+                        setSolidColorSection(0, ledcount, rgbCode);
+                    else SmartDashboard.putString("current task", "speaker, ready to shoot");
                 } else {
-                    setFlashingColorSection(0, ledcount, rgbCode, new int[] {0, 0, 0});
-                    SmartDashboard.putString("current task", "speaker, preparing");
+                    if (Constants.currentMode == Mode.REAL)
+                        setFlashingColorSection(0, ledcount, rgbCode, new int[] {0, 0, 0});
+                    else SmartDashboard.putString("current task", "speaker, preparing");
                 }
             }
 
             // endgame
             if (scoringSubsystem.getCurrentState() == ScoringState.ENDGAME) {
-                setSolidColorSection(0, ledcount, new int[] {140, 0, 255});
-                SmartDashboard.putString("current task", "endgame");
+                if (Constants.currentMode == Mode.REAL)
+                    setSolidColorSection(0, ledcount, new int[] {140, 0, 255});
+                else SmartDashboard.putNumber("current task", 5);
+
+                // SmartDashboard.putString("current task", "endgame");
             }
         }
-        led.setData(ledBuffer);
+        // led.setData(ledBuffer);
     }
 
     private void clear() {
