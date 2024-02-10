@@ -64,7 +64,7 @@ public class LED extends SubsystemBase {
 
             // shooting amp
             if (scoringSubsystem.getCurrentState() == ScoringState.AMP_PRIME) {
-                if (scoringSubsystem.readyToShoot) {
+                if (scoringSubsystem.readyToShoot()) {
                     if (Constants.currentMode == Mode.REAL)
                         setSolidColorSection(0, ledcount, new int[] {32, 227, 64});
                     else SmartDashboard.putString("current task", "amp, ready to shoot");
@@ -90,7 +90,7 @@ public class LED extends SubsystemBase {
                     rgbCode[2] = 0;
                 }
 
-                if (scoringSubsystem.readyToShoot) {
+                if (scoringSubsystem.readyToShoot()) {
                     if (Constants.currentMode == Mode.REAL)
                         setSolidColorSection(0, ledcount, rgbCode);
                     else SmartDashboard.putString("current task", "speaker, ready to shoot");

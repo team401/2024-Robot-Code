@@ -241,7 +241,7 @@ public class RobotContainer {
             intakeSubsystem.setScoringSupplier(scoringSubsystem::canIntake);
         }
 
-        leds = new LED(scoringSubsystem);
+        if (FeatureFlags.enableLEDS) leds = new LED(scoringSubsystem);
     }
 
     public void enabledInit() {

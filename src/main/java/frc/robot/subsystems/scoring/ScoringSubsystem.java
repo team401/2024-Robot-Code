@@ -79,7 +79,7 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private ScoringAction action = ScoringAction.WAIT;
 
-    public boolean readyToShoot = false;
+    private boolean readyToShoot = false;
 
     public ScoringSubsystem(
             ShooterIO shooterIo,
@@ -364,5 +364,9 @@ public class ScoringSubsystem extends SubsystemBase {
 
     public ScoringState getCurrentState() {
         return state;
+    }
+
+    public boolean readyToShoot() {
+        return readyToShoot;
     }
 }
