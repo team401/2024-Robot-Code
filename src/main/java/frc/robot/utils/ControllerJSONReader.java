@@ -1,26 +1,16 @@
 package frc.robot.utils;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.function.BiConsumer;
-
-import javax.crypto.spec.PBEKeySpec;
-import javax.management.RuntimeErrorException;
+import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pathplanner.lib.auto.AutoBuilderException;
-
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -28,8 +18,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class ControllerJSONReader {
 
-    private static HashMap<String, Trigger> triggers;
     private static HashMap<Integer, CommandGenericHID> controllers;
+
+    private static HashMap<String, Trigger> triggers;
+    private static HashMap<String, DoubleSupplier> axes;
+    private static HashMap<String, IntSupplier> pov;
+
 
     public static void pullConfiguration(String configuration) {
         JSONParser jsonParser = new JSONParser();
@@ -44,6 +38,8 @@ public class ControllerJSONReader {
         }
         setControllers((JSONArray) jsonObject.get("controllers"));
         setTriggers((JSONArray) jsonObject.get("buttons"));
+        setAxes((JSONArray) jsonObject.get("axes"));
+        setPOV((JSONArray) jsonObject.get("pov"));
     }
 
     private static HashMap<Integer, CommandGenericHID> setControllers(JSONArray controllersJSON) {
@@ -69,7 +65,6 @@ public class ControllerJSONReader {
             
             int port = (int) trigger.get("controller");
             switch (((String) trigger.get("button"))) {
-                //gamepad buttons
                 case "a":
                 case "0":
                     t = controllers.get(port).button(0);
@@ -134,6 +129,9 @@ public class ControllerJSONReader {
                 case "pov315":
                     t = controllers.get(port).pov(315);
                     break;
+                case "povCenter":
+                    t = controllers.get(port).pov(-1);
+                    break;
                 default:
                     t = null;
                     break;
@@ -144,6 +142,68 @@ public class ControllerJSONReader {
         triggers = triggerList;
         return triggerList;
     }
+
+    private static HashMap<String, DoubleSupplier> setAxes(JSONArray axisJSON) {
+        HashMap<String, DoubleSupplier> axisList = new HashMap<String, DoubleSupplier>();
+        Iterator<JSONObject> iterator = axisJSON.iterator();
+        while(iterator.hasNext()) {
+            JSONObject axis = iterator.next();
+            DoubleSupplier t;
+            
+            int port = (int) axis.get("controller");
+            switch (((String) axis.get("axis"))) {
+                case "leftX":
+                case "xAxis":
+                    if ((boolean) axis.get("negate")) t = () -> -controllers.get(port).getRawAxis(0);
+                    else t = () -> controllers.get(port).getRawAxis(0);
+                    break;
+                case "leftY":
+                case "yAxis":
+                    if ((boolean) axis.get("negate")) t = () -> -controllers.get(port).getRawAxis(1);
+                    else t = () -> controllers.get(port).getRawAxis(1);
+                    break;
+                case "leftTrigger":
+                case "zRotate":
+                    if ((boolean) axis.get("negate")) t = () -> -controllers.get(port).getRawAxis(2);
+                    else t = () -> controllers.get(port).getRawAxis(2);
+                    break;
+                case "rightTrigger":
+                case "slider":
+                    if ((boolean) axis.get("negate")) t = () -> -controllers.get(port).getRawAxis(3);
+                    else t = () -> controllers.get(port).getRawAxis(3);
+                    break;
+                case "rightX":
+                    if ((boolean) axis.get("negate")) t = () -> -controllers.get(port).getRawAxis(4);
+                    else t = () -> controllers.get(port).getRawAxis(4);
+                    break;
+                case "rightY":
+                    if ((boolean) axis.get("negate")) t = () -> -controllers.get(port).getRawAxis(5);
+                    else t = () -> controllers.get(port).getRawAxis(5);
+                    break;
+                default:
+                    t = null;
+                    break;
+            }
+
+            axisList.put((String) axis.get("command"), t);
+        }
+        axes = axisList;
+        return axisList;
+    }
+    //controller.getHID().getPOV(),
+
+    private static HashMap<String, IntSupplier> setPOV(JSONArray povJSON) {
+        HashMap<String, IntSupplier> povList = new HashMap<String, IntSupplier>();
+        Iterator<JSONObject> iterator = povJSON.iterator();
+        while(iterator.hasNext()) {
+            JSONObject p = iterator.next();
+
+            povList.put((String) p.get("command"), () -> controllers.get(p.get("controller")).getHID().getPOV());
+        }
+        pov = povList;
+        return povList;
+    }
+
 
     public static HashMap<Integer, CommandGenericHID> getControllers() {
         if (controllers == null) {
@@ -160,4 +220,21 @@ public class ControllerJSONReader {
             return triggers;
         }
     }
+
+    public static HashMap<String, DoubleSupplier> getAxes() {
+        if (axes == null) {
+            throw new RuntimeException("Axes not yet generated, run pullConfiguration");
+        } else {
+            return axes;
+        }
+    }
+
+    public static HashMap<String, IntSupplier> getPOVs() {
+        if (pov == null) {
+            throw new RuntimeException("POVs not yet generated, run pullConfiguration");
+        } else {
+            return pov;
+        }
+    }
+
 }

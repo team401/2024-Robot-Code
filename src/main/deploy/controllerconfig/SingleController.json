@@ -1,0 +1,77 @@
+{
+    "controllers": [
+        {
+            "port": 2,
+            "type": "gamepad"
+        }
+    ],
+
+    "buttons": [
+        {   "command": "intake",
+            "controller": 2,
+            "button": "a"
+        },
+        {
+            "command": "aimSpeaker",
+            "controller": 2,
+            "button": "b"
+        },
+        {
+            "command": "aimAmp",
+            "controller": 2,
+            "button": "back"
+        },
+        {
+            "command": "manualIdle",
+            "controller": 2,
+            "button": "start"
+        },
+        {
+            "command": "align",
+            "controller": 2,
+            "button": "rightBumper"
+        },
+        {
+            "command": "shoot",
+            "controller": 2,
+            "button": "x"
+        },
+        {
+            
+            "command": "endgame",
+            "controller": 2,
+            "button": "y"
+        },
+        {
+            "command": "test",
+            "controller": 2,
+            "button": "leftBumper"
+        }
+    ],
+
+    "axes": [
+        {   "command": "xDrive",
+            "controller": 2,
+            "axis": "leftY",
+            "negate": true
+        },
+        {
+            "command": "yDrive",
+            "controller": 2,
+            "axis": "leftX",
+            "negate": true
+        },
+        {
+            "command": "rotation",
+            "controller": 2,
+            "axis": "rightX",
+            "negate": true
+        }
+    ],
+
+    "pov": [
+        {   "command": "pov",
+            "controller": 2
+        }
+    ]
+}

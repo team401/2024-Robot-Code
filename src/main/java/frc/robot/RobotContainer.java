@@ -60,6 +60,8 @@ import frc.robot.utils.ControllerJSONReader;
 import frc.robot.utils.FieldFinder;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -68,11 +70,9 @@ public class RobotContainer {
     IntakeSubsystem intakeSubsystem;
     EndgameSubsystem endgameSubsystem;
 
-    CommandJoystick leftJoystick = new CommandJoystick(0);
-    CommandJoystick rightJoystick = new CommandJoystick(1);
-    CommandXboxController controller = new CommandXboxController(2);
-
     HashMap<String, Trigger> triggers;
+    HashMap<String, DoubleSupplier> axes;
+    HashMap<String, IntSupplier> pov;
 
     VisionLocalizer tagVision;
 
@@ -89,6 +89,85 @@ public class RobotContainer {
         configureModes();
         configureAutonomous();
     }
+
+    // spotless:off
+    private void configureBindings() {
+        ControllerJSONReader.pullConfiguration("SingleController");
+        triggers = ControllerJSONReader.getTriggers();
+        axes = ControllerJSONReader.getAxes();
+        pov = ControllerJSONReader.getPOVs();
+
+        if (FeatureFlags.runDrive) {
+            drivetrain.setDefaultCommand(
+                    new DriveWithJoysticks(
+                            drivetrain,
+                            axes.get("xDrive"),
+                            axes.get("yDrive"),
+                            axes.get("rotation"),
+                            pov.get("pov"),
+                            () -> true,
+                            () -> false,
+                            triggers.get("leftBumper"))); //unsure if using trigger as booleansupplier will work
+                
+            triggers.get("align")
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignState(AlignState.ALIGNING)))
+                .onFalse(new InstantCommand(
+                    () -> drivetrain.setAlignState(AlignState.MANUAL)));
+        }
+
+        if (FeatureFlags.runScoring) {
+            triggers.get("intake")
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.INTAKE)))
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignState(AlignState.MANUAL)))
+                .onTrue(new InstantCommand(
+                    () -> intakeSubsystem.toggle()));
+
+            triggers.get("aimSpeaker")
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                         ScoringSubsystem.ScoringAction.AIM)))
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
+
+            triggers.get("shoot")
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.SHOOT)))
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)))
+                .onFalse(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.AIM)));
+
+            triggers.get("endgame")
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.ENDGAME)))
+                .onFalse(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.WAIT)));
+
+            triggers.get("aimAmp")
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.AMP_AIM)))
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.AMP)));
+
+            triggers.get("manualIdle")
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.WAIT)))
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignState(AlignState.MANUAL)));
+        }
+    } // spotless:on
+
+    private void configureModes() {}
 
     public void configureSubsystems() {
         switch (Constants.currentMode) {
