@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringState;
@@ -18,12 +19,12 @@ public class LED extends SubsystemBase {
 
     private Timer timer;
 
-    private final int ledcount = 1000;
+    private final int ledcount = LEDConstants.ledLength;
 
     private ScoringSubsystem scoringSubsystem;
 
     public LED(ScoringSubsystem scoringSubsystem) {
-        led = new AddressableLED(0);
+        led = new AddressableLED(LEDConstants.ledPort);
         ledBuffer = new AddressableLEDBuffer(ledcount);
         timer = new Timer();
         this.scoringSubsystem = scoringSubsystem;
@@ -105,12 +106,10 @@ public class LED extends SubsystemBase {
             if (scoringSubsystem.getCurrentState() == ScoringState.ENDGAME) {
                 if (Constants.currentMode == Mode.REAL)
                     setSolidColorSection(0, ledcount, new int[] {140, 0, 255});
-                else SmartDashboard.putNumber("current task", 5);
-
-                // SmartDashboard.putString("current task", "endgame");
+                else SmartDashboard.putString("current task", "endgame");
             }
         }
-        // led.setData(ledBuffer);
+        if (Constants.currentMode == Mode.REAL) led.setData(ledBuffer);
     }
 
     private void clear() {
