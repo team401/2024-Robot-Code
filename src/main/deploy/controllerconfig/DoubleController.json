@@ -42,5 +42,43 @@
                 "controller": 2,
                 "button": "y"
             }
-    ]
+    ],
+
+    "axis": [
+        {   "command": "xDrive",
+            "controller": 2,
+            "button": "a"
+        },
+        {
+            "command": "yDrive",
+            "controller": 2,
+            "button": "b"
+        },
+        {
+            "command": "rotation",
+            "controller": 2,
+            "button": "back"
+        },
+        {
+            "command": "manualIdle",
+            "controller": 2,
+            "button": "start"
+        },
+        {
+            "command": "align",
+            "controller": 2,
+            "button": "rightBumper"
+        },
+        {
+            "command": "shoot",
+            "controller": 2,
+            "button": "x"
+        },
+        {
+            
+            "command": "endgame",
+            "controller": 2,
+            "button": "y"
+        }
+]
 }

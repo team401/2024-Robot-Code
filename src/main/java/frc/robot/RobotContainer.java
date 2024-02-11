@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FeatureFlags;
 import frc.robot.Constants.FieldConstants;
@@ -55,6 +56,11 @@ import frc.robot.utils.FieldFinder;
 import frc.robot.utils.feedforward.TuneG;
 import frc.robot.utils.feedforward.TuneS;
 import frc.robot.utils.feedforward.TuneV;
+import frc.robot.utils.ControllerJSONReader;
+import frc.robot.utils.FieldFinder;
+import java.util.Collections;
+import java.util.HashMap;
+
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -65,6 +71,8 @@ public class RobotContainer {
     CommandJoystick leftJoystick = new CommandJoystick(0);
     CommandJoystick rightJoystick = new CommandJoystick(1);
     CommandXboxController controller = new CommandXboxController(2);
+
+    HashMap<String, Trigger> triggers;
 
     VisionLocalizer tagVision;
 

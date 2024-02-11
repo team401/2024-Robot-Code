@@ -29,8 +29,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class ControllerJSONReader {
 
     private static HashMap<String, Trigger> triggers;
-    private static HashMap<Integer, CommandXboxController> gamepads;
-    private static HashMap<Integer, CommandJoystick> joysticks;
+    private static HashMap<Integer, CommandGenericHID> controllers;
 
     public static void pullConfiguration(String configuration) {
         JSONParser jsonParser = new JSONParser();
@@ -47,19 +46,18 @@ public class ControllerJSONReader {
         setTriggers((JSONArray) jsonObject.get("buttons"));
     }
 
-    private static void setControllers(JSONArray controllersJSON) {
-        HashMap<Integer, CommandXboxController> gamepadsList = new HashMap<Integer, CommandXboxController>();
-        HashMap<Integer, CommandJoystick> joysticksList = new HashMap<Integer, CommandJoystick>();
+    private static HashMap<Integer, CommandGenericHID> setControllers(JSONArray controllersJSON) {
+        HashMap<Integer, CommandGenericHID> controllersList = new HashMap<Integer, CommandGenericHID>();
         Iterator<JSONObject> iterator = controllersJSON.iterator();
         while(iterator.hasNext()) {
             JSONObject controller = iterator.next();
             if (((String)controller.get("type")).equals("joysticks")) 
-                joysticksList.put((Integer) controller.get("port"), new CommandJoystick((int) controller.get("port")));
+                controllersList.put((Integer) controller.get("port"), new CommandJoystick((int) controller.get("port")));
             else 
-                gamepadsList.put((Integer) controller.get("port"), new CommandXboxController((int) controller.get("port")));
+                controllersList.put((Integer) controller.get("port"), new CommandXboxController((int) controller.get("port")));
         }
-        gamepads = gamepadsList;
-        joysticks = joysticksList;
+        controllers = controllersList;
+        return controllersList;
     }
 
     private static HashMap<String, Trigger> setTriggers(JSONArray triggersJSON) {
@@ -71,34 +69,75 @@ public class ControllerJSONReader {
             
             int port = (int) trigger.get("controller");
             switch (((String) trigger.get("button"))) {
-                //gamepad cases
-                case "x":
-                    t = gamepads.get(port).x();
-                case "y":
-                    t = gamepads.get(port).y();
+                //gamepad buttons
                 case "a":
-                    t = gamepads.get(port).a();
+                case "0":
+                    t = controllers.get(port).button(0);
+                    break;
                 case "b":
-                    t = gamepads.get(port).b();
-                case "back":
-                    t = gamepads.get(port).back();
-                case "start":
-                    t = gamepads.get(port).start();
-                case "leftTrigger":
-                    t = gamepads.get(port).leftTrigger();
+                case "1":
+                    t = controllers.get(port).button(1);
+                    break;
+                case "x":
+                case "2":
+                    t = controllers.get(port).button(2);
+                    break;
+                case "y":
+                case "3":
+                    t = controllers.get(port).button(3);
+                    break;
                 case "leftBumper":
-                    t = gamepads.get(port).leftBumper();
-                case "rightTrigger":
-                    t = gamepads.get(port).rightTrigger();
+                case "4":
+                    t = controllers.get(port).button(4);
+                    break;
                 case "rightBumper":
-                    t = gamepads.get(port).rightBumper();
+                case "5":
+                    t = controllers.get(port).button(5);
+                    break;
+                case "back":
+                case "6":
+                    t = controllers.get(port).button(6);
+                    break;
+                case "start":
+                case "7":
+                    t = controllers.get(port).button(7);
+                    break;
+                case "leftJoystickPress":
+                case "8":
+                    t = controllers.get(port).button(8);
+                    break;
+                case "rightJoystickPress":
+                case "9":
+                    t = controllers.get(port).button(9);
+                    break;
                 case "pov0":
-                    t = gamepads.get(port).pov(0);
-                    case "pov0":
-                    t = gamepads.get(port).pov(0);
+                    t = controllers.get(port).pov(0);
+                    break;
+                case "pov45":
+                    t = controllers.get(port).pov(45);
+                    break;
+                case "pov90":
+                    t = controllers.get(port).pov(90);
+                    break;
+                case "pov135":
+                    t = controllers.get(port).pov(135);
+                    break;
+                case "pov180":
+                    t = controllers.get(port).pov(180);
+                    break;
+                case "pov225":
+                    t = controllers.get(port).pov(225);
+                    break;
+                case "pov270":
+                    t = controllers.get(port).pov(270);
+                    break;
+                case "pov315":
+                    t = controllers.get(port).pov(315);
+                    break;
+                default:
+                    t = null;
+                    break;
             }
-            }
-        
 
             triggerList.put((String) trigger.get("command"), t);
         }
