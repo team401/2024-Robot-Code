@@ -20,7 +20,8 @@ public class EndgameIOSparkFlex implements EndgameIO {
 
         rightEndgameMotor.follow(leftEndgameMotor, true); // TODO: check if this should be inverted
 
-        leftEndgameMotor.getEncoder().setPosition(0);
+        leftEndgameMotor.getEncoder().setPositionConversionFactor(EndgameConstants.encoderToMeters);
+        leftEndgameMotor.getEncoder().setPosition(0.0);
     }
 
     @Override
@@ -36,7 +37,6 @@ public class EndgameIOSparkFlex implements EndgameIO {
         inputs.endgameRightAppliedVolts = rightEndgameMotor.getAppliedOutput();
         inputs.endgameRightCurrentAmps = rightEndgameMotor.getOutputCurrent();
 
-        inputs.position =
-                leftEndgameMotor.getEncoder().getPosition() * EndgameConstants.encoderToMeters;
+        inputs.position = leftEndgameMotor.getEncoder().getPosition();
     }
 }

@@ -11,8 +11,10 @@ import frc.robot.Constants.ScoringConstants;
 
 public class ShooterIOSim implements ShooterIO {
     // TODO: Tune this later
-    private final FlywheelSim shooterLeftSim = new FlywheelSim(DCMotor.getKrakenX60(1), 1.0, 0.1);
-    private final FlywheelSim shooterRightSim = new FlywheelSim(DCMotor.getKrakenX60(1), 1.0, 0.1);
+    private final FlywheelSim shooterLeftSim =
+            new FlywheelSim(DCMotor.getKrakenX60(1), 0.5, 0.0010639061);
+    private final FlywheelSim shooterRightSim =
+            new FlywheelSim(DCMotor.getKrakenX60(1), 0.5, 0.0010639061);
 
     private final PIDController shooterLeftController =
             new PIDController(

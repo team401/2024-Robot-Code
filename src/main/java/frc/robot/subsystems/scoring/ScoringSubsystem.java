@@ -288,9 +288,9 @@ public class ScoringSubsystem extends SubsystemBase {
             aimerIo.setAngleClampsRad(0, 0);
         } else {
             double elevatorLimit =
-                    (Math.PI / 2 / 0.45) * (elevatorPositionSupplier.get() - 0.45) + Math.PI / 2; // TODO: Tune
+                    (Math.PI / 2 / 0.45) * (elevatorPositionSupplier.get() - 0.45) + Math.PI / 2;
             aimerIo.setAngleClampsRad(
-                    0, Math.min(ScoringConstants.aimMaxAngleRadians, elevatorLimit));
+                    Math.max(0.0, elevatorLimit), ScoringConstants.aimMaxAngleRadians);
         }
 
         aimerIo.controlAimAngleRad();

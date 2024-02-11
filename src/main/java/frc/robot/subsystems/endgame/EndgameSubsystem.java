@@ -40,6 +40,8 @@ public class EndgameSubsystem extends SubsystemBase {
         return endgameInputs.position;
     }
 
+    public void home() {}
+
     @Override
     public void periodic() {
         endgameIo.updateInputs(endgameInputs);

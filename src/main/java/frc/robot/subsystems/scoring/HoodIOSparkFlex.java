@@ -1,6 +1,6 @@
-// FIXME: Fix once we get the real robot
 package frc.robot.subsystems.scoring;
 
+import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkFlex;
 import frc.robot.Constants.ScoringConstants;
 
@@ -16,11 +16,12 @@ public class HoodIOSparkFlex implements HoodIO {
         hoodMotor.getPIDController().setP(ScoringConstants.hoodkP);
         hoodMotor.getPIDController().setI(ScoringConstants.hoodkI);
         hoodMotor.getPIDController().setD(ScoringConstants.hoodkD);
+        hoodMotor.getPIDController().setFF(ScoringConstants.hoodkFF);
 
-        hoodMotor.getEncoder().setPosition(0);
+        hoodMotor.getEncoder().setPosition(0.0);
+        hoodMotor.getEncoder().setPositionConversionFactor(ScoringConstants.hoodEncoderToRad);
 
-        // TODO: Get position later
-        // hoodMotor.getEncoder().setPositionConversionFactor()
+        hoodMotor.setIdleMode(CANSparkFlex.IdleMode.kBrake);
     }
 
     @Override
@@ -30,6 +31,8 @@ public class HoodIOSparkFlex implements HoodIO {
 
     @Override
     public void updateInputs(HoodIOInputs inputs) {
+        hoodMotor.getPIDController().setReference(goalAngleRad, ControlType.kPosition);
+
         inputs.hoodAngleRad = hoodMotor.getEncoder().getPosition();
         inputs.hoodGoalAngleRad = goalAngleRad;
 

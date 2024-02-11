@@ -6,7 +6,7 @@ import frc.robot.Constants;
 
 public class EndgameIOSim implements EndgameIO {
     private final ElevatorSim elevatorSim =
-            new ElevatorSim(DCMotor.getNeoVortex(2), 0.05, 0.1, 0.05, 0.0, 0.45, false, 0.0);
+            new ElevatorSim(DCMotor.getNeoVortex(2), 20, 1.814, 0.02231009, 0.0, 0.45, true, 0.0);
 
     double appliedVolts = 0.0;
 

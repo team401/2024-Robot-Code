@@ -24,7 +24,6 @@ import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignTarget;
 import frc.robot.subsystems.endgame.EndgameIOSim;
 import frc.robot.subsystems.endgame.EndgameIOSparkFlex;
 import frc.robot.subsystems.endgame.EndgameSubsystem;
-import frc.robot.subsystems.endgame.EndgameSubsystem.EndgameAction;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -105,35 +104,23 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
 
-            // controller.x()
-            //     .onTrue(new InstantCommand(
-            //         () -> scoringSubsystem.setAction(
-            //             ScoringSubsystem.ScoringAction.SHOOT)))
-            //     .onTrue(new InstantCommand(
-            //         () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)))
-            //     .onFalse(new InstantCommand(
-            //         () -> scoringSubsystem.setAction(
-            //             ScoringSubsystem.ScoringAction.AIM)));
-
-            // controller.y()
-            //     .onTrue(new InstantCommand(
-            //         () -> scoringSubsystem.setAction(
-            //             ScoringSubsystem.ScoringAction.ENDGAME)))
-            //     .onFalse(new InstantCommand(
-            //         () -> scoringSubsystem.setAction(
-            //             ScoringSubsystem.ScoringAction.WAIT)));
-
             controller.x()
                 .onTrue(new InstantCommand(
-                    () -> endgameSubsystem.setAction(EndgameAction.GO_UP)))
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.SHOOT)))
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)))
                 .onFalse(new InstantCommand(
-                    () -> endgameSubsystem.setAction(EndgameAction.CANCEL)));
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.AIM)));
 
             controller.y()
                 .onTrue(new InstantCommand(
-                    () -> endgameSubsystem.setAction(EndgameAction.GO_DOWN)))
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.ENDGAME)))
                 .onFalse(new InstantCommand(
-                    () -> endgameSubsystem.setAction(EndgameAction.CANCEL)));
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.WAIT)));
 
             controller.back()
                 .onTrue(new InstantCommand(
