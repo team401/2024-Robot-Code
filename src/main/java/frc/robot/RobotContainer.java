@@ -58,6 +58,7 @@ public class RobotContainer {
     Telemetry driveTelemetry = new Telemetry(DriveConstants.MaxSpeedMetPerSec);
 
     SendableChooser<String> autoChooser = new SendableChooser<String>();
+    SendableChooser<String> testModeChooser = new SendableChooser<String>();
 
     public RobotContainer() {
         configureSubsystems();
@@ -68,6 +69,9 @@ public class RobotContainer {
 
     // spotless:off
     private void configureBindings() {
+        // Resets bindings
+        controller = new CommandXboxController(2);
+
         if (FeatureFlags.runDrive) {
             drivetrain.setDefaultCommand(
                     new DriveWithJoysticks(
@@ -138,7 +142,19 @@ public class RobotContainer {
         }
     } // spotless:on
 
-    private void configureModes() {}
+    private void configureModes() {
+        testModeChooser.setDefaultOption("Blank", "tuning");
+
+        testModeChooser.addOption("Speaker Tuning", "tuning-speaker");
+
+
+        testModeChooser.addOption("Aimer Tuning", "tuning-aimer");
+        testModeChooser.addOption("Hood Tuning", "tuning-hood");
+        testModeChooser.addOption("Shooter Tuning", "tuning-shooter");
+        testModeChooser.addOption("Endgame Tuning", "tuning-endgame");
+
+        SmartDashboard.putData("Test Mode Chooser", testModeChooser);
+    }
 
     public void configureSubsystems() {
         switch (Constants.currentMode) {
@@ -242,22 +258,33 @@ public class RobotContainer {
         }
     }
 
-    public void testInit(String choice) {
-        switch (choice) {
+    public void testInit() {
+        // Resets bindings
+        controller = new CommandXboxController(2);
+        
+        // spotless:off
+        switch (testModeChooser.getSelected()) {
             case "tuning":
                 break;
             case "tuning-speaker":
                 drivetrain.seedFieldRelative();
                 scoringSubsystem.setAction(ScoringAction.TUNING);
-                // spotless:off
                 controller.leftBumper()
                         .onTrue(new InstantCommand(
                             () -> scoringSubsystem.setTuningKickerVolts(5)))
                         .onFalse(new InstantCommand(
                             () -> scoringSubsystem.setTuningKickerVolts(0)));
                 break;
-                // spotless:on
+            case "tuning-aimer":
+                break;
+            case "tuning-hood":
+                break;
+            case "tuning-shooter":
+                break;
+            case "tuning-endgame":
+                break;
         }
+        // spotless:on
     }
 
     private Translation2d getFieldToSpeaker() {

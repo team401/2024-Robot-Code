@@ -74,6 +74,8 @@ public class AimerIOTalon implements AimerIO {
         inputs.aimGoalAngleRad = goalAngleRad;
         inputs.aimAngleRad = encoder.getAbsolutePosition() * 2 * Math.PI;
 
+        inputs.aimVelocityRadPerSec = encoder.;
+
         inputs.aimAppliedVolts = aimerLeft.getMotorVoltage().getValueAsDouble();
         inputs.aimCurrentAmps = aimerLeft.getSupplyCurrent().getValueAsDouble();
     }

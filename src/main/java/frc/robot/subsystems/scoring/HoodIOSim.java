@@ -39,6 +39,8 @@ public class HoodIOSim implements HoodIO {
         inputs.hoodAngleRad = sim.getAngleRads();
         inputs.hoodGoalAngleRad = goalAngleRad;
 
+        inputs.hoodVelocityRadPerSec = sim.getVelocityRadPerSec();
+
         inputs.hoodAppliedVolts = appliedVolts;
         inputs.hoodCurrentAmps = sim.getCurrentDrawAmps();
     }

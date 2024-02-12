@@ -20,7 +20,8 @@ public class HoodIOVortex implements HoodIO {
         hoodMotor.getEncoder().setPosition(0);
 
         // TODO: Get position later
-        // hoodMotor.getEncoder().setPositionConversionFactor()
+        // hoodMotor.getEncoder().setPositionConversionFactor();
+        // hoodMotor.getEncoder().setVelocityConversionFactor();
     }
 
     @Override
@@ -32,6 +33,8 @@ public class HoodIOVortex implements HoodIO {
     public void updateInputs(HoodIOInputs inputs) {
         inputs.hoodAngleRad = hoodMotor.getEncoder().getPosition();
         inputs.hoodGoalAngleRad = goalAngleRad;
+
+        inputs.hoodVelocityRadPerSec = hoodMotor.getEncoder().getVelocity();
 
         inputs.hoodAppliedVolts = hoodMotor.getAppliedOutput();
         inputs.hoodCurrentAmps = hoodMotor.getOutputCurrent();

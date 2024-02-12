@@ -18,10 +18,12 @@ import frc.robot.Constants.ScoringConstants;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
+import frc.robot.utils.Tunable;
+
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
-public class ScoringSubsystem extends SubsystemBase {
+public class ScoringSubsystem extends SubsystemBase implements Tunable {
     private final ShooterIO shooterIo;
     private final ShooterIOInputsAutoLogged shooterInputs = new ShooterIOInputsAutoLogged();
 
@@ -348,4 +350,79 @@ public class ScoringSubsystem extends SubsystemBase {
     public void setTuningKickerVolts(double kickerVoltsTuning) {
         this.kickerVoltsTuning = kickerVoltsTuning;
     }
+
+    @Override
+    public double getPosition(int slot) {
+        switch(slot) {
+            // Aimer
+            case 0:
+                return aimerInputs.aimAngleRad;
+            // Hood
+            case 1:
+                return hoodInputs.hoodAngleRad;
+            // Shooter
+            case 2:
+                return shooterInputs.shooterLeftVelocityRPM;
+        }
+        return 0.0;
+    }
+
+    @Override
+    public double getVelocity(int slot) {
+        switch(slot) {
+            // Aimer
+            case 0:
+                return aimerInputs.aimVelocityRadPerSec;
+            // Hood
+            case 1:
+                return hoodInputs.hoodVelocityRadPerSec;
+            // Shooter
+            case 2:
+                return shooterInputs.shooterLeftVelocityRPM;
+        }
+        return 0.0;
+    }
+
+    @Override
+    public void setVolts(double volts, int slot) {
+        switch(slot) {
+            // Aimer
+            case 0:
+                break;
+            // Hood
+            case 1:
+                break;
+            // Shooter
+            case 2:
+                break;
+        }
+    }
+
+    @Override
+    public void setPID(double p, double i, double d, int slot) {
+        switch(slot) {
+            // Aimer
+            case 0:
+                break;
+            // Hood
+            case 1:
+                break;
+            // Shooter
+            case 2:
+                break;
+        }
+    }
+
+
+    @Override
+    public double getPosition() { return 0.0; }
+
+    @Override
+    public double getVelocity() { return 0.0; }
+
+    @Override
+    public void setVolts(double volts) {}
+
+    @Override
+    public void setPID(double p, double i, double d) {}
 }
