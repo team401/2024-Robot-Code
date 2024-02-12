@@ -4,9 +4,17 @@ package frc.robot.utils;
 public interface Tunable {
     public double getPosition();
 
-    public double getVel();
+    public double getPosition(int slot);
+
+    public double getVelocity();
+
+    public double getVelocity(int slot);
 
     public void setVolts(double volts);
 
-    public void stop();
+    public void setVolts(double volts, int slot);
+
+    public void setPID(double p, double i, double d);
+
+    public void setPID(double p, double i, double d, int slot);
 }

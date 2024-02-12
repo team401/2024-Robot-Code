@@ -94,6 +94,8 @@ public class AimerIOSim implements AimerIO {
         inputs.aimGoalAngleRad = goalAngleRad;
         inputs.aimAngleRad = sim.getAngleRads();
 
+        inputs.aimVelocityRadPerSec = sim.getVelocityRadPerSec();
+
         inputs.aimAppliedVolts = appliedVolts;
         inputs.aimCurrentAmps = sim.getCurrentDrawAmps();
     }

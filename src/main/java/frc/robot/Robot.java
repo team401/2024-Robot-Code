@@ -106,7 +106,7 @@ public class Robot extends LoggedRobot {
     public void testInit() {
         CommandScheduler.getInstance().cancelAll();
 
-        robotContainer.testInit("tuning-speaker");
+        robotContainer.testInit();
     }
 
     @Override

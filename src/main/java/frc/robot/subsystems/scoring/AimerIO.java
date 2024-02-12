@@ -9,6 +9,8 @@ public interface AimerIO {
         public double aimGoalAngleRad = 0.0;
         public double aimAppliedVolts = 0.0;
         public double aimCurrentAmps = 0.0;
+
+        public double aimVelocityRadPerSec = 0.0;
     }
 
     public default void updateInputs(AimerIOInputs inputs) {}
