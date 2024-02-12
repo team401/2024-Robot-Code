@@ -12,16 +12,15 @@ import frc.robot.Constants;
 import frc.robot.Constants.ScoringConstants;
 
 public class AimerIOSim implements AimerIO {
-    // TODO: Tune this later
     private final SingleJointedArmSim sim =
             new SingleJointedArmSim(
-                    DCMotor.getNeoVortex(2),
-                    1.5,
-                    SingleJointedArmSim.estimateMOI(0.5, 4.5),
-                    0.5,
+                    DCMotor.getFalcon500(2),
+                    80,
+                    SingleJointedArmSim.estimateMOI(0.3872, 8.61),
+                    0.4,
                     0.0,
-                    ScoringConstants.aimMaxAngleRadians,
-                    false,
+                    ScoringConstants.aimMaxAngleRadians + Math.PI / 2.0,
+                    true,
                     0.0);
     private final PIDController controller =
             new PIDController(
@@ -33,7 +32,9 @@ public class AimerIOSim implements AimerIO {
                     ScoringConstants.aimerkV,
                     ScoringConstants.aimerkA);
     private final TrapezoidProfile profile =
-            new TrapezoidProfile(new TrapezoidProfile.Constraints(0.8, 0.5));
+            new TrapezoidProfile(
+                    new TrapezoidProfile.Constraints(
+                            ScoringConstants.aimCruiseVelocity, ScoringConstants.aimAcceleration));
 
     private final Timer timer = new Timer();
 
