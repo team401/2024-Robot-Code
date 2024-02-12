@@ -66,6 +66,104 @@ public class RobotContainer {
         configureAutonomous();
     }
 
+    public void configureSubsystems() {
+        switch (Constants.currentMode) {
+            case REAL:
+                if (FeatureFlags.runScoring) {
+                    scoringSubsystem =
+                            new ScoringSubsystem(
+                                    new ShooterIOTalon(),
+                                    new AimerIOTalon(),
+                                    new HoodIOSparkFlex());
+                }
+
+                if (FeatureFlags.runEndgame) {
+                    endgameSubsystem = new EndgameSubsystem(new EndgameIOSparkFlex());
+                }
+
+                if (FeatureFlags.runIntake) {
+                    intakeSubsystem = new IntakeSubsystem(new IntakeIOSparkMax());
+                }
+
+                if (FeatureFlags.runVision) {
+                    tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
+                }
+                break;
+            case SIM:
+                if (FeatureFlags.runDrive) {
+                    drivetrain.seedFieldRelative(DriveConstants.initialPose);
+                }
+
+                if (FeatureFlags.runEndgame) {
+                    endgameSubsystem = new EndgameSubsystem(new EndgameIOSim());
+                }
+
+                if (FeatureFlags.runScoring) {
+                    scoringSubsystem =
+                            new ScoringSubsystem(
+                                    new ShooterIOSim(), new AimerIOSim(), new HoodIOSim());
+                }
+
+                if (FeatureFlags.simulateVision) {
+                    tagVision =
+                            new VisionLocalizer(
+                                    new VisionIOSim(
+                                            VisionConstants.cameras,
+                                            driveTelemetry::getModuleStates));
+                } else if (FeatureFlags.runVision) {
+                    tagVision =
+                            new VisionLocalizer(
+                                    new VisionIOSim(
+                                            Collections.emptyList(),
+                                            driveTelemetry::getModuleStates));
+                }
+
+                if (FeatureFlags.runIntake) {
+                    intakeSubsystem = new IntakeSubsystem(new IntakeIOSim());
+                }
+                break;
+            case REPLAY:
+                break;
+        }
+
+        if (FeatureFlags.runDrive) {
+            drivetrain.registerTelemetry(driveTelemetry::telemeterize);
+            drivetrain.setPoseSupplier(driveTelemetry::getFieldToRobot);
+            drivetrain.setVelocitySupplier(driveTelemetry::getVelocity);
+            drivetrain.setSpeakerSupplier(this::getFieldToSpeaker);
+            drivetrain.setAmpSupplier(this::getFieldToAmpHeading);
+            drivetrain.setSourceSupplier(this::getFieldToSourceHeading);
+
+            if (FeatureFlags.runVision) {
+                tagVision.setCameraConsumer(
+                        (m) ->
+                                drivetrain.addVisionMeasurement(
+                                        m.pose(), m.timestamp(), m.variance()));
+                tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
+            }
+        }
+
+        if (FeatureFlags.runScoring) {
+            if (FeatureFlags.runDrive) {
+                scoringSubsystem.setPoseSupplier(driveTelemetry::getFieldToRobot);
+
+                scoringSubsystem.setVelocitySupplier(
+                        () ->
+                                VecBuilder.fill(
+                                        driveTelemetry.getVelocityX(),
+                                        driveTelemetry.getVelocityY()));
+
+                scoringSubsystem.setSpeakerSupplier(this::getFieldToSpeaker);
+            }
+            if (FeatureFlags.runEndgame) {
+                scoringSubsystem.setElevatorPositionSupplier(endgameSubsystem::getPosition);
+            }
+            if (FeatureFlags.runIntake) {
+                intakeSubsystem.setScoringSupplier(scoringSubsystem::canIntake);
+            }
+        }
+    }
+
     // spotless:off
     private void configureBindings() {
         if (FeatureFlags.runDrive) {
@@ -150,106 +248,6 @@ public class RobotContainer {
     } // spotless:on
 
     private void configureModes() {}
-
-    public void configureSubsystems() {
-        switch (Constants.currentMode) {
-            case REAL:
-                if (FeatureFlags.runScoring) {
-                    if (FeatureFlags.runEndgame) {
-                        endgameSubsystem = new EndgameSubsystem(new EndgameIOSparkFlex());
-                    }
-
-                    scoringSubsystem =
-                            new ScoringSubsystem(
-                                    new ShooterIOTalon(),
-                                    new AimerIOTalon(),
-                                    new HoodIOSparkFlex(),
-                                    driveTelemetry::getFieldToRobot,
-                                    () ->
-                                            VecBuilder.fill(
-                                                    driveTelemetry.getVelocityX(),
-                                                    driveTelemetry.getVelocityY()),
-                                    this::getFieldToSpeaker,
-                                    endgameSubsystem::getPosition);
-                }
-
-                if (FeatureFlags.runIntake) {
-                    intakeSubsystem = new IntakeSubsystem(new IntakeIOSparkMax());
-                }
-
-                if (FeatureFlags.runVision) {
-                    tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
-                }
-                break;
-            case SIM:
-                if (FeatureFlags.runDrive) {
-                    drivetrain.seedFieldRelative(DriveConstants.initialPose);
-                }
-
-                if (FeatureFlags.runEndgame) {
-                    endgameSubsystem = new EndgameSubsystem(new EndgameIOSim());
-                }
-
-                if (FeatureFlags.runScoring) {
-                    scoringSubsystem =
-                            new ScoringSubsystem(
-                                    new ShooterIOSim(),
-                                    new AimerIOSim(),
-                                    new HoodIOSim(),
-                                    driveTelemetry::getFieldToRobot,
-                                    () ->
-                                            VecBuilder.fill(
-                                                    driveTelemetry.getVelocityX(),
-                                                    driveTelemetry.getVelocityY()),
-                                    this::getFieldToSpeaker,
-                                    endgameSubsystem::getPosition);
-                }
-
-                if (FeatureFlags.simulateVision) {
-                    tagVision =
-                            new VisionLocalizer(
-                                    new VisionIOSim(
-                                            VisionConstants.cameras,
-                                            driveTelemetry::getModuleStates));
-                } else if (FeatureFlags.runVision) {
-                    tagVision =
-                            new VisionLocalizer(
-                                    new VisionIOSim(
-                                            Collections.emptyList(),
-                                            driveTelemetry::getModuleStates));
-                }
-
-                if (FeatureFlags.runIntake) {
-                    intakeSubsystem = new IntakeSubsystem(new IntakeIOSim());
-                }
-                break;
-            case REPLAY:
-                break;
-        }
-
-        if (FeatureFlags.runDrive) {
-            drivetrain.registerTelemetry(driveTelemetry::telemeterize);
-            drivetrain.setPoseSupplier(driveTelemetry::getFieldToRobot);
-            drivetrain.setVelocitySupplier(driveTelemetry::getVelocity);
-            drivetrain.setSpeakerSupplier(this::getFieldToSpeaker);
-            drivetrain.setAmpSupplier(this::getFieldToAmpHeading);
-            drivetrain.setSourceSupplier(this::getFieldToSourceHeading);
-
-            if (FeatureFlags.runVision) {
-                tagVision.setCameraConsumer(
-                        (m) ->
-                                drivetrain.addVisionMeasurement(
-                                        m.pose(), m.timestamp(), m.variance()));
-                tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
-            }
-        }
-
-        if (FeatureFlags.runScoring) {}
-
-        if (FeatureFlags.runIntake && FeatureFlags.runScoring) {
-            intakeSubsystem.setScoringSupplier(scoringSubsystem::canIntake);
-        }
-    }
 
     public void enabledInit() {
         if (FeatureFlags.runScoring) {

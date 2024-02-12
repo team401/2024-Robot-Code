@@ -33,9 +33,10 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private final Timer shootTimer = new Timer();
 
-    private final Supplier<Pose2d> poseSupplier;
-    private final Supplier<Vector<N2>> velocitySupplier;
-    private final Supplier<Double> elevatorPositionSupplier;
+    private Supplier<Pose2d> poseSupplier = null;
+    private Supplier<Vector<N2>> velocitySupplier = null;
+    private Supplier<Translation2d> speakerSupplier = null;
+    private Supplier<Double> elevatorPositionSupplier = null;
 
     private final InterpolateDouble shooterInterpolated;
     private final InterpolateDouble aimerInterpolated;
@@ -44,8 +45,6 @@ public class ScoringSubsystem extends SubsystemBase {
     private double shooterGoalVelocityRPMTuning = 0.0;
     private double aimerGoalAngleRadTuning = 0.0;
     private double kickerVoltsTuning = 0.0;
-
-    private final Supplier<Translation2d> speakerSupplier;
 
     private final Mechanism2d mechanism = new Mechanism2d(2.2, 2.0);
     private final MechanismRoot2d rootMechanism = mechanism.getRoot("scoring", 0.6, 0.3);
@@ -80,22 +79,10 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private ScoringAction action = ScoringAction.WAIT;
 
-    public ScoringSubsystem(
-            ShooterIO shooterIo,
-            AimerIO aimerIo,
-            HoodIO hoodIo,
-            Supplier<Pose2d> poseSupplier,
-            Supplier<Vector<N2>> velocitySupplier,
-            Supplier<Translation2d> speakerSupplier,
-            Supplier<Double> elevatorPositionSupplier) {
+    public ScoringSubsystem(ShooterIO shooterIo, AimerIO aimerIo, HoodIO hoodIo) {
         this.shooterIo = shooterIo;
         this.aimerIo = aimerIo;
         this.hoodIo = hoodIo;
-
-        this.poseSupplier = poseSupplier;
-        this.velocitySupplier = velocitySupplier;
-        this.speakerSupplier = speakerSupplier;
-        this.elevatorPositionSupplier = elevatorPositionSupplier;
 
         shooterInterpolated = new InterpolateDouble(ScoringConstants.getShooterMap());
 
@@ -264,6 +251,22 @@ public class ScoringSubsystem extends SubsystemBase {
 
     public boolean canIntake() {
         return aimerInputs.aimAngleRad > ScoringConstants.intakeAngleToleranceRadians;
+    }
+
+    public void setPoseSupplier(Supplier<Pose2d> poseSupplier) {
+        this.poseSupplier = poseSupplier;
+    }
+
+    public void setVelocitySupplier(Supplier<Vector<N2>> velocitySupplier) {
+        this.velocitySupplier = velocitySupplier;
+    }
+
+    public void setSpeakerSupplier(Supplier<Translation2d> speakerSupplier) {
+        this.speakerSupplier = speakerSupplier;
+    }
+
+    public void setElevatorPositionSupplier(Supplier<Double> elevatorPositionSupplier) {
+        this.elevatorPositionSupplier = elevatorPositionSupplier;
     }
 
     @Override
