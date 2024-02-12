@@ -154,6 +154,8 @@ public class RobotContainer {
                                         driveTelemetry.getVelocityY()));
 
                 scoringSubsystem.setSpeakerSupplier(this::getFieldToSpeaker);
+
+                scoringSubsystem.setDriveAllignedSupplier(() -> drivetrain.isAligned());
             }
             if (FeatureFlags.runEndgame) {
                 scoringSubsystem.setElevatorPositionSupplier(endgameSubsystem::getPosition);

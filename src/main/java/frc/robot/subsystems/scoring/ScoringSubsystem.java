@@ -1,5 +1,6 @@
 package frc.robot.subsystems.scoring;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -33,10 +34,11 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private final Timer shootTimer = new Timer();
 
-    private Supplier<Pose2d> poseSupplier = null;
-    private Supplier<Vector<N2>> velocitySupplier = null;
-    private Supplier<Translation2d> speakerSupplier = null;
-    private Supplier<Double> elevatorPositionSupplier = null;
+    private Supplier<Pose2d> poseSupplier = () -> new Pose2d();
+    private Supplier<Vector<N2>> velocitySupplier = () -> VecBuilder.fill(0.0, 0.0);
+    private Supplier<Translation2d> speakerSupplier = () -> new Translation2d(0, 0);
+    private Supplier<Double> elevatorPositionSupplier = () -> 0.0;
+    private Supplier<Boolean> driveAllignedSupplier = () -> true;
 
     private final InterpolateDouble shooterInterpolated;
     private final InterpolateDouble aimerInterpolated;
@@ -178,7 +180,7 @@ public class ScoringSubsystem extends SubsystemBase {
         boolean hoodReady =
                 Math.abs(hoodInputs.hoodAngleRad - hoodInputs.hoodGoalAngleRad)
                         < ScoringConstants.hoodAngleMarginRadians; // TODO: Tune
-        boolean driveReady = true; // TODO: Add drive ready
+        boolean driveReady = driveAllignedSupplier.get();
         boolean notePresent = hasNote();
 
         boolean primeReady = shooterReady && aimReady && hoodReady && driveReady && notePresent;
@@ -269,9 +271,14 @@ public class ScoringSubsystem extends SubsystemBase {
         this.elevatorPositionSupplier = elevatorPositionSupplier;
     }
 
+    public void setDriveAllignedSupplier(Supplier<Boolean> driveAllignedSupplier) {
+        this.driveAllignedSupplier = driveAllignedSupplier;
+    }
+
     @Override
     public void periodic() {
         if (state != ScoringState.TUNING
+                && action != ScoringAction.ENDGAME
                 && (FieldFinder.willIHitThis(
                                 poseSupplier.get().getX(),
                                 poseSupplier.get().getY(),
@@ -290,8 +297,15 @@ public class ScoringSubsystem extends SubsystemBase {
                                 FieldLocations.RED_STAGE))) {
             aimerIo.setAngleClampsRad(0, 0);
         } else {
+            // Linear equation in point-slope form to calculate the arm's limit based on the
+            // elevator position
+            double maxElevatorPosition = 0.45; // x-intercept
+            double maxAimAngle = Math.PI / 2; // y-intercept
+
             double elevatorLimit =
-                    (Math.PI / 2 / 0.45) * (elevatorPositionSupplier.get() - 0.45) + Math.PI / 2;
+                    (maxAimAngle / maxElevatorPosition)
+                                    * (elevatorPositionSupplier.get() - maxElevatorPosition)
+                            + maxAimAngle;
             aimerIo.setAngleClampsRad(
                     Math.max(0.0, elevatorLimit), ScoringConstants.aimMaxAngleRadians);
         }

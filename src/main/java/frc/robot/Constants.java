@@ -82,6 +82,8 @@ public final class Constants {
 
         public static final double anticipationTime = 0.1;
         public static final double minimumAnticipationVelocity = 0.0;
+
+        public static final double alignToleranceRadians = Math.PI / 6;
     }
 
     public static final class FieldConstants {
