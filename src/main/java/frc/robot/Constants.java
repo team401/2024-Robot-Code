@@ -49,8 +49,8 @@ public final class Constants {
         public static final boolean runLocalizer = true;
 
         public static final boolean runIntake = true;
-        public static final boolean runScoring = true;
-        public static final boolean runEndgame = true;
+        public static final boolean runScoring = false;
+        public static final boolean runEndgame = false;
         public static final boolean runDrive = true;
     }
 
@@ -82,6 +82,8 @@ public final class Constants {
 
         public static final double anticipationTime = 0.1;
         public static final double minimumAnticipationVelocity = 0.0;
+
+        public static final double alignToleranceRadians = Math.PI / 6;
     }
 
     public static final class FieldConstants {
@@ -199,9 +201,10 @@ public final class Constants {
     public static final class EndgameConstants {
         public static final int leftMotorID = 1;
         public static final int rightMotorID = 2;
-        public static final int endgameUp = 3;
-        public static final int endgameDown = 0;
-        public static final int ticksPerFoot = 10;
+
+        public static final int smartCurrentLimit = 25; // TODO: Tune this
+
+        public static final double encoderToMeters = Math.PI * Units.inchesToMeters(1.7567) / 80;
     }
 
     public static final class TunerConstants {
@@ -371,26 +374,31 @@ public final class Constants {
     }
 
     public static final class ScoringConstants {
-        public static final double aimerkP = 6.0;
-        public static final double aimerkI = 0.4;
-        public static final double aimerkD = 2.5;
+        public static final double aimerkP = 10.0;
+        public static final double aimerkI = 0.0;
+        public static final double aimerkD = 0.0;
 
-        public static final double aimerkS = 0.0;
-        public static final double aimerkG = 0.0;
-        public static final double aimerkV = 0.0;
-        public static final double aimerkA = 0.0;
+        public static final double aimerkS = 0.0; // TODO: Find Imperically
+        public static final double aimerkG = 0.17;
+        public static final double aimerkV = 1.51;
+        public static final double aimerkA = 0.01;
 
-        public static final double shooterkP = 10.0;
+        public static final double shooterkP = 0.05;
         public static final double shooterkI = 0.0;
         public static final double shooterkD = 0.0;
 
-        public static final double shooterkS = 0.0;
-        public static final double shooterkV = 0.0;
+        public static final double shooterkS = 0.0; // TODO: Find Imperically
+        public static final double shooterkV = 0.0095;
         public static final double shooterkA = 0.0;
 
-        public static final double hoodkP = 0.02;
+        public static final double hoodkP = 0.05;
         public static final double hoodkI = 0.0;
-        public static final double hoodkD = 0.6;
+        public static final double hoodkD = 0.0;
+        public static final double hoodkFF = 0.0; // TODO: Find Imperically
+
+        public static final double hoodPositionTolerance = 0.01;
+
+        public static final double hoodEncoderToRad = 0.0;
 
         public static final int aimLeftMotorId = 9;
         public static final int aimRightMotorId = 10;
@@ -404,8 +412,8 @@ public final class Constants {
 
         public static final int aimEncoderPort = 0; // TODO: Change
 
-        public static final double aimAcceleration = 1;
-        public static final double aimCruiseVelocity = 1;
+        public static final double aimAcceleration = 10.0;
+        public static final double aimCruiseVelocity = 10.0;
 
         public static final double shooterAcceleration = 1;
         public static final double shooterJerk = 1;
@@ -425,6 +433,9 @@ public final class Constants {
         public static final double minAimIntake = 0.0;
 
         public static final double shooterOffsetAdjustment = 0.6;
+
+        public static final double maxElevatorPosition = 0.45;
+        public static final double maxAimAngleElevatorLimit = Math.PI / 2;
 
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters
