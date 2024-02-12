@@ -10,16 +10,16 @@ public class HoodIOSim implements HoodIO {
     private final SingleJointedArmSim sim =
             new SingleJointedArmSim(
                     DCMotor.getNeoVortex(1),
-                    0.1,
-                    SingleJointedArmSim.estimateMOI(0.1, 2),
-                    0.1,
+                    2.533,
+                    SingleJointedArmSim.estimateMOI(0.1778, 0.68),
+                    0.1778,
                     0.0,
                     Math.PI,
                     false,
                     0.0);
     private final PIDController controller =
             new PIDController(
-                    ScoringConstants.aimerkP, ScoringConstants.aimerkI, ScoringConstants.aimerkD);
+                    ScoringConstants.hoodkP, ScoringConstants.hoodkI, ScoringConstants.hoodkD);
 
     double goalAngleRad = 0.0;
     double appliedVolts = 0.0;
@@ -33,7 +33,9 @@ public class HoodIOSim implements HoodIO {
     public void updateInputs(HoodIOInputs inputs) {
         sim.update(Constants.loopTime);
 
-        appliedVolts = controller.calculate(sim.getAngleRads(), goalAngleRad);
+        appliedVolts =
+                controller.calculate(sim.getAngleRads(), goalAngleRad)
+                        + Math.signum(controller.getPositionError()) * ScoringConstants.hoodkFF;
         sim.setInputVoltage(appliedVolts);
 
         inputs.hoodAngleRad = sim.getAngleRads();

@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.robot.Constants.ScoringConstants;
 
 public class AimerIOTalon implements AimerIO {
-    // TODO: Tune this later
     private final TalonFX aimerLeft = new TalonFX(ScoringConstants.aimLeftMotorId);
     private final TalonFX aimerRight = new TalonFX(ScoringConstants.aimRightMotorId);
 

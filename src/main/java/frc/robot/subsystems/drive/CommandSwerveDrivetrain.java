@@ -39,6 +39,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private double vx, vy, omega = 0.0;
     private boolean fieldCentric = true;
 
+    private double alignError = 0.0;
+
     public enum AlignTarget {
         NONE,
         AMP,
@@ -231,6 +233,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             omega =
                     thetaController.calculate(
                             pose.getRotation().getDegrees(), desiredHeading.getDegrees());
+
+            alignError = thetaController.getPositionError();
+
             Logger.recordOutput("Drive/rotationError", thetaController.getPositionError());
         }
 
@@ -290,6 +295,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         double phi = (Math.PI / 2) - Math.acos(getRobotVelocity.get().getY() / noteVelocity);
 
         return angle.minus(new Rotation2d(phi));
+    }
+
+    public boolean isAligned() {
+        return Math.abs(alignError) < DriveConstants.alignToleranceRadians;
     }
 
     @Override

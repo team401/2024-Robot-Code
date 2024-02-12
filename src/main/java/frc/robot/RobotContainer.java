@@ -21,8 +21,8 @@ import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignState;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignTarget;
-import frc.robot.subsystems.endgame.EndgameSimIO;
-import frc.robot.subsystems.endgame.EndgameSparkMaxIO;
+import frc.robot.subsystems.endgame.EndgameIOSim;
+import frc.robot.subsystems.endgame.EndgameIOSparkFlex;
 import frc.robot.subsystems.endgame.EndgameSubsystem;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOSparkMax;
@@ -34,7 +34,7 @@ import frc.robot.subsystems.localization.VisionLocalizer;
 import frc.robot.subsystems.scoring.AimerIOSim;
 import frc.robot.subsystems.scoring.AimerIOTalon;
 import frc.robot.subsystems.scoring.HoodIOSim;
-import frc.robot.subsystems.scoring.HoodIOVortex;
+import frc.robot.subsystems.scoring.HoodIOSparkFlex;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringAction;
 import frc.robot.subsystems.scoring.ShooterIOSim;
@@ -66,80 +66,6 @@ public class RobotContainer {
         configureAutonomous();
     }
 
-    // spotless:off
-    private void configureBindings() {
-        if (FeatureFlags.runDrive) {
-            drivetrain.setDefaultCommand(
-                    new DriveWithJoysticks(
-                            drivetrain,
-                            () -> -controller.getLeftY(),
-                            () -> -controller.getLeftX(),
-                            () -> -controller.getRightX(),
-                            () -> controller.getHID().getPOV(),
-                            () -> true,
-                            () -> false,
-                            () -> controller.getHID().getLeftBumper()));
-                
-            controller.rightBumper()
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignState(AlignState.ALIGNING)))
-                .onFalse(new InstantCommand(
-                    () -> drivetrain.setAlignState(AlignState.MANUAL)));
-        }
-
-        if (FeatureFlags.runScoring) {
-            controller.a()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.INTAKE)))
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignState(AlignState.MANUAL)))
-                .onTrue(new InstantCommand(
-                    () -> intakeSubsystem.toggle()));
-
-            controller.b()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                         ScoringSubsystem.ScoringAction.AIM)))
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
-
-            controller.x()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.SHOOT)))
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)))
-                .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AIM)));
-
-            controller.y()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.ENDGAME)))
-                .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)));
-
-            controller.back()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AMP_AIM)))
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignTarget(AlignTarget.AMP)));
-
-            controller.start()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)))
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignState(AlignState.MANUAL)));
-        }
-    } // spotless:on
-
-    private void configureModes() {}
-
     public void configureSubsystems() {
         switch (Constants.currentMode) {
             case REAL:
@@ -148,13 +74,11 @@ public class RobotContainer {
                             new ScoringSubsystem(
                                     new ShooterIOTalon(),
                                     new AimerIOTalon(),
-                                    new HoodIOVortex(),
-                                    driveTelemetry::getFieldToRobot,
-                                    () ->
-                                            VecBuilder.fill(
-                                                    driveTelemetry.getVelocityX(),
-                                                    driveTelemetry.getVelocityY()),
-                                    this::getFieldToSpeaker);
+                                    new HoodIOSparkFlex());
+                }
+
+                if (FeatureFlags.runEndgame) {
+                    endgameSubsystem = new EndgameSubsystem(new EndgameIOSparkFlex());
                 }
 
                 if (FeatureFlags.runIntake) {
@@ -164,28 +88,20 @@ public class RobotContainer {
                 if (FeatureFlags.runVision) {
                     tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
                 }
-
-                if (FeatureFlags.runEndgame) {
-                    endgameSubsystem = new EndgameSubsystem(new EndgameSparkMaxIO());
-                }
                 break;
             case SIM:
                 if (FeatureFlags.runDrive) {
                     drivetrain.seedFieldRelative(DriveConstants.initialPose);
                 }
 
+                if (FeatureFlags.runEndgame) {
+                    endgameSubsystem = new EndgameSubsystem(new EndgameIOSim());
+                }
+
                 if (FeatureFlags.runScoring) {
                     scoringSubsystem =
                             new ScoringSubsystem(
-                                    new ShooterIOSim(),
-                                    new AimerIOSim(),
-                                    new HoodIOSim(),
-                                    driveTelemetry::getFieldToRobot,
-                                    () ->
-                                            VecBuilder.fill(
-                                                    driveTelemetry.getVelocityX(),
-                                                    driveTelemetry.getVelocityY()),
-                                    this::getFieldToSpeaker);
+                                    new ShooterIOSim(), new AimerIOSim(), new HoodIOSim());
                 }
 
                 if (FeatureFlags.simulateVision) {
@@ -200,10 +116,6 @@ public class RobotContainer {
                                     new VisionIOSim(
                                             Collections.emptyList(),
                                             driveTelemetry::getModuleStates));
-                }
-
-                if (FeatureFlags.runEndgame) {
-                    endgameSubsystem = new EndgameSubsystem(new EndgameSimIO());
                 }
 
                 if (FeatureFlags.runIntake) {
@@ -231,10 +143,113 @@ public class RobotContainer {
             }
         }
 
-        if (FeatureFlags.runIntake) {
-            intakeSubsystem.setScoringSupplier(scoringSubsystem::canIntake);
+        if (FeatureFlags.runScoring) {
+            if (FeatureFlags.runDrive) {
+                scoringSubsystem.setPoseSupplier(driveTelemetry::getFieldToRobot);
+
+                scoringSubsystem.setVelocitySupplier(
+                        () ->
+                                VecBuilder.fill(
+                                        driveTelemetry.getVelocityX(),
+                                        driveTelemetry.getVelocityY()));
+
+                scoringSubsystem.setSpeakerSupplier(this::getFieldToSpeaker);
+
+                scoringSubsystem.setDriveAllignedSupplier(() -> drivetrain.isAligned());
+            }
+            if (FeatureFlags.runEndgame) {
+                scoringSubsystem.setElevatorPositionSupplier(endgameSubsystem::getPosition);
+            }
+            if (FeatureFlags.runIntake) {
+                intakeSubsystem.setScoringSupplier(scoringSubsystem::canIntake);
+            }
         }
     }
+
+    // spotless:off
+    private void configureBindings() {
+        if (FeatureFlags.runDrive) {
+            drivetrain.setDefaultCommand(
+                    new DriveWithJoysticks(
+                            drivetrain,
+                            () -> -controller.getLeftY(),
+                            () -> -controller.getLeftX(),
+                            () -> -controller.getRightX(),
+                            () -> controller.getHID().getPOV(),
+                            () -> true,
+                            () -> false,
+                            () -> controller.getHID().getLeftBumper()));
+                
+            controller.rightBumper()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignState(AlignState.ALIGNING)))
+                .onFalse(new InstantCommand(
+                    () -> drivetrain.setAlignState(AlignState.MANUAL)));
+
+            controller.leftBumper()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.seedFieldRelative(new Pose2d(1, 1.5, new Rotation2d()))
+                ));
+
+            controller.b()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
+
+            controller.x()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
+
+            controller.back()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.AMP)));
+        }
+
+        if (FeatureFlags.runIntake) {
+            controller.a()
+                .onTrue(new InstantCommand(
+                        () -> intakeSubsystem.toggle()));
+        }
+
+        if (FeatureFlags.runScoring) {
+            controller.a()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.INTAKE)));
+
+            controller.b()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                         ScoringSubsystem.ScoringAction.AIM)));
+
+            controller.x()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.SHOOT)))
+                .onFalse(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.AIM)));
+
+            controller.y()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.ENDGAME)))
+                .onFalse(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.WAIT)));
+
+            controller.back()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.AMP_AIM)));
+
+            controller.start()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.WAIT)));
+        }
+    } // spotless:on
+
+    private void configureModes() {}
 
     public void enabledInit() {
         if (FeatureFlags.runScoring) {

@@ -36,8 +36,11 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private final Timer shootTimer = new Timer();
 
-    private final Supplier<Pose2d> poseSupplier;
-    private final Supplier<Vector<N2>> velocitySupplier;
+    private Supplier<Pose2d> poseSupplier = () -> new Pose2d();
+    private Supplier<Vector<N2>> velocitySupplier = () -> VecBuilder.fill(0.0, 0.0);
+    private Supplier<Translation2d> speakerSupplier = () -> new Translation2d(0, 0);
+    private Supplier<Double> elevatorPositionSupplier = () -> 0.0;
+    private Supplier<Boolean> driveAllignedSupplier = () -> true;
 
     private final InterpolateDouble shooterInterpolated;
     private final InterpolateDouble aimerInterpolated;
@@ -46,8 +49,6 @@ public class ScoringSubsystem extends SubsystemBase {
     private double shooterGoalVelocityRPMTuning = 0.0;
     private double aimerGoalAngleRadTuning = 0.0;
     private double kickerVoltsTuning = 0.0;
-
-    private final Supplier<Translation2d> speakerSupplier;
 
     private final Mechanism2d mechanism = new Mechanism2d(2.2, 2.0);
     private final MechanismRoot2d rootMechanism = mechanism.getRoot("scoring", 0.6, 0.3);
@@ -82,20 +83,10 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private ScoringAction action = ScoringAction.WAIT;
 
-    public ScoringSubsystem(
-            ShooterIO shooterIo,
-            AimerIO aimerIo,
-            HoodIO hoodIo,
-            Supplier<Pose2d> poseSupplier,
-            Supplier<Vector<N2>> velocitySupplier,
-            Supplier<Translation2d> speakerSupplier) {
+    public ScoringSubsystem(ShooterIO shooterIo, AimerIO aimerIo, HoodIO hoodIo) {
         this.shooterIo = shooterIo;
         this.aimerIo = aimerIo;
         this.hoodIo = hoodIo;
-
-        this.poseSupplier = poseSupplier;
-        this.velocitySupplier = velocitySupplier;
-        this.speakerSupplier = speakerSupplier;
 
         shooterInterpolated = new InterpolateDouble(ScoringConstants.getShooterMap());
 
@@ -183,7 +174,7 @@ public class ScoringSubsystem extends SubsystemBase {
     private void ampPrime() {
         shooterIo.setShooterVelocityRPM(ScoringConstants.shooterAmpVelocityRPM);
         aimerIo.setAimAngleRad(Math.PI / 2, true);
-        hoodIo.setHoodAngleRad(Math.PI / 2);
+        hoodIo.setHoodAngleRad(Math.PI);
 
         boolean shooterReady =
                 Math.abs(
@@ -196,7 +187,7 @@ public class ScoringSubsystem extends SubsystemBase {
         boolean hoodReady =
                 Math.abs(hoodInputs.hoodAngleRad - hoodInputs.hoodGoalAngleRad)
                         < ScoringConstants.hoodAngleMarginRadians; // TODO: Tune
-        boolean driveReady = true; // TODO: Add drive ready
+        boolean driveReady = driveAllignedSupplier.get();
         boolean notePresent = hasNote();
 
         boolean primeReady = shooterReady && aimReady && hoodReady && driveReady && notePresent;
@@ -303,9 +294,30 @@ public class ScoringSubsystem extends SubsystemBase {
         return aimerInputs.aimAngleRad > ScoringConstants.intakeAngleToleranceRadians;
     }
 
+    public void setPoseSupplier(Supplier<Pose2d> poseSupplier) {
+        this.poseSupplier = poseSupplier;
+    }
+
+    public void setVelocitySupplier(Supplier<Vector<N2>> velocitySupplier) {
+        this.velocitySupplier = velocitySupplier;
+    }
+
+    public void setSpeakerSupplier(Supplier<Translation2d> speakerSupplier) {
+        this.speakerSupplier = speakerSupplier;
+    }
+
+    public void setElevatorPositionSupplier(Supplier<Double> elevatorPositionSupplier) {
+        this.elevatorPositionSupplier = elevatorPositionSupplier;
+    }
+
+    public void setDriveAllignedSupplier(Supplier<Boolean> driveAllignedSupplier) {
+        this.driveAllignedSupplier = driveAllignedSupplier;
+    }
+
     @Override
     public void periodic() {
         if (state != ScoringState.TUNING
+                && action != ScoringAction.ENDGAME
                 && (FieldFinder.willIHitThis(
                                 poseSupplier.get().getX(),
                                 poseSupplier.get().getY(),
@@ -324,7 +336,17 @@ public class ScoringSubsystem extends SubsystemBase {
                                 FieldLocations.RED_STAGE))) {
             aimerIo.setAngleClampsRad(0, 0);
         } else {
-            aimerIo.setAngleClampsRad(0, ScoringConstants.aimMaxAngleRadians);
+            // Linear equation in point-slope form to calculate the arm's limit based on the
+            // elevator position
+            double maxElevatorPosition = ScoringConstants.maxElevatorPosition; // x-intercept
+            double maxAimAngle = ScoringConstants.maxAimAngleElevatorLimit; // y-intercept
+
+            double elevatorLimit =
+                    (maxAimAngle / maxElevatorPosition)
+                                    * (elevatorPositionSupplier.get() - maxElevatorPosition)
+                            + maxAimAngle;
+            aimerIo.setAngleClampsRad(
+                    Math.max(0.0, elevatorLimit), ScoringConstants.aimMaxAngleRadians);
         }
 
         aimerIo.controlAimAngleRad();
