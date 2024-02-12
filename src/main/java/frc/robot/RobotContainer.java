@@ -40,6 +40,7 @@ import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringAction;
 import frc.robot.subsystems.scoring.ShooterIOSim;
 import frc.robot.subsystems.scoring.ShooterIOTalon;
 import frc.robot.utils.FieldFinder;
+import frc.robot.utils.feedforward.TuneS;
 import java.util.Collections;
 import org.littletonrobotics.junction.Logger;
 
@@ -62,7 +63,6 @@ public class RobotContainer {
 
     public RobotContainer() {
         configureSubsystems();
-        configureBindings();
         configureModes();
         configureAutonomous();
     }
@@ -169,6 +169,9 @@ public class RobotContainer {
 
     // spotless:off
     private void configureBindings() {
+        // Resets bindings
+        controller = new CommandXboxController(2);
+        
         if (FeatureFlags.runDrive) {
             drivetrain.setDefaultCommand(
                     new DriveWithJoysticks(
@@ -255,7 +258,6 @@ public class RobotContainer {
 
         testModeChooser.addOption("Speaker Tuning", "tuning-speaker");
 
-
         testModeChooser.addOption("Aimer Tuning", "tuning-aimer");
         testModeChooser.addOption("Hood Tuning", "tuning-hood");
         testModeChooser.addOption("Shooter Tuning", "tuning-shooter");
@@ -273,7 +275,7 @@ public class RobotContainer {
     public void testInit() {
         // Resets bindings
         controller = new CommandXboxController(2);
-        
+
         // spotless:off
         switch (testModeChooser.getSelected()) {
             case "tuning":
@@ -288,6 +290,10 @@ public class RobotContainer {
                             () -> scoringSubsystem.setTuningKickerVolts(0)));
                 break;
             case "tuning-aimer":
+                scoringSubsystem.setAction(ScoringAction.TUNING);
+                
+                controller.a()
+                    .onTrue(new TuneS(scoringSubsystem, 0));
                 break;
             case "tuning-hood":
                 break;
@@ -298,6 +304,8 @@ public class RobotContainer {
         }
         // spotless:on
     }
+
+    public void testPeriodic() {}
 
     private Translation2d getFieldToSpeaker() {
         if (DriverStation.getAlliance().isEmpty()) {
@@ -393,5 +401,9 @@ public class RobotContainer {
                 "Wait Scoring",
                 new InstantCommand(
                         () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+    }
+
+    public void teleopInit() {
+        configureBindings();
     }
 }

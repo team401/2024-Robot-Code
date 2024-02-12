@@ -20,4 +20,6 @@ public interface AimerIO {
     public default void controlAimAngleRad() {}
 
     public default void setAngleClampsRad(double min, double max) {}
+
+    public default void setOverrideVolts(double volts) {}
 }

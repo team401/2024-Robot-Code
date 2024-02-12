@@ -1,5 +1,6 @@
 package frc.robot.subsystems.scoring;
 
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.Follower;
@@ -25,6 +26,9 @@ public class AimerIOTalon implements AimerIO {
     double minAngleClamp = 0.0;
     double maxAngleClamp = 0.0;
 
+    double lastPosition = 0.0;
+    double lastTime = Utils.getCurrentTimeSeconds();
+
     public AimerIOTalon() {
         aimerRight.setControl(new Follower(ScoringConstants.aimLeftMotorId, true));
 
@@ -48,6 +52,8 @@ public class AimerIOTalon implements AimerIO {
 
         aimerLeft.getConfigurator().apply(configs);
         aimerRight.getConfigurator().apply(configs);
+
+        encoder.setDistancePerRotation(2 * Math.PI);
     }
 
     @Override
@@ -71,9 +77,14 @@ public class AimerIOTalon implements AimerIO {
         aimerLeft.setControl(controller.withPosition(goalAngleRad));
 
         inputs.aimGoalAngleRad = goalAngleRad;
-        inputs.aimAngleRad = encoder.getAbsolutePosition() * 2 * Math.PI;
+        inputs.aimAngleRad = encoder.getAbsolutePosition();
 
-        inputs.aimVelocityRadPerSec = encoder.;
+        double currentTime = Utils.getCurrentTimeSeconds();
+        double diffTime = currentTime - lastTime;
+        lastTime = currentTime;
+
+        inputs.aimVelocityRadPerSec = (encoder.getAbsolutePosition() - lastPosition) / diffTime;
+        lastPosition = encoder.getAbsolutePosition();
 
         inputs.aimAppliedVolts = aimerLeft.getMotorVoltage().getValueAsDouble();
         inputs.aimCurrentAmps = aimerLeft.getSupplyCurrent().getValueAsDouble();

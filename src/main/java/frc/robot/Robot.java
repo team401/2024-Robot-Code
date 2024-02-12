@@ -110,7 +110,9 @@ public class Robot extends LoggedRobot {
     }
 
     @Override
-    public void testPeriodic() {}
+    public void testPeriodic() {
+        robotContainer.testPeriodic();
+    }
 
     @Override
     public void simulationInit() {}

@@ -20,7 +20,6 @@ import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
 import frc.robot.utils.Tunable;
-
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -66,7 +65,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         SHOOT,
         AMP_SHOOT,
         ENDGAME,
-        TUNING
+        TUNING,
+        OVERRIDE
     }
 
     public enum ScoringAction {
@@ -76,7 +76,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         AMP_AIM,
         SHOOT,
         ENDGAME,
-        TUNING
+        TUNING,
+        OVERRIDE
     }
 
     private ScoringState state = ScoringState.IDLE;
@@ -367,6 +368,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
             case TUNING:
                 tuning();
                 break;
+            case OVERRIDE:
+                break;
         }
     }
 
@@ -376,14 +379,14 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     @Override
     public double getPosition(int slot) {
-        switch(slot) {
-            // Aimer
+        switch (slot) {
+                // Aimer
             case 0:
                 return aimerInputs.aimAngleRad;
-            // Hood
+                // Hood
             case 1:
                 return hoodInputs.hoodAngleRad;
-            // Shooter
+                // Shooter
             case 2:
                 return shooterInputs.shooterLeftVelocityRPM;
         }
@@ -392,14 +395,14 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     @Override
     public double getVelocity(int slot) {
-        switch(slot) {
-            // Aimer
+        switch (slot) {
+                // Aimer
             case 0:
                 return aimerInputs.aimVelocityRadPerSec;
-            // Hood
+                // Hood
             case 1:
                 return hoodInputs.hoodVelocityRadPerSec;
-            // Shooter
+                // Shooter
             case 2:
                 return shooterInputs.shooterLeftVelocityRPM;
         }
@@ -408,44 +411,34 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     @Override
     public void setVolts(double volts, int slot) {
-        switch(slot) {
-            // Aimer
+        switch (slot) {
+                // Aimer
             case 0:
+                aimerIo.setOverrideVolts(volts);
                 break;
-            // Hood
+                // Hood
             case 1:
+                // hoodIo.setOverrideVolts(volts);
                 break;
-            // Shooter
+                // Shooter
             case 2:
+                // shooterIo.setOverrideVolts(volts);
                 break;
         }
     }
 
     @Override
     public void setPID(double p, double i, double d, int slot) {
-        switch(slot) {
-            // Aimer
+        switch (slot) {
+                // Aimer
             case 0:
                 break;
-            // Hood
+                // Hood
             case 1:
                 break;
-            // Shooter
+                // Shooter
             case 2:
                 break;
         }
     }
-
-
-    @Override
-    public double getPosition() { return 0.0; }
-
-    @Override
-    public double getVelocity() { return 0.0; }
-
-    @Override
-    public void setVolts(double volts) {}
-
-    @Override
-    public void setPID(double p, double i, double d) {}
 }

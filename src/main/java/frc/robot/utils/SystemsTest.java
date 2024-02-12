@@ -9,22 +9,29 @@ public class SystemsTest extends Command {
     private Tunable subsystem;
     private boolean inverted;
 
+    private int slot;
+
     private Timer timer;
 
     public SystemsTest(Tunable subsystem) {
-        this(subsystem, false);
+        this(subsystem, false, 0);
     }
 
     public SystemsTest(Tunable subsystem, boolean inverted) {
+        this(subsystem, inverted, 0);
+    }
+
+    public SystemsTest(Tunable subsystem, boolean inverted, int slot) {
         this.subsystem = subsystem;
         this.inverted = inverted;
+        this.slot = slot;
 
         timer = new Timer();
     }
 
     @Override
     public void initialize() {
-        subsystem.setVolts(inverted ? 0.5 : -0.5);
+        subsystem.setVolts(inverted ? 0.5 : -0.5, slot);
         timer.start();
     }
 
@@ -42,7 +49,7 @@ public class SystemsTest extends Command {
                             + subsystem.toString()
                             + " ***********************************");
             return true;
-        } else if (subsystem.getVel() > 0.1) {
+        } else if (subsystem.getVelocity(slot) > 0.1) {
             return true;
         }
         return false;

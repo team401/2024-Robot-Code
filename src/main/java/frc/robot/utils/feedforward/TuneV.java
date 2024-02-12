@@ -12,6 +12,8 @@ public class TuneV extends Command {
 
     private double volts;
 
+    private int slot;
+
     private ArrayList<Double> velocities;
 
     double startPosition; // TODO
@@ -21,9 +23,10 @@ public class TuneV extends Command {
     double average = 0;
     double vel = 0;
 
-    public TuneV(Tunable subsystem, double volts) {
+    public TuneV(Tunable subsystem, double volts, int slot) {
         this.subsystem = subsystem;
         this.volts = volts;
+        this.slot = slot;
         this.kS = SmartDashboard.getNumber("kS", 0);
         this.pastkV = SmartDashboard.getNumber("kV", 0);
 
@@ -33,15 +36,15 @@ public class TuneV extends Command {
     @Override
     public void initialize() {
         SmartDashboard.putBoolean("Ended", false);
-        subsystem.setVolts(volts);
+        subsystem.setVolts(volts, slot);
         velocities = new ArrayList<Double>();
     }
 
     @Override
     public void execute() {
-        vel = subsystem.getVel();
+        vel = subsystem.getVelocity(slot);
         SmartDashboard.putNumber("Velocity", vel);
-        if (Math.abs(subsystem.getPosition()) < 0.6) {
+        if (Math.abs(subsystem.getPosition(slot)) < 0.6) {
             velocities.add(vel);
         }
     }
@@ -49,7 +52,7 @@ public class TuneV extends Command {
     @Override
     public void end(boolean interrupted) {
         SmartDashboard.putBoolean("Ended", true);
-        subsystem.stop();
+        subsystem.setVolts(0.0, slot);
 
         for (double v : velocities) {
             average += v;
@@ -62,6 +65,6 @@ public class TuneV extends Command {
 
     @Override
     public boolean isFinished() {
-        return Math.abs(subsystem.getPosition()) > 1;
+        return Math.abs(subsystem.getPosition(slot)) > 1;
     }
 }
