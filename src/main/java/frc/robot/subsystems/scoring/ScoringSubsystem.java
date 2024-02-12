@@ -1,8 +1,10 @@
 package frc.robot.subsystems.scoring;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N2;
@@ -17,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
+import frc.robot.utils.GeomUtil;
 import frc.robot.utils.InterpolateDouble;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -113,6 +116,8 @@ public class ScoringSubsystem extends SubsystemBase {
         shooterIo.setKickerVolts(0);
         hoodIo.setHoodAngleRad(0);
 
+        // findVelocityToGoal();
+
         Logger.recordOutput("scoring/aimGoal", 0.0);
 
         if (!hasNote() && action == ScoringAction.INTAKE) {
@@ -145,6 +150,9 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private void prime() {
         double distancetoGoal = findDistanceToGoal();
+        // Calculate velocity to goal.
+        // Value is unused right now, as we are just logging it out to check if the value is sane.
+        findVelocityToGoal();
         Logger.recordOutput("scoring/aimGoal", aimerInterpolated.getValue(distancetoGoal));
         shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
         aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal), false);
@@ -256,15 +264,34 @@ public class ScoringSubsystem extends SubsystemBase {
     }
 
     private double findVelocityToGoal() {
-        Translation2d speakerPose = speakerSupplier.get();
+        Pose2d speakerPose = GeomUtil.translationToPose(speakerSupplier.get());
         Pose2d robotPose = poseSupplier.get();
-        double dx = robotPose.getX() - speakerPose.getX();
-        double dy = robotPose.getY() - speakerPose.getY();
+        Vector<N2> robotVelocity = velocitySupplier.get();
 
-        double velocityToGoal =
-                (dx * velocitySupplier.get().get(0, 0) + dy * velocitySupplier.get().get(0, 1))
-                        / (Math.sqrt(
-                                Math.pow(dx, 2) + Math.pow(dy, 2)));
+        // Calculate the velocity to the goal based on this formula
+        // https://web.ma.utexas.edu/users/m408m/Display12-3-4.shtml
+
+        // Vector from robot to speaker (translate speaker so that robot is now 0, 0)
+        Pose2d robotToSpeaker = GeomUtil.transformToPose(speakerPose.minus(robotPose));
+        // Convert it to a vector so we can take norm of it later
+        Vector<N2> robotToSpeakerVec = VecBuilder.fill(robotToSpeaker.getX(), robotToSpeaker.getY());
+
+        // Get the angle of the vector from robot to speaker
+        Rotation2d speakerAngle =
+                Rotation2d.fromRadians(Math.atan2(robotToSpeaker.getY(), robotToSpeaker.getX()));
+
+        // Get the angle of the velocity vector of the robot
+        Rotation2d velocityAngle =
+                Rotation2d.fromRadians(
+                        Math.atan2(robotVelocity.get(1, 0), robotVelocity.get(0, 0)));
+
+        // Calculate theta, the angle between the speakerAngle and the current velocity angle
+        Rotation2d theta = velocityAngle.minus(speakerAngle);
+        // Project the velocity vector onto the speaker vector with ||u|| * cos(theta)
+        // Where u is the vector toward the goal
+        double velocityToGoal = robotToSpeakerVec.norm() * theta.getCos();
+
+        Logger.recordOutput("scoring/velocityToGoal", velocityToGoal);
         return velocityToGoal;
     }
 
