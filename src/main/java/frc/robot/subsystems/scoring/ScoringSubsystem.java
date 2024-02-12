@@ -299,8 +299,8 @@ public class ScoringSubsystem extends SubsystemBase {
         } else {
             // Linear equation in point-slope form to calculate the arm's limit based on the
             // elevator position
-            double maxElevatorPosition = 0.45; // x-intercept
-            double maxAimAngle = Math.PI / 2; // y-intercept
+            double maxElevatorPosition = ScoringConstants.maxElevatorPosition; // x-intercept
+            double maxAimAngle = ScoringConstants.maxAimAngleElevatorLimit; // y-intercept
 
             double elevatorLimit =
                     (maxAimAngle / maxElevatorPosition)

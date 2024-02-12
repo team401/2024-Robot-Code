@@ -434,6 +434,9 @@ public final class Constants {
 
         public static final double shooterOffsetAdjustment = 0.6;
 
+        public static final double maxElevatorPosition = 0.45;
+        public static final double maxAimAngleElevatorLimit = Math.PI / 2;
+
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters
         // Value - Aimer angle in radians
