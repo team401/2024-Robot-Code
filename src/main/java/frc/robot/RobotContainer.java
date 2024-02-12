@@ -85,31 +85,46 @@ public class RobotContainer {
                     () -> drivetrain.setAlignState(AlignState.ALIGNING)))
                 .onFalse(new InstantCommand(
                     () -> drivetrain.setAlignState(AlignState.MANUAL)));
+
+            controller.leftBumper()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.seedFieldRelative(new Pose2d(1, 1.5, new Rotation2d()))
+                ));
+
+            controller.b()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
+
+            controller.x()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
+
+            controller.back()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.AMP)));
+        }
+
+        if (FeatureFlags.runIntake) {
+            controller.a()
+                .onTrue(new InstantCommand(
+                        () -> intakeSubsystem.toggle()));
         }
 
         if (FeatureFlags.runScoring) {
             controller.a()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.INTAKE)))
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignState(AlignState.MANUAL)))
-                .onTrue(new InstantCommand(
-                    () -> intakeSubsystem.toggle()));
+                        ScoringSubsystem.ScoringAction.INTAKE)));
 
             controller.b()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
-                         ScoringSubsystem.ScoringAction.AIM)))
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
+                         ScoringSubsystem.ScoringAction.AIM)));
 
             controller.x()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.SHOOT)))
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)))
                 .onFalse(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.AIM)));
@@ -125,16 +140,12 @@ public class RobotContainer {
             controller.back()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AMP_AIM)))
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignTarget(AlignTarget.AMP)));
+                        ScoringSubsystem.ScoringAction.AMP_AIM)));
 
             controller.start()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)))
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignState(AlignState.MANUAL)));
+                        ScoringSubsystem.ScoringAction.WAIT)));
         }
     } // spotless:on
 
@@ -233,7 +244,9 @@ public class RobotContainer {
             }
         }
 
-        if (FeatureFlags.runIntake) {
+        if (FeatureFlags.runScoring) {}
+
+        if (FeatureFlags.runIntake && FeatureFlags.runScoring) {
             intakeSubsystem.setScoringSupplier(scoringSubsystem::canIntake);
         }
     }
