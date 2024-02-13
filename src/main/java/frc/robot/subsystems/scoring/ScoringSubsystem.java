@@ -106,15 +106,7 @@ public class ScoringSubsystem extends SubsystemBase {
         shooterIo.setKickerVolts(0);
         hoodIo.setHoodAngleRad(0);
 
-        // Function used to debug a portion of velocityToGoal
-        // TODO: remove fVTPTest
-        Logger.recordOutput(
-                "scoring/fVTPTest",
-                GeomUtil.fVTPTest(
-                        velocitySupplier.get(),
-                        GeomUtil.poseToTranslation(poseSupplier.get()),
-                        speakerSupplier.get()));
-
+        // TODO: Use actual data from findVelocityTowardPoint to adjust RPM, instead of just logging
         Logger.recordOutput(
                 "scoring/velocityToGoal",
                 GeomUtil.findVelocityTowardPoint(

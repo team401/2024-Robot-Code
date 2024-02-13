@@ -155,35 +155,6 @@ public class GeomUtil {
         return new Translation2d(translation.getX(), translation.getZ());
     }
 
-    // TODO: remove fVTPTest (temp function to debug findVelocityTowardPoint)
-    public static double fVTPTest(
-            Vector<N2> velocity,
-            Translation2d currentTranslation,
-            Translation2d targetTranslation) {
-
-        // Vector from current to target (translate target so that current is now 0, 0)
-        Translation2d currentToTarget = targetTranslation.minus(currentTranslation);
-        // Convert it to a vector so we can take norm of it later
-        Vector<N2> currentToTargetVec =
-                VecBuilder.fill(currentToTarget.getX(), currentToTarget.getY());
-
-        // Get the angle of the vector from robot to speaker
-        Rotation2d speakerAngle =
-                Rotation2d.fromRadians(Math.atan2(currentToTarget.getY(), currentToTarget.getX()));
-
-        // Get the angle of the velocity vector of the robot
-        Rotation2d velocityAngle =
-                Rotation2d.fromRadians(Math.atan2(velocity.get(1, 0), velocity.get(0, 0)));
-
-        // Calculate theta, the angle between the speakerAngle and the current velocity angle
-        Rotation2d theta = velocityAngle.minus(speakerAngle);
-        // Project the velocity vector onto the speaker vector with ||u|| * cos(theta)
-        // Where u is the vector toward the goal
-        double velocityToGoal = currentToTargetVec.norm() * theta.getCos();
-
-        return velocityAngle.getDegrees();
-    }
-
     public static double findVelocityTowardPoint(
             Vector<N2> velocity,
             Translation2d currentTranslation,
@@ -193,9 +164,6 @@ public class GeomUtil {
 
         // Vector from current to target (translate target so that current is now 0, 0)
         Translation2d currentToTarget = targetTranslation.minus(currentTranslation);
-        // Convert it to a vector so we can take norm of it later
-        Vector<N2> currentToTargetVec =
-                VecBuilder.fill(currentToTarget.getX(), currentToTarget.getY());
 
         // Get the angle of the vector from current to target
         Rotation2d targetAngle =
@@ -208,8 +176,8 @@ public class GeomUtil {
         // Calculate theta, the angle between the speakerAngle and the current velocity angle
         Rotation2d theta = velocityAngle.minus(targetAngle);
         // Project the velocity vector onto the speaker vector with ||u|| * cos(theta)
-        // Where u is the vector toward the goal
-        double velocityToGoal = currentToTargetVec.norm() * theta.getCos();
+        // Where u is the velocity vector
+        double velocityToGoal = velocity.norm() * theta.getCos();
 
         return velocityToGoal;
     }
