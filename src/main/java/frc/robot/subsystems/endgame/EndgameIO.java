@@ -13,6 +13,7 @@ public interface EndgameIO {
         public double endgameRightCurrentAmps = 0.0;
 
         public double position = 0.0;
+        public double velocity = 0.0;
     }
 
     public default void updateInputs(EndgameIOInputs inputs) {}

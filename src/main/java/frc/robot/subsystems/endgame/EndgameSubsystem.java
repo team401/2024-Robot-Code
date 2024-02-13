@@ -3,17 +3,29 @@ package frc.robot.subsystems.endgame;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utils.Tunable;
+
 import org.littletonrobotics.junction.Logger;
 
-public class EndgameSubsystem extends SubsystemBase {
+public class EndgameSubsystem extends SubsystemBase implements Tunable {
     private final EndgameIO endgameIo;
     private final EndgameIOInputsAutoLogged endgameInputs = new EndgameIOInputsAutoLogged();
+
+    private double overrideVolts = 0.0;
 
     public enum EndgameAction {
         GO_UP,
         GO_DOWN,
-        CANCEL
+        CANCEL,
+        OVERRIDE
     }
+
+    private enum State {
+        OVERRIDE,
+        NORMAL
+    }
+
+    private State state = State.NORMAL;
 
     public EndgameSubsystem(EndgameIO endgameIO) {
         this.endgameIo = endgameIO;
@@ -23,17 +35,22 @@ public class EndgameSubsystem extends SubsystemBase {
         switch (action) {
             case GO_UP:
                 endgameIo.setVolts(4.0);
-                Logger.recordOutput("endgame/State", action);
+                state = State.NORMAL;
                 break;
             case GO_DOWN:
                 endgameIo.setVolts(-4.0);
-                Logger.recordOutput("endgame/State", action);
+                state = State.NORMAL;
                 break;
             case CANCEL:
                 endgameIo.setVolts(0.0);
-                Logger.recordOutput("endgame/State", action);
+                state = State.NORMAL;
+                break;
+            case OVERRIDE:
+                state = State.OVERRIDE;
                 break;
         }
+
+        Logger.recordOutput("endgame/Action", action);
     }
 
     public double getPosition() {
@@ -43,9 +60,35 @@ public class EndgameSubsystem extends SubsystemBase {
     public void home() {}
 
     @Override
+    public double getPosition(int slot) {
+        return endgameInputs.position;
+    }
+
+    @Override
+    public double getVelocity(int slot) {
+        return endgameInputs.velocity;
+    }
+
+    @Override
+    public void setVolts(double volts, int slot) {
+        overrideVolts = volts;
+    }
+
+    @Override
+    public void setPID(double p, double i, double d, int slot) {
+        throw new UnsupportedOperationException("Unimplemented method 'setPID'");
+    }
+
+    @Override
     public void periodic() {
         endgameIo.updateInputs(endgameInputs);
         Logger.processInputs("endgame", endgameInputs);
+
+        Logger.recordOutput("endgame/State", state);
+
+        if (state == State.OVERRIDE) {
+            endgameIo.setVolts(overrideVolts);
+        }
 
         Logger.recordOutput(
                 "endgame/Elevator3d",
