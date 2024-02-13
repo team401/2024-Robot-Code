@@ -7,7 +7,6 @@ package frc.robot.utils;
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -155,6 +154,14 @@ public class GeomUtil {
         return new Translation2d(translation.getX(), translation.getZ());
     }
 
+    /**
+     * Find the velocity of an object toward a target point
+     *
+     * @param velocity The velocity of the object
+     * @param currentTranslation The current position of the object
+     * @param targetTranslation The position of the target point
+     * @return The velocity toward the target point (a negative number if object is moving away)
+     */
     public static double findVelocityTowardPoint(
             Vector<N2> velocity,
             Translation2d currentTranslation,
