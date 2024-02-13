@@ -56,13 +56,13 @@
     "axes": [
         {   "command": "xDrive",
             "controller": 0,
-            "axis": "xAxis",
+            "axis": "yAxis",
             "negate": true
         },
         {
             "command": "yDrive",
             "controller": 0,
-            "axis": "yAxis",
+            "axis": "xAxis",
             "negate": true
         },
         {
