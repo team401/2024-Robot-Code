@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
+import frc.robot.utils.GeomUtil;
 import frc.robot.utils.InterpolateDouble;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -108,6 +109,14 @@ public class ScoringSubsystem extends SubsystemBase {
         shooterIo.setKickerVolts(0);
         hoodIo.setHoodAngleRad(0);
 
+        // TODO: Use actual data from findVelocityTowardPoint to adjust RPM, instead of just logging
+        Logger.recordOutput(
+                "scoring/velocityToGoal",
+                GeomUtil.findVelocityTowardPoint(
+                        velocitySupplier.get(),
+                        GeomUtil.poseToTranslation(poseSupplier.get()),
+                        speakerSupplier.get()));
+
         Logger.recordOutput("scoring/aimGoal", 0.0);
 
         if (!hasNote() && action == ScoringAction.INTAKE) {
@@ -140,6 +149,7 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private void prime() {
         double distancetoGoal = findDistanceToGoal();
+
         Logger.recordOutput("scoring/aimGoal", aimerInterpolated.getValue(distancetoGoal));
         shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
         aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal), false);
