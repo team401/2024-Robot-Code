@@ -21,6 +21,8 @@ public class HoodIOSim implements HoodIO {
             new PIDController(
                     ScoringConstants.hoodkP, ScoringConstants.hoodkI, ScoringConstants.hoodkD);
 
+    private boolean override = false;
+
     double goalAngleRad = 0.0;
     double appliedVolts = 0.0;
 
@@ -30,12 +32,25 @@ public class HoodIOSim implements HoodIO {
     }
 
     @Override
+    public void setOverrideMode(boolean override) {
+        this.override = override;
+    }
+
+    @Override
+    public void setOverrideVolts(double volts) {
+        appliedVolts = volts;
+    }
+
+    @Override
     public void updateInputs(HoodIOInputs inputs) {
         sim.update(Constants.loopTime);
 
-        appliedVolts =
-                controller.calculate(sim.getAngleRads(), goalAngleRad)
-                        + Math.signum(controller.getPositionError()) * ScoringConstants.hoodkFF;
+        if (!override) {
+            appliedVolts =
+                    controller.calculate(sim.getAngleRads(), goalAngleRad)
+                            + Math.signum(controller.getPositionError()) * ScoringConstants.hoodkFF;
+        }
+
         sim.setInputVoltage(appliedVolts);
 
         inputs.hoodAngleRad = sim.getAngleRads();

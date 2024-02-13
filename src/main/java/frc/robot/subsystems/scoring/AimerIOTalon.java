@@ -21,6 +21,9 @@ public class AimerIOTalon implements AimerIO {
 
     private final DutyCycleEncoder encoder = new DutyCycleEncoder(ScoringConstants.aimEncoderPort);
 
+    private boolean override = false;
+    private double overrideVolts = 0.0;
+
     double goalAngleRad = 0.0;
 
     double minAngleClamp = 0.0;
@@ -73,8 +76,22 @@ public class AimerIOTalon implements AimerIO {
     }
 
     @Override
+    public void setOverrideMode(boolean override) {
+        this.override = override;
+    }
+
+    @Override
+    public void setOverrideVolts(double volts) {
+        overrideVolts = volts;
+    }
+
+    @Override
     public void updateInputs(AimerIOInputs inputs) {
-        aimerLeft.setControl(controller.withPosition(goalAngleRad));
+        if (override) {
+            aimerLeft.setVoltage(overrideVolts);
+        } else {
+            aimerLeft.setControl(controller.withPosition(goalAngleRad));
+        }
 
         inputs.aimGoalAngleRad = goalAngleRad;
         inputs.aimAngleRad = encoder.getAbsolutePosition();

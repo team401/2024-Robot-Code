@@ -8,6 +8,10 @@ public class HoodIOSparkFlex implements HoodIO {
     private final CANSparkFlex hoodMotor =
             new CANSparkFlex(ScoringConstants.hoodId, CANSparkFlex.MotorType.kBrushless);
 
+    private boolean override = false;
+
+    double overrideVolts = 0.0;
+
     double goalAngleRad = 0.0;
 
     public HoodIOSparkFlex() {
@@ -22,9 +26,8 @@ public class HoodIOSparkFlex implements HoodIO {
         hoodMotor.getEncoder().setPositionConversionFactor(ScoringConstants.hoodEncoderToRad);
 
         hoodMotor.setIdleMode(CANSparkFlex.IdleMode.kBrake);
-        // TODO: Get position later
-        // hoodMotor.getEncoder().setPositionConversionFactor();
-        // hoodMotor.getEncoder().setVelocityConversionFactor();
+        hoodMotor.getEncoder().setPositionConversionFactor(15 / 38 * 2 * Math.PI);
+        hoodMotor.getEncoder().setVelocityConversionFactor(15 / 38 * 2 * Math.PI);
     }
 
     @Override
@@ -33,8 +36,22 @@ public class HoodIOSparkFlex implements HoodIO {
     }
 
     @Override
+    public void setOverrideMode(boolean override) {
+        this.override = override;
+    }
+
+    @Override
+    public void setOverrideVolts(double volts) {
+        overrideVolts = volts;
+    }
+
+    @Override
     public void updateInputs(HoodIOInputs inputs) {
-        hoodMotor.getPIDController().setReference(goalAngleRad, ControlType.kPosition);
+        if (override) {
+            hoodMotor.setVoltage(overrideVolts);
+        } else {
+            hoodMotor.getPIDController().setReference(goalAngleRad, ControlType.kPosition);
+        }
 
         inputs.hoodAngleRad = hoodMotor.getEncoder().getPosition();
         inputs.hoodGoalAngleRad = goalAngleRad;

@@ -49,7 +49,7 @@ public class SystemsTest extends Command {
                             + subsystem.toString()
                             + " ***********************************");
             return true;
-        } else if (subsystem.getVelocity(slot) > 0.1) {
+        } else if (Math.abs(subsystem.getVelocity(slot)) > 0.1) {
             return true;
         }
         return false;

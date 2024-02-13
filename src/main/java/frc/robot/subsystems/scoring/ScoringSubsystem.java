@@ -123,6 +123,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
             state = ScoringState.TUNING;
             SmartDashboard.putNumber("Tuning/AimerGoal", aimerGoalAngleRadTuning);
             SmartDashboard.putNumber("Tuning/ShooterGoal", shooterGoalVelocityRPMTuning);
+        } else if (action == ScoringAction.OVERRIDE) {
+            state = ScoringState.OVERRIDE;
         }
     }
 
@@ -227,8 +229,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private void tuning() {
-        shooterGoalVelocityRPMTuning = SmartDashboard.getNumber("Tuning/ShooterGoal", 0.0);
-        aimerGoalAngleRadTuning = SmartDashboard.getNumber("Tuning/AimerGoal", 0.0);
+        shooterGoalVelocityRPMTuning = SmartDashboard.getNumber("tuning/ShooterGoal", 0.0);
+        aimerGoalAngleRadTuning = SmartDashboard.getNumber("tuning/AimerGoal", 0.0);
         shooterIo.setShooterVelocityRPM(shooterGoalVelocityRPMTuning);
         aimerIo.setAimAngleRad(aimerGoalAngleRadTuning, false);
         hoodIo.setHoodAngleRad(0.0);
@@ -236,6 +238,20 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
         if (action != ScoringAction.TUNING) {
             state = ScoringState.IDLE;
+        }
+    }
+
+    private void override() {
+        aimerIo.setOverrideMode(true);
+        hoodIo.setOverrideMode(true);
+        shooterIo.setOverrideMode(true);
+
+        if (action != ScoringAction.OVERRIDE) {
+            state = ScoringState.IDLE;
+
+            aimerIo.setOverrideMode(false);
+            hoodIo.setOverrideMode(false);
+            shooterIo.setOverrideMode(false);
         }
     }
 
@@ -369,6 +385,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                 tuning();
                 break;
             case OVERRIDE:
+                override();
                 break;
         }
     }
@@ -418,11 +435,11 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                 break;
                 // Hood
             case 1:
-                // hoodIo.setOverrideVolts(volts);
+                hoodIo.setOverrideVolts(volts);
                 break;
                 // Shooter
             case 2:
-                // shooterIo.setOverrideVolts(volts);
+                shooterIo.setOverrideVolts(volts);
                 break;
         }
     }

@@ -16,4 +16,8 @@ public interface HoodIO {
     public default void updateInputs(HoodIOInputs inputs) {}
 
     public default void setHoodAngleRad(double angle) {}
+
+    public default void setOverrideMode(boolean override) {}
+
+    public default void setOverrideVolts(double volts) {}
 }

@@ -26,4 +26,8 @@ public interface ShooterIO {
     public default void setShooterVelocityRPM(double velocity) {}
 
     public default void setKickerVolts(double volts) {}
+
+    public default void setOverrideMode(boolean override) {}
+
+    public default void setOverrideVolts(double volts) {}
 }

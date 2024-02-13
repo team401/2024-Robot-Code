@@ -24,6 +24,9 @@ public class ShooterIOTalon implements ShooterIO {
 
     DigitalInput bannerSensor = new DigitalInput(Constants.SensorConstants.bannerPort);
 
+    private boolean override = false;
+    private double overrideVolts = 0.0;
+
     double goalLeftVelocityRPM = 0.0;
     double goalRightVelocityRPM = 0.0;
 
@@ -63,9 +66,24 @@ public class ShooterIOTalon implements ShooterIO {
     }
 
     @Override
+    public void setOverrideMode(boolean override) {
+        this.override = override;
+    }
+
+    @Override
+    public void setOverrideVolts(double volts) {
+        overrideVolts = volts;
+    }
+
+    @Override
     public void updateInputs(ShooterIOInputs inputs) {
-        shooterLeft.setControl(leftController.withVelocity(goalLeftVelocityRPM));
-        shooterRight.setControl(rightController.withVelocity(goalRightVelocityRPM));
+        if (override) {
+            shooterLeft.setVoltage(overrideVolts);
+            shooterRight.setVoltage(overrideVolts);
+        } else {
+            shooterLeft.setControl(leftController.withVelocity(goalLeftVelocityRPM));
+            shooterRight.setControl(rightController.withVelocity(goalRightVelocityRPM));
+        }
 
         inputs.shooterLeftVelocityRPM =
                 shooterLeft.getVelocity().getValueAsDouble()
