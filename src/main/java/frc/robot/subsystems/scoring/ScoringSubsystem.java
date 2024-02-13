@@ -121,8 +121,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
             // state = ScoringState.ENDGAME; TODO: Later
         } else if (action == ScoringAction.TUNING) {
             state = ScoringState.TUNING;
-            SmartDashboard.putNumber("Tuning/AimerGoal", aimerGoalAngleRadTuning);
-            SmartDashboard.putNumber("Tuning/ShooterGoal", shooterGoalVelocityRPMTuning);
+            SmartDashboard.putNumber("Test-Mode/AimerGoal", aimerGoalAngleRadTuning);
+            SmartDashboard.putNumber("Test-Mode/ShooterGoal", shooterGoalVelocityRPMTuning);
         } else if (action == ScoringAction.OVERRIDE) {
             state = ScoringState.OVERRIDE;
         }
@@ -229,8 +229,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private void tuning() {
-        shooterGoalVelocityRPMTuning = SmartDashboard.getNumber("tuning/ShooterGoal", 0.0);
-        aimerGoalAngleRadTuning = SmartDashboard.getNumber("tuning/AimerGoal", 0.0);
+        shooterGoalVelocityRPMTuning = SmartDashboard.getNumber("Test-Mode/ShooterGoal", 0.0);
+        aimerGoalAngleRadTuning = SmartDashboard.getNumber("Test-Mode/AimerGoal", 0.0);
         shooterIo.setShooterVelocityRPM(shooterGoalVelocityRPMTuning);
         aimerIo.setAimAngleRad(aimerGoalAngleRadTuning, false);
         hoodIo.setHoodAngleRad(0.0);
@@ -422,6 +422,22 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                 // Shooter
             case 2:
                 return shooterInputs.shooterLeftVelocityRPM;
+        }
+        return 0.0;
+    }
+
+    @Override
+    public double getConversionFactor(int slot) {
+        switch (slot) {
+                // Aimer
+            case 0:
+                return 1.0 / (2 * Math.PI);
+                // Hood
+            case 1:
+                return 1.0 / (2 * Math.PI);
+                // Shooter
+            case 2:
+                return 1.0;
         }
         return 0.0;
     }

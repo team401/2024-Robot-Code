@@ -13,6 +13,7 @@ public class TuneV extends Command {
     private double volts;
 
     private int slot;
+    private double conversionFactor;
 
     private ArrayList<Double> velocities;
 
@@ -27,15 +28,17 @@ public class TuneV extends Command {
         this.subsystem = subsystem;
         this.volts = volts;
         this.slot = slot;
-        this.kS = SmartDashboard.getNumber("kS", 0);
-        this.pastkV = SmartDashboard.getNumber("kV", 0);
+        this.kS = SmartDashboard.getNumber("Test-Mode/kS", 0);
+        this.pastkV = SmartDashboard.getNumber("Test-Mode/kV", 0);
+
+        this.conversionFactor = subsystem.getConversionFactor(slot);
 
         // this.withTimeout(5); TODO: Maybe add?
     }
 
     @Override
     public void initialize() {
-        SmartDashboard.putBoolean("Ended", false);
+        SmartDashboard.putBoolean("Test-Mode/Ended", false);
         subsystem.setVolts(volts, slot);
         velocities = new ArrayList<Double>();
     }
@@ -43,15 +46,15 @@ public class TuneV extends Command {
     @Override
     public void execute() {
         vel = subsystem.getVelocity(slot);
-        SmartDashboard.putNumber("Velocity", vel);
-        if (Math.abs(subsystem.getPosition(slot)) < 0.6) {
+        SmartDashboard.putNumber("Test-Mode/Velocity", vel);
+        if (Math.abs(subsystem.getPosition(slot)) < 0.6 * conversionFactor) {
             velocities.add(vel);
         }
     }
 
     @Override
     public void end(boolean interrupted) {
-        SmartDashboard.putBoolean("Ended", true);
+        SmartDashboard.putBoolean("Test-Mode/Ended", true);
         subsystem.setVolts(0.0, slot);
 
         for (double v : velocities) {
@@ -60,11 +63,11 @@ public class TuneV extends Command {
 
         average /= velocities.size();
 
-        SmartDashboard.putNumber("kV", ((volts - kS) / average) + pastkV);
+        SmartDashboard.putNumber("Test-Mode/kV", ((volts - kS) / average) + pastkV);
     }
 
     @Override
     public boolean isFinished() {
-        return Math.abs(subsystem.getPosition(slot)) > 1;
+        return Math.abs(subsystem.getPosition(slot)) > 1 * conversionFactor;
     }
 }

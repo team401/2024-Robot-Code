@@ -37,11 +37,11 @@ public class TuneS extends Command {
     @Override
     public void end(boolean interrupted) {
         subsystem.setVolts(0.0, slot);
-        SmartDashboard.putNumber("kS", appliedVolts);
+        SmartDashboard.putNumber("Test-Mode/kS", appliedVolts);
     }
 
     @Override
     public boolean isFinished() {
-        return subsystem.getVelocity(slot) > 0.1;
+        return subsystem.getVelocity(slot) > 0.01;
     }
 }

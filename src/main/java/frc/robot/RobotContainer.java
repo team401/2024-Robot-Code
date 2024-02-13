@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FeatureFlags;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveWithJoysticks;
@@ -40,7 +41,9 @@ import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringAction;
 import frc.robot.subsystems.scoring.ShooterIOSim;
 import frc.robot.subsystems.scoring.ShooterIOTalon;
 import frc.robot.utils.FieldFinder;
+import frc.robot.utils.feedforward.TuneG;
 import frc.robot.utils.feedforward.TuneS;
+import frc.robot.utils.feedforward.TuneV;
 import java.util.Collections;
 import org.littletonrobotics.junction.Logger;
 
@@ -256,7 +259,7 @@ public class RobotContainer {
     private void configureModes() {
         testModeChooser.setDefaultOption("Blank", "tuning");
 
-        testModeChooser.addOption("Speaker Tuning", "tuning-speaker");
+        testModeChooser.addOption("Speaker Tuning", "calculate-speaker");
 
         testModeChooser.addOption("Aimer Tuning", "tuning-aimer");
         testModeChooser.addOption("Hood Tuning", "tuning-hood");
@@ -270,6 +273,9 @@ public class RobotContainer {
         if (FeatureFlags.runScoring) {
             scoringSubsystem.setAction(ScoringAction.WAIT);
         }
+        if (FeatureFlags.runEndgame) {
+            endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.CANCEL);
+        }
     }
 
     public void testInit() {
@@ -280,7 +286,7 @@ public class RobotContainer {
         switch (testModeChooser.getSelected()) {
             case "tuning":
                 break;
-            case "tuning-speaker":
+            case "calculate-speaker":
                 drivetrain.seedFieldRelative();
                 scoringSubsystem.setAction(ScoringAction.TUNING);
                 controller.leftBumper()
@@ -290,16 +296,119 @@ public class RobotContainer {
                             () -> scoringSubsystem.setTuningKickerVolts(0)));
                 break;
             case "tuning-aimer":
-                scoringSubsystem.setAction(ScoringAction.TUNING);
-                
+                SmartDashboard.putNumber("Test-Mode/aimer/kP", ScoringConstants.aimerkP);
+                SmartDashboard.putNumber("Test-Mode/aimer/kI", ScoringConstants.aimerkI);
+                SmartDashboard.putNumber("Test-Mode/aimer/kD", ScoringConstants.aimerkD);
+
+                scoringSubsystem.setAction(ScoringAction.OVERRIDE);
+
                 controller.a()
                     .onTrue(new TuneS(scoringSubsystem, 0));
+
+                controller.b()
+                    .onTrue(new TuneG(scoringSubsystem, 0));
+
+                controller.x()
+                    .onTrue(new TuneV(scoringSubsystem, 1.0, 0));
+
+                controller.y()
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setPID(
+                        SmartDashboard.getNumber("Test-Mode/aimer/kP", ScoringConstants.aimerkP),
+                        SmartDashboard.getNumber("Test-Mode/aimer/kI", ScoringConstants.aimerkI),
+                        SmartDashboard.getNumber("Test-Mode/aimer/kD", ScoringConstants.aimerkD), 0)));
+
+                controller.leftBumper()
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(1.0, 0)))
+                    .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 0)));
+
+                controller.rightBumper()
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(-1.0, 0)))
+                    .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 0)));
                 break;
             case "tuning-hood":
+                SmartDashboard.putNumber("Test-Mode/hood/kP", ScoringConstants.hoodkP);
+                SmartDashboard.putNumber("Test-Mode/hood/kI", ScoringConstants.hoodkI);
+                SmartDashboard.putNumber("Test-Mode/hood/kD", ScoringConstants.hoodkD);
+
+                scoringSubsystem.setAction(ScoringAction.OVERRIDE);
+
+                controller.a()
+                    .onTrue(new TuneS(scoringSubsystem, 1));
+
+                controller.b()
+                    .onTrue(new TuneG(scoringSubsystem, 1));
+
+                controller.x()
+                    .onTrue(new TuneV(scoringSubsystem, 1.0, 1));
+
+                controller.y()
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setPID(
+                        SmartDashboard.getNumber("Test-Mode/hood/kP", ScoringConstants.hoodkP),
+                        SmartDashboard.getNumber("Test-Mode/hood/kI", ScoringConstants.hoodkI),
+                        SmartDashboard.getNumber("Test-Mode/hood/kD", ScoringConstants.hoodkD), 1)));
+
+                controller.leftBumper()
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(1.0, 1)))
+                    .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 1)));
+
+                controller.rightBumper()
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(-1.0, 1)))
+                    .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 1)));
                 break;
             case "tuning-shooter":
+                SmartDashboard.putNumber("Test-Mode/shooter/kP", ScoringConstants.shooterkP);
+                SmartDashboard.putNumber("Test-Mode/shooter/kI", ScoringConstants.shooterkI);
+                SmartDashboard.putNumber("Test-Mode/shooter/kD", ScoringConstants.shooterkD);
+
+                scoringSubsystem.setAction(ScoringAction.OVERRIDE);
+
+                controller.a()
+                    .onTrue(new TuneS(scoringSubsystem, 2));
+
+                controller.b()
+                    .onTrue(new TuneG(scoringSubsystem, 2));
+
+                controller.x()
+                    .onTrue(new TuneV(scoringSubsystem, 1.0, 2));
+
+                controller.y()
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setPID(
+                        SmartDashboard.getNumber("Test-Mode/shooter/kP", ScoringConstants.shooterkP),
+                        SmartDashboard.getNumber("Test-Mode/shooter/kI", ScoringConstants.shooterkI),
+                        SmartDashboard.getNumber("Test-Mode/shooter/kD", ScoringConstants.shooterkD), 2)));
+
+                controller.leftBumper()
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(1.0, 2)))
+                    .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 2)));
+
+                controller.rightBumper()
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(-1.0, 2)))
+                    .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 2)));
                 break;
             case "tuning-endgame":
+                // TODO: Add in later
+                // SmartDashboard.putNumber("Test-Mode/endgame/kP", EndgameConstants.kP);
+                // SmartDashboard.putNumber("Test-Mode/endgame/kI", EndgameConstants.kI);
+                // SmartDashboard.putNumber("Test-Mode/endgame/kD", EndgameConstants.kD);
+
+                endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.OVERRIDE);
+
+                controller.a()
+                    .onTrue(new TuneS(endgameSubsystem, 0));
+
+                controller.b()
+                    .onTrue(new TuneG(endgameSubsystem, 0));
+
+                controller.x()
+                    .onTrue(new TuneV(endgameSubsystem, 1.0, 0));
+                
+                controller.leftBumper()
+                    .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(1.0, 0)))
+                    .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0, 0)));
+
+                controller.rightBumper()
+                    .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(-1.0, 0)))
+                    .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0, 0)));
                 break;
         }
         // spotless:on

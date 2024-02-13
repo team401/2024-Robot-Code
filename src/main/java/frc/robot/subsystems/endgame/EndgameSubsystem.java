@@ -4,7 +4,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.Tunable;
-
 import org.littletonrobotics.junction.Logger;
 
 public class EndgameSubsystem extends SubsystemBase implements Tunable {
@@ -67,6 +66,11 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
     @Override
     public double getVelocity(int slot) {
         return endgameInputs.velocity;
+    }
+
+    @Override
+    public double getConversionFactor(int slot) {
+        return 1.0 / 0.45;
     }
 
     @Override

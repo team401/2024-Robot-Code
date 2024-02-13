@@ -18,7 +18,7 @@ public class TuneG extends Command {
 
     public TuneG(Tunable subsystem, int slot) {
         this.subsystem = subsystem;
-        this.kS = SmartDashboard.getNumber("kS", 0);
+        this.kS = SmartDashboard.getNumber("Test-Mode/kS", 0);
         this.slot = slot;
 
         // this.withTimeout(5); TODO: Maybe add?
@@ -39,7 +39,7 @@ public class TuneG extends Command {
     @Override
     public void end(boolean interrupted) {
         subsystem.setVolts(0.0, slot);
-        SmartDashboard.putNumber("kG", kG - kS);
+        SmartDashboard.putNumber("Test-Mode/kG", kG - kS);
     }
 
     @Override
