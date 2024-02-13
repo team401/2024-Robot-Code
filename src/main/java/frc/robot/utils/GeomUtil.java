@@ -7,6 +7,8 @@ package frc.robot.utils;
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,6 +17,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.numbers.N2;
 
 /** Geometry utilities for working with translations, rotations, transforms, and poses. */
 public class GeomUtil {
@@ -81,6 +84,16 @@ public class GeomUtil {
     }
 
     /**
+     * Creates a translation from the x and y of a pose, ignoring rotation
+     *
+     * @param pose The pose to create the translation with
+     * @return The resulting translation
+     */
+    public static Translation2d poseToTranslation(Pose2d pose) {
+        return new Translation2d(pose.getX(), pose.getY());
+    }
+
+    /**
      * Creates a pure rotated pose
      *
      * @param rotation The rotation to create the pose with
@@ -140,5 +153,64 @@ public class GeomUtil {
      */
     public static Translation2d translation3dTo2dXZ(Translation3d translation) {
         return new Translation2d(translation.getX(), translation.getZ());
+    }
+
+    // TODO: remove fVTPTest (temp function to debug findVelocityTowardPoint)
+    public static double fVTPTest(
+            Vector<N2> velocity,
+            Translation2d currentTranslation,
+            Translation2d targetTranslation) {
+
+        // Vector from current to target (translate target so that current is now 0, 0)
+        Translation2d currentToTarget = targetTranslation.minus(currentTranslation);
+        // Convert it to a vector so we can take norm of it later
+        Vector<N2> currentToTargetVec =
+                VecBuilder.fill(currentToTarget.getX(), currentToTarget.getY());
+
+        // Get the angle of the vector from robot to speaker
+        Rotation2d speakerAngle =
+                Rotation2d.fromRadians(Math.atan2(currentToTarget.getY(), currentToTarget.getX()));
+
+        // Get the angle of the velocity vector of the robot
+        Rotation2d velocityAngle =
+                Rotation2d.fromRadians(Math.atan2(velocity.get(1, 0), velocity.get(0, 0)));
+
+        // Calculate theta, the angle between the speakerAngle and the current velocity angle
+        Rotation2d theta = velocityAngle.minus(speakerAngle);
+        // Project the velocity vector onto the speaker vector with ||u|| * cos(theta)
+        // Where u is the vector toward the goal
+        double velocityToGoal = currentToTargetVec.norm() * theta.getCos();
+
+        return velocityAngle.getDegrees();
+    }
+
+    public static double findVelocityTowardPoint(
+            Vector<N2> velocity,
+            Translation2d currentTranslation,
+            Translation2d targetTranslation) {
+        // Calculate the velocity to the goal based on this formula
+        // https://web.ma.utexas.edu/users/m408m/Display12-3-4.shtml
+
+        // Vector from current to target (translate target so that current is now 0, 0)
+        Translation2d currentToTarget = targetTranslation.minus(currentTranslation);
+        // Convert it to a vector so we can take norm of it later
+        Vector<N2> currentToTargetVec =
+                VecBuilder.fill(currentToTarget.getX(), currentToTarget.getY());
+
+        // Get the angle of the vector from current to target
+        Rotation2d targetAngle =
+                Rotation2d.fromRadians(Math.atan2(currentToTarget.getY(), currentToTarget.getX()));
+
+        // Get the angle of the velocity vector
+        Rotation2d velocityAngle =
+                Rotation2d.fromRadians(Math.atan2(velocity.get(1, 0), velocity.get(0, 0)));
+
+        // Calculate theta, the angle between the speakerAngle and the current velocity angle
+        Rotation2d theta = velocityAngle.minus(targetAngle);
+        // Project the velocity vector onto the speaker vector with ||u|| * cos(theta)
+        // Where u is the vector toward the goal
+        double velocityToGoal = currentToTargetVec.norm() * theta.getCos();
+
+        return velocityToGoal;
     }
 }
