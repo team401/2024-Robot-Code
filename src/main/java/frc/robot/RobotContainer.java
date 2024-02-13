@@ -370,9 +370,6 @@ public class RobotContainer {
                 controller.a()
                     .onTrue(new TuneS(scoringSubsystem, 2));
 
-                controller.b()
-                    .onTrue(new TuneG(scoringSubsystem, 2));
-
                 controller.x()
                     .onTrue(new TuneV(scoringSubsystem, 1.0, 2));
 

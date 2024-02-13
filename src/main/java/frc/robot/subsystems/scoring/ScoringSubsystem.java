@@ -483,6 +483,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
             case 2:
                 break;
         }
+    }
 
     public ScoringAction getCurrentAction() {
         return action;
