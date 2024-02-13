@@ -57,7 +57,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
             aimMechanism.append(
                     new MechanismLigament2d("hood", 0.2, 0.0, 10.0, new Color8Bit(0, 200, 50)));
 
-    private enum ScoringState {
+    public enum ScoringState {
         IDLE,
         INTAKE,
         PRIME,
@@ -84,7 +84,10 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     private ScoringAction action = ScoringAction.WAIT;
 
+    private boolean readyToShoot = false;
+
     public ScoringSubsystem(ShooterIO shooterIo, AimerIO aimerIo, HoodIO hoodIo) {
+
         this.shooterIo = shooterIo;
         this.aimerIo = aimerIo;
         this.hoodIo = hoodIo;
@@ -158,6 +161,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         boolean notePresent = hasNote();
 
         boolean primeReady = shooterReady && aimReady && driveReady && notePresent;
+        readyToShoot = primeReady;
 
         if (action != ScoringAction.SHOOT && action != ScoringAction.AIM) {
             state = ScoringState.IDLE;
@@ -166,6 +170,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
             shootTimer.reset();
             shootTimer.start();
+            readyToShoot = false;
         }
     }
 
@@ -189,6 +194,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         boolean notePresent = hasNote();
 
         boolean primeReady = shooterReady && aimReady && hoodReady && driveReady && notePresent;
+        readyToShoot = primeReady;
 
         if (action != ScoringAction.SHOOT && action != ScoringAction.AMP_AIM) {
             state = ScoringState.IDLE;
@@ -197,6 +203,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
             shootTimer.reset();
             shootTimer.start();
+            readyToShoot = false;
         }
     }
 
@@ -362,12 +369,15 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         switch (state) {
             case IDLE:
                 idle();
+                SmartDashboard.putString("shoot", "idle");
                 break;
             case INTAKE:
                 intake();
+                SmartDashboard.putString("shoot", "intake");
                 break;
             case PRIME:
                 prime();
+                SmartDashboard.putString("shoot", "prime");
                 break;
             case AMP_PRIME:
                 ampPrime();
@@ -473,5 +483,16 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
             case 2:
                 break;
         }
+
+    public ScoringAction getCurrentAction() {
+        return action;
+    }
+
+    public ScoringState getCurrentState() {
+        return state;
+    }
+
+    public boolean readyToShoot() {
+        return readyToShoot;
     }
 }

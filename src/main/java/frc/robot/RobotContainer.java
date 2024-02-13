@@ -19,6 +19,7 @@ import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveWithJoysticks;
+import frc.robot.subsystems.LED;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignState;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignTarget;
@@ -63,6 +64,8 @@ public class RobotContainer {
 
     SendableChooser<String> autoChooser = new SendableChooser<String>();
     SendableChooser<String> testModeChooser = new SendableChooser<String>();
+
+    LED leds;
 
     public RobotContainer() {
         configureSubsystems();
@@ -168,6 +171,8 @@ public class RobotContainer {
                 intakeSubsystem.setScoringSupplier(scoringSubsystem::canIntake);
             }
         }
+
+        if (FeatureFlags.enableLEDS) leds = new LED(scoringSubsystem);
     }
 
     // spotless:off
