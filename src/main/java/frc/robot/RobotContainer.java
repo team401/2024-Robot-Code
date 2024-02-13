@@ -10,8 +10,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FeatureFlags;
@@ -62,7 +60,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
-
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -92,7 +89,7 @@ public class RobotContainer {
 
     // spotless:off
     private void configureBindings() {
-        ControllerJSONReader.pullConfiguration("SingleController");
+        ControllerJSONReader.pullConfiguration("SimJoysticks");
         triggers = ControllerJSONReader.getTriggers();
         axes = ControllerJSONReader.getAxes();
         pov = ControllerJSONReader.getPOVs();
@@ -107,7 +104,7 @@ public class RobotContainer {
                             pov.get("pov"),
                             () -> true,
                             () -> false,
-                            triggers.get("leftBumper"))); //unsure if using trigger as booleansupplier will work
+                            triggers.get("toggleAlign"))); //unsure if using trigger as booleansupplier will work
                 
             triggers.get("align")
                 .onTrue(new InstantCommand(

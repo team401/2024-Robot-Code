@@ -1,77 +1,81 @@
 {
     "controllers": [
         {
-            "port": 2,
-            "type": "gamepad"
+            "port": 0,
+            "type": "joystick"
+        },
+        {
+            "port": 1,
+            "type": "joystick"
         }
     ],
 
     "buttons": [
         {   "command": "intake",
-            "controller": 2,
-            "button": "a"
+            "controller": 0,
+            "button": "1"
         },
         {
             "command": "aimSpeaker",
-            "controller": 2,
-            "button": "b"
+            "controller": 0,
+            "button": "2"
         },
         {
             "command": "aimAmp",
-            "controller": 2,
-            "button": "back"
+            "controller": 0,
+            "button": "3"
         },
         {
             "command": "manualIdle",
-            "controller": 2,
-            "button": "start"
+            "controller": 0,
+            "button": "4"
         },
         {
             "command": "align",
-            "controller": 2,
-            "button": "rightBumper"
+            "controller": 1,
+            "button": "1"
         },
         {
             "command": "shoot",
-            "controller": 2,
-            "button": "x"
+            "controller": 1,
+            "button": "2"
         },
         {
             
             "command": "endgame",
-            "controller": 2,
-            "button": "y"
+            "controller": 1,
+            "button": "3"
         },
         {
             "command": "toggleAlign",
-            "controller": 2,
-            "button": "leftBumper"
+            "controller": 1,
+            "button": "4"
         }
     ],
 
     "axes": [
         {   "command": "xDrive",
-            "controller": 2,
-            "axis": "leftY",
+            "controller": 0,
+            "axis": "xAxis",
             "negate": true
         },
         {
             "command": "yDrive",
-            "controller": 2,
-            "axis": "leftX",
+            "controller": 0,
+            "axis": "yAxis",
             "negate": true
         },
         {
             "command": "rotation",
-            "controller": 2,
-            "axis": "rightX",
+            "controller": 1,
+            "axis": "xAxis",
             "negate": true
         }
     ],
 
     "pov": [
         {   "command": "pov",
-            "controller": 2
+            "controller": 0
         }
     ]
 }
