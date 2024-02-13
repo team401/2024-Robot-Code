@@ -49,9 +49,11 @@ public final class Constants {
         public static final boolean runLocalizer = true;
 
         public static final boolean runIntake = true;
-        public static final boolean runScoring = false;
+        public static final boolean runScoring = true;
         public static final boolean runEndgame = false;
         public static final boolean runDrive = true;
+
+        public static final boolean enableLEDS = true;
     }
 
     public static final class ConversionConstants {
@@ -510,5 +512,10 @@ public final class Constants {
 
             return map;
         }
+    }
+
+    public static final class LEDConstants {
+        public static final int ledPort = 0;
+        public static final int ledLength = 1000;
     }
 }
