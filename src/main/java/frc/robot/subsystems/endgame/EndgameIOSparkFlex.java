@@ -38,5 +38,6 @@ public class EndgameIOSparkFlex implements EndgameIO {
         inputs.endgameRightCurrentAmps = rightEndgameMotor.getOutputCurrent();
 
         inputs.position = leftEndgameMotor.getEncoder().getPosition();
+        inputs.velocity = leftEndgameMotor.getEncoder().getVelocity();
     }
 }

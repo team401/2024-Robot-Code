@@ -9,6 +9,8 @@ public interface AimerIO {
         public double aimGoalAngleRad = 0.0;
         public double aimAppliedVolts = 0.0;
         public double aimCurrentAmps = 0.0;
+
+        public double aimVelocityRadPerSec = 0.0;
     }
 
     public default void updateInputs(AimerIOInputs inputs) {}
@@ -18,4 +20,10 @@ public interface AimerIO {
     public default void controlAimAngleRad() {}
 
     public default void setAngleClampsRad(double min, double max) {}
+
+    public default void setOverrideMode(boolean override) {}
+
+    public default void setOverrideVolts(double volts) {}
+
+    public default void setPID(double p, double i, double d) {}
 }

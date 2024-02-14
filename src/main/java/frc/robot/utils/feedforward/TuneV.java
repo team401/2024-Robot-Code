@@ -12,6 +12,9 @@ public class TuneV extends Command {
 
     private double volts;
 
+    private int slot;
+    private double conversionFactor;
+
     private ArrayList<Double> velocities;
 
     double startPosition; // TODO
@@ -21,35 +24,38 @@ public class TuneV extends Command {
     double average = 0;
     double vel = 0;
 
-    public TuneV(Tunable subsystem, double volts) {
+    public TuneV(Tunable subsystem, double volts, int slot) {
         this.subsystem = subsystem;
         this.volts = volts;
-        this.kS = SmartDashboard.getNumber("kS", 0);
-        this.pastkV = SmartDashboard.getNumber("kV", 0);
+        this.slot = slot;
+        this.kS = SmartDashboard.getNumber("Test-Mode/kS", 0);
+        this.pastkV = SmartDashboard.getNumber("Test-Mode/kV", 0);
+
+        this.conversionFactor = subsystem.getConversionFactor(slot);
 
         // this.withTimeout(5); TODO: Maybe add?
     }
 
     @Override
     public void initialize() {
-        SmartDashboard.putBoolean("Ended", false);
-        subsystem.setVolts(volts);
+        SmartDashboard.putBoolean("Test-Mode/Ended", false);
+        subsystem.setVolts(volts, slot);
         velocities = new ArrayList<Double>();
     }
 
     @Override
     public void execute() {
-        vel = subsystem.getVel();
-        SmartDashboard.putNumber("Velocity", vel);
-        if (Math.abs(subsystem.getPosition()) < 0.6) {
+        vel = subsystem.getVelocity(slot);
+        SmartDashboard.putNumber("Test-Mode/Velocity", vel);
+        if (Math.abs(subsystem.getPosition(slot)) < 0.6 * conversionFactor) {
             velocities.add(vel);
         }
     }
 
     @Override
     public void end(boolean interrupted) {
-        SmartDashboard.putBoolean("Ended", true);
-        subsystem.stop();
+        SmartDashboard.putBoolean("Test-Mode/Ended", true);
+        subsystem.setVolts(0.0, slot);
 
         for (double v : velocities) {
             average += v;
@@ -57,11 +63,11 @@ public class TuneV extends Command {
 
         average /= velocities.size();
 
-        SmartDashboard.putNumber("kV", ((volts - kS) / average) + pastkV);
+        SmartDashboard.putNumber("Test-Mode/kV", ((volts - kS) / average) + pastkV);
     }
 
     @Override
     public boolean isFinished() {
-        return Math.abs(subsystem.getPosition()) > 1;
+        return Math.abs(subsystem.getPosition(slot)) > 1 * conversionFactor;
     }
 }

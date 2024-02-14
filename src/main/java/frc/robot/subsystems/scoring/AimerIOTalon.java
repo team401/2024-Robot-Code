@@ -1,5 +1,6 @@
 package frc.robot.subsystems.scoring;
 
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.Follower;
@@ -20,10 +21,16 @@ public class AimerIOTalon implements AimerIO {
 
     private final DutyCycleEncoder encoder = new DutyCycleEncoder(ScoringConstants.aimEncoderPort);
 
+    private boolean override = false;
+    private double overrideVolts = 0.0;
+
     double goalAngleRad = 0.0;
 
     double minAngleClamp = 0.0;
     double maxAngleClamp = 0.0;
+
+    double lastPosition = 0.0;
+    double lastTime = Utils.getCurrentTimeSeconds();
 
     public AimerIOTalon() {
         aimerRight.setControl(new Follower(ScoringConstants.aimLeftMotorId, true));
@@ -48,6 +55,8 @@ public class AimerIOTalon implements AimerIO {
 
         aimerLeft.getConfigurator().apply(configs);
         aimerRight.getConfigurator().apply(configs);
+
+        encoder.setDistancePerRotation(2 * Math.PI);
     }
 
     @Override
@@ -67,11 +76,42 @@ public class AimerIOTalon implements AimerIO {
     }
 
     @Override
+    public void setOverrideMode(boolean override) {
+        this.override = override;
+    }
+
+    @Override
+    public void setOverrideVolts(double volts) {
+        overrideVolts = volts;
+    }
+
+    @Override
+    public void setPID(double p, double i, double d) {
+        slot0.withKP(p);
+        slot0.withKI(i);
+        slot0.withKD(d);
+
+        aimerLeft.getConfigurator().apply(slot0);
+        aimerRight.getConfigurator().apply(slot0);
+    }
+
+    @Override
     public void updateInputs(AimerIOInputs inputs) {
-        aimerLeft.setControl(controller.withPosition(goalAngleRad));
+        if (override) {
+            aimerLeft.setVoltage(overrideVolts);
+        } else {
+            aimerLeft.setControl(controller.withPosition(goalAngleRad));
+        }
 
         inputs.aimGoalAngleRad = goalAngleRad;
-        inputs.aimAngleRad = encoder.getAbsolutePosition() * 2 * Math.PI;
+        inputs.aimAngleRad = encoder.getAbsolutePosition();
+
+        double currentTime = Utils.getCurrentTimeSeconds();
+        double diffTime = currentTime - lastTime;
+        lastTime = currentTime;
+
+        inputs.aimVelocityRadPerSec = (encoder.getAbsolutePosition() - lastPosition) / diffTime;
+        lastPosition = encoder.getAbsolutePosition();
 
         inputs.aimAppliedVolts = aimerLeft.getMotorVoltage().getValueAsDouble();
         inputs.aimCurrentAmps = aimerLeft.getSupplyCurrent().getValueAsDouble();
