@@ -37,6 +37,8 @@ public final class Constants {
 
     public static final Mode currentMode = Robot.isReal() ? Mode.REAL : Mode.SIM;
 
+    // public static final Mode currentMode = Mode.REPLAY;
+
     public static enum Mode {
         REAL,
         SIM,
@@ -50,7 +52,7 @@ public final class Constants {
 
         public static final boolean runIntake = true;
         public static final boolean runScoring = true;
-        public static final boolean runEndgame = false;
+        public static final boolean runEndgame = true;
         public static final boolean runDrive = true;
 
         public static final boolean enableLEDS = true;
