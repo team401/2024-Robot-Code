@@ -14,7 +14,7 @@ public class HoodIOSim implements HoodIO {
                     SingleJointedArmSim.estimateMOI(0.1778, 0.68),
                     0.1778,
                     0.0,
-                    Math.PI,
+                    3.0 * Math.PI / 2.0,
                     false,
                     0.0);
     private final PIDController controller =
@@ -39,6 +39,13 @@ public class HoodIOSim implements HoodIO {
     @Override
     public void setOverrideVolts(double volts) {
         appliedVolts = volts;
+    }
+
+    @Override
+    public void setPID(double p, double i, double d) {
+        controller.setP(p);
+        controller.setI(i);
+        controller.setD(d);
     }
 
     @Override

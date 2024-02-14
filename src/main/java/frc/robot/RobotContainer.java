@@ -292,6 +292,10 @@ public class RobotContainer {
         // Resets bindings
         controller = new CommandXboxController(2);
 
+        if (FeatureFlags.runScoring) {
+            scoringSubsystem.homeHood();
+        }
+
         // spotless:off
         switch (testModeChooser.getSelected()) {
             case "tuning":
@@ -325,7 +329,8 @@ public class RobotContainer {
                     .onTrue(new InstantCommand(() -> scoringSubsystem.setPID(
                         SmartDashboard.getNumber("Test-Mode/aimer/kP", ScoringConstants.aimerkP),
                         SmartDashboard.getNumber("Test-Mode/aimer/kI", ScoringConstants.aimerkI),
-                        SmartDashboard.getNumber("Test-Mode/aimer/kD", ScoringConstants.aimerkD), 0)));
+                        SmartDashboard.getNumber("Test-Mode/aimer/kD", ScoringConstants.aimerkD), 0)))
+                    .onTrue(new InstantCommand(() ->scoringSubsystem.runToPosition(0.25, 0)));
 
                 controller.leftBumper()
                     .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(1.0, 0)))
@@ -355,7 +360,8 @@ public class RobotContainer {
                     .onTrue(new InstantCommand(() -> scoringSubsystem.setPID(
                         SmartDashboard.getNumber("Test-Mode/hood/kP", ScoringConstants.hoodkP),
                         SmartDashboard.getNumber("Test-Mode/hood/kI", ScoringConstants.hoodkI),
-                        SmartDashboard.getNumber("Test-Mode/hood/kD", ScoringConstants.hoodkD), 1)));
+                        SmartDashboard.getNumber("Test-Mode/hood/kD", ScoringConstants.hoodkD), 1)))
+                    .onTrue(new InstantCommand(() ->scoringSubsystem.runToPosition(0.25, 1)));
 
                 controller.leftBumper()
                     .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(1.0, 1)))
@@ -382,7 +388,8 @@ public class RobotContainer {
                     .onTrue(new InstantCommand(() -> scoringSubsystem.setPID(
                         SmartDashboard.getNumber("Test-Mode/shooter/kP", ScoringConstants.shooterkP),
                         SmartDashboard.getNumber("Test-Mode/shooter/kI", ScoringConstants.shooterkI),
-                        SmartDashboard.getNumber("Test-Mode/shooter/kD", ScoringConstants.shooterkD), 2)));
+                        SmartDashboard.getNumber("Test-Mode/shooter/kD", ScoringConstants.shooterkD), 2)))
+                    .onTrue(new InstantCommand(() ->scoringSubsystem.runToPosition(0.25, 2)));
 
                 controller.leftBumper()
                     .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(1.0, 2)))
@@ -521,5 +528,10 @@ public class RobotContainer {
 
     public void teleopInit() {
         configureBindings();
+
+        // This is in teleopInit to prevent it from wasting time in auto
+        if (FeatureFlags.runScoring) {
+            scoringSubsystem.homeHood();
+        }
     }
 }

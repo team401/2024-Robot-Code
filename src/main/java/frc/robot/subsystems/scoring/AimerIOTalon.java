@@ -86,6 +86,16 @@ public class AimerIOTalon implements AimerIO {
     }
 
     @Override
+    public void setPID(double p, double i, double d) {
+        slot0.withKP(p);
+        slot0.withKI(i);
+        slot0.withKD(d);
+
+        aimerLeft.getConfigurator().apply(slot0);
+        aimerRight.getConfigurator().apply(slot0);
+    }
+
+    @Override
     public void updateInputs(AimerIOInputs inputs) {
         if (override) {
             aimerLeft.setVoltage(overrideVolts);

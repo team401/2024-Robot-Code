@@ -16,4 +16,6 @@ public interface Tunable {
     public void setVolts(double volts, int slot);
 
     public void setPID(double p, double i, double d, int slot);
+
+    public void runToPosition(double position, int slot);
 }

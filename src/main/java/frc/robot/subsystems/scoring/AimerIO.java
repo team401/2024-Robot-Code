@@ -24,4 +24,6 @@ public interface AimerIO {
     public default void setOverrideMode(boolean override) {}
 
     public default void setOverrideVolts(double volts) {}
+
+    public default void setPID(double p, double i, double d) {}
 }

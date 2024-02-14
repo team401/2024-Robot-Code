@@ -76,6 +76,16 @@ public class ShooterIOTalon implements ShooterIO {
     }
 
     @Override
+    public void setPID(double p, double i, double d) {
+        slot0.withKP(p);
+        slot0.withKI(i);
+        slot0.withKD(d);
+
+        shooterLeft.getConfigurator().apply(slot0);
+        shooterRight.getConfigurator().apply(slot0);
+    }
+
+    @Override
     public void updateInputs(ShooterIOInputs inputs) {
         if (override) {
             shooterLeft.setVoltage(overrideVolts);

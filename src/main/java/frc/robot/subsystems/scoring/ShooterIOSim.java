@@ -68,6 +68,12 @@ public class ShooterIOSim implements ShooterIO {
     }
 
     @Override
+    public void setPID(double p, double i, double d) {
+        shooterLeftController.setPID(p, i, d);
+        shooterRightController.setPID(p, i, d);
+    }
+
+    @Override
     public void updateInputs(ShooterIOInputs inputs) {
         shooterLeftSim.update(Constants.loopTime);
         shooterRightSim.update(Constants.loopTime);

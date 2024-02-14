@@ -70,7 +70,7 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
 
     @Override
     public double getConversionFactor(int slot) {
-        return 1.0 / 0.45;
+        return 0.45;
     }
 
     @Override
@@ -81,6 +81,11 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
     @Override
     public void setPID(double p, double i, double d, int slot) {
         throw new UnsupportedOperationException("Unimplemented method 'setPID'");
+    }
+
+    @Override
+    public void runToPosition(double position, int slot) {
+        throw new UnsupportedOperationException("Unimplemented method 'runToPosition'");
     }
 
     @Override

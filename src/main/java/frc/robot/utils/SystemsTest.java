@@ -18,6 +18,10 @@ public class SystemsTest extends Command {
         this(subsystem, false, 0);
     }
 
+    public SystemsTest(Tunable subsystem, int slot) {
+        this(subsystem, false, slot);
+    }
+
     public SystemsTest(Tunable subsystem, boolean inverted) {
         this(subsystem, inverted, 0);
     }

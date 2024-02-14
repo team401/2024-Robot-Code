@@ -89,6 +89,13 @@ public class AimerIOSim implements AimerIO {
     }
 
     @Override
+    public void setPID(double p, double i, double d) {
+        controller.setP(p);
+        controller.setI(i);
+        controller.setD(d);
+    }
+
+    @Override
     public void updateInputs(AimerIOInputs inputs) {
         sim.update(Constants.loopTime);
 

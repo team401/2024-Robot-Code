@@ -429,6 +429,9 @@ public final class Constants {
 
         public static final double shooterAmpVelocityRPM = 10;
 
+        public static final double hoodHomeAmps = 10.0; // TODO: Find this
+        public static final double hoodHomeAngleRad = Math.PI;
+
         public static final double aimMaxAngleRadians = Math.PI / 2;
 
         public static final double maxAimIntake = 0.0;
