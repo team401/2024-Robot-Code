@@ -14,12 +14,14 @@ public class HoodIOSim implements HoodIO {
                     SingleJointedArmSim.estimateMOI(0.1778, 0.68),
                     0.1778,
                     0.0,
-                    Math.PI,
+                    3.0 * Math.PI / 2.0,
                     false,
                     0.0);
     private final PIDController controller =
             new PIDController(
                     ScoringConstants.hoodkP, ScoringConstants.hoodkI, ScoringConstants.hoodkD);
+
+    private boolean override = false;
 
     double goalAngleRad = 0.0;
     double appliedVolts = 0.0;
@@ -30,16 +32,38 @@ public class HoodIOSim implements HoodIO {
     }
 
     @Override
+    public void setOverrideMode(boolean override) {
+        this.override = override;
+    }
+
+    @Override
+    public void setOverrideVolts(double volts) {
+        appliedVolts = volts;
+    }
+
+    @Override
+    public void setPID(double p, double i, double d) {
+        controller.setP(p);
+        controller.setI(i);
+        controller.setD(d);
+    }
+
+    @Override
     public void updateInputs(HoodIOInputs inputs) {
         sim.update(Constants.loopTime);
 
-        appliedVolts =
-                controller.calculate(sim.getAngleRads(), goalAngleRad)
-                        + Math.signum(controller.getPositionError()) * ScoringConstants.hoodkFF;
+        if (!override) {
+            appliedVolts =
+                    controller.calculate(sim.getAngleRads(), goalAngleRad)
+                            + Math.signum(controller.getPositionError()) * ScoringConstants.hoodkFF;
+        }
+
         sim.setInputVoltage(appliedVolts);
 
         inputs.hoodAngleRad = sim.getAngleRads();
         inputs.hoodGoalAngleRad = goalAngleRad;
+
+        inputs.hoodVelocityRadPerSec = sim.getVelocityRadPerSec();
 
         inputs.hoodAppliedVolts = appliedVolts;
         inputs.hoodCurrentAmps = sim.getCurrentDrawAmps();

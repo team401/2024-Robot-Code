@@ -24,6 +24,9 @@ public class ShooterIOTalon implements ShooterIO {
 
     DigitalInput bannerSensor = new DigitalInput(Constants.SensorConstants.bannerPort);
 
+    private boolean override = false;
+    private double overrideVolts = 0.0;
+
     double goalLeftVelocityRPM = 0.0;
     double goalRightVelocityRPM = 0.0;
 
@@ -63,13 +66,34 @@ public class ShooterIOTalon implements ShooterIO {
     }
 
     @Override
+    public void setOverrideMode(boolean override) {
+        this.override = override;
+    }
+
+    @Override
+    public void setOverrideVolts(double volts) {
+        overrideVolts = volts;
+    }
+
+    @Override
+    public void setPID(double p, double i, double d) {
+        slot0.withKP(p);
+        slot0.withKI(i);
+        slot0.withKD(d);
+
+        shooterLeft.getConfigurator().apply(slot0);
+        shooterRight.getConfigurator().apply(slot0);
+    }
+
+    @Override
     public void updateInputs(ShooterIOInputs inputs) {
-        shooterLeft.setControl(
-                leftController.withVelocity(
-                        goalLeftVelocityRPM * ConversionConstants.kMinutesToSeconds));
-        shooterRight.setControl(
-                rightController.withVelocity(
-                        goalRightVelocityRPM * ConversionConstants.kMinutesToSeconds));
+        if (override) {
+            shooterLeft.setVoltage(overrideVolts);
+            shooterRight.setVoltage(overrideVolts);
+        } else {
+            shooterLeft.setControl(leftController.withVelocity(goalLeftVelocityRPM * ConversionConstants.kMinutesToSeconds));
+            shooterRight.setControl(rightController.withVelocity(goalRightVelocityRPM * ConversionConstants.kMinutesToSeconds));
+        }
 
         inputs.shooterLeftVelocityRPM =
                 shooterLeft.getVelocity().getValueAsDouble()

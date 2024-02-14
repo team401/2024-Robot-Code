@@ -48,12 +48,12 @@ public final class Constants {
     public static final class FeatureFlags {
         public static final boolean runVision = false;
 
-        public static final boolean runIntake = true;
+        public static final boolean runIntake = false;
         public static final boolean runScoring = true;
-        public static final boolean runEndgame = true;
-        public static final boolean runDrive = true;
+        public static final boolean runEndgame = false;
+        public static final boolean runDrive = false;
 
-        public static final boolean enableLEDS = true;
+        public static final boolean enableLEDS = false;
     }
 
     public static final class ConversionConstants {
@@ -428,6 +428,9 @@ public final class Constants {
                 Math.PI / 2 - Units.degreesToRadians(40);
 
         public static final double shooterAmpVelocityRPM = 10;
+
+        public static final double hoodHomeAmps = 10.0; // TODO: Find this
+        public static final double hoodHomeAngleRad = Math.PI;
 
         public static final double aimMaxAngleRadians = Math.PI / 2;
 
