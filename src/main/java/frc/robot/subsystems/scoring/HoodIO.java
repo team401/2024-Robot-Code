@@ -9,9 +9,19 @@ public interface HoodIO {
         public double hoodGoalAngleRad = 0.0;
         public double hoodAppliedVolts = 0.0;
         public double hoodCurrentAmps = 0.0;
+
+        public double hoodVelocityRadPerSec = 0.0;
     }
 
     public default void updateInputs(HoodIOInputs inputs) {}
 
     public default void setHoodAngleRad(double angle) {}
+
+    public default void setOverrideMode(boolean override) {}
+
+    public default void setOverrideVolts(double volts) {}
+
+    public default void home() {}
+
+    public default void setPID(double p, double i, double d) {}
 }

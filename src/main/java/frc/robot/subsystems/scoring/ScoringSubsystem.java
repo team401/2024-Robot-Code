@@ -1,5 +1,6 @@
 package frc.robot.subsystems.scoring;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -19,10 +20,11 @@ import frc.robot.Constants.ScoringConstants;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
+import frc.robot.utils.Tunable;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
-public class ScoringSubsystem extends SubsystemBase {
+public class ScoringSubsystem extends SubsystemBase implements Tunable {
     private final ShooterIO shooterIo;
     private final ShooterIOInputsAutoLogged shooterInputs = new ShooterIOInputsAutoLogged();
 
@@ -64,7 +66,9 @@ public class ScoringSubsystem extends SubsystemBase {
         SHOOT,
         AMP_SHOOT,
         ENDGAME,
-        TUNING
+        TUNING,
+        OVERRIDE,
+        TEMPORARY_SETPOINT
     }
 
     public enum ScoringAction {
@@ -74,12 +78,16 @@ public class ScoringSubsystem extends SubsystemBase {
         AMP_AIM,
         SHOOT,
         ENDGAME,
-        TUNING
+        TUNING,
+        OVERRIDE
     }
 
     private ScoringState state = ScoringState.IDLE;
 
     private ScoringAction action = ScoringAction.WAIT;
+
+    private int temporarySetpointSlot = 0;
+    private double temporarySetpointPosition = 0.0;
 
     private boolean readyToShoot = false;
 
@@ -121,13 +129,15 @@ public class ScoringSubsystem extends SubsystemBase {
             // state = ScoringState.ENDGAME; TODO: Later
         } else if (action == ScoringAction.TUNING) {
             state = ScoringState.TUNING;
-            SmartDashboard.putNumber("Tuning/AimerGoal", aimerGoalAngleRadTuning);
-            SmartDashboard.putNumber("Tuning/ShooterGoal", shooterGoalVelocityRPMTuning);
+            SmartDashboard.putNumber("Test-Mode/AimerGoal", aimerGoalAngleRadTuning);
+            SmartDashboard.putNumber("Test-Mode/ShooterGoal", shooterGoalVelocityRPMTuning);
+        } else if (action == ScoringAction.OVERRIDE) {
+            state = ScoringState.OVERRIDE;
         }
     }
 
     private void intake() {
-        if (!canIntake()) {
+        if (!aimerAtIntakePosition()) {
             aimerIo.setAimAngleRad(ScoringConstants.intakeAngleToleranceRadians, true);
         }
         shooterIo.setKickerVolts(0);
@@ -231,8 +241,8 @@ public class ScoringSubsystem extends SubsystemBase {
     }
 
     private void tuning() {
-        shooterGoalVelocityRPMTuning = SmartDashboard.getNumber("Tuning/ShooterGoal", 0.0);
-        aimerGoalAngleRadTuning = SmartDashboard.getNumber("Tuning/AimerGoal", 0.0);
+        shooterGoalVelocityRPMTuning = SmartDashboard.getNumber("Test-Mode/ShooterGoal", 0.0);
+        aimerGoalAngleRadTuning = SmartDashboard.getNumber("Test-Mode/AimerGoal", 0.0);
         shooterIo.setShooterVelocityRPM(shooterGoalVelocityRPMTuning);
         aimerIo.setAimAngleRad(aimerGoalAngleRadTuning, false);
         hoodIo.setHoodAngleRad(0.0);
@@ -240,6 +250,33 @@ public class ScoringSubsystem extends SubsystemBase {
 
         if (action != ScoringAction.TUNING) {
             state = ScoringState.IDLE;
+        }
+    }
+
+    private void override() {
+        aimerIo.setOverrideMode(true);
+        hoodIo.setOverrideMode(true);
+        shooterIo.setOverrideMode(true);
+
+        if (action != ScoringAction.OVERRIDE) {
+            state = ScoringState.IDLE;
+
+            aimerIo.setOverrideMode(false);
+            hoodIo.setOverrideMode(false);
+            shooterIo.setOverrideMode(false);
+        }
+    }
+
+    private void temporarySetpoint() {
+        if (MathUtil.isNear(temporarySetpointPosition, getPosition(temporarySetpointSlot), 0.1)
+                && MathUtil.isNear(0.0, getVelocity(temporarySetpointSlot), 0.01)) {
+            state = ScoringState.OVERRIDE;
+
+            setVolts(0.0, temporarySetpointSlot);
+        } else if (action != ScoringAction.OVERRIDE) {
+            state = ScoringState.OVERRIDE;
+
+            setVolts(0.0, temporarySetpointSlot);
         }
     }
 
@@ -258,8 +295,16 @@ public class ScoringSubsystem extends SubsystemBase {
         return shooterInputs.bannerSensor;
     }
 
-    public boolean canIntake() {
+    public boolean aimerAtIntakePosition() {
         return aimerInputs.aimAngleRad > ScoringConstants.intakeAngleToleranceRadians;
+    }
+
+    public boolean canIntake() {
+        return aimerAtIntakePosition() && !hasNote();
+    }
+
+    public void homeHood() {
+        hoodIo.home();
     }
 
     public void setPoseSupplier(Supplier<Pose2d> poseSupplier) {
@@ -284,7 +329,9 @@ public class ScoringSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (state != ScoringState.TUNING
+        if (state == ScoringState.TEMPORARY_SETPOINT) {
+            aimerIo.setAngleClampsRad(0.0, Math.PI);
+        } else if (state != ScoringState.TUNING
                 && action != ScoringAction.ENDGAME
                 && (FieldFinder.willIHitThis(
                                 poseSupplier.get().getX(),
@@ -375,11 +422,133 @@ public class ScoringSubsystem extends SubsystemBase {
             case TUNING:
                 tuning();
                 break;
+            case OVERRIDE:
+                override();
+                break;
+            case TEMPORARY_SETPOINT:
+                temporarySetpoint();
+                break;
         }
     }
 
     public void setTuningKickerVolts(double kickerVoltsTuning) {
         this.kickerVoltsTuning = kickerVoltsTuning;
+    }
+
+    @Override
+    public double getPosition(int slot) {
+        switch (slot) {
+                // Aimer
+            case 0:
+                return aimerInputs.aimAngleRad;
+                // Hood
+            case 1:
+                return hoodInputs.hoodAngleRad;
+                // Shooter
+            case 2:
+                return shooterInputs.shooterLeftVelocityRPM;
+            default:
+                throw new IllegalArgumentException("Invalid slot");
+        }
+    }
+
+    @Override
+    public double getVelocity(int slot) {
+        switch (slot) {
+                // Aimer
+            case 0:
+                return aimerInputs.aimVelocityRadPerSec;
+                // Hood
+            case 1:
+                return hoodInputs.hoodVelocityRadPerSec;
+                // Shooter
+            case 2:
+                return shooterInputs.shooterLeftVelocityRPM;
+            default:
+                throw new IllegalArgumentException("Invalid slot");
+        }
+    }
+
+    @Override
+    public double getConversionFactor(int slot) {
+        switch (slot) {
+                // Aimer
+            case 0:
+                return 2 * Math.PI;
+                // Hood
+            case 1:
+                return 2 * Math.PI;
+                // Shooter
+            case 2:
+                return 1000.0;
+            default:
+                throw new IllegalArgumentException("Invalid slot");
+        }
+    }
+
+    @Override
+    public void setVolts(double volts, int slot) {
+        switch (slot) {
+                // Aimer
+            case 0:
+                aimerIo.setOverrideVolts(volts);
+                break;
+                // Hood
+            case 1:
+                hoodIo.setOverrideVolts(volts);
+                break;
+                // Shooter
+            case 2:
+                shooterIo.setOverrideVolts(volts);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid slot");
+        }
+    }
+
+    @Override
+    public void setPID(double p, double i, double d, int slot) {
+        switch (slot) {
+                // Aimer
+            case 0:
+                aimerIo.setPID(p, i, d);
+                break;
+                // Hood
+            case 1:
+                hoodIo.setPID(p, i, d);
+                break;
+                // Shooter
+            case 2:
+                shooterIo.setPID(p, i, d);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid slot");
+        }
+    }
+
+    @Override
+    public void runToPosition(double position, int slot) {
+        state = ScoringState.TEMPORARY_SETPOINT;
+
+        temporarySetpointPosition = position * getConversionFactor(slot);
+        temporarySetpointSlot = slot;
+
+        switch (slot) {
+                // Aimer
+            case 0:
+                aimerIo.setAimAngleRad(temporarySetpointPosition, true);
+                break;
+                // Hood
+            case 1:
+                hoodIo.setHoodAngleRad(temporarySetpointPosition);
+                break;
+                // Shooter
+            case 2:
+                shooterIo.setShooterVelocityRPM(temporarySetpointPosition);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid slot");
+        }
     }
 
     public ScoringAction getCurrentAction() {
