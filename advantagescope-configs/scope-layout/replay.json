@@ -18,7 +18,9 @@
             "/AdvantageKit/RealOutputs/scoring",
             "/telemetry/Pose3d",
             "/telemetry/Pose3d/translation",
-            "/AdvantageKit/RealOutputs/endgame"
+            "/AdvantageKit/RealOutputs/endgame",
+            "/RealOutputs/endgame",
+            "/RealOutputs/scoring"
           ]
         },
         "tabs": {
@@ -61,25 +63,25 @@
                 [
                   {
                     "type": "Robot",
-                    "key": "NT:/AdvantageKit/telemetry/Pose3d",
+                    "key": "/telemetry/Pose3d",
                     "sourceTypeIndex": 1,
                     "sourceType": "Pose3d"
                   },
                   {
                     "type": "Component (Robot)",
-                    "key": "NT:/AdvantageKit/RealOutputs/scoring/Aimer3d",
+                    "key": "/RealOutputs/scoring/Aimer3d",
                     "sourceTypeIndex": 1,
                     "sourceType": "Pose3d"
                   },
                   {
                     "type": "Component (Robot)",
-                    "key": "NT:/AdvantageKit/RealOutputs/scoring/Hood3d",
+                    "key": "/RealOutputs/scoring/Hood3d",
                     "sourceTypeIndex": 1,
                     "sourceType": "Pose3d"
                   },
                   {
                     "type": "Component (Robot)",
-                    "key": "NT:/AdvantageKit/RealOutputs/endgame/Elevator3d",
+                    "key": "/RealOutputs/endgame/Elevator3d",
                     "sourceTypeIndex": 1,
                     "sourceType": "Pose3d"
                   }
@@ -98,9 +100,9 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  1.4695761589768194e-15,
-                  5.999999999999987,
-                  -11.999999999999964
+                  -0.6390879093060414,
+                  6.806737653793903,
+                  -6.692831383000527
                 ],
                 "cameraTarget": [
                   0,
