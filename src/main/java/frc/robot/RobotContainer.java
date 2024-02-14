@@ -220,7 +220,11 @@ public class RobotContainer {
         if (FeatureFlags.runIntake) {
             controller.a()
                 .onTrue(new InstantCommand(
-                        () -> intakeSubsystem.toggle()));
+                        () -> intakeSubsystem.run(IntakeAction.INTAKE)));
+                
+            controller.start()
+                .onTrue(new InstantCommand(
+                        () -> intakeSubsystem.run(IntakeAction.NONE)));
         }
 
         if (FeatureFlags.runScoring) {

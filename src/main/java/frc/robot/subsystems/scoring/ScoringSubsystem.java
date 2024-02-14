@@ -132,7 +132,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private void intake() {
-        if (!canIntake()) {
+        if (!aimerAtIntakePosition()) {
             aimerIo.setAimAngleRad(ScoringConstants.intakeAngleToleranceRadians, true);
         }
         shooterIo.setKickerVolts(0);
@@ -277,8 +277,12 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         return shooterInputs.bannerSensor;
     }
 
-    public boolean canIntake() {
+    public boolean aimerAtIntakePosition() {
         return aimerInputs.aimAngleRad > ScoringConstants.intakeAngleToleranceRadians;
+    }
+
+    public boolean canIntake() {
+        return aimerAtIntakePosition() && !hasNote();
     }
 
     public void setPoseSupplier(Supplier<Pose2d> poseSupplier) {

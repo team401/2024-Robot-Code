@@ -22,6 +22,8 @@ public class HoodIOSparkFlex implements HoodIO {
         hoodMotor.getPIDController().setD(ScoringConstants.hoodkD);
         hoodMotor.getPIDController().setFF(ScoringConstants.hoodkFF);
 
+        hoodMotor.setInverted(true);
+
         hoodMotor.getEncoder().setPosition(0.0);
         hoodMotor.getEncoder().setPositionConversionFactor(ScoringConstants.hoodEncoderToRad);
 
