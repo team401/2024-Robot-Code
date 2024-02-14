@@ -91,8 +91,12 @@ public class ShooterIOTalon implements ShooterIO {
             shooterLeft.setVoltage(overrideVolts);
             shooterRight.setVoltage(overrideVolts);
         } else {
-            shooterLeft.setControl(leftController.withVelocity(goalLeftVelocityRPM * ConversionConstants.kMinutesToSeconds));
-            shooterRight.setControl(rightController.withVelocity(goalRightVelocityRPM * ConversionConstants.kMinutesToSeconds));
+            shooterLeft.setControl(
+                    leftController.withVelocity(
+                            goalLeftVelocityRPM * ConversionConstants.kMinutesToSeconds));
+            shooterRight.setControl(
+                    rightController.withVelocity(
+                            goalRightVelocityRPM * ConversionConstants.kMinutesToSeconds));
         }
 
         inputs.shooterLeftVelocityRPM =
