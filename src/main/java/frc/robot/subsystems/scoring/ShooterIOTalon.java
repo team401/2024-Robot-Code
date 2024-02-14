@@ -64,8 +64,12 @@ public class ShooterIOTalon implements ShooterIO {
 
     @Override
     public void updateInputs(ShooterIOInputs inputs) {
-        shooterLeft.setControl(leftController.withVelocity(goalLeftVelocityRPM));
-        shooterRight.setControl(rightController.withVelocity(goalRightVelocityRPM));
+        shooterLeft.setControl(
+                leftController.withVelocity(
+                        goalLeftVelocityRPM * ConversionConstants.kMinutesToSeconds));
+        shooterRight.setControl(
+                rightController.withVelocity(
+                        goalRightVelocityRPM * ConversionConstants.kMinutesToSeconds));
 
         inputs.shooterLeftVelocityRPM =
                 shooterLeft.getVelocity().getValueAsDouble()
