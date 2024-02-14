@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.telemetry;
 
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
@@ -20,18 +20,23 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
 
 public class Telemetry {
     private final double maxSpeed;
+
+    private final TelemetryIO telemetryIo;
+    private final TelemetryIOInputsAutoLogged telemetryInputs = new TelemetryIOInputsAutoLogged();
 
     /**
      * Construct a telemetry object, with the specified max speed of the robot
      *
      * @param maxSpeed Maximum speed in meters per second
      */
-    public Telemetry(double maxSpeed) {
+    public Telemetry(double maxSpeed, TelemetryIO telemetryIo) {
         this.maxSpeed = maxSpeed;
+        this.telemetryIo = telemetryIo;
     }
 
     /* What to publish over networktables for telemetry */
@@ -175,9 +180,13 @@ public class Telemetry {
      */
     public void logDataSynchronously() {
         Pose2d pose = new Pose2d(latestPose.getX(), latestPose.getY(), latestPose.getRotation());
-        Logger.recordOutput("Telemetry/fieldToRobot3d", getFieldToRobot3d());
-        Logger.recordOutput("Telemetry/fieldToRobot", pose);
-        Logger.recordOutput("Telemetry/moduleStates", moduleStates);
+
+        telemetryIo.setRobotPose(getFieldToRobot3d());
+        telemetryIo.setRobotPose(pose);
+        telemetryIo.setSwerveModuleStates(moduleStates);
+
+        telemetryIo.updateInputs(telemetryInputs);
+        Logger.processInputs("telemetry", telemetryInputs);
     }
 
     public double getRotationRadians() {

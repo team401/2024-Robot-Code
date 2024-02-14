@@ -22,9 +22,11 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignState;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignTarget;
+import frc.robot.subsystems.endgame.EndgameIO;
 import frc.robot.subsystems.endgame.EndgameIOSim;
 import frc.robot.subsystems.endgame.EndgameIOSparkFlex;
 import frc.robot.subsystems.endgame.EndgameSubsystem;
+import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -32,14 +34,20 @@ import frc.robot.subsystems.intake.IntakeSubsystem.IntakeAction;
 import frc.robot.subsystems.localization.VisionIOReal;
 import frc.robot.subsystems.localization.VisionIOSim;
 import frc.robot.subsystems.localization.VisionLocalizer;
+import frc.robot.subsystems.scoring.AimerIO;
 import frc.robot.subsystems.scoring.AimerIOSim;
 import frc.robot.subsystems.scoring.AimerIOTalon;
+import frc.robot.subsystems.scoring.HoodIO;
 import frc.robot.subsystems.scoring.HoodIOSim;
 import frc.robot.subsystems.scoring.HoodIOSparkFlex;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringAction;
+import frc.robot.subsystems.scoring.ShooterIO;
 import frc.robot.subsystems.scoring.ShooterIOSim;
 import frc.robot.subsystems.scoring.ShooterIOTalon;
+import frc.robot.telemetry.Telemetry;
+import frc.robot.telemetry.TelemetryIO;
+import frc.robot.telemetry.TelemetryIOLive;
 import frc.robot.utils.FieldFinder;
 import java.util.Collections;
 import org.littletonrobotics.junction.Logger;
@@ -56,7 +64,7 @@ public class RobotContainer {
     VisionLocalizer tagVision;
 
     CommandSwerveDrivetrain drivetrain = FeatureFlags.runDrive ? TunerConstants.DriveTrain : null;
-    Telemetry driveTelemetry = new Telemetry(DriveConstants.MaxSpeedMetPerSec);
+    Telemetry driveTelemetry;
 
     SendableChooser<String> autoChooser = new SendableChooser<String>();
 
@@ -72,6 +80,11 @@ public class RobotContainer {
     public void configureSubsystems() {
         switch (Constants.currentMode) {
             case REAL:
+                if (FeatureFlags.runDrive) {
+                    driveTelemetry =
+                            new Telemetry(DriveConstants.MaxSpeedMetPerSec, new TelemetryIOLive());
+                }
+
                 if (FeatureFlags.runScoring) {
                     scoringSubsystem =
                             new ScoringSubsystem(
@@ -94,6 +107,9 @@ public class RobotContainer {
                 break;
             case SIM:
                 if (FeatureFlags.runDrive) {
+                    driveTelemetry =
+                            new Telemetry(DriveConstants.MaxSpeedMetPerSec, new TelemetryIOLive());
+
                     drivetrain.seedFieldRelative(DriveConstants.initialPose);
                 }
 
@@ -126,6 +142,40 @@ public class RobotContainer {
                 }
                 break;
             case REPLAY:
+                if (FeatureFlags.runDrive) {
+                    driveTelemetry =
+                            new Telemetry(DriveConstants.MaxSpeedMetPerSec, new TelemetryIO() {});
+
+                    drivetrain.seedFieldRelative(DriveConstants.initialPose);
+                }
+
+                if (FeatureFlags.runEndgame) {
+                    endgameSubsystem = new EndgameSubsystem(new EndgameIO() {});
+                }
+
+                if (FeatureFlags.runScoring) {
+                    scoringSubsystem =
+                            new ScoringSubsystem(
+                                    new ShooterIO() {}, new AimerIO() {}, new HoodIO() {});
+                }
+
+                if (FeatureFlags.simulateVision) {
+                    tagVision =
+                            new VisionLocalizer(
+                                    new VisionIOSim(
+                                            VisionConstants.cameras,
+                                            driveTelemetry::getModuleStates));
+                } else if (FeatureFlags.runVision) {
+                    tagVision =
+                            new VisionLocalizer(
+                                    new VisionIOSim(
+                                            Collections.emptyList(),
+                                            driveTelemetry::getModuleStates));
+                }
+
+                if (FeatureFlags.runIntake) {
+                    intakeSubsystem = new IntakeSubsystem(new IntakeIO() {});
+                }
                 break;
         }
 
