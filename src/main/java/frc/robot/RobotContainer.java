@@ -60,7 +60,8 @@ public class RobotContainer {
     VisionLocalizer tagVision;
 
     CommandSwerveDrivetrain drivetrain = FeatureFlags.runDrive ? TunerConstants.DriveTrain : null;
-    Telemetry driveTelemetry = new Telemetry(DriveConstants.MaxSpeedMetPerSec);
+    Telemetry driveTelemetry =
+            FeatureFlags.runDrive ? new Telemetry(DriveConstants.MaxSpeedMetPerSec) : null;
 
     SendableChooser<String> autoChooser = new SendableChooser<String>();
     SendableChooser<String> testModeChooser = new SendableChooser<String>();

@@ -3,8 +3,8 @@
 package frc.robot.utils;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import org.littletonrobotics.junction.Logger;
 
 public class SystemsTest extends Command {
     private Tunable subsystem;
@@ -49,7 +49,7 @@ public class SystemsTest extends Command {
                     "*********************************** Faliure with "
                             + subsystem.toString()
                             + " ***********************************");
-            Logger.recordOutput("Test-Mode/" + subsystem.toString(), false);
+            SmartDashboard.putBoolean("Test-Mode/" + subsystem.toString(), false);
             return true;
         } else if (Math.abs(subsystem.getVelocity(slot)) > 0.1) {
             return true;

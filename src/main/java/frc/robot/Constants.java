@@ -48,12 +48,12 @@ public final class Constants {
         public static final boolean runVision = false;
         public static final boolean runLocalizer = true;
 
-        public static final boolean runIntake = true;
+        public static final boolean runIntake = false;
         public static final boolean runScoring = true;
         public static final boolean runEndgame = false;
-        public static final boolean runDrive = true;
+        public static final boolean runDrive = false;
 
-        public static final boolean enableLEDS = true;
+        public static final boolean enableLEDS = false;
     }
 
     public static final class ConversionConstants {

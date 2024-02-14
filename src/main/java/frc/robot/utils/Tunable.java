@@ -1,6 +1,11 @@
 package frc.robot.utils;
 
-// Interface for subsystems to be tuned
+/**
+ * Interface for subsystems to be tuned.
+ *
+ * <p>Slots are used to differentiate between different motor-groups/io-elements in the same
+ * subsystem
+ */
 public interface Tunable {
     public double getPosition(int slot);
 
