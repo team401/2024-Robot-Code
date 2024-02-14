@@ -32,6 +32,7 @@ import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem.IntakeAction;
 import frc.robot.subsystems.localization.VisionIOReal;
+import frc.robot.subsystems.localization.VisionIOReplay;
 import frc.robot.subsystems.localization.VisionIOSim;
 import frc.robot.subsystems.localization.VisionLocalizer;
 import frc.robot.subsystems.scoring.AimerIO;
@@ -123,13 +124,7 @@ public class RobotContainer {
                                     new ShooterIOSim(), new AimerIOSim(), new HoodIOSim());
                 }
 
-                if (FeatureFlags.simulateVision) {
-                    tagVision =
-                            new VisionLocalizer(
-                                    new VisionIOSim(
-                                            VisionConstants.cameras,
-                                            driveTelemetry::getModuleStates));
-                } else if (FeatureFlags.runVision) {
+                if (FeatureFlags.runVision) {
                     tagVision =
                             new VisionLocalizer(
                                     new VisionIOSim(
@@ -159,22 +154,13 @@ public class RobotContainer {
                                     new ShooterIO() {}, new AimerIO() {}, new HoodIO() {});
                 }
 
-                if (FeatureFlags.simulateVision) {
-                    tagVision =
-                            new VisionLocalizer(
-                                    new VisionIOSim(
-                                            VisionConstants.cameras,
-                                            driveTelemetry::getModuleStates));
-                } else if (FeatureFlags.runVision) {
-                    tagVision =
-                            new VisionLocalizer(
-                                    new VisionIOSim(
-                                            Collections.emptyList(),
-                                            driveTelemetry::getModuleStates));
-                }
-
                 if (FeatureFlags.runIntake) {
                     intakeSubsystem = new IntakeSubsystem(new IntakeIO() {});
+                }
+
+                if (FeatureFlags.runVision) {
+                    tagVision =
+                            new VisionLocalizer(new VisionIOReplay(VisionConstants.cameras.size()));
                 }
                 break;
         }
