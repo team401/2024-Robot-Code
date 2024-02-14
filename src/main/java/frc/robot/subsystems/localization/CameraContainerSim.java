@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.simulation.VisionSystemSim;
 
-public class VisionIOSim implements VisionIO {
+public class CameraContainerSim implements CameraContainer {
 
     private VisionSystemSim visionSim = new VisionSystemSim("main");
 
@@ -35,7 +35,8 @@ public class VisionIOSim implements VisionIO {
             };
     private Timer dtTimer = new Timer();
 
-    public VisionIOSim(List<CameraParams> params, Supplier<SwerveModuleState[]> getModuleStates) {
+    public CameraContainerSim(
+            List<CameraParams> params, Supplier<SwerveModuleState[]> getModuleStates) {
         this.getModuleStates = getModuleStates;
 
         visionSim.addAprilTags(VisionConstants.fieldLayout);
