@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FeatureFlags;
@@ -50,6 +51,7 @@ import frc.robot.telemetry.Telemetry;
 import frc.robot.telemetry.TelemetryIO;
 import frc.robot.telemetry.TelemetryIOLive;
 import frc.robot.telemetry.TelemetryIOSim;
+import frc.robot.utils.ControllerJSONReader;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.feedforward.TuneG;
 import frc.robot.utils.feedforward.TuneS;
@@ -85,11 +87,12 @@ public class RobotContainer {
         configureSubsystems();
         configureModes();
         configureAutonomous();
+        configureBindings();
     }
 
     // spotless:off
     private void configureBindings() {
-        ControllerJSONReader.pullConfiguration("SimJoysticks");
+        ControllerJSONReader.pullConfiguration("SingleController");
         triggers = ControllerJSONReader.getTriggers();
         axes = ControllerJSONReader.getAxes();
         pov = ControllerJSONReader.getPOVs();
@@ -425,7 +428,8 @@ public class RobotContainer {
 
     public void testInit() {
         // Resets bindings
-        controller = new CommandXboxController(2);
+
+        CommandXboxController testController = new CommandXboxController(2);
 
         // spotless:off
         switch (testModeChooser.getSelected()) {
@@ -484,10 +488,10 @@ public class RobotContainer {
 
                 scoringSubsystem.setAction(ScoringAction.OVERRIDE);
 
-                controller.a()
+                testController.a()
                     .onTrue(new TuneS(scoringSubsystem, 0));
 
-                controller.b()
+                testController.b()
                     .onTrue(new TuneG(scoringSubsystem, 0));
 
                 controller.y()
@@ -531,7 +535,7 @@ public class RobotContainer {
 
                 controller.x().onTrue(new InstantCommand(() -> scoringSubsystem.homeHood()));
 
-                controller.y()
+                testController.y()
                     .onTrue(new InstantCommand(() -> scoringSubsystem.setPID(
                         SmartDashboard.getNumber("Test-Mode/hood/kP", ScoringConstants.hoodkP),
                         SmartDashboard.getNumber("Test-Mode/hood/kI", ScoringConstants.hoodkI),
@@ -545,11 +549,11 @@ public class RobotContainer {
                     .onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.TEMPORARY_SETPOINT)))
                     .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.OVERRIDE)));
 
-                controller.leftBumper()
+                testController.leftBumper()
                     .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(1.0, 1)))
                     .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 1)));
 
-                controller.rightBumper()
+                testController.rightBumper()
                     .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(-1.0, 1)))
                     .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 1)));
                 break;
@@ -606,13 +610,13 @@ public class RobotContainer {
 
                 endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.OVERRIDE);
 
-                controller.a()
+                testController.a()
                     .onTrue(new TuneS(endgameSubsystem, 0));
 
-                controller.b()
+                testController.b()
                     .onTrue(new TuneG(endgameSubsystem, 0));
 
-                controller.x()
+                testController.x()
                     .onTrue(new TuneV(endgameSubsystem, 1.0, 0));
                 
                 controller.leftBumper()

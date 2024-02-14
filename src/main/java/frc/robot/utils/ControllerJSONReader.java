@@ -24,6 +24,7 @@ public class ControllerJSONReader {
     private static HashMap<String, DoubleSupplier> axes;
     private static HashMap<String, IntSupplier> pov;
 
+    // gets json objects from chosen json file
     public static void pullConfiguration(String configuration) {
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject;
@@ -47,25 +48,31 @@ public class ControllerJSONReader {
         setPOV((JSONArray) jsonObject.get("pov"));
     }
 
+    // initializes controllers based on json file data
     private static HashMap<Integer, CommandGenericHID> setControllers(JSONArray controllersJSON) {
         HashMap<Integer, CommandGenericHID> controllersList =
                 new HashMap<Integer, CommandGenericHID>();
         Iterator<JSONObject> iterator = controllersJSON.iterator();
         while (iterator.hasNext()) {
+            // initializes each controller
             JSONObject controller = iterator.next();
-            if (((String) controller.get("type")).equals("joystick"))
+            // joysticks
+            if (((String) controller.get("type")).equals("joystick")) {
                 controllersList.put(
                         ((Long) controller.get("port")).intValue(),
                         new CommandJoystick(((Long) controller.get("port")).intValue()));
-            else
+            } else {
+                // xbox controller
                 controllersList.put(
                         ((Long) controller.get("port")).intValue(),
                         new CommandXboxController(((Long) controller.get("port")).intValue()));
+            }
         }
         controllers = controllersList;
         return controllersList;
     }
 
+    // assigns triggers to string keys
     private static HashMap<String, Trigger> setTriggers(JSONArray triggersJSON) {
         HashMap<String, Trigger> triggerList = new HashMap<String, Trigger>();
         Iterator<JSONObject> iterator = triggersJSON.iterator();
@@ -74,6 +81,8 @@ public class ControllerJSONReader {
             Trigger t;
 
             int port = ((Long) trigger.get("controller")).intValue();
+
+            // first case is for xbox controllers, second case is for joysticks
             switch (((String) trigger.get("button"))) {
                 case "a":
                 case "1":
@@ -153,6 +162,7 @@ public class ControllerJSONReader {
         return triggerList;
     }
 
+    // assigns axis doublesuppliers to string keys
     private static HashMap<String, DoubleSupplier> setAxes(JSONArray axisJSON) {
         HashMap<String, DoubleSupplier> axisList = new HashMap<String, DoubleSupplier>();
         Iterator<JSONObject> iterator = axisJSON.iterator();
@@ -161,6 +171,8 @@ public class ControllerJSONReader {
             DoubleSupplier t;
 
             int port = ((Long) axis.get("controller")).intValue();
+
+            // first case is for xbox controller, second case is for joysticks
             switch (((String) axis.get("axis"))) {
                 case "leftX":
                 case "xAxis":
@@ -208,8 +220,7 @@ public class ControllerJSONReader {
         return axisList;
     }
 
-    // controller.getHID().getPOV(),
-
+    // assigns pov intsuppliers to string keys
     private static HashMap<String, IntSupplier> setPOV(JSONArray povJSON) {
         HashMap<String, IntSupplier> povList = new HashMap<String, IntSupplier>();
         Iterator<JSONObject> iterator = povJSON.iterator();
@@ -226,6 +237,8 @@ public class ControllerJSONReader {
         pov = povList;
         return povList;
     }
+
+    // methods to get controllers, triggers, axes, povs for robotcontainer use
 
     public static HashMap<Integer, CommandGenericHID> getControllers() {
         if (controllers == null) {
