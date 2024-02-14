@@ -14,14 +14,14 @@ import org.littletonrobotics.junction.Logger;
 
 public class VisionLocalizer extends SubsystemBase {
 
-    private VisionIO io;
+    private CameraContainer io;
 
     // avoid NullPointerExceptions by setting a default no-op
     private Consumer<CameraMeasurement> cameraConsumer = (c) -> {};
 
     private Supplier<Pose2d> fieldToRobotSupplier = () -> new Pose2d();
 
-    public VisionLocalizer(VisionIO io) {
+    public VisionLocalizer(CameraContainer io) {
         this.io = io;
     }
 

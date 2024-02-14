@@ -31,9 +31,9 @@ import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem.IntakeAction;
-import frc.robot.subsystems.localization.VisionIOReal;
-import frc.robot.subsystems.localization.VisionIOReplay;
-import frc.robot.subsystems.localization.VisionIOSim;
+import frc.robot.subsystems.localization.CameraContainerReal;
+import frc.robot.subsystems.localization.CameraContainerReplay;
+import frc.robot.subsystems.localization.CameraContainerSim;
 import frc.robot.subsystems.localization.VisionLocalizer;
 import frc.robot.subsystems.scoring.AimerIO;
 import frc.robot.subsystems.scoring.AimerIOSim;
@@ -50,7 +50,6 @@ import frc.robot.telemetry.Telemetry;
 import frc.robot.telemetry.TelemetryIO;
 import frc.robot.telemetry.TelemetryIOLive;
 import frc.robot.utils.FieldFinder;
-import java.util.Collections;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -103,7 +102,8 @@ public class RobotContainer {
                 }
 
                 if (FeatureFlags.runVision) {
-                    tagVision = new VisionLocalizer(new VisionIOReal(VisionConstants.cameras));
+                    tagVision =
+                            new VisionLocalizer(new CameraContainerReal(VisionConstants.cameras));
                 }
                 break;
             case SIM:
@@ -127,8 +127,8 @@ public class RobotContainer {
                 if (FeatureFlags.runVision) {
                     tagVision =
                             new VisionLocalizer(
-                                    new VisionIOSim(
-                                            Collections.emptyList(),
+                                    new CameraContainerSim(
+                                            VisionConstants.cameras,
                                             driveTelemetry::getModuleStates));
                 }
 
@@ -160,7 +160,8 @@ public class RobotContainer {
 
                 if (FeatureFlags.runVision) {
                     tagVision =
-                            new VisionLocalizer(new VisionIOReplay(VisionConstants.cameras.size()));
+                            new VisionLocalizer(
+                                    new CameraContainerReplay(VisionConstants.cameras.size()));
                 }
                 break;
         }
