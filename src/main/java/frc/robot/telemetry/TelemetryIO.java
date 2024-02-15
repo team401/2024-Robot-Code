@@ -19,6 +19,8 @@ public interface TelemetryIO {
                     new SwerveModuleState(),
                     new SwerveModuleState()
                 };
+        public double accelerationX = 0.0;
+        public double accelerationY = 0.0;
     }
 
     public default void updateInputs(TelemetryIOInputs inputs) {}
