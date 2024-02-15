@@ -72,6 +72,7 @@ public class Telemetry {
 
     double accelFiltered = 0.0;
     double prevVelocityNorm = 0.0;
+    double prevVelocityFilteredNorm = 0.0;
 
     /* Keep a reference of the last pose to calculate the speeds */
     Pose2d latestPose = new Pose2d();
@@ -167,7 +168,14 @@ public class Telemetry {
         accelFiltered = diffVelocity / diffTime;
         odomPeriod.set(state.OdometryPeriod);
 
-        prevVelocityNorm = velocities.getNorm();
+        /* calculate norm from filtered velocities and set filtered acceleration */
+        double velocityFilteredNorm =
+                Math.sqrt(Math.pow(velocityXFiltered, 2) + Math.pow(velocityYFiltered, 2));
+        double diffVelocityFiltered = velocityFilteredNorm - prevVelocityFilteredNorm;
+        accelFiltered = diffVelocityFiltered / diffTime;
+
+        /* update previous to current norm after calculations */
+        prevVelocityFilteredNorm = velocityFilteredNorm;
 
         latestModuleStates = state.ModuleStates;
 
