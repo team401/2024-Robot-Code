@@ -226,4 +226,8 @@ public class Telemetry {
     public double getVelocityY() {
         return velocityYFiltered;
     }
+
+    public double getAcceleration() {
+        return accelFiltered;
+    }
 }
