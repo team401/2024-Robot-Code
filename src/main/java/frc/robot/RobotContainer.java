@@ -429,7 +429,10 @@ public class RobotContainer {
     public void testInit() {
         // Resets bindings
 
-        CommandXboxController testController = new CommandXboxController(2);
+        HashMap<String, Trigger> testTriggers;
+
+        ControllerJSONReader.pullConfiguration("SingleControllerTestMode");
+        testTriggers = ControllerJSONReader.getTriggers();
 
         // spotless:off
         switch (testModeChooser.getSelected()) {
@@ -488,10 +491,10 @@ public class RobotContainer {
 
                 scoringSubsystem.setAction(ScoringAction.OVERRIDE);
 
-                testController.a()
+                testTriggers.get("a")
                     .onTrue(new TuneS(scoringSubsystem, 0));
 
-                testController.b()
+                testTriggers.get("b")
                     .onTrue(new TuneG(scoringSubsystem, 0));
 
                 controller.y()
@@ -535,7 +538,7 @@ public class RobotContainer {
 
                 controller.x().onTrue(new InstantCommand(() -> scoringSubsystem.homeHood()));
 
-                testController.y()
+                testTriggers.get("y")
                     .onTrue(new InstantCommand(() -> scoringSubsystem.setPID(
                         SmartDashboard.getNumber("Test-Mode/hood/kP", ScoringConstants.hoodkP),
                         SmartDashboard.getNumber("Test-Mode/hood/kI", ScoringConstants.hoodkI),
@@ -549,11 +552,11 @@ public class RobotContainer {
                     .onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.TEMPORARY_SETPOINT)))
                     .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.OVERRIDE)));
 
-                testController.leftBumper()
+                testTriggers.get("leftBumper")
                     .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(1.0, 1)))
                     .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 1)));
 
-                testController.rightBumper()
+                testTriggers.get("rightBumper")
                     .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(-1.0, 1)))
                     .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 1)));
                 break;
@@ -610,13 +613,13 @@ public class RobotContainer {
 
                 endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.OVERRIDE);
 
-                testController.a()
+                testTriggers.get("a")
                     .onTrue(new TuneS(endgameSubsystem, 0));
 
-                testController.b()
+                testTriggers.get("b")
                     .onTrue(new TuneG(endgameSubsystem, 0));
 
-                testController.x()
+                testTriggers.get("x")
                     .onTrue(new TuneV(endgameSubsystem, 1.0, 0));
                 
                 controller.leftBumper()

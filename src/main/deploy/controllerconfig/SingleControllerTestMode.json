@@ -1,0 +1,67 @@
+{
+    "controllers": [
+        {
+            "port": 2,
+            "type": "gamepad"
+        }
+    ],
+
+    "buttons": [
+        {   "command": "a",
+            "controller": 2,
+            "button": "a"
+        },
+        {
+            "command": "b",
+            "controller": 2,
+            "button": "b"
+        },
+        {
+            "command": "right",
+            "controller": 2,
+            "button": "rightBumper"
+        },
+        {
+            "command": "x",
+            "controller": 2,
+            "button": "x"
+        },
+        {
+            
+            "command": "y",
+            "controller": 2,
+            "button": "y"
+        },
+        {
+            "command": "left",
+            "controller": 2,
+            "button": "leftBumper"
+        }
+    ],
+
+    "axes": [
+        {   "command": "xDrive",
+            "controller": 2,
+            "axis": "leftY",
+            "negate": true
+        },
+        {
+            "command": "yDrive",
+            "controller": 2,
+            "axis": "leftX",
+            "negate": true
+        },
+        {
+            "command": "rotation",
+            "controller": 2,
+            "axis": "rightX",
+            "negate": true
+        }
+    ],
+
+    "pov": [
+        {   "command": "pov",
+            "controller": 2
+        }
+    ]
+}
