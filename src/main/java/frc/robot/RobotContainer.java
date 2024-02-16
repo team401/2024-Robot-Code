@@ -318,6 +318,7 @@ public class RobotContainer {
     public void enabledInit() {
         if (FeatureFlags.runScoring) {
             scoringSubsystem.setAction(ScoringAction.WAIT);
+            scoringSubsystem.homeHood();
         }
         if (FeatureFlags.runEndgame) {
             endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.CANCEL);

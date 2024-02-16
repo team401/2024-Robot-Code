@@ -91,6 +91,7 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().cancelAll();
 
         robotContainer.enabledInit();
+        robotContainer.teleopInit();
     }
 
     @Override
@@ -106,6 +107,7 @@ public class Robot extends LoggedRobot {
     public void testInit() {
         CommandScheduler.getInstance().cancelAll();
 
+        robotContainer.enabledInit();
         robotContainer.testInit();
     }
 
