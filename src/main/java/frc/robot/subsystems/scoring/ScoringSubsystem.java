@@ -50,6 +50,10 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     private double aimerGoalAngleRadTuning = 0.0;
     private double kickerVoltsTuning = 0.0;
 
+    private boolean overrideIntake = false;
+    private boolean overrideShoot = false;
+    private boolean overrideStageAvoidance = false;
+
     private final Mechanism2d mechanism = new Mechanism2d(2.2, 2.0);
     private final MechanismRoot2d rootMechanism = mechanism.getRoot("scoring", 0.6, 0.3);
     private final MechanismLigament2d aimMechanism =
@@ -118,7 +122,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
         Logger.recordOutput("scoring/aimGoal", 0.0);
 
-        if (!hasNote() && action == ScoringAction.INTAKE) {
+        if ((!hasNote() || overrideIntake) && action == ScoringAction.INTAKE) {
             state = ScoringState.INTAKE;
         } else if (action == ScoringAction.AIM || action == ScoringAction.SHOOT) {
             state = ScoringState.PRIME;
@@ -162,7 +166,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         boolean aimReady =
                 Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad)
                         < ScoringConstants.aimAngleMarginRadians; // TODO: Tune
-        boolean driveReady = true; // TODO: Add drive ready
+        boolean driveReady = driveAllignedSupplier.get();
         boolean notePresent = hasNote();
 
         boolean primeReady = shooterReady && aimReady && driveReady && notePresent;
@@ -170,7 +174,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
         if (action != ScoringAction.SHOOT && action != ScoringAction.AIM) {
             state = ScoringState.IDLE;
-        } else if (action == ScoringAction.SHOOT && primeReady) {
+        } else if (action == ScoringAction.SHOOT && (primeReady || overrideShoot)) {
             state = ScoringState.SHOOT;
 
             shootTimer.reset();
@@ -203,7 +207,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
         if (action != ScoringAction.SHOOT && action != ScoringAction.AMP_AIM) {
             state = ScoringState.IDLE;
-        } else if (action == ScoringAction.SHOOT && primeReady) {
+        } else if (action == ScoringAction.SHOOT && (primeReady || overrideShoot)) {
             state = ScoringState.AMP_SHOOT;
 
             shootTimer.reset();
@@ -332,7 +336,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         if (state == ScoringState.TEMPORARY_SETPOINT) {
             aimerIo.setAngleClampsRad(0.0, Math.PI);
         } else if (state != ScoringState.TUNING
-                && action != ScoringAction.ENDGAME
+                && state != ScoringState.ENDGAME
+                && !overrideStageAvoidance
                 && (FieldFinder.willIHitThis(
                                 poseSupplier.get().getX(),
                                 poseSupplier.get().getY(),
@@ -433,6 +438,18 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     public void setTuningKickerVolts(double kickerVoltsTuning) {
         this.kickerVoltsTuning = kickerVoltsTuning;
+    }
+
+    public void setOverrideIntake(boolean overrideIntake) {
+        this.overrideIntake = overrideIntake;
+    }
+
+    public void setOverrideShoot(boolean overrideShoot) {
+        this.overrideShoot = overrideShoot;
+    }
+
+    public void setOverrideStageAvoidance(boolean overrideStageAvoidance) {
+        this.overrideStageAvoidance = overrideStageAvoidance;
     }
 
     @Override
