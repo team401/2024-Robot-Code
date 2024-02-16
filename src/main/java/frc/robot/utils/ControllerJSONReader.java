@@ -1,5 +1,6 @@
 package frc.robot.utils;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
@@ -153,6 +154,8 @@ public class ControllerJSONReader {
                     break;
                 default:
                     t = null;
+                    DriverStation.reportError(
+                            "Trigger" + (String) trigger.get("button") + "not found", false);
                     break;
             }
 
@@ -211,6 +214,8 @@ public class ControllerJSONReader {
                     break;
                 default:
                     t = null;
+                    DriverStation.reportError(
+                            "Axis" + (String) axis.get("button") + "not found", false);
                     break;
             }
 
@@ -229,6 +234,7 @@ public class ControllerJSONReader {
 
             if (controllers.get(p.get("controller")) == null) {
                 povList.put((String) p.get("command"), () -> 0);
+                DriverStation.reportError("POV" + (String) p.get("command") + "not found", false);
             } else
                 povList.put(
                         (String) p.get("command"),
