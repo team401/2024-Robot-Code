@@ -579,4 +579,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     public boolean readyToShoot() {
         return readyToShoot;
     }
+
+    public void setKickerVolts(double volts) {
+        shooterIo.setKickerVolts(volts);
+    }
 }

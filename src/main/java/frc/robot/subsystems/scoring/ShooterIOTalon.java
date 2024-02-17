@@ -1,12 +1,12 @@
 package frc.robot.subsystems.scoring;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.wpilibj.DigitalInput;
-import frc.robot.Constants;
 import frc.robot.Constants.ConversionConstants;
 import frc.robot.Constants.ScoringConstants;
 
@@ -22,7 +22,7 @@ public class ShooterIOTalon implements ShooterIO {
     private final MotionMagicConfigs configs = new MotionMagicConfigs();
     private final Slot0Configs slot0 = new Slot0Configs();
 
-    DigitalInput bannerSensor = new DigitalInput(Constants.SensorConstants.bannerPort);
+    // DigitalInput bannerSensor = new DigitalInput(Constants.SensorConstants.bannerPort);
 
     private boolean override = false;
     private double overrideVolts = 0.0;
@@ -31,10 +31,29 @@ public class ShooterIOTalon implements ShooterIO {
     double goalRightVelocityRPM = 0.0;
 
     public ShooterIOTalon() {
-        shooterRight.setInverted(true);
+        kicker.setInverted(true);
+
+        shooterLeft.setInverted(true);
+        shooterRight.setInverted(false);
 
         shooterLeft.setNeutralMode(NeutralModeValue.Coast);
         shooterRight.setNeutralMode(NeutralModeValue.Coast);
+
+        TalonFXConfigurator shooterLeftConfig = shooterLeft.getConfigurator();
+        // shooterLeftConfig.apply(new
+        // MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
+        shooterLeftConfig.apply(
+                new CurrentLimitsConfigs()
+                        .withSupplyCurrentLimit(60)
+                        .withStatorCurrentLimitEnable(false));
+
+        TalonFXConfigurator shooterRightConfig = shooterRight.getConfigurator();
+        // shooterRightConfig.apply(new
+        // MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
+        shooterRightConfig.apply(
+                new CurrentLimitsConfigs()
+                        .withSupplyCurrentLimit(60)
+                        .withStatorCurrentLimitEnable(false));
 
         slot0.withKP(ScoringConstants.shooterkP);
         slot0.withKI(ScoringConstants.shooterkI);
@@ -116,6 +135,7 @@ public class ShooterIOTalon implements ShooterIO {
         inputs.kickerAppliedVolts = kicker.getMotorVoltage().getValueAsDouble();
         inputs.kickerCurrentAmps = kicker.getSupplyCurrent().getValueAsDouble();
 
-        inputs.bannerSensor = bannerSensor.get();
+        // inputs.bannerSensor = bannerSensor.get();
+        inputs.bannerSensor = false;
     }
 }

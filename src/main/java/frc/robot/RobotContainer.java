@@ -318,7 +318,7 @@ public class RobotContainer {
     public void enabledInit() {
         if (FeatureFlags.runScoring) {
             scoringSubsystem.setAction(ScoringAction.WAIT);
-            scoringSubsystem.homeHood();
+            // scoringSubsystem.homeHood();
         }
         if (FeatureFlags.runEndgame) {
             endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.CANCEL);
@@ -330,7 +330,7 @@ public class RobotContainer {
         controller = new CommandXboxController(2);
 
         if (FeatureFlags.runScoring) {
-            scoringSubsystem.homeHood();
+            // scoringSubsystem.homeHood();
         }
 
         // spotless:off
@@ -428,12 +428,15 @@ public class RobotContainer {
                         SmartDashboard.getNumber("Test-Mode/shooter/kD", ScoringConstants.shooterkD), 2)))
                     .onTrue(new InstantCommand(() ->scoringSubsystem.runToPosition(0.25, 2)));
 
+                controller.povUp().onTrue(new InstantCommand(() -> scoringSubsystem.setKickerVolts(2.0))).onFalse(new InstantCommand(() -> scoringSubsystem.setKickerVolts(0.0)));
+                controller.povDown().onTrue(new InstantCommand(() -> scoringSubsystem.setKickerVolts(-2.0))).onFalse(new InstantCommand(() -> scoringSubsystem.setKickerVolts(0.0)));
+
                 controller.leftBumper()
-                    .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(1.0, 2)))
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(10.0, 2)))
                     .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 2)));
 
                 controller.rightBumper()
-                    .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(-1.0, 2)))
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(-10.0, 2)))
                     .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 2)));
                 break;
             case "tuning-endgame":
@@ -568,7 +571,7 @@ public class RobotContainer {
 
         // This is in teleopInit to prevent it from wasting time in auto
         if (FeatureFlags.runScoring) {
-            scoringSubsystem.homeHood();
+            // scoringSubsystem.homeHood();
         }
     }
 }

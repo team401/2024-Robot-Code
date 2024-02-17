@@ -16,7 +16,7 @@ public class HoodIOSparkFlex implements HoodIO {
     double goalAngleRad = 0.0;
 
     public HoodIOSparkFlex() {
-        hoodMotor.setSmartCurrentLimit(10);
+        hoodMotor.setSmartCurrentLimit(120);
 
         hoodMotor.getPIDController().setP(ScoringConstants.hoodkP);
         hoodMotor.getPIDController().setI(ScoringConstants.hoodkI);
@@ -51,7 +51,7 @@ public class HoodIOSparkFlex implements HoodIO {
     @Override
     public void home() {
         homing = true;
-        hoodMotor.setVoltage(-4);
+        hoodMotor.setVoltage(2);
     }
 
     @Override

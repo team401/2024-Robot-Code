@@ -189,10 +189,9 @@ public final class Constants {
     }
 
     public static final class IntakeConstants {
-        public static final int leftIntakeMotorID = 0;
-        public static final int rightIntakeMotorID = 0;
-        public static final int frontBeltMotorID = 0;
-        public static final int backBeltMotorID = 0;
+        public static final int leftIntakeMotorID = 9;
+        public static final int rightIntakeMotorID = 10;
+        public static final int indexTwoMotorID = 14;
 
         public static final int bannerSensorID = 0;
 
@@ -201,8 +200,8 @@ public final class Constants {
     }
 
     public static final class EndgameConstants {
-        public static final int leftMotorID = 1;
-        public static final int rightMotorID = 2;
+        public static final int leftMotorID = 18;
+        public static final int rightMotorID = 19;
 
         public static final int smartCurrentLimit = 25; // TODO: Tune this
 
@@ -402,15 +401,15 @@ public final class Constants {
 
         public static final double hoodEncoderToRad = 0.0;
 
-        public static final int aimLeftMotorId = 9;
-        public static final int aimRightMotorId = 10;
+        public static final int aimLeftMotorId = 15;
+        public static final int aimRightMotorId = 16;
 
         public static final int shooterLeftMotorId = 11;
         public static final int shooterRightMotorId = 12;
 
         public static final int kickerMotorId = 13;
 
-        public static final int hoodId = 14;
+        public static final int hoodId = 17;
 
         public static final int aimEncoderPort = 0; // TODO: Change
 
@@ -429,7 +428,7 @@ public final class Constants {
 
         public static final double shooterAmpVelocityRPM = 10;
 
-        public static final double hoodHomeAmps = 10.0; // TODO: Find this
+        public static final double hoodHomeAmps = 100.0; // TODO: Find this
         public static final double hoodHomeAngleRad = Math.PI;
 
         public static final double aimMaxAngleRadians = Math.PI / 2;
