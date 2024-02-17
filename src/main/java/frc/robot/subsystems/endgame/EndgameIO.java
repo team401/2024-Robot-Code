@@ -20,5 +20,7 @@ public interface EndgameIO {
 
     public default void updateInputs(EndgameIOInputs inputs) {}
 
+    public default void setPID(double p, double i, double d) {}
+
     public default void setVolts(double volts) {}
 }

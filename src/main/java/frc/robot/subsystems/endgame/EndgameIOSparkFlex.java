@@ -22,6 +22,14 @@ public class EndgameIOSparkFlex implements EndgameIO {
 
         leftEndgameMotor.getEncoder().setPositionConversionFactor(EndgameConstants.encoderToMeters);
         leftEndgameMotor.getEncoder().setPosition(0.0);
+
+        leftEndgameMotor.getPIDController().setP(EndgameConstants.climberkP);
+        leftEndgameMotor.getPIDController().setI(EndgameConstants.climberkI);
+        leftEndgameMotor.getPIDController().setD(EndgameConstants.climberkD);
+
+        rightEndgameMotor.getPIDController().setP(EndgameConstants.climberkP);
+        rightEndgameMotor.getPIDController().setI(EndgameConstants.climberkI);
+        rightEndgameMotor.getPIDController().setD(EndgameConstants.climberkD);
     }
 
     @Override
@@ -39,5 +47,16 @@ public class EndgameIOSparkFlex implements EndgameIO {
 
         inputs.position = leftEndgameMotor.getEncoder().getPosition();
         inputs.velocity = leftEndgameMotor.getEncoder().getVelocity();
+    }
+
+    @Override
+    public void setPID(double p, double i, double d) {
+        leftEndgameMotor.getPIDController().setP(p);
+        leftEndgameMotor.getPIDController().setI(i);
+        leftEndgameMotor.getPIDController().setD(d);
+
+        rightEndgameMotor.getPIDController().setP(p);
+        rightEndgameMotor.getPIDController().setI(i);
+        rightEndgameMotor.getPIDController().setD(d);
     }
 }

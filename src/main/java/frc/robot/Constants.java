@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -211,7 +212,14 @@ public final class Constants {
 
         public static final int smartCurrentLimit = 50;
 
-        public static final double encoderToMeters = Math.PI * Units.inchesToMeters(1.7567) / 20.0;
+        public static final TrapezoidProfile.Constraints climberProfileConstraints = new TrapezoidProfile.Constraints(1, 2); // TODO: Find safe values for this
+
+        // Constants for the climber PID controller
+        public static final double climberkP = 10.0; // TODO: Tune climber PID controller
+        public static final double climberkI = 0.0;
+        public static final double climberkD = 0.0;
+
+        public static final double encoderToMeters = Math.PI * Units.inchesToMeters(1.7567) / 80;
     }
 
     public static final class TunerConstants {

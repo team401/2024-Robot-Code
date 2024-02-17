@@ -1,8 +1,12 @@
 package frc.robot.subsystems.endgame;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.EndgameConstants;
 import frc.robot.utils.Tunable;
 import org.littletonrobotics.junction.Logger;
 
@@ -25,9 +29,14 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
     }
 
     private State state = State.NORMAL;
+    private final TrapezoidProfile climberProfile = new TrapezoidProfile(EndgameConstants.climberProfileConstraints);
+
+    private Timer timer = new Timer();
 
     public EndgameSubsystem(EndgameIO endgameIO) {
         this.endgameIo = endgameIO;
+
+        timer.reset();
     }
 
     public void setAction(EndgameAction action) {
@@ -80,7 +89,12 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
 
     @Override
     public void setPID(double p, double i, double d, int slot) {
-        throw new UnsupportedOperationException("Unimplemented method 'setPID'");
+        switch (slot) {
+            case 0:
+                endgameIo.setPID(p, i, d);
+            default:
+                throw new IllegalArgumentException("Invalid slot");
+        }
     }
 
     @Override
