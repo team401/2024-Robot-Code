@@ -40,20 +40,16 @@ public class ShooterIOTalon implements ShooterIO {
         shooterRight.setNeutralMode(NeutralModeValue.Coast);
 
         TalonFXConfigurator shooterLeftConfig = shooterLeft.getConfigurator();
-        // shooterLeftConfig.apply(new
-        // MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
         shooterLeftConfig.apply(
                 new CurrentLimitsConfigs()
-                        .withSupplyCurrentLimit(60)
-                        .withStatorCurrentLimitEnable(false));
+                        .withStatorCurrentLimit(60)
+                        .withStatorCurrentLimitEnable(true));
 
         TalonFXConfigurator shooterRightConfig = shooterRight.getConfigurator();
-        // shooterRightConfig.apply(new
-        // MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
         shooterRightConfig.apply(
                 new CurrentLimitsConfigs()
-                        .withSupplyCurrentLimit(60)
-                        .withStatorCurrentLimitEnable(false));
+                        .withStatorCurrentLimit(60)
+                        .withStatorCurrentLimitEnable(true));
 
         slot0.withKP(ScoringConstants.shooterkP);
         slot0.withKI(ScoringConstants.shooterkI);
@@ -99,6 +95,32 @@ public class ShooterIOTalon implements ShooterIO {
         slot0.withKP(p);
         slot0.withKI(i);
         slot0.withKD(d);
+
+        shooterLeft.getConfigurator().apply(slot0);
+        shooterRight.getConfigurator().apply(slot0);
+    }
+
+    @Override
+    public void setMaxAcceleration(double maxAcceleration) {
+        configs.withMotionMagicAcceleration(maxAcceleration);
+
+        shooterLeft.getConfigurator().apply(configs);
+        shooterRight.getConfigurator().apply(configs);
+    }
+
+    @Override
+    public void setMaxJerk(double maxJerk) {
+        configs.withMotionMagicJerk(maxJerk);
+
+        shooterLeft.getConfigurator().apply(configs);
+        shooterRight.getConfigurator().apply(configs);
+    }
+    
+    @Override
+    public void setFF(double kS, double kV, double kA) {
+        slot0.withKS(kS);
+        slot0.withKV(kV);
+        slot0.withKA(kA);
 
         shooterLeft.getConfigurator().apply(slot0);
         shooterRight.getConfigurator().apply(slot0);

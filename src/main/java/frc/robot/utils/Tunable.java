@@ -17,5 +17,11 @@ public interface Tunable {
 
     public void setPID(double p, double i, double d, int slot);
 
+    public void setFF(double kS, double kV, double kA, double kG, int slot);
+
+    public void setMaxProfileVelocity(double maxVelocity, int slot);
+
+    public void setMaxProfileAcceleration(double maxAcceleration, int slot);
+
     public void runToPosition(double position, int slot);
 }

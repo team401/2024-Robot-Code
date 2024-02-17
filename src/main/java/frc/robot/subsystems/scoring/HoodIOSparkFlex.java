@@ -27,10 +27,9 @@ public class HoodIOSparkFlex implements HoodIO {
 
         hoodMotor.getEncoder().setPosition(0.0);
         hoodMotor.getEncoder().setPositionConversionFactor(ScoringConstants.hoodEncoderToRad);
+        hoodMotor.getEncoder().setVelocityConversionFactor(ScoringConstants.hoodEncoderToRad);
 
         hoodMotor.setIdleMode(CANSparkFlex.IdleMode.kBrake);
-        hoodMotor.getEncoder().setPositionConversionFactor(15.0 / 38.0 * 2.0 * Math.PI);
-        hoodMotor.getEncoder().setVelocityConversionFactor(15.0 / 38.0 * 2.0 * Math.PI);
     }
 
     @Override
@@ -51,7 +50,7 @@ public class HoodIOSparkFlex implements HoodIO {
     @Override
     public void home() {
         homing = true;
-        hoodMotor.setVoltage(2);
+        hoodMotor.setVoltage(0.5);
     }
 
     @Override

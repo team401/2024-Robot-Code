@@ -1,8 +1,11 @@
 package frc.robot.subsystems.scoring;
 
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -37,6 +40,21 @@ public class AimerIOTalon implements AimerIO {
 
         aimerLeft.setNeutralMode(NeutralModeValue.Brake);
         aimerRight.setNeutralMode(NeutralModeValue.Brake);
+
+        aimerLeft.setInverted(true);
+        aimerRight.setInverted(false);
+
+        TalonFXConfigurator aimerLeftConfig = aimerLeft.getConfigurator();
+        aimerLeftConfig.apply(
+                new CurrentLimitsConfigs()
+                        .withStatorCurrentLimit(60)
+                        .withStatorCurrentLimitEnable(true));
+
+        TalonFXConfigurator aimerRightConfig = aimerRight.getConfigurator();
+        aimerRightConfig.apply(
+                new CurrentLimitsConfigs()
+                        .withStatorCurrentLimit(60)
+                        .withStatorCurrentLimitEnable(true));
 
         slot0.withKP(ScoringConstants.aimerkP);
         slot0.withKI(ScoringConstants.aimerkI);
@@ -90,6 +108,31 @@ public class AimerIOTalon implements AimerIO {
         slot0.withKP(p);
         slot0.withKI(i);
         slot0.withKD(d);
+
+        aimerLeft.getConfigurator().apply(slot0);
+        aimerRight.getConfigurator().apply(slot0);
+    }
+
+    @Override
+    public void setMaxVelocity(double maxVelocity) {
+        configs.withMotionMagicCruiseVelocity(maxVelocity);
+        aimerLeft.getConfigurator().apply(configs);
+        aimerRight.getConfigurator().apply(configs);
+    }
+
+    @Override
+    public void setMaxAcceleration(double maxAcceleration) {
+        configs.withMotionMagicAcceleration(maxAcceleration);
+        aimerLeft.getConfigurator().apply(configs);
+        aimerRight.getConfigurator().apply(configs);
+    }
+
+    @Override
+    public void setFF(double kS, double kV, double kA, double kG) {
+        slot0.withKS(kS);
+        slot0.withKV(kV);
+        slot0.withKA(kA);
+        slot0.withKG(kG);
 
         aimerLeft.getConfigurator().apply(slot0);
         aimerRight.getConfigurator().apply(slot0);

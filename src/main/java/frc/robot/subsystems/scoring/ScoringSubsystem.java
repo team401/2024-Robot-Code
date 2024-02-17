@@ -262,6 +262,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         hoodIo.setOverrideMode(true);
         shooterIo.setOverrideMode(true);
 
+        shooterIo.setKickerVolts(kickerVoltsTuning);
+
         if (action != ScoringAction.OVERRIDE) {
             state = ScoringState.IDLE;
 
@@ -491,13 +493,13 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         switch (slot) {
                 // Aimer
             case 0:
-                return 2 * Math.PI;
+                return Math.PI / 2.0;
                 // Hood
             case 1:
-                return 2 * Math.PI;
+                return Math.PI;
                 // Shooter
             case 2:
-                return 1000.0;
+                return 100.0;
             default:
                 throw new IllegalArgumentException("Invalid slot");
         }
@@ -544,6 +546,54 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     @Override
+    public void setMaxProfileVelocity(double maxVelocity, int slot) {
+        switch (slot) {
+                // Aimer
+            case 0:
+                aimerIo.setMaxVelocity(maxVelocity);
+                break;
+                // Shooter
+            case 2:
+                shooterIo.setMaxAcceleration(maxVelocity);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid slot");
+        }
+    }
+
+    @Override
+    public void setMaxProfileAcceleration(double maxAcceleration, int slot) {
+        switch (slot) {
+                // Aimer
+            case 0:
+                aimerIo.setMaxAcceleration(maxAcceleration);
+                break;
+                // Shooter
+            case 2:
+                shooterIo.setMaxJerk(maxAcceleration);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid slot");
+        }
+    }
+
+    @Override
+    public void setFF(double kS, double kV, double kA, double kG, int slot) {
+        switch (slot) {
+                // Aimer
+            case 0:
+                aimerIo.setFF(kS, kV, kA, kG);
+                break;
+            // Shooter
+            case 2:
+                shooterIo.setFF(kS, kV, kA);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid slot");
+        }
+    }
+
+    @Override
     public void runToPosition(double position, int slot) {
         state = ScoringState.TEMPORARY_SETPOINT;
 
@@ -578,9 +628,5 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     public boolean readyToShoot() {
         return readyToShoot;
-    }
-
-    public void setKickerVolts(double volts) {
-        shooterIo.setKickerVolts(volts);
     }
 }

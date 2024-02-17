@@ -405,7 +405,7 @@ public final class Constants {
 
         public static final double hoodPositionTolerance = 0.01;
 
-        public static final double hoodEncoderToRad = 0.0;
+        public static final double hoodEncoderToRad = (0.3947368421) * (2.0 * Math.PI);
 
         public static final int aimLeftMotorId = 15;
         public static final int aimRightMotorId = 16;

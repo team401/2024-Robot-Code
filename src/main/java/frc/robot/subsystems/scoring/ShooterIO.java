@@ -32,4 +32,10 @@ public interface ShooterIO {
     public default void setOverrideVolts(double volts) {}
 
     public default void setPID(double p, double i, double d) {}
+
+    public default void setMaxAcceleration(double maxAcceleration) {}
+
+    public default void setMaxJerk(double maxJerk) {}
+
+    public default void setFF(double kS, double kV, double kA) {}
 }
