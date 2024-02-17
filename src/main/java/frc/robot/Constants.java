@@ -107,6 +107,12 @@ public final class Constants {
 
         public static final Translation2d fieldToBlueSpeaker =
                 new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42));
+
+        public static final Pose2d robotAgainstBlueSpeaker =
+                new Pose2d(1.39, 5.56, Rotation2d.fromDegrees(180));
+
+        public static final Pose2d robotAgainstRedSpeaker =
+                new Pose2d(15.19, 5.56, Rotation2d.fromDegrees(0));
     }
 
     public static final class VisionConstants {
