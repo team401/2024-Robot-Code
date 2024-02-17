@@ -584,7 +584,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
             case 0:
                 aimerIo.setFF(kS, kV, kA, kG);
                 break;
-            // Shooter
+                // Shooter
             case 2:
                 shooterIo.setFF(kS, kV, kA);
                 break;

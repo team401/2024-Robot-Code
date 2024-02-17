@@ -115,7 +115,7 @@ public class ShooterIOTalon implements ShooterIO {
         shooterLeft.getConfigurator().apply(configs);
         shooterRight.getConfigurator().apply(configs);
     }
-    
+
     @Override
     public void setFF(double kS, double kV, double kA) {
         slot0.withKS(kS);
