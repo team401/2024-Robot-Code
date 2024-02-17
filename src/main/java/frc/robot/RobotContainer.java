@@ -5,8 +5,12 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+<<<<<<< HEAD
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
+=======
+import edu.wpi.first.math.geometry.Translation3d;
+>>>>>>> 0720d10 (saving progress)
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -58,8 +62,13 @@ import frc.robot.telemetry.TelemetryIO;
 import frc.robot.telemetry.TelemetryIOLive;
 import frc.robot.telemetry.TelemetryIOSim;
 import frc.robot.utils.FieldFinder;
+<<<<<<< HEAD
 import frc.robot.utils.feedforward.TuneG;
 import frc.robot.utils.feedforward.TuneS;
+=======
+import frc.robot.utils.NoteSimSubsystem;
+import java.util.Collections;
+>>>>>>> 0720d10 (saving progress)
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
