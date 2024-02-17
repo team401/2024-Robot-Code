@@ -42,6 +42,7 @@ public class ScoringSubsystem extends SubsystemBase {
     private Supplier<Boolean> driveAllignedSupplier = () -> true;
 
     private final InterpolateDouble shooterInterpolated;
+    private final InterpolateDouble shooterVelocityToRpmInterpolated;
     private final InterpolateDouble aimerInterpolated;
     private final InterpolateDouble timeToPutAimDown;
 
@@ -88,6 +89,8 @@ public class ScoringSubsystem extends SubsystemBase {
         this.hoodIo = hoodIo;
 
         shooterInterpolated = new InterpolateDouble(ScoringConstants.getShooterMap());
+        shooterVelocityToRpmInterpolated =
+                new InterpolateDouble(ScoringConstants.getShooterVelocityToRpmMap());
 
         aimerInterpolated =
                 new InterpolateDouble(
@@ -146,9 +149,16 @@ public class ScoringSubsystem extends SubsystemBase {
 
     private void prime() {
         double distancetoGoal = findDistanceToGoal();
+        double velocityToGoal =
+                GeomUtil.findVelocityTowardPoint(
+                        velocitySupplier.get(),
+                        GeomUtil.poseToTranslation(poseSupplier.get()),
+                        speakerSupplier.get());
 
         Logger.recordOutput("scoring/aimGoal", aimerInterpolated.getValue(distancetoGoal));
-        shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
+        shooterIo.setShooterVelocityRPM(
+                shooterInterpolated.getValue(distancetoGoal)
+                        - shooterVelocityToRpmInterpolated.getValue(velocityToGoal));
         aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal), false);
 
         boolean shooterReady =

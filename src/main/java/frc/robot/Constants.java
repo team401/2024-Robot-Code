@@ -477,6 +477,15 @@ public final class Constants {
             return map;
         }
 
+        // Key - Velocity toward goal in meters per second
+        // Value - Shooter RPM to subtract
+        public static HashMap<Double, Double> getShooterVelocityToRpmMap() { // TODO: Find this
+            HashMap<Double, Double> map = new HashMap<Double, Double>();
+            map.put(0.0, 0.0);
+            map.put(10.0, 10.0);
+            return map;
+        }
+
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters
         // Value - Time in seconds
