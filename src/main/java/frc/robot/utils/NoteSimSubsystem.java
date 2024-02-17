@@ -49,6 +49,7 @@ public class NoteSimSubsystem {
     }
 
     public Command launch(Translation3d launchVelocity) {
+
         launching = true;
         lastVelocity = launchVelocity;
         lastRecordedTime = 0;
@@ -58,9 +59,11 @@ public class NoteSimSubsystem {
 
         return Commands.run(
                         () -> {
+                            SmartDashboard.putBoolean("??", true);
                             calculateTrajectory();
                             getNotePosition();
                         })
+                .ignoringDisable(true)
                 .until(
                         () ->
                                 lastNotePos.getZ() <= 0

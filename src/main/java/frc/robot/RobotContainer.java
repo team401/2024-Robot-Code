@@ -14,6 +14,10 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+<<<<<<< HEAD
+=======
+import edu.wpi.first.wpilibj2.command.Command;
+>>>>>>> 65458a3 (still struggling a bit- tried importing NoteVisualizer by Advantagekit, which does work)
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -99,6 +103,91 @@ public class RobotContainer {
         configureAutonomous();
     }
 
+<<<<<<< HEAD
+=======
+    // spotless:off
+    private void configureBindings() {
+        if (FeatureFlags.runDrive) {
+            drivetrain.setDefaultCommand(
+                    new DriveWithJoysticks(
+                            drivetrain,
+                            () -> -controller.getLeftY(),
+                            () -> -controller.getLeftX(),
+                            () -> -controller.getRightX(),
+                            () -> controller.getHID().getPOV(),
+                            () -> true,
+                            () -> false,
+                            () -> controller.getHID().getLeftBumper()));
+                
+            controller.rightBumper()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignState(AlignState.ALIGNING)))
+                .onFalse(new InstantCommand(
+                    () -> drivetrain.setAlignState(AlignState.MANUAL)));
+        }
+
+        if (FeatureFlags.runScoring) {
+            controller.a()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.INTAKE)))
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignState(AlignState.MANUAL)))
+                .onTrue(new InstantCommand(
+                    () -> intakeSubsystem.toggle()));
+
+            controller.b()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                         ScoringSubsystem.ScoringAction.AIM)))
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
+
+            controller.x()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.SHOOT)))
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)))
+                .onFalse(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.AIM)));
+
+            controller.y()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.ENDGAME)))
+                .onFalse(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.WAIT)));
+
+            controller.back()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.AMP_AIM)))
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.AMP)));
+
+            controller.start()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.WAIT)))
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignState(AlignState.MANUAL)));
+
+            controller.rightTrigger()
+            .whileTrue(launchCommand());
+        }
+    } // spotless:on
+
+    public Command launchCommand() {
+        NoteSimSubsystem note = new NoteSimSubsystem(drivetrain, scoringSubsystem);
+        return Commands.sequence(note.launch(new Translation3d(5, 0, 5)), Commands.idle());
+    }
+
+    private void configureModes() {}
+
+>>>>>>> 65458a3 (still struggling a bit- tried importing NoteVisualizer by Advantagekit, which does work)
     public void configureSubsystems() {
         switch (Constants.currentMode) {
             case REAL:
