@@ -1,6 +1,5 @@
 package frc.robot.subsystems.intake;
 
-import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
@@ -9,6 +8,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.IntakeConstants;
 
 public class IntakeIOSparkMax implements IntakeIO {
@@ -19,23 +19,23 @@ public class IntakeIOSparkMax implements IntakeIO {
             new CANSparkMax(IntakeConstants.rightIntakeMotorID, MotorType.kBrushless);
 
     private TalonFX belt = new TalonFX(IntakeConstants.indexTwoMotorID);
-    private StatusSignal<Double> beltVoltage = belt.getMotorVoltage();
-    private StatusSignal<Double> beltCurrent = belt.getStatorCurrent();
 
     // private DigitalInput bannerSensor = new DigitalInput(IntakeConstants.bannerSensorID);
 
     public IntakeIOSparkMax() {
-        leftIntake.setSmartCurrentLimit(20, 25);
-        rightIntake.setSmartCurrentLimit(20, 25);
+        SmartDashboard.putBoolean("noteInBelts", false);
+
+        leftIntake.setSmartCurrentLimit(40, 40);
+        rightIntake.setSmartCurrentLimit(40, 40);
+
+        belt.setInverted(false);
 
         TalonFXConfigurator beltConfig = belt.getConfigurator();
         beltConfig.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
         beltConfig.apply(
                 new CurrentLimitsConfigs()
-                        .withSupplyCurrentLimit(30)
-                        .withStatorCurrentLimitEnable(true)
-                        .withSupplyCurrentThreshold(35)
-                        .withSupplyTimeThreshold(1));
+                        .withStatorCurrentLimit(60)
+                        .withStatorCurrentLimitEnable(true));
     }
 
     @Override
@@ -46,11 +46,11 @@ public class IntakeIOSparkMax implements IntakeIO {
         inputs.rightIntakeVoltage = rightIntake.getAppliedOutput() * 12;
         inputs.rightIntakeCurrent = rightIntake.getOutputCurrent();
 
-        inputs.beltVoltage = beltVoltage.getValueAsDouble();
-        inputs.beltCurrent = beltCurrent.getValueAsDouble();
+        inputs.beltVoltage = belt.getMotorVoltage().getValueAsDouble();
+        inputs.beltCurrent = belt.getStatorCurrent().getValueAsDouble();
 
         // inputs.noteSensed = bannerSensor.get();
-        inputs.noteSensed = false;
+        inputs.noteSensed = SmartDashboard.getBoolean("noteInBelts", false);
     }
 
     @Override
@@ -61,6 +61,6 @@ public class IntakeIOSparkMax implements IntakeIO {
 
     @Override
     public void setBeltVoltage(double volts) {
-        belt.setControl(new VoltageOut(volts));
+        belt.setControl(new VoltageOut(-volts));
     }
 }

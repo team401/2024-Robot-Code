@@ -10,6 +10,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.robot.Constants.ScoringConstants;
 
 public class AimerIOTalon implements AimerIO {
@@ -20,8 +21,7 @@ public class AimerIOTalon implements AimerIO {
     private final MotionMagicConfigs configs = new MotionMagicConfigs();
     private final Slot0Configs slot0 = new Slot0Configs();
 
-    // private final DutyCycleEncoder encoder = new
-    // DutyCycleEncoder(ScoringConstants.aimEncoderPort);
+    private final DutyCycleEncoder encoder = new DutyCycleEncoder(ScoringConstants.aimEncoderPort);
 
     private boolean override = false;
     private double overrideVolts = 0.0;
@@ -73,7 +73,8 @@ public class AimerIOTalon implements AimerIO {
         aimerLeft.getConfigurator().apply(configs);
         aimerRight.getConfigurator().apply(configs);
 
-        // encoder.setDistancePerRotation(2 * Math.PI);
+        encoder.setDistancePerRotation(2 * Math.PI);
+        encoder.setPositionOffset(ScoringConstants.aimerEncoderOffset);
     }
 
     @Override
@@ -113,20 +114,6 @@ public class AimerIOTalon implements AimerIO {
     }
 
     @Override
-    public void setMaxVelocity(double maxVelocity) {
-        configs.withMotionMagicCruiseVelocity(maxVelocity);
-        aimerLeft.getConfigurator().apply(configs);
-        aimerRight.getConfigurator().apply(configs);
-    }
-
-    @Override
-    public void setMaxAcceleration(double maxAcceleration) {
-        configs.withMotionMagicAcceleration(maxAcceleration);
-        aimerLeft.getConfigurator().apply(configs);
-        aimerRight.getConfigurator().apply(configs);
-    }
-
-    @Override
     public void setFF(double kS, double kV, double kA, double kG) {
         slot0.withKS(kS);
         slot0.withKV(kV);
@@ -146,18 +133,18 @@ public class AimerIOTalon implements AimerIO {
         }
 
         inputs.aimGoalAngleRad = goalAngleRad;
-        // inputs.aimAngleRad = encoder.getAbsolutePosition();
+        inputs.aimAngleRad = encoder.getAbsolutePosition();
         inputs.aimAngleRad = 0.0;
 
         double currentTime = Utils.getCurrentTimeSeconds();
         double diffTime = currentTime - lastTime;
         lastTime = currentTime;
 
-        // inputs.aimVelocityRadPerSec = (encoder.getAbsolutePosition() - lastPosition) / diffTime;
-        // lastPosition = encoder.getAbsolutePosition();
+        inputs.aimVelocityRadPerSec = (encoder.getAbsolutePosition() - lastPosition) / diffTime;
+        lastPosition = encoder.getAbsolutePosition();
         inputs.aimVelocityRadPerSec = 0.0;
 
         inputs.aimAppliedVolts = aimerLeft.getMotorVoltage().getValueAsDouble();
-        inputs.aimCurrentAmps = aimerLeft.getSupplyCurrent().getValueAsDouble();
+        inputs.aimCurrentAmps = aimerLeft.getStatorCurrent().getValueAsDouble();
     }
 }

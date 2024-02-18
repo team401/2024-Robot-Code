@@ -7,8 +7,10 @@ import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants.ConversionConstants;
 import frc.robot.Constants.ScoringConstants;
+import frc.robot.Constants.SensorConstants;
 
 public class ShooterIOTalon implements ShooterIO {
     private final TalonFX kicker = new TalonFX(ScoringConstants.kickerMotorId);
@@ -22,7 +24,7 @@ public class ShooterIOTalon implements ShooterIO {
     private final MotionMagicConfigs configs = new MotionMagicConfigs();
     private final Slot0Configs slot0 = new Slot0Configs();
 
-    // DigitalInput bannerSensor = new DigitalInput(Constants.SensorConstants.bannerPort);
+    DigitalInput bannerSensor = new DigitalInput(SensorConstants.upperBannerPort);
 
     private boolean override = false;
     private double overrideVolts = 0.0;
@@ -42,13 +44,13 @@ public class ShooterIOTalon implements ShooterIO {
         TalonFXConfigurator shooterLeftConfig = shooterLeft.getConfigurator();
         shooterLeftConfig.apply(
                 new CurrentLimitsConfigs()
-                        .withStatorCurrentLimit(60)
+                        .withStatorCurrentLimit(120)
                         .withStatorCurrentLimitEnable(true));
 
         TalonFXConfigurator shooterRightConfig = shooterRight.getConfigurator();
         shooterRightConfig.apply(
                 new CurrentLimitsConfigs()
-                        .withStatorCurrentLimit(60)
+                        .withStatorCurrentLimit(120)
                         .withStatorCurrentLimitEnable(true));
 
         slot0.withKP(ScoringConstants.shooterkP);
@@ -134,30 +136,31 @@ public class ShooterIOTalon implements ShooterIO {
         } else {
             shooterLeft.setControl(
                     leftController.withVelocity(
-                            goalLeftVelocityRPM * ConversionConstants.kMinutesToSeconds));
+                            goalLeftVelocityRPM / ConversionConstants.kMinutesToSeconds));
             shooterRight.setControl(
                     rightController.withVelocity(
-                            goalRightVelocityRPM * ConversionConstants.kMinutesToSeconds));
+                            goalRightVelocityRPM / ConversionConstants.kMinutesToSeconds));
         }
 
         inputs.shooterLeftVelocityRPM =
                 shooterLeft.getVelocity().getValueAsDouble()
-                        * ConversionConstants.kSecondsToMinutes;
+                        / ConversionConstants.kSecondsToMinutes;
         inputs.shooterLeftGoalVelocityRPM = goalLeftVelocityRPM;
         inputs.shooterLeftAppliedVolts = shooterLeft.getMotorVoltage().getValueAsDouble();
-        inputs.shooterLeftCurrentAmps = shooterLeft.getSupplyCurrent().getValueAsDouble();
+        inputs.shooterLeftCurrentAmps = shooterLeft.getStatorCurrent().getValueAsDouble();
+        inputs.shooterLeftSupplyCurrentAmps = shooterLeft.getSupplyCurrent().getValueAsDouble();
 
         inputs.shooterRightVelocityRPM =
                 shooterRight.getVelocity().getValueAsDouble()
-                        * ConversionConstants.kSecondsToMinutes;
+                        / ConversionConstants.kSecondsToMinutes;
         inputs.shooterRightGoalVelocityRPM = goalRightVelocityRPM;
         inputs.shooterRightAppliedVolts = shooterRight.getMotorVoltage().getValueAsDouble();
-        inputs.shooterRightCurrentAmps = shooterRight.getSupplyCurrent().getValueAsDouble();
+        inputs.shooterRightCurrentAmps = shooterRight.getStatorCurrent().getValueAsDouble();
+        inputs.shooterRightSupplyCurrentAmps = shooterRight.getSupplyCurrent().getValueAsDouble();
 
         inputs.kickerAppliedVolts = kicker.getMotorVoltage().getValueAsDouble();
-        inputs.kickerCurrentAmps = kicker.getSupplyCurrent().getValueAsDouble();
+        inputs.kickerCurrentAmps = kicker.getStatorCurrent().getValueAsDouble();
 
-        // inputs.bannerSensor = bannerSensor.get();
-        inputs.bannerSensor = false;
+        inputs.bannerSensor = bannerSensor.get();
     }
 }

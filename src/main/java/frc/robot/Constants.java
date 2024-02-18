@@ -49,8 +49,8 @@ public final class Constants {
         public static final boolean runVision = false;
 
         public static final boolean runIntake = false;
-        public static final boolean runScoring = true;
-        public static final boolean runEndgame = false;
+        public static final boolean runScoring = false;
+        public static final boolean runEndgame = true;
         public static final boolean runDrive = false;
 
         public static final boolean enableLEDS = false;
@@ -70,7 +70,7 @@ public final class Constants {
     public static final class CANDevices {}
 
     public static final class SensorConstants {
-        public static final int bannerPort = 1; // TODO: Change this
+        public static final int upperBannerPort = 1;
     }
 
     public static final class DriveConstants {
@@ -199,19 +199,19 @@ public final class Constants {
         public static final int rightIntakeMotorID = 10;
         public static final int indexTwoMotorID = 14;
 
-        public static final int bannerSensorID = 0;
+        public static final int bannerSensorID = 2;
 
-        public static final double intakePower = 5.0;
-        public static final double beltPower = 5.0;
+        public static final double intakePower = 7.0;
+        public static final double beltPower = 7.0;
     }
 
     public static final class EndgameConstants {
         public static final int leftMotorID = 18;
         public static final int rightMotorID = 19;
 
-        public static final int smartCurrentLimit = 25; // TODO: Tune this
+        public static final int smartCurrentLimit = 50;
 
-        public static final double encoderToMeters = Math.PI * Units.inchesToMeters(1.7567) / 80;
+        public static final double encoderToMeters = Math.PI * Units.inchesToMeters(1.7567) / 20.0;
     }
 
     public static final class TunerConstants {
@@ -381,12 +381,12 @@ public final class Constants {
     }
 
     public static final class ScoringConstants {
-        public static final double aimerkP = 10.0;
-        public static final double aimerkI = 0.0;
+        public static final double aimerkP = 15.0;
+        public static final double aimerkI = 5.0;
         public static final double aimerkD = 0.0;
 
-        public static final double aimerkS = 0.0; // TODO: Find Imperically
-        public static final double aimerkG = 0.17;
+        public static final double aimerkS = 0.265;
+        public static final double aimerkG = 0.095;
         public static final double aimerkV = 1.51;
         public static final double aimerkA = 0.01;
 
@@ -407,8 +407,8 @@ public final class Constants {
 
         public static final double hoodEncoderToRad = (0.3947368421) * (2.0 * Math.PI);
 
-        public static final int aimLeftMotorId = 15;
-        public static final int aimRightMotorId = 16;
+        public static final int aimLeftMotorId = 16;
+        public static final int aimRightMotorId = 15;
 
         public static final int shooterLeftMotorId = 11;
         public static final int shooterRightMotorId = 12;
@@ -417,10 +417,11 @@ public final class Constants {
 
         public static final int hoodId = 17;
 
-        public static final int aimEncoderPort = 0; // TODO: Change
+        public static final int aimEncoderPort = 0;
+        public static final double aimerEncoderOffset = 0.251;
 
-        public static final double aimAcceleration = 10.0;
-        public static final double aimCruiseVelocity = 10.0;
+        public static final double aimAcceleration = 15.0;
+        public static final double aimCruiseVelocity = 15.0;
 
         public static final double shooterAcceleration = 1;
         public static final double shooterJerk = 1;
@@ -517,6 +518,20 @@ public final class Constants {
             map.put(Math.PI / 4, 0.5);
             map.put(Math.PI / 3, 0.7);
             map.put(Math.PI / 2, 1.0);
+
+            return map;
+        }
+
+        // NOTE - This should be monotonically increasing
+        // Key - Elevator position in meters
+        // Value - Aimer angle in radians
+        public static HashMap<Double, Double> aimerAvoidElevatorTable() {
+            HashMap<Double, Double> map = new HashMap<Double, Double>();
+            map.put(0.0, 0.0);
+            map.put(0.01, Math.PI / 6);
+            map.put(0.2, Math.PI / 4);
+            map.put(0.3, Math.PI / 3);
+            map.put(0.4, Math.PI / 2);
 
             return map;
         }

@@ -16,6 +16,9 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private IntakeAction action = IntakeAction.NONE;
 
+    private double intakeOverrideVolts = 0.0;
+    private double beltOverrideVolts = 0.0;
+
     public IntakeSubsystem(IntakeIO io) {
         this.io = io;
     }
@@ -37,6 +40,9 @@ public class IntakeSubsystem extends SubsystemBase {
                 break;
             case REVERSING:
                 reversing();
+                break;
+            case OVERRIDE:
+                override();
                 break;
         }
 
@@ -75,6 +81,8 @@ public class IntakeSubsystem extends SubsystemBase {
             state = State.REVERSING;
             io.setIntakeVoltage(-IntakeConstants.intakePower);
             io.setBeltVoltage(-IntakeConstants.beltPower);
+        } else if (action == IntakeAction.OVERRIDE) {
+            state = State.OVERRIDE;
         }
     }
 
@@ -116,16 +124,32 @@ public class IntakeSubsystem extends SubsystemBase {
         }
     }
 
+    private void override() {
+        if (action != IntakeAction.OVERRIDE) {
+            state = State.IDLE;
+        }
+
+        io.setIntakeVoltage(intakeOverrideVolts);
+        io.setBeltVoltage(beltOverrideVolts);
+    }
+
+    public void setOverrideVolts(double intake, double belt) {
+        intakeOverrideVolts = intake;
+        beltOverrideVolts = belt;
+    }
+
     private enum State {
         IDLE, // do nothing
         SEEKING, // run intake wheels until a note is taken in
         PASSING, // move the belt to pass the note to the shooter when its ready
-        REVERSING // whole intake backwards
+        REVERSING, // whole intake backwards
+        OVERRIDE
     }
 
     public enum IntakeAction {
         NONE, // do nothing
         INTAKE, // Try to intake a note if you don't have one
-        REVERSE // run backwards
+        REVERSE, // run backwards
+        OVERRIDE
     }
 }

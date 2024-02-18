@@ -27,9 +27,7 @@ public interface AimerIO {
 
     public default void setPID(double p, double i, double d) {}
 
-    public default void setMaxVelocity(double maxVelocity) {}
-
-    public default void setMaxAcceleration(double maxAcceleration) {}
+    public default void setMaxProfile(double maxVelocity, double maxAcceleration) {}
 
     public default void setFF(double kS, double kV, double kA, double kG) {}
 }

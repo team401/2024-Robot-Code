@@ -1,6 +1,5 @@
 package frc.robot.subsystems.scoring;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -45,6 +44,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     private final InterpolateDouble shooterInterpolated;
     private final InterpolateDouble aimerInterpolated;
     private final InterpolateDouble timeToPutAimDown;
+    private final InterpolateDouble aimerAvoidElevator;
 
     private double shooterGoalVelocityRPMTuning = 0.0;
     private double aimerGoalAngleRadTuning = 0.0;
@@ -83,7 +83,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         SHOOT,
         ENDGAME,
         TUNING,
-        OVERRIDE
+        OVERRIDE,
+        TEMPORARY_SETPOINT
     }
 
     private ScoringState state = ScoringState.IDLE;
@@ -108,6 +109,9 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                         ScoringConstants.getAimerMap(), 0.0, ScoringConstants.aimMaxAngleRadians);
 
         timeToPutAimDown = new InterpolateDouble(ScoringConstants.timeToPutAimDownMap(), 0.0, 2.0);
+
+        aimerAvoidElevator =
+                new InterpolateDouble(ScoringConstants.aimerAvoidElevatorTable(), 0.0, 0.4);
     }
 
     public void setAction(ScoringAction action) {
@@ -115,7 +119,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private void idle() {
-        aimerIo.setAimAngleRad(0, true);
+        aimerIo.setAimAngleRad(0.0, true);
         shooterIo.setShooterVelocityRPM(0);
         shooterIo.setKickerVolts(0);
         hoodIo.setHoodAngleRad(0);
@@ -258,28 +262,21 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private void override() {
-        aimerIo.setOverrideMode(true);
-        hoodIo.setOverrideMode(true);
-        shooterIo.setOverrideMode(true);
-
         shooterIo.setKickerVolts(kickerVoltsTuning);
+
+        if (action == ScoringAction.TEMPORARY_SETPOINT) {
+            state = ScoringState.TEMPORARY_SETPOINT;
+        }
 
         if (action != ScoringAction.OVERRIDE) {
             state = ScoringState.IDLE;
-
-            aimerIo.setOverrideMode(false);
-            hoodIo.setOverrideMode(false);
-            shooterIo.setOverrideMode(false);
         }
     }
 
     private void temporarySetpoint() {
-        if (MathUtil.isNear(temporarySetpointPosition, getPosition(temporarySetpointSlot), 0.1)
-                && MathUtil.isNear(0.0, getVelocity(temporarySetpointSlot), 0.01)) {
-            state = ScoringState.OVERRIDE;
-
-            setVolts(0.0, temporarySetpointSlot);
-        } else if (action != ScoringAction.OVERRIDE) {
+        // if (MathUtil.isNear(temporarySetpointPosition, getPosition(temporarySetpointSlot), 0.1)
+        //         && MathUtil.isNear(0.0, getVelocity(temporarySetpointSlot), 0.01)) {
+        if (action != ScoringAction.TEMPORARY_SETPOINT) {
             state = ScoringState.OVERRIDE;
 
             setVolts(0.0, temporarySetpointSlot);
@@ -363,13 +360,20 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
             double maxElevatorPosition = ScoringConstants.maxElevatorPosition; // x-intercept
             double maxAimAngle = ScoringConstants.maxAimAngleElevatorLimit; // y-intercept
 
-            double elevatorLimit =
-                    (maxAimAngle / maxElevatorPosition)
-                                    * (elevatorPositionSupplier.get() - maxElevatorPosition)
-                            + maxAimAngle;
+            // double elevatorLimit =
+            //         (maxAimAngle / maxElevatorPosition)
+            //                         * (elevatorPositionSupplier.get() - maxElevatorPosition)
+            //                 + maxAimAngle;
+            // double elevatorLimit = aimerAvoidElevator.getValue(elevatorPositionSupplier.get());
+            double elevatorLimit = 0.0;
+            Logger.recordOutput("Scoring/elevatorLimit", elevatorLimit);
             aimerIo.setAngleClampsRad(
                     Math.max(0.0, elevatorLimit), ScoringConstants.aimMaxAngleRadians);
         }
+
+        aimerIo.setOverrideMode(state == ScoringState.OVERRIDE);
+        hoodIo.setOverrideMode(state == ScoringState.OVERRIDE);
+        shooterIo.setOverrideMode(state == ScoringState.OVERRIDE);
 
         aimerIo.controlAimAngleRad();
 
@@ -546,31 +550,15 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     @Override
-    public void setMaxProfileVelocity(double maxVelocity, int slot) {
+    public void setMaxProfileProperties(double maxVelocity, double maxAcceleration, int slot) {
         switch (slot) {
                 // Aimer
             case 0:
-                aimerIo.setMaxVelocity(maxVelocity);
+                aimerIo.setMaxProfile(maxVelocity, maxAcceleration);
                 break;
                 // Shooter
             case 2:
                 shooterIo.setMaxAcceleration(maxVelocity);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid slot");
-        }
-    }
-
-    @Override
-    public void setMaxProfileAcceleration(double maxAcceleration, int slot) {
-        switch (slot) {
-                // Aimer
-            case 0:
-                aimerIo.setMaxAcceleration(maxAcceleration);
-                break;
-                // Shooter
-            case 2:
-                shooterIo.setMaxJerk(maxAcceleration);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid slot");

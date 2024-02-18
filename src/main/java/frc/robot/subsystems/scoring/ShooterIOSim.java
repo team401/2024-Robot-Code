@@ -35,7 +35,7 @@ public class ShooterIOSim implements ShooterIO {
 
     private boolean override = false;
 
-    DigitalInput bannerSensor = new DigitalInput(Constants.SensorConstants.bannerPort);
+    DigitalInput bannerSensor = new DigitalInput(Constants.SensorConstants.upperBannerPort);
 
     double shooterLeftGoalVelRPM = 0.0;
     double shooterLeftAppliedVolts = 0.0;

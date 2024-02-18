@@ -110,12 +110,7 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
     }
 
     @Override
-    public void setMaxProfileVelocity(double maxVelocity, int slot) {
+    public void setMaxProfileProperties(double maxVelocity, double maxAcceleration, int slot) {
         throw new UnsupportedOperationException("Unimplemented method 'setMaxProfileVelocity'");
-    }
-
-    @Override
-    public void setMaxProfileAcceleration(double maxAcceleration, int slot) {
-        throw new UnsupportedOperationException("Unimplemented method 'setMaxProfileAcceleration'");
     }
 }

@@ -19,9 +19,7 @@ public interface Tunable {
 
     public void setFF(double kS, double kV, double kA, double kG, int slot);
 
-    public void setMaxProfileVelocity(double maxVelocity, int slot);
-
-    public void setMaxProfileAcceleration(double maxAcceleration, int slot);
+    public void setMaxProfileProperties(double maxVelocity, double maxAcceleration, int slot);
 
     public void runToPosition(double position, int slot);
 }

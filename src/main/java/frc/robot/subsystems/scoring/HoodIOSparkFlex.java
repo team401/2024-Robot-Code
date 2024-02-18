@@ -2,6 +2,7 @@ package frc.robot.subsystems.scoring;
 
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkFlex;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.ScoringConstants;
 
 public class HoodIOSparkFlex implements HoodIO {
@@ -14,6 +15,8 @@ public class HoodIOSparkFlex implements HoodIO {
     double overrideVolts = 0.0;
 
     double goalAngleRad = 0.0;
+
+    private Timer homeTimer = new Timer();
 
     public HoodIOSparkFlex() {
         hoodMotor.setSmartCurrentLimit(120);
@@ -49,8 +52,11 @@ public class HoodIOSparkFlex implements HoodIO {
 
     @Override
     public void home() {
-        homing = true;
-        hoodMotor.setVoltage(0.5);
+        // homing = true;
+        // hoodMotor.setVoltage(0.5);
+
+        // homeTimer.reset();
+        // homeTimer.start();
     }
 
     @Override
@@ -63,13 +69,16 @@ public class HoodIOSparkFlex implements HoodIO {
     @Override
     public void updateInputs(HoodIOInputs inputs) {
         if (homing) {
-            if (hoodMotor.getOutputCurrent() > ScoringConstants.hoodHomeAmps) {
-                hoodMotor.setVoltage(0);
+            if (hoodMotor.getOutputCurrent() > ScoringConstants.hoodHomeAmps
+                    && homeTimer.get() > 1.0) {
+                // hoodMotor.setVoltage(0);
                 hoodMotor.getEncoder().setPosition(ScoringConstants.hoodHomeAngleRad);
                 homing = false;
+
+                homeTimer.stop();
             }
         } else if (override) {
-            hoodMotor.setVoltage(overrideVolts);
+            // hoodMotor.setVoltage(overrideVolts);
         } else {
             hoodMotor.getPIDController().setReference(goalAngleRad, ControlType.kPosition);
         }
