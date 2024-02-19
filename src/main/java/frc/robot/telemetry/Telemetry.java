@@ -157,7 +157,6 @@ public class Telemetry {
         latestPose = pose;
 
         Translation2d velocities = distanceDiff.div(diffTime);
-      
 
         speed.set(velocities.getNorm());
         velocityX.set(velocities.getX());
@@ -165,13 +164,11 @@ public class Telemetry {
         accelX.set(telemetryInputs.accelerationX);
         accelY.set(telemetryInputs.accelerationY);
 
-
         velocityXFiltered = velocityXFilter.calculate(velocityFieldRelative.getX());
         velocityYFiltered = velocityYFilter.calculate(velocityFieldRelative.getY());
         accelXFiltered = accelXFilter.calculate(telemetryInputs.accelerationX);
         accelYFiltered = accelYFilter.calculate(telemetryInputs.accelerationY);
         odomPeriod.set(state.OdometryPeriod);
-
 
         latestModuleStates = state.ModuleStates;
 
