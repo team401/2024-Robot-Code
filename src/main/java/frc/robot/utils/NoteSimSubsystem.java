@@ -9,10 +9,13 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import java.util.Set;
 import org.littletonrobotics.junction.Logger;
+import org.opencv.core.Point3;
 
 public class NoteSimSubsystem {
 
@@ -49,7 +52,30 @@ public class NoteSimSubsystem {
     }
 
     public Command launch(Translation3d launchVelocity) {
+        SmartDashboard.putString("AHHH", ":D");
+        return new ScheduleCommand( // Branch off and exit immediately
+                Commands.defer(
+                                () -> {
+                                    launching = true;
+                                    lastVelocity = launchVelocity;
+                                    lastRecordedTime = 0;
+                                    lastNotePos =
+                                            new Pose3d(drivetrain.getState().Pose)
+                                                    .transformBy(launcherTransform);
+                                    timeSinceLaunch.reset();
+                                    timeSinceLaunch.start();
+                                    return Commands.run(
+                                                    () -> {
+                                                        SmartDashboard.putBoolean("??", true);
+                                                        calculateTrajectory();
+                                                        getNotePosition();
+                                                    })
+                                            .until(() -> timeSinceLaunch.hasElapsed(10));
+                                },
+                                Set.of())
+                        .ignoringDisable(true));
 
+        /*
         launching = true;
         lastVelocity = launchVelocity;
         lastRecordedTime = 0;
@@ -71,7 +97,7 @@ public class NoteSimSubsystem {
                                                         .minus(speaker)
                                                         .getTranslation()
                                                         .getDistance(new Translation3d(0, 0, 0))
-                                                <= 0.5);
+                                                <= 0.5);*/
     }
 
     private void calculateTrajectory() {
@@ -97,5 +123,19 @@ public class NoteSimSubsystem {
         Logger.recordOutput("Note", lastNotePos);
         SmartDashboard.putNumber("Height", lastNotePos.getZ());
         return lastNotePos;
+    }
+
+
+
+    public boolean withinRange(Pose3d object, Pose3d withinCenter, double radius) {
+        double dX = object.getX()-withinCenter.getY();
+        double dY = object.getY()-withinCenter.getY();
+        double dZ = object.getZ()-withinCenter.getZ();
+        if (Math.sqrt(dX*dX + dY*dY + dZ*dZ) <= radius) return true;
+        return false;
+    }
+
+    public boolean withinRectangle(Pose3d object, int[][] points) {
+        return false; //in progress, unsure if there's an easy way to do pip for 3d or if there's an existing library or something
     }
 }

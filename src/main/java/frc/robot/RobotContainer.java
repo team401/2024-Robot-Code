@@ -6,11 +6,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 =======
 import edu.wpi.first.math.geometry.Translation3d;
 >>>>>>> 0720d10 (saving progress)
+=======
+>>>>>>> d1b1751 (argh I don't know how to post data to advantagekit help please)
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -67,10 +70,14 @@ import frc.robot.telemetry.TelemetryIOLive;
 import frc.robot.telemetry.TelemetryIOSim;
 import frc.robot.utils.FieldFinder;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import frc.robot.utils.feedforward.TuneG;
 import frc.robot.utils.feedforward.TuneS;
 =======
 import frc.robot.utils.NoteSimSubsystem;
+=======
+import frc.robot.utils.NoteVisualizer;
+>>>>>>> d1b1751 (argh I don't know how to post data to advantagekit help please)
 import java.util.Collections;
 >>>>>>> 0720d10 (saving progress)
 import org.littletonrobotics.junction.Logger;
@@ -175,14 +182,13 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignState(AlignState.MANUAL)));
 
-            controller.rightTrigger()
-            .whileTrue(launchCommand());
+            controller.button(1).whileTrue(launchCommand());
         }
     } // spotless:on
 
     public Command launchCommand() {
-        NoteSimSubsystem note = new NoteSimSubsystem(drivetrain, scoringSubsystem);
-        return Commands.sequence(note.launch(new Translation3d(5, 0, 5)), Commands.idle());
+        NoteVisualizer.setRobotPoseSupplier(() -> drivetrain.getState().Pose);
+        return Commands.sequence(NoteVisualizer.shoot(), Commands.idle());
     }
 
     private void configureModes() {}
