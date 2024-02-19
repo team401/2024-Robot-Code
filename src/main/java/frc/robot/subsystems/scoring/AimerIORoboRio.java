@@ -74,6 +74,8 @@ public class AimerIORoboRio implements AimerIO {
                 new CurrentLimitsConfigs()
                         .withStatorCurrentLimit(120)
                         .withStatorCurrentLimitEnable(true));
+
+        aimerRight.setPosition(0.0);
     }
 
     @Override
@@ -132,7 +134,9 @@ public class AimerIORoboRio implements AimerIO {
     }
 
     private double getEncoderPosition() {
-        return encoder.getAbsolutePosition() * 2.0 * Math.PI - ScoringConstants.aimerEncoderOffset;
+        // return encoder.getAbsolutePosition() * 2.0 * Math.PI -
+        // ScoringConstants.aimerEncoderOffset;
+        return aimerRight.getPosition().getValueAsDouble() * (2.0 * Math.PI) / 80.0;
     }
 
     @Override
@@ -144,14 +148,18 @@ public class AimerIORoboRio implements AimerIO {
                         new State(goalAngleRad, 0));
 
         if (override) {
-            aimerRight.setVoltage(overrideVolts);
+            appliedVolts = overrideVolts;
         } else {
             appliedVolts =
                     feedforward.calculate(trapezoidSetpoint.position, trapezoidSetpoint.velocity)
                             + controller.calculate(
                                     getEncoderPosition(), trapezoidSetpoint.position);
-            aimerRight.setVoltage(appliedVolts);
         }
+
+        if (getEncoderPosition() > Math.PI / 2.0) {
+            appliedVolts = 0.0;
+        }
+        aimerRight.setVoltage(appliedVolts);
 
         inputs.aimGoalAngleRad = trapezoidSetpoint.position;
         inputs.aimAngleRad = getEncoderPosition();
@@ -165,6 +173,7 @@ public class AimerIORoboRio implements AimerIO {
         lastPosition = getEncoderPosition();
 
         inputs.aimAppliedVolts = aimerRight.getMotorVoltage().getValueAsDouble();
-        inputs.aimCurrentAmps = aimerRight.getStatorCurrent().getValueAsDouble();
+        inputs.aimStatorCurrentAmps = aimerRight.getStatorCurrent().getValueAsDouble();
+        inputs.aimSupplyCurrentAmps = aimerRight.getSupplyCurrent().getValueAsDouble();
     }
 }

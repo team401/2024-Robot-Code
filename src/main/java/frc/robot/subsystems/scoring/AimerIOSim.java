@@ -39,6 +39,7 @@ public class AimerIOSim implements AimerIO {
     private final Timer timer = new Timer();
 
     private boolean override = false;
+    private double overrideVolts = 0.0;
 
     boolean newProfile = false;
     double previousGoalAngle = 0.0;
@@ -105,12 +106,14 @@ public class AimerIOSim implements AimerIO {
                         new State(initialAngle, initialVelocity),
                         new State(goalAngleRad, 0));
 
-        if (!override) {
+        if (override) {
+            sim.setInputVoltage(overrideVolts);
+        } else {
             appliedVolts =
                     feedforward.calculate(trapezoidSetpoint.position, trapezoidSetpoint.velocity)
                             + controller.calculate(sim.getAngleRads(), trapezoidSetpoint.position);
+            sim.setInputVoltage(appliedVolts);
         }
-        sim.setInputVoltage(appliedVolts);
 
         inputs.aimGoalAngleRad = goalAngleRad;
         inputs.aimAngleRad = sim.getAngleRads();
@@ -118,6 +121,6 @@ public class AimerIOSim implements AimerIO {
         inputs.aimVelocityRadPerSec = sim.getVelocityRadPerSec();
 
         inputs.aimAppliedVolts = appliedVolts;
-        inputs.aimCurrentAmps = sim.getCurrentDrawAmps();
+        inputs.aimStatorCurrentAmps = sim.getCurrentDrawAmps();
     }
 }

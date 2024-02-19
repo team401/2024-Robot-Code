@@ -49,8 +49,8 @@ public final class Constants {
         public static final boolean runVision = false;
 
         public static final boolean runIntake = false;
-        public static final boolean runScoring = false;
-        public static final boolean runEndgame = true;
+        public static final boolean runScoring = true;
+        public static final boolean runEndgame = false;
         public static final boolean runDrive = false;
 
         public static final boolean enableLEDS = false;
@@ -418,20 +418,17 @@ public final class Constants {
         public static final int hoodId = 17;
 
         public static final int aimEncoderPort = 0;
-        public static final double aimerEncoderOffset = 0.251;
+        public static final double aimerEncoderOffset = 0.465;
 
-        public static final double aimAcceleration = 15.0;
-        public static final double aimCruiseVelocity = 15.0;
-
-        public static final double shooterAcceleration = 1;
-        public static final double shooterJerk = 1;
+        public static final double aimAcceleration = 0.1; // TODO: 15.0
+        public static final double aimCruiseVelocity = 0.1; // TODO: 15.0
 
         public static final double shooterVelocityMarginRPM = 10;
         public static final double aimAngleMarginRadians = Units.degreesToRadians(5);
         public static final double hoodAngleMarginRadians = Units.degreesToRadians(5);
 
-        public static final double intakeAngleToleranceRadians =
-                Math.PI / 2 - Units.degreesToRadians(40);
+        public static final double intakeAngleToleranceRadians = 0.0;
+        // Math.PI / 2 - Units.degreesToRadians(40);
 
         public static final double shooterAmpVelocityRPM = 10;
 
@@ -529,8 +526,8 @@ public final class Constants {
             HashMap<Double, Double> map = new HashMap<Double, Double>();
             map.put(0.0, 0.0);
             map.put(0.01, Math.PI / 6);
-            map.put(0.2, Math.PI / 4);
-            map.put(0.3, Math.PI / 3);
+            map.put(0.1, Math.PI / 4);
+            map.put(0.2, Math.PI / 3);
             map.put(0.4, Math.PI / 2);
 
             return map;

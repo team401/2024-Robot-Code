@@ -111,7 +111,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         timeToPutAimDown = new InterpolateDouble(ScoringConstants.timeToPutAimDownMap(), 0.0, 2.0);
 
         aimerAvoidElevator =
-                new InterpolateDouble(ScoringConstants.aimerAvoidElevatorTable(), 0.0, 0.4);
+                new InterpolateDouble(
+                        ScoringConstants.aimerAvoidElevatorTable(), 0.0, Math.PI / 2.0);
     }
 
     public void setAction(ScoringAction action) {
@@ -173,8 +174,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         boolean driveReady = driveAllignedSupplier.get();
         boolean notePresent = hasNote();
 
-        boolean primeReady = shooterReady && aimReady && driveReady && notePresent;
-        readyToShoot = primeReady;
+        boolean primeReady = shooterReady && aimReady && driveReady;
+        readyToShoot = primeReady && notePresent;
 
         if (action != ScoringAction.SHOOT && action != ScoringAction.AIM) {
             state = ScoringState.IDLE;
@@ -237,15 +238,22 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     private void ampShoot() {
         shooterIo.setKickerVolts(5);
 
-        if (shootTimer.get() > 0.5) { // TODO: Tune time
+        if (shootTimer.get() > 1.0) { // TODO: Tune time
             state = ScoringState.AMP_PRIME;
 
             shootTimer.stop();
         }
     }
 
-    private void endgame() { // TODO: Later
-        state = ScoringState.IDLE;
+    private void endgame() {
+        aimerIo.setAimAngleRad(0.0, true);
+        shooterIo.setShooterVelocityRPM(0);
+        shooterIo.setKickerVolts(0);
+        hoodIo.setHoodAngleRad(0);
+
+        if (action != ScoringAction.ENDGAME) {
+            state = ScoringState.IDLE;
+        }
     }
 
     private void tuning() {
@@ -330,42 +338,36 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         this.driveAllignedSupplier = driveAllignedSupplier;
     }
 
+    private boolean willHitStage() {
+        return (FieldFinder.willIHitThis(
+                        poseSupplier.get().getX(),
+                        poseSupplier.get().getY(),
+                        velocitySupplier.get().get(0, 0)
+                                * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
+                        velocitySupplier.get().get(1, 0)
+                                * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
+                        FieldLocations.BLUE_STAGE)
+                || FieldFinder.willIHitThis(
+                        poseSupplier.get().getX(),
+                        poseSupplier.get().getY(),
+                        velocitySupplier.get().get(0, 0)
+                                * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
+                        velocitySupplier.get().get(1, 0)
+                                * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
+                        FieldLocations.RED_STAGE));
+    }
+
     @Override
     public void periodic() {
         if (state == ScoringState.TEMPORARY_SETPOINT) {
-            aimerIo.setAngleClampsRad(0.0, Math.PI);
+            aimerIo.setAngleClampsRad(0.0, ScoringConstants.aimMaxAngleRadians);
         } else if (state != ScoringState.TUNING
                 && state != ScoringState.ENDGAME
                 && !overrideStageAvoidance
-                && (FieldFinder.willIHitThis(
-                                poseSupplier.get().getX(),
-                                poseSupplier.get().getY(),
-                                velocitySupplier.get().get(0, 0)
-                                        * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
-                                velocitySupplier.get().get(1, 0)
-                                        * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
-                                FieldLocations.BLUE_STAGE)
-                        || FieldFinder.willIHitThis(
-                                poseSupplier.get().getX(),
-                                poseSupplier.get().getY(),
-                                velocitySupplier.get().get(0, 0)
-                                        * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
-                                velocitySupplier.get().get(1, 0)
-                                        * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
-                                FieldLocations.RED_STAGE))) {
+                && willHitStage()) {
             aimerIo.setAngleClampsRad(0, 0);
         } else {
-            // Linear equation in point-slope form to calculate the arm's limit based on the
-            // elevator position
-            double maxElevatorPosition = ScoringConstants.maxElevatorPosition; // x-intercept
-            double maxAimAngle = ScoringConstants.maxAimAngleElevatorLimit; // y-intercept
-
-            // double elevatorLimit =
-            //         (maxAimAngle / maxElevatorPosition)
-            //                         * (elevatorPositionSupplier.get() - maxElevatorPosition)
-            //                 + maxAimAngle;
-            // double elevatorLimit = aimerAvoidElevator.getValue(elevatorPositionSupplier.get());
-            double elevatorLimit = 0.0;
+            double elevatorLimit = aimerAvoidElevator.getValue(elevatorPositionSupplier.get());
             Logger.recordOutput("Scoring/elevatorLimit", elevatorLimit);
             aimerIo.setAngleClampsRad(
                     Math.max(0.0, elevatorLimit), ScoringConstants.aimMaxAngleRadians);
@@ -503,7 +505,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                 return Math.PI;
                 // Shooter
             case 2:
-                return 100.0;
+                return 1.0;
             default:
                 throw new IllegalArgumentException("Invalid slot");
         }
@@ -555,10 +557,6 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                 // Aimer
             case 0:
                 aimerIo.setMaxProfile(maxVelocity, maxAcceleration);
-                break;
-                // Shooter
-            case 2:
-                shooterIo.setMaxAcceleration(maxVelocity);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid slot");

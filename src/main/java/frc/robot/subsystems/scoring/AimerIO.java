@@ -8,7 +8,8 @@ public interface AimerIO {
         public double aimAngleRad = 0.0;
         public double aimGoalAngleRad = 0.0;
         public double aimAppliedVolts = 0.0;
-        public double aimCurrentAmps = 0.0;
+        public double aimStatorCurrentAmps = 0.0;
+        public double aimSupplyCurrentAmps = 0.0;
 
         public double aimVelocityRadPerSec = 0.0;
     }

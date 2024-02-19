@@ -145,6 +145,7 @@ public class AimerIOTalon implements AimerIO {
         inputs.aimVelocityRadPerSec = 0.0;
 
         inputs.aimAppliedVolts = aimerLeft.getMotorVoltage().getValueAsDouble();
-        inputs.aimCurrentAmps = aimerLeft.getStatorCurrent().getValueAsDouble();
+        inputs.aimStatorCurrentAmps = aimerLeft.getStatorCurrent().getValueAsDouble();
+        inputs.aimSupplyCurrentAmps = aimerLeft.getSupplyCurrent().getValueAsDouble();
     }
 }

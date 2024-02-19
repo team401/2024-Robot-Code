@@ -8,7 +8,8 @@ public interface HoodIO {
         public double hoodAngleRad = 0.0;
         public double hoodGoalAngleRad = 0.0;
         public double hoodAppliedVolts = 0.0;
-        public double hoodCurrentAmps = 0.0;
+        public double hoodStatorCurrentAmps = 0.0;
+        public double hoodSupplyCurrentAmps = 0.0;
 
         public double hoodVelocityRadPerSec = 0.0;
     }

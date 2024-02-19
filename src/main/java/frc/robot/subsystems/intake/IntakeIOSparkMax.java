@@ -3,7 +3,6 @@ package frc.robot.subsystems.intake;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -28,6 +27,9 @@ public class IntakeIOSparkMax implements IntakeIO {
         leftIntake.setSmartCurrentLimit(40, 40);
         rightIntake.setSmartCurrentLimit(40, 40);
 
+        leftIntake.setInverted(true);
+        leftIntake.setInverted(true);
+
         belt.setInverted(false);
 
         TalonFXConfigurator beltConfig = belt.getConfigurator();
@@ -41,13 +43,14 @@ public class IntakeIOSparkMax implements IntakeIO {
     @Override
     public void updateInputs(IntakeIOInputs inputs) {
         inputs.leftIntakeVoltage = leftIntake.getAppliedOutput() * 12;
-        inputs.leftIntakeCurrent = leftIntake.getOutputCurrent();
+        inputs.leftIntakeStatorCurrent = leftIntake.getOutputCurrent();
 
         inputs.rightIntakeVoltage = rightIntake.getAppliedOutput() * 12;
-        inputs.rightIntakeCurrent = rightIntake.getOutputCurrent();
+        inputs.rightIntakeStatorCurrent = rightIntake.getOutputCurrent();
 
         inputs.beltVoltage = belt.getMotorVoltage().getValueAsDouble();
-        inputs.beltCurrent = belt.getStatorCurrent().getValueAsDouble();
+        inputs.beltStatorCurrent = belt.getStatorCurrent().getValueAsDouble();
+        inputs.beltSupplyCurrent = belt.getSupplyCurrent().getValueAsDouble();
 
         // inputs.noteSensed = bannerSensor.get();
         inputs.noteSensed = SmartDashboard.getBoolean("noteInBelts", false);
@@ -61,6 +64,6 @@ public class IntakeIOSparkMax implements IntakeIO {
 
     @Override
     public void setBeltVoltage(double volts) {
-        belt.setControl(new VoltageOut(-volts));
+        // belt.setControl(new VoltageOut(-volts));
     }
 }

@@ -66,6 +66,6 @@ public class HoodIOSim implements HoodIO {
         inputs.hoodVelocityRadPerSec = sim.getVelocityRadPerSec();
 
         inputs.hoodAppliedVolts = appliedVolts;
-        inputs.hoodCurrentAmps = sim.getCurrentDrawAmps();
+        inputs.hoodStatorCurrentAmps = sim.getCurrentDrawAmps();
     }
 }

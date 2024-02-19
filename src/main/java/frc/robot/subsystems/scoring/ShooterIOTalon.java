@@ -1,10 +1,9 @@
 package frc.robot.subsystems.scoring;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
-import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -18,10 +17,6 @@ public class ShooterIOTalon implements ShooterIO {
     private final TalonFX shooterLeft = new TalonFX(ScoringConstants.shooterLeftMotorId);
     private final TalonFX shooterRight = new TalonFX(ScoringConstants.shooterRightMotorId);
 
-    MotionMagicVelocityVoltage leftController = new MotionMagicVelocityVoltage(0).withSlot(0);
-    MotionMagicVelocityVoltage rightController = new MotionMagicVelocityVoltage(0).withSlot(0);
-
-    private final MotionMagicConfigs configs = new MotionMagicConfigs();
     private final Slot0Configs slot0 = new Slot0Configs();
 
     DigitalInput bannerSensor = new DigitalInput(SensorConstants.upperBannerPort);
@@ -61,14 +56,8 @@ public class ShooterIOTalon implements ShooterIO {
         slot0.withKV(ScoringConstants.shooterkV);
         slot0.withKA(ScoringConstants.shooterkA);
 
-        configs.withMotionMagicAcceleration(ScoringConstants.shooterAcceleration);
-        configs.withMotionMagicJerk(ScoringConstants.shooterJerk);
-
         shooterLeft.getConfigurator().apply(slot0);
         shooterRight.getConfigurator().apply(slot0);
-
-        shooterLeft.getConfigurator().apply(configs);
-        shooterRight.getConfigurator().apply(configs);
     }
 
     @Override
@@ -103,22 +92,6 @@ public class ShooterIOTalon implements ShooterIO {
     }
 
     @Override
-    public void setMaxAcceleration(double maxAcceleration) {
-        configs.withMotionMagicAcceleration(maxAcceleration);
-
-        shooterLeft.getConfigurator().apply(configs);
-        shooterRight.getConfigurator().apply(configs);
-    }
-
-    @Override
-    public void setMaxJerk(double maxJerk) {
-        configs.withMotionMagicJerk(maxJerk);
-
-        shooterLeft.getConfigurator().apply(configs);
-        shooterRight.getConfigurator().apply(configs);
-    }
-
-    @Override
     public void setFF(double kS, double kV, double kA) {
         slot0.withKS(kS);
         slot0.withKV(kV);
@@ -134,12 +107,8 @@ public class ShooterIOTalon implements ShooterIO {
             shooterLeft.setVoltage(overrideVolts);
             shooterRight.setVoltage(overrideVolts);
         } else {
-            shooterLeft.setControl(
-                    leftController.withVelocity(
-                            goalLeftVelocityRPM / ConversionConstants.kMinutesToSeconds));
-            shooterRight.setControl(
-                    rightController.withVelocity(
-                            goalRightVelocityRPM / ConversionConstants.kMinutesToSeconds));
+            shooterLeft.setControl(new VelocityDutyCycle(goalLeftVelocityRPM));
+            shooterRight.setControl(new VelocityDutyCycle(goalRightVelocityRPM));
         }
 
         inputs.shooterLeftVelocityRPM =
@@ -147,7 +116,7 @@ public class ShooterIOTalon implements ShooterIO {
                         / ConversionConstants.kSecondsToMinutes;
         inputs.shooterLeftGoalVelocityRPM = goalLeftVelocityRPM;
         inputs.shooterLeftAppliedVolts = shooterLeft.getMotorVoltage().getValueAsDouble();
-        inputs.shooterLeftCurrentAmps = shooterLeft.getStatorCurrent().getValueAsDouble();
+        inputs.shooterLeftStatorCurrentAmps = shooterLeft.getStatorCurrent().getValueAsDouble();
         inputs.shooterLeftSupplyCurrentAmps = shooterLeft.getSupplyCurrent().getValueAsDouble();
 
         inputs.shooterRightVelocityRPM =
@@ -155,11 +124,11 @@ public class ShooterIOTalon implements ShooterIO {
                         / ConversionConstants.kSecondsToMinutes;
         inputs.shooterRightGoalVelocityRPM = goalRightVelocityRPM;
         inputs.shooterRightAppliedVolts = shooterRight.getMotorVoltage().getValueAsDouble();
-        inputs.shooterRightCurrentAmps = shooterRight.getStatorCurrent().getValueAsDouble();
+        inputs.shooterRightStatorCurrentAmps = shooterRight.getStatorCurrent().getValueAsDouble();
         inputs.shooterRightSupplyCurrentAmps = shooterRight.getSupplyCurrent().getValueAsDouble();
 
         inputs.kickerAppliedVolts = kicker.getMotorVoltage().getValueAsDouble();
-        inputs.kickerCurrentAmps = kicker.getStatorCurrent().getValueAsDouble();
+        inputs.kickerStatorCurrentAmps = kicker.getStatorCurrent().getValueAsDouble();
 
         inputs.bannerSensor = bannerSensor.get();
     }

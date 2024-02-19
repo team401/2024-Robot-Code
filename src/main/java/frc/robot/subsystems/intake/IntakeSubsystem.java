@@ -104,7 +104,7 @@ public class IntakeSubsystem extends SubsystemBase {
         } else {
             io.setBeltVoltage(0);
         }
-        if (!inputs.noteSensed && inputs.beltCurrent < 2.0) {
+        if (!inputs.noteSensed && inputs.beltStatorCurrent < 2.0) {
             state = State.IDLE;
             io.setBeltVoltage(0);
         }

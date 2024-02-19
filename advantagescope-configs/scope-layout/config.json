@@ -1,10 +1,10 @@
 {
   "hubs": [
     {
-      "x": 133,
-      "y": 35,
+      "x": 119,
+      "y": 14,
       "width": 1100,
-      "height": 650,
+      "height": 560,
       "state": {
         "sidebar": {
           "width": 300,
@@ -12,13 +12,14 @@
             "/AdvantageKit",
             "/AdvantageKit/RealOutputs",
             "/AdvantageKit/telemetry",
-            "/AdvantageKit/scoring",
             "/telemetry",
             "/RealOutputs",
             "/AdvantageKit/RealOutputs/scoring",
             "/telemetry/Pose3d",
             "/telemetry/Pose3d/translation",
-            "/AdvantageKit/RealOutputs/endgame"
+            "/AdvantageKit/RealOutputs/endgame",
+            "/AdvantageKit/intake",
+            "/AdvantageKit/RealOutputs/Scoring"
           ]
         },
         "tabs": {
@@ -37,7 +38,66 @@
                     "type": null,
                     "factor": 1
                   },
-                  "fields": []
+                  "fields": [
+                    {
+                      "key": "NT:/AdvantageKit/endgame/Position",
+                      "color": "#2b66a2",
+                      "show": true
+                    }
+                  ]
+                },
+                "discrete": {
+                  "fields": [
+                    {
+                      "key": "NT:/AdvantageKit/RealOutputs/scoring/State",
+                      "color": "#e5b31b",
+                      "show": true
+                    }
+                  ]
+                },
+                "right": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": [
+                    {
+                      "key": "NT:/AdvantageKit/RealOutputs/Scoring/elevatorLimit",
+                      "color": "#af2437",
+                      "show": true
+                    },
+                    {
+                      "key": "NT:/AdvantageKit/scoring/aimer/AimAngleRad",
+                      "color": "#80588e",
+                      "show": true
+                    }
+                  ]
+                }
+              },
+              "title": "Line Graph"
+            },
+            {
+              "type": 1,
+              "legends": {
+                "left": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": [
+                    {
+                      "key": "NT:/AdvantageKit/scoring/aimer/AimAngleRad",
+                      "color": "#2b66a2",
+                      "show": true
+                    },
+                    {
+                      "key": "NT:/AdvantageKit/scoring/aimer/AimGoalAngleRad",
+                      "color": "#e5b31b",
+                      "show": true
+                    }
+                  ]
                 },
                 "discrete": {
                   "fields": []
@@ -52,6 +112,27 @@
                 }
               },
               "title": "Line Graph"
+            },
+            {
+              "type": 8,
+              "uuid": "h88lmidg3e3b5f0d0ni8y5fo0ud1a1zn",
+              "fields": [],
+              "listFields": [],
+              "options": {
+                "ids": [
+                  0,
+                  1,
+                  2
+                ],
+                "layouts": [
+                  "None",
+                  "None",
+                  "Xbox Controller (Blue)"
+                ]
+              },
+              "configHidden": false,
+              "visualizer": null,
+              "title": "Joysticks"
             },
             {
               "type": 6,
@@ -98,14 +179,14 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  1.4695761589768194e-15,
-                  5.999999999999987,
-                  -11.999999999999964
+                  10.102714356287965,
+                  0.26622930405943956,
+                  -2.8352716372526316
                 ],
                 "cameraTarget": [
-                  0,
-                  0.5,
-                  0
+                  1.619835703195438,
+                  -0.10624782552698095,
+                  -5.541832675475496
                 ]
               },
               "title": "3D Field"
