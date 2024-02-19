@@ -237,8 +237,8 @@ public class RobotContainer {
 
             controller.leftBumper()
                 .onTrue(new InstantCommand(
-                    () -> drivetrain.seedFieldRelative(new Pose2d(1, 1.5, new Rotation2d()))
-                ));
+                    () -> drivetrain.seedFieldRelative(getPoseAgainstSpeaker()))
+                );
 
             controller.b()
                 .onTrue(new InstantCommand(
@@ -486,6 +486,20 @@ public class RobotContainer {
     private Rotation2d getFieldToAmpHeading() {
         Logger.recordOutput("Field/amp", FieldConstants.fieldToAmpHeading);
         return FieldConstants.fieldToAmpHeading;
+    }
+
+    private Pose2d getPoseAgainstSpeaker() {
+        if (DriverStation.getAlliance().isEmpty()) {
+            return FieldConstants.robotAgainstRedSpeaker;
+        } else {
+            switch (DriverStation.getAlliance().get()) {
+                case Blue:
+                    return FieldConstants.robotAgainstBlueSpeaker;
+                case Red:
+                    return FieldConstants.robotAgainstRedSpeaker;
+            }
+        }
+        throw new RuntimeException("Unreachable branch of switch expression");
     }
 
     private Rotation2d getFieldToSourceHeading() {
