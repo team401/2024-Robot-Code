@@ -182,7 +182,7 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignState(AlignState.MANUAL)));
 
-            controller.button(1).whileTrue(launchCommand());
+            controller.rightTrigger().whileTrue(launchCommand());
         }
     } // spotless:on
 

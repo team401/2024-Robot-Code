@@ -17,8 +17,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -30,11 +28,10 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class NoteVisualizer {
-    private static final Translation3d blueSpeaker = new Translation3d(0.225, 5.55, 2.1);
-    private static final Translation3d redSpeaker = new Translation3d(16.317, 5.55, 2.1);
     private static final Transform3d launcherTransform =
-            new Transform3d(0.35, 0, 0.8, new Rotation3d(0.0, Units.degreesToRadians(-55.0), 0.0));
-    private static final double shotSpeed = 5.0; // Meters per sec
+            new Transform3d(0.35, 0, 0.8, new Rotation3d());
+    private static double shotSpeed = 5.0; // Meters per sec
+    private static double shotAngleRad = Math.PI / 6;
     private static Supplier<Pose2d> robotPoseSupplier = () -> new Pose2d();
 
     public static void setRobotPoseSupplier(Supplier<Pose2d> supplier) {
@@ -45,37 +42,57 @@ public class NoteVisualizer {
         return new ScheduleCommand( // Branch off and exit immediately
                 Commands.defer(
                                 () -> {
-                                    final Pose3d startPose =
+                                    Pose3d startPose =
                                             new Pose3d(robotPoseSupplier.get())
                                                     .transformBy(launcherTransform);
-                                    final boolean isRed =
+                                    boolean isRed =
                                             DriverStation.getAlliance().isPresent()
                                                     && DriverStation.getAlliance()
                                                             .get()
                                                             .equals(Alliance.Red);
-                                    final Pose3d endPose =
-                                            new Pose3d(
-                                                    isRed ? redSpeaker : blueSpeaker,
-                                                    startPose.getRotation());
-
-                                    final double duration =
-                                            startPose
-                                                            .getTranslation()
-                                                            .getDistance(endPose.getTranslation())
-                                                    / shotSpeed;
-                                    final Timer timer = new Timer();
-                                    timer.start();
+                                    Timer timeSinceLaunch = new Timer();
+                                    timeSinceLaunch.start();
                                     return Commands.run(
                                                     () -> {
                                                         Logger.recordOutput(
                                                                 "NoteVisualizer",
-                                                                new Pose3d[] {
-                                                                    startPose.interpolate(
-                                                                            endPose,
-                                                                            timer.get() / duration)
-                                                                });
+                                                                new Pose3d(
+                                                                        shotSpeed
+                                                                                        * Math.cos(
+                                                                                                shotAngleRad)
+                                                                                        * Math.sin(
+                                                                                                startPose
+                                                                                                        .getRotation()
+                                                                                                        .getAngle())
+                                                                                        * timeSinceLaunch
+                                                                                                .get()
+                                                                                + startPose.getX(),
+                                                                        shotSpeed
+                                                                                        * Math.cos(
+                                                                                                shotAngleRad)
+                                                                                        * Math.cos(
+                                                                                                startPose
+                                                                                                        .getRotation()
+                                                                                                        .getAngle())
+                                                                                        * timeSinceLaunch
+                                                                                                .get()
+                                                                                + startPose.getY(),
+                                                                        shotSpeed
+                                                                                        * Math.sin(
+                                                                                                shotAngleRad)
+                                                                                        * timeSinceLaunch
+                                                                                                .get()
+                                                                                + startPose.getZ()
+                                                                                - 1
+                                                                                        / 2
+                                                                                        * 9.8
+                                                                                        * Math.pow(
+                                                                                                timeSinceLaunch
+                                                                                                        .get(),
+                                                                                                2),
+                                                                        startPose.getRotation()));
                                                     })
-                                            .until(() -> timer.hasElapsed(duration))
+                                            .until(() -> timeSinceLaunch.hasElapsed(10))
                                             .finallyDo(
                                                     () -> {
                                                         Logger.recordOutput(

@@ -15,7 +15,6 @@ import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import java.util.Set;
 import org.littletonrobotics.junction.Logger;
-import org.opencv.core.Point3;
 
 public class NoteSimSubsystem {
 
@@ -125,17 +124,17 @@ public class NoteSimSubsystem {
         return lastNotePos;
     }
 
-
-
     public boolean withinRange(Pose3d object, Pose3d withinCenter, double radius) {
-        double dX = object.getX()-withinCenter.getY();
-        double dY = object.getY()-withinCenter.getY();
-        double dZ = object.getZ()-withinCenter.getZ();
-        if (Math.sqrt(dX*dX + dY*dY + dZ*dZ) <= radius) return true;
+        double dX = object.getX() - withinCenter.getY();
+        double dY = object.getY() - withinCenter.getY();
+        double dZ = object.getZ() - withinCenter.getZ();
+        if (Math.sqrt(dX * dX + dY * dY + dZ * dZ) <= radius) return true;
         return false;
     }
 
     public boolean withinRectangle(Pose3d object, int[][] points) {
-        return false; //in progress, unsure if there's an easy way to do pip for 3d or if there's an existing library or something
+
+        return false; // in progress, unsure if there's an easy way to do pip for 3d or if there's
+        // an existing library or something
     }
 }
