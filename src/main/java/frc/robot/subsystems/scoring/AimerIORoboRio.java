@@ -13,6 +13,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Constants.ConversionConstants;
 import frc.robot.Constants.ScoringConstants;
 
 public class AimerIORoboRio implements AimerIO {
@@ -40,7 +41,7 @@ public class AimerIORoboRio implements AimerIO {
     private boolean override = false;
     private double overrideVolts = 0.0;
 
-    boolean newProfile = false;
+    boolean useProfile = false;
     double previousGoalAngle = 0.0;
 
     double minAngleClamp = 0.0;
@@ -81,14 +82,14 @@ public class AimerIORoboRio implements AimerIO {
     }
 
     @Override
-    public void setAimAngleRad(double goalAngleRad, boolean newProfile) {
+    public void setAimAngleRad(double goalAngleRad) {
         this.goalAngleRad = goalAngleRad;
-        this.newProfile = newProfile;
-    }
 
-    @Override
-    public void controlAimAngleRad() {
-        if (goalAngleRad != previousGoalAngle && newProfile) {
+        useProfile =
+                (Math.abs(goalAngleRad - getEncoderPosition())
+                        > 10 * ConversionConstants.kDegreesToRadians);
+
+        if (goalAngleRad != previousGoalAngle && useProfile) {
             timer.reset();
             timer.start();
 
@@ -103,8 +104,13 @@ public class AimerIORoboRio implements AimerIO {
 
     @Override
     public void setAngleClampsRad(double minAngleClamp, double maxAngleClamp) {
-        this.minAngleClamp = minAngleClamp;
-        this.maxAngleClamp = maxAngleClamp;
+        if (minAngleClamp > maxAngleClamp) {
+            return;
+        }
+        this.minAngleClamp =
+                MathUtil.clamp(minAngleClamp, 0.0, ScoringConstants.aimMaxAngleRadians);
+        this.maxAngleClamp =
+                MathUtil.clamp(maxAngleClamp, 0.0, ScoringConstants.aimMaxAngleRadians);
     }
 
     @Override
@@ -142,7 +148,9 @@ public class AimerIORoboRio implements AimerIO {
 
     @Override
     public void updateInputs(AimerIOInputs inputs) {
-        goalAngleRad = MathUtil.clamp(goalAngleRad, 0.0, ScoringConstants.aimMaxAngleRadians);
+        double controlSetpoint = goalAngleRad;
+        double velocitySetpoint = 0.0;
+        appliedVolts = 0.0;
 
         State trapezoidSetpoint =
                 profile.calculate(
@@ -150,34 +158,33 @@ public class AimerIORoboRio implements AimerIO {
                         new State(initialAngle, initialVelocity),
                         new State(goalAngleRad, 0));
 
-        double trapezoidSetpointPosition =
-                MathUtil.clamp(
-                        trapezoidSetpoint.position, 0.0, ScoringConstants.aimMaxAngleRadians);
-        double trapezoidSetpointVelocity = trapezoidSetpoint.velocity;
+        if (useProfile) {
+            controlSetpoint =
+                    MathUtil.clamp(
+                            trapezoidSetpoint.position, 0.0, ScoringConstants.aimMaxAngleRadians);
 
-        appliedVolts = 0.0;
+            velocitySetpoint = trapezoidSetpoint.velocity;
+        }
 
         if (override) {
             appliedVolts = overrideVolts;
         } else {
             boolean atSetpoint =
                     MathUtil.isNear(
-                            trapezoidSetpointPosition,
+                            controlSetpoint,
                             getEncoderPosition(),
                             ScoringConstants.aimPositionTolerance);
             double controllerVolts =
-                    atSetpoint
-                            ? 0.0
-                            : controller.calculate(getEncoderPosition(), trapezoidSetpointPosition);
+                    atSetpoint ? 0.0 : controller.calculate(getEncoderPosition(), controlSetpoint);
             appliedVolts =
-                    feedforward.calculate(trapezoidSetpointPosition, trapezoidSetpointVelocity)
-                            + controllerVolts;
+                    feedforward.calculate(controlSetpoint, velocitySetpoint) + controllerVolts;
         }
 
+        appliedVolts = MathUtil.clamp(appliedVolts, -12.0, 12.0);
         aimerRight.setVoltage(appliedVolts);
 
         inputs.aimGoalAngleRad = goalAngleRad;
-        inputs.aimProfileGoalAngleRad = trapezoidSetpointPosition;
+        inputs.aimProfileGoalAngleRad = controlSetpoint;
         inputs.aimAngleRad = getEncoderPosition();
 
         double currentTime = Utils.getCurrentTimeSeconds();

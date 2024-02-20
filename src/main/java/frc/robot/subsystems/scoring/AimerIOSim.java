@@ -9,6 +9,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.Constants;
+import frc.robot.Constants.ConversionConstants;
 import frc.robot.Constants.ScoringConstants;
 
 public class AimerIOSim implements AimerIO {
@@ -41,7 +42,7 @@ public class AimerIOSim implements AimerIO {
     private boolean override = false;
     private double overrideVolts = 0.0;
 
-    boolean newProfile = false;
+    boolean useProfile = false;
     double previousGoalAngle = 0.0;
 
     double minAngleClamp = 0.0;
@@ -54,14 +55,14 @@ public class AimerIOSim implements AimerIO {
     double initialVelocity = 0.0;
 
     @Override
-    public void setAimAngleRad(double goalAngleRad, boolean newProfile) {
+    public void setAimAngleRad(double goalAngleRad) {
         this.goalAngleRad = goalAngleRad;
-        this.newProfile = newProfile;
-    }
 
-    @Override
-    public void controlAimAngleRad() {
-        if (goalAngleRad != previousGoalAngle && newProfile) {
+        useProfile =
+                (Math.abs(goalAngleRad - sim.getAngleRads())
+                        > 10 * ConversionConstants.kDegreesToRadians);
+
+        if (goalAngleRad != previousGoalAngle && useProfile) {
             timer.reset();
             timer.start();
 
@@ -75,8 +76,13 @@ public class AimerIOSim implements AimerIO {
 
     @Override
     public void setAngleClampsRad(double minAngleClamp, double maxAngleClamp) {
-        this.minAngleClamp = minAngleClamp;
-        this.maxAngleClamp = maxAngleClamp;
+        if (minAngleClamp > maxAngleClamp) {
+            return;
+        }
+        this.minAngleClamp =
+                MathUtil.clamp(minAngleClamp, 0.0, ScoringConstants.aimMaxAngleRadians);
+        this.maxAngleClamp =
+                MathUtil.clamp(maxAngleClamp, 0.0, ScoringConstants.aimMaxAngleRadians);
     }
 
     @Override
@@ -100,18 +106,28 @@ public class AimerIOSim implements AimerIO {
     public void updateInputs(AimerIOInputs inputs) {
         sim.update(Constants.loopTime);
 
+        double controlSetpoint = goalAngleRad;
+
         State trapezoidSetpoint =
                 profile.calculate(
                         timer.get(),
                         new State(initialAngle, initialVelocity),
                         new State(goalAngleRad, 0));
 
+        if (useProfile) {
+            controlSetpoint =
+                    MathUtil.clamp(
+                            trapezoidSetpoint.position, 0.0, ScoringConstants.aimMaxAngleRadians);
+        }
+
         if (override) {
             sim.setInputVoltage(overrideVolts);
         } else {
             appliedVolts =
-                    feedforward.calculate(trapezoidSetpoint.position, trapezoidSetpoint.velocity)
-                            + controller.calculate(sim.getAngleRads(), trapezoidSetpoint.position);
+                    feedforward.calculate(
+                                    controlSetpoint, useProfile ? trapezoidSetpoint.velocity : 0.0)
+                            + controller.calculate(sim.getAngleRads(), controlSetpoint);
+            appliedVolts = MathUtil.clamp(appliedVolts, -12.0, 12.0);
             sim.setInputVoltage(appliedVolts);
         }
 

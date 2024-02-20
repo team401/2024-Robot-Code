@@ -116,7 +116,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                         ScoringConstants.aimerAvoidElevatorTable(), 0.0, Math.PI / 2.0);
 
         // This causes elevator avoidance to work upon enable
-        aimerIo.setAimAngleRad(0.01, true);
+        aimerIo.setAimAngleRad(0.01);
     }
 
     public void setAction(ScoringAction action) {
@@ -124,7 +124,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private void idle() {
-        aimerIo.setAimAngleRad(0.0, true);
+        aimerIo.setAimAngleRad(0.0);
         shooterIo.setShooterVelocityRPM(0);
         shooterIo.setKickerVolts(0);
         hoodIo.setHoodAngleRad(0);
@@ -135,7 +135,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
             state = ScoringState.INTAKE;
         } else if (action == ScoringAction.AIM || action == ScoringAction.SHOOT) {
             state = ScoringState.PRIME;
-            aimerIo.setAimAngleRad(Math.PI / 4, true);
+            aimerIo.setAimAngleRad(aimerInputs.aimAngleRad);
         } else if (action == ScoringAction.AMP_AIM) {
             state = ScoringState.AMP_PRIME;
         } else if (action == ScoringAction.ENDGAME) {
@@ -151,7 +151,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     private void intake() {
         if (!aimerAtIntakePosition()) {
-            aimerIo.setAimAngleRad(ScoringConstants.intakeAngleToleranceRadians, true);
+            aimerIo.setAimAngleRad(ScoringConstants.intakeAngleToleranceRadians);
         }
         shooterIo.setKickerVolts(0);
         hoodIo.setHoodAngleRad(0);
@@ -165,7 +165,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         double distancetoGoal = findDistanceToGoal();
         Logger.recordOutput("scoring/aimGoal", aimerInterpolated.getValue(distancetoGoal));
         shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
-        aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal), false);
+        aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal));
 
         boolean shooterReady =
                 Math.abs(
@@ -194,7 +194,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     private void ampPrime() {
         shooterIo.setShooterVelocityRPM(ScoringConstants.shooterAmpVelocityRPM);
-        aimerIo.setAimAngleRad(Math.PI / 2, true);
+        aimerIo.setAimAngleRad(Math.PI / 2);
         hoodIo.setHoodAngleRad(Math.PI);
 
         boolean shooterReady =
@@ -228,7 +228,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     private void shoot() {
         double distancetoGoal = findDistanceToGoal();
         shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
-        aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal), false);
+        aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal));
 
         shooterIo.setKickerVolts(5);
 
@@ -250,7 +250,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private void endgame() {
-        aimerIo.setAimAngleRad(0.0, true);
+        aimerIo.setAimAngleRad(0.0);
         shooterIo.setShooterVelocityRPM(0);
         shooterIo.setKickerVolts(0);
         hoodIo.setHoodAngleRad(0);
@@ -264,7 +264,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         shooterGoalVelocityRPMTuning = SmartDashboard.getNumber("Test-Mode/ShooterGoal", 0.0);
         aimerGoalAngleRadTuning = SmartDashboard.getNumber("Test-Mode/AimerGoal", 0.0);
         shooterIo.setShooterVelocityRPM(shooterGoalVelocityRPMTuning);
-        aimerIo.setAimAngleRad(aimerGoalAngleRadTuning, false);
+        aimerIo.setAimAngleRad(aimerGoalAngleRadTuning);
         hoodIo.setHoodAngleRad(0.0);
         shooterIo.setKickerVolts(kickerVoltsTuning);
 
@@ -382,8 +382,6 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         aimerIo.setOverrideMode(state == ScoringState.OVERRIDE);
         hoodIo.setOverrideMode(state == ScoringState.OVERRIDE);
         shooterIo.setOverrideMode(state == ScoringState.OVERRIDE);
-
-        aimerIo.controlAimAngleRad();
 
         Logger.recordOutput("scoring/State", state.toString());
         Logger.recordOutput("scoring/Action", action.toString());
@@ -595,7 +593,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         switch (slot) {
                 // Aimer
             case 0:
-                aimerIo.setAimAngleRad(temporarySetpointPosition, true);
+                aimerIo.setAimAngleRad(temporarySetpointPosition);
                 break;
                 // Hood
             case 1:
