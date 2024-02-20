@@ -22,7 +22,7 @@
             "button": "back"
         },
         {
-            "command": "manualIdle",
+            "command": "stopIntake",
             "controller": 2,
             "button": "start"
         },
@@ -43,9 +43,19 @@
             "button": "y"
         },
         {
-            "command": "toggleAlign",
+            "command": "fieldRelative",
             "controller": 2,
             "button": "leftBumper"
+        },
+        {
+            "command": "endgame1",
+            "controller": 2,
+            "button": "pov0"
+        },
+        {
+            "command": "endgame2",
+            "controller": 2,
+            "button": "pov180"
         }
     ],
 
@@ -53,13 +63,13 @@
         {   "command": "xDrive",
             "controller": 2,
             "axis": "leftY",
-            "negate": true
+            "negate": false
         },
         {
             "command": "yDrive",
             "controller": 2,
             "axis": "leftX",
-            "negate": true
+            "negate": false
         },
         {
             "command": "rotation",

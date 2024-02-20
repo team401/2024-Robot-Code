@@ -36,6 +36,11 @@
             "command": "left",
             "controller": 2,
             "button": "leftBumper"
+        },
+        {
+            "command": "povUp",
+            "controller": 2,
+            "button": "pov0"
         }
     ],
 
@@ -43,19 +48,24 @@
         {   "command": "xDrive",
             "controller": 2,
             "axis": "leftY",
-            "negate": true
+            "negate": false
         },
         {
             "command": "yDrive",
             "controller": 2,
             "axis": "leftX",
-            "negate": true
+            "negate": false
         },
         {
             "command": "rotation",
             "controller": 2,
             "axis": "rightX",
             "negate": true
+        },
+        {
+            "command": "povDown",
+            "controller": 2,
+            "button": "pov180"
         }
     ],
 
