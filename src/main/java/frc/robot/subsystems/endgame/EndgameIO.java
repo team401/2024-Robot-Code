@@ -19,4 +19,7 @@ public interface EndgameIO {
     public default void updateInputs(EndgameIOInputs inputs) {}
 
     public default void setVolts(double volts) {}
+
+    public default void setBrakeMode(boolean brake) {}
+    ;
 }

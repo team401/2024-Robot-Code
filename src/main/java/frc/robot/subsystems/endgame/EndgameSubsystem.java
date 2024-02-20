@@ -52,6 +52,10 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
         Logger.recordOutput("endgame/Action", action);
     }
 
+    public void setBrakeMode(boolean brake) {
+        endgameIo.setBrakeMode(brake);
+    }
+
     public double getPosition() {
         return endgameInputs.position;
     }
