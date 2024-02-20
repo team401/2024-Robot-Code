@@ -62,13 +62,19 @@ public class Telemetry {
     DoublePublisher velocityX = driveStats.getDoubleTopic("Velocity X").publish();
     DoublePublisher velocityY = driveStats.getDoubleTopic("Velocity Y").publish();
     DoublePublisher speed = driveStats.getDoubleTopic("Speed").publish();
+    DoublePublisher accelX = driveStats.getDoubleTopic("Acceleration X").publish();
+    DoublePublisher accelY = driveStats.getDoubleTopic("Acceleration Y").publish();
     DoublePublisher odomPeriod = driveStats.getDoubleTopic("Odometry Period").publish();
 
     double velocityXFiltered = 0.0;
     double velocityYFiltered = 0.0;
     LinearFilter velocityXFilter = LinearFilter.singlePoleIIR(0.1, Constants.loopTime);
     LinearFilter velocityYFilter = LinearFilter.singlePoleIIR(0.1, Constants.loopTime);
+    LinearFilter accelXFilter = LinearFilter.singlePoleIIR(0.1, Constants.loopTime);
+    LinearFilter accelYFilter = LinearFilter.singlePoleIIR(0.1, Constants.loopTime);
 
+    double accelXFiltered = 0.0;
+    double accelYFiltered = 0.0;
     /* Keep a reference of the last pose to calculate the speeds */
     Pose2d latestPose = new Pose2d();
     double lastTime = Utils.getCurrentTimeSeconds();
@@ -155,9 +161,13 @@ public class Telemetry {
         speed.set(velocities.getNorm());
         velocityX.set(velocities.getX());
         velocityY.set(velocities.getY());
+        accelX.set(telemetryInputs.accelerationX);
+        accelY.set(telemetryInputs.accelerationY);
 
         velocityXFiltered = velocityXFilter.calculate(velocityFieldRelative.getX());
         velocityYFiltered = velocityYFilter.calculate(velocityFieldRelative.getY());
+        accelXFiltered = accelXFilter.calculate(telemetryInputs.accelerationX);
+        accelYFiltered = accelYFilter.calculate(telemetryInputs.accelerationY);
         odomPeriod.set(state.OdometryPeriod);
 
         latestModuleStates = state.ModuleStates;
@@ -225,5 +235,13 @@ public class Telemetry {
 
     public double getVelocityY() {
         return velocityYFiltered;
+    }
+
+    public double getAccelerationX() {
+        return accelXFiltered;
+    }
+
+    public double getAccelerationY() {
+        return accelYFiltered;
     }
 }
