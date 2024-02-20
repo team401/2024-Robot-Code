@@ -17,8 +17,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -29,33 +27,28 @@ import org.littletonrobotics.junction.Logger;
 
 public class NoteVisualizer {
     private static final Transform3d launcherTransform =
-            new Transform3d(0.35, 0, 0.8, new Rotation3d());
-    private static double shotSpeed = 5.0; // Meters per sec
-    private static double shotAngleRad = Math.PI / 6;
+            new Transform3d(0.35, 0, 0.8, new Rotation3d(0, Math.PI / 3, 0));
+
     private static Supplier<Pose2d> robotPoseSupplier = () -> new Pose2d();
+
+    private static Pose3d lastPose = new Pose3d(100, 100, 100, new Rotation3d());
 
     public static void setRobotPoseSupplier(Supplier<Pose2d> supplier) {
         robotPoseSupplier = supplier;
     }
 
-    public static Command shoot() {
+    public static Command shoot(double shotSpeed, double shotAngleRad) {
         return new ScheduleCommand( // Branch off and exit immediately
                 Commands.defer(
                                 () -> {
                                     Pose3d startPose =
                                             new Pose3d(robotPoseSupplier.get())
                                                     .transformBy(launcherTransform);
-                                    boolean isRed =
-                                            DriverStation.getAlliance().isPresent()
-                                                    && DriverStation.getAlliance()
-                                                            .get()
-                                                            .equals(Alliance.Red);
                                     Timer timeSinceLaunch = new Timer();
                                     timeSinceLaunch.start();
                                     return Commands.run(
                                                     () -> {
-                                                        Logger.recordOutput(
-                                                                "NoteVisualizer",
+                                                        lastPose =
                                                                 new Pose3d(
                                                                         shotSpeed
                                                                                         * Math.cos(
@@ -83,16 +76,16 @@ public class NoteVisualizer {
                                                                                         * timeSinceLaunch
                                                                                                 .get()
                                                                                 + startPose.getZ()
-                                                                                - 1
-                                                                                        / 2
-                                                                                        * 9.8
+                                                                                - 4.9
                                                                                         * Math.pow(
                                                                                                 timeSinceLaunch
                                                                                                         .get(),
                                                                                                 2),
-                                                                        startPose.getRotation()));
+                                                                        startPose.getRotation());
+                                                        Logger.recordOutput(
+                                                                "NoteVisualizer", lastPose);
                                                     })
-                                            .until(() -> timeSinceLaunch.hasElapsed(10))
+                                            .until(() -> lastPose.getZ() < 0)
                                             .finallyDo(
                                                     () -> {
                                                         Logger.recordOutput(
@@ -101,5 +94,19 @@ public class NoteVisualizer {
                                 },
                                 Set.of())
                         .ignoringDisable(true));
+    }
+
+    public boolean withinRange(Pose3d object, Pose3d withinCenter, double radius) {
+        double dX = object.getX() - withinCenter.getY();
+        double dY = object.getY() - withinCenter.getY();
+        double dZ = object.getZ() - withinCenter.getZ();
+        if (Math.sqrt(dX * dX + dY * dY + dZ * dZ) <= radius) return true;
+        return false;
+    }
+
+    public boolean withinRectangle(Pose3d object, int[][] points) {
+
+        return false; // in progress, unsure if there's an easy way to do pip for 3d or if there's
+        // an existing library or something
     }
 }

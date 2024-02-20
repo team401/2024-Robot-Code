@@ -32,5 +32,6 @@
     "editor.detectIndentation": false,
     "editor.rulers": [
         100
-    ]
+    ],
+    "java.debug.settings.onBuildFailureProceed": true
 }

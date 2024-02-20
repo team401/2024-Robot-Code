@@ -188,7 +188,7 @@ public class RobotContainer {
 
     public Command launchCommand() {
         NoteVisualizer.setRobotPoseSupplier(() -> drivetrain.getState().Pose);
-        return Commands.sequence(NoteVisualizer.shoot(), Commands.idle());
+        return Commands.sequence(NoteVisualizer.shoot(10.0, Math.PI / 3), Commands.idle());
     }
 
     private void configureModes() {}
