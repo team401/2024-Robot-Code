@@ -50,8 +50,8 @@ public final class Constants {
 
         public static final boolean runIntake = false;
         public static final boolean runScoring = true;
-        public static final boolean runEndgame = false;
-        public static final boolean runDrive = false;
+        public static final boolean runEndgame = true;
+        public static final boolean runDrive = true;
 
         public static final boolean enableLEDS = false;
     }
@@ -418,10 +418,12 @@ public final class Constants {
         public static final int hoodId = 17;
 
         public static final int aimEncoderPort = 0;
-        public static final double aimerEncoderOffset = 0.465;
+        public static final double aimerEncoderOffset = 1.78;
 
-        public static final double aimAcceleration = 0.1; // TODO: 15.0
-        public static final double aimCruiseVelocity = 0.1; // TODO: 15.0
+        public static final double aimPositionTolerance = 0.015;
+
+        public static final double aimAcceleration = 5.0; // TODO: 15.0
+        public static final double aimCruiseVelocity = 5.0; // TODO: 15.0
 
         public static final double shooterVelocityMarginRPM = 10;
         public static final double aimAngleMarginRadians = Units.degreesToRadians(5);
@@ -432,7 +434,7 @@ public final class Constants {
 
         public static final double shooterAmpVelocityRPM = 10;
 
-        public static final double hoodHomeAmps = 100.0; // TODO: Find this
+        public static final double hoodHomeAmps = 40.0; // TODO: Find this
         public static final double hoodHomeAngleRad = Math.PI;
 
         public static final double aimMaxAngleRadians = Math.PI / 2;
@@ -525,10 +527,11 @@ public final class Constants {
         public static HashMap<Double, Double> aimerAvoidElevatorTable() {
             HashMap<Double, Double> map = new HashMap<Double, Double>();
             map.put(0.0, 0.0);
-            map.put(0.01, Math.PI / 6);
+            map.put(0.01, Math.PI / 8);
+            map.put(0.05, Math.PI / 6);
             map.put(0.1, Math.PI / 4);
             map.put(0.2, Math.PI / 3);
-            map.put(0.4, Math.PI / 2);
+            map.put(0.4, 1.37);
 
             return map;
         }

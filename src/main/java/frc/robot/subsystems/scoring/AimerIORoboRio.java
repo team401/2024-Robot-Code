@@ -66,16 +66,18 @@ public class AimerIORoboRio implements AimerIO {
         TalonFXConfigurator aimerLeftConfig = aimerLeft.getConfigurator();
         aimerLeftConfig.apply(
                 new CurrentLimitsConfigs()
-                        .withStatorCurrentLimit(120)
+                        .withStatorCurrentLimit(60)
                         .withStatorCurrentLimitEnable(true));
 
         TalonFXConfigurator aimerRightConfig = aimerRight.getConfigurator();
         aimerRightConfig.apply(
                 new CurrentLimitsConfigs()
-                        .withStatorCurrentLimit(120)
+                        .withStatorCurrentLimit(60)
                         .withStatorCurrentLimitEnable(true));
 
         aimerRight.setPosition(0.0);
+
+        controller.setTolerance(0.015);
     }
 
     @Override
@@ -90,7 +92,8 @@ public class AimerIORoboRio implements AimerIO {
             timer.reset();
             timer.start();
 
-            initialAngle = getEncoderPosition();
+            initialAngle =
+                    MathUtil.clamp(getEncoderPosition(), 0.0, ScoringConstants.aimMaxAngleRadians);
             initialVelocity = velocity;
 
             previousGoalAngle = goalAngleRad;
@@ -134,34 +137,47 @@ public class AimerIORoboRio implements AimerIO {
     }
 
     private double getEncoderPosition() {
-        // return encoder.getAbsolutePosition() * 2.0 * Math.PI -
-        // ScoringConstants.aimerEncoderOffset;
-        return aimerRight.getPosition().getValueAsDouble() * (2.0 * Math.PI) / 80.0;
+        return encoder.getAbsolutePosition() * 2.0 * Math.PI - ScoringConstants.aimerEncoderOffset;
     }
 
     @Override
     public void updateInputs(AimerIOInputs inputs) {
+        goalAngleRad = MathUtil.clamp(goalAngleRad, 0.0, ScoringConstants.aimMaxAngleRadians);
+
         State trapezoidSetpoint =
                 profile.calculate(
                         timer.get(),
                         new State(initialAngle, initialVelocity),
                         new State(goalAngleRad, 0));
 
+        double trapezoidSetpointPosition =
+                MathUtil.clamp(
+                        trapezoidSetpoint.position, 0.0, ScoringConstants.aimMaxAngleRadians);
+        double trapezoidSetpointVelocity = trapezoidSetpoint.velocity;
+
+        appliedVolts = 0.0;
+
         if (override) {
             appliedVolts = overrideVolts;
         } else {
+            boolean atSetpoint =
+                    MathUtil.isNear(
+                            trapezoidSetpointPosition,
+                            getEncoderPosition(),
+                            ScoringConstants.aimPositionTolerance);
+            double controllerVolts =
+                    atSetpoint
+                            ? 0.0
+                            : controller.calculate(getEncoderPosition(), trapezoidSetpointPosition);
             appliedVolts =
-                    feedforward.calculate(trapezoidSetpoint.position, trapezoidSetpoint.velocity)
-                            + controller.calculate(
-                                    getEncoderPosition(), trapezoidSetpoint.position);
+                    feedforward.calculate(trapezoidSetpointPosition, trapezoidSetpointVelocity)
+                            + controllerVolts;
         }
 
-        if (getEncoderPosition() > Math.PI / 2.0) {
-            appliedVolts = 0.0;
-        }
         aimerRight.setVoltage(appliedVolts);
 
-        inputs.aimGoalAngleRad = trapezoidSetpoint.position;
+        inputs.aimGoalAngleRad = goalAngleRad;
+        inputs.aimProfileGoalAngleRad = trapezoidSetpointPosition;
         inputs.aimAngleRad = getEncoderPosition();
 
         double currentTime = Utils.getCurrentTimeSeconds();
@@ -172,7 +188,7 @@ public class AimerIORoboRio implements AimerIO {
         velocity = (getEncoderPosition() - lastPosition) / diffTime;
         lastPosition = getEncoderPosition();
 
-        inputs.aimAppliedVolts = aimerRight.getMotorVoltage().getValueAsDouble();
+        inputs.aimAppliedVolts = appliedVolts;
         inputs.aimStatorCurrentAmps = aimerRight.getStatorCurrent().getValueAsDouble();
         inputs.aimSupplyCurrentAmps = aimerRight.getSupplyCurrent().getValueAsDouble();
     }

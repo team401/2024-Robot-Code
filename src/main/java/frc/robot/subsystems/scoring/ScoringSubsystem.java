@@ -20,6 +20,7 @@ import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
 import frc.robot.utils.Tunable;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -38,7 +39,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     private Supplier<Pose2d> poseSupplier = () -> new Pose2d();
     private Supplier<Vector<N2>> velocitySupplier = () -> VecBuilder.fill(0.0, 0.0);
     private Supplier<Translation2d> speakerSupplier = () -> new Translation2d(0, 0);
-    private Supplier<Double> elevatorPositionSupplier = () -> 0.0;
+    private DoubleSupplier elevatorPositionSupplier = () -> 0.0;
     private Supplier<Boolean> driveAllignedSupplier = () -> true;
 
     private final InterpolateDouble shooterInterpolated;
@@ -113,6 +114,9 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         aimerAvoidElevator =
                 new InterpolateDouble(
                         ScoringConstants.aimerAvoidElevatorTable(), 0.0, Math.PI / 2.0);
+
+        // This causes elevator avoidance to work upon enable
+        aimerIo.setAimAngleRad(0.01, true);
     }
 
     public void setAction(ScoringAction action) {
@@ -330,7 +334,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         this.speakerSupplier = speakerSupplier;
     }
 
-    public void setElevatorPositionSupplier(Supplier<Double> elevatorPositionSupplier) {
+    public void setElevatorPositionSupplier(DoubleSupplier elevatorPositionSupplier) {
         this.elevatorPositionSupplier = elevatorPositionSupplier;
     }
 
@@ -367,8 +371,10 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                 && willHitStage()) {
             aimerIo.setAngleClampsRad(0, 0);
         } else {
-            double elevatorLimit = aimerAvoidElevator.getValue(elevatorPositionSupplier.get());
-            Logger.recordOutput("Scoring/elevatorLimit", elevatorLimit);
+            double elevatorLimit =
+                    aimerAvoidElevator.getValue(elevatorPositionSupplier.getAsDouble());
+            Logger.recordOutput("scoring/elevatorPosition", elevatorPositionSupplier.getAsDouble());
+            Logger.recordOutput("scoring/elevatorLimit", elevatorLimit);
             aimerIo.setAngleClampsRad(
                     Math.max(0.0, elevatorLimit), ScoringConstants.aimMaxAngleRadians);
         }

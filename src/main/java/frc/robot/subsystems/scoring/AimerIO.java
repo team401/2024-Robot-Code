@@ -7,6 +7,7 @@ public interface AimerIO {
     public static class AimerIOInputs {
         public double aimAngleRad = 0.0;
         public double aimGoalAngleRad = 0.0;
+        public double aimProfileGoalAngleRad = 0.0;
         public double aimAppliedVolts = 0.0;
         public double aimStatorCurrentAmps = 0.0;
         public double aimSupplyCurrentAmps = 0.0;

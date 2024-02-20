@@ -23,7 +23,10 @@ public class InterpolateDouble {
         this.minValue = minValue;
         this.maxValue = maxValue;
 
-        sortedKeys = new ArrayList<Double>(map.keySet());
+        sortedKeys = new ArrayList<Double>();
+        for (Double k : map.keySet()) {
+            sortedKeys.add(k);
+        }
         Collections.sort(sortedKeys);
 
         // Get lowest and highest keys of the HashMap
@@ -67,6 +70,11 @@ public class InterpolateDouble {
 
         double lowerValue = map.get(lowerKey);
         double upperValue = map.get(upperKey);
+
+        // Edge case if keys equal each other
+        if (upperKey == lowerKey) {
+            upperKey += 0.01;
+        }
 
         double t = (key - lowerKey) / (upperKey - lowerKey);
         double result = lowerValue * (1.0 - t) + t * upperValue;

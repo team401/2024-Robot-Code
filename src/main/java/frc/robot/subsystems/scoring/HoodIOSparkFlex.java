@@ -52,12 +52,11 @@ public class HoodIOSparkFlex implements HoodIO {
 
     @Override
     public void home() {
-        // TODO: Add back
-        // homing = true;
-        // hoodMotor.setVoltage(0.5);
+        homing = true;
+        hoodMotor.setVoltage(1.5);
 
-        // homeTimer.reset();
-        // homeTimer.start();
+        homeTimer.reset();
+        homeTimer.start();
     }
 
     @Override
@@ -71,7 +70,7 @@ public class HoodIOSparkFlex implements HoodIO {
     public void updateInputs(HoodIOInputs inputs) {
         if (homing) {
             if (hoodMotor.getOutputCurrent() > ScoringConstants.hoodHomeAmps
-                    && homeTimer.get() > 1.0) {
+                    && homeTimer.get() > 0.25) {
                 hoodMotor.setVoltage(0);
                 hoodMotor.getEncoder().setPosition(ScoringConstants.hoodHomeAngleRad);
                 homing = false;

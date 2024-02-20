@@ -26,7 +26,7 @@ public class EndgameIOSparkFlex implements EndgameIO {
 
     @Override
     public void setVolts(double volts) {
-        rightEndgameMotor.setVoltage(-volts);
+        rightEndgameMotor.setVoltage(volts);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class EndgameIOSparkFlex implements EndgameIO {
         inputs.endgameRightAppliedVolts = rightEndgameMotor.getAppliedOutput();
         inputs.endgameRightStatorCurrentAmps = rightEndgameMotor.getOutputCurrent();
 
-        inputs.position = -leftEndgameMotor.getEncoder().getPosition();
-        inputs.velocity = -leftEndgameMotor.getEncoder().getVelocity();
+        inputs.position = leftEndgameMotor.getEncoder().getPosition();
+        inputs.velocity = leftEndgameMotor.getEncoder().getVelocity();
     }
 }

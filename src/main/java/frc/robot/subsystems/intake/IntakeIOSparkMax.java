@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -28,9 +29,9 @@ public class IntakeIOSparkMax implements IntakeIO {
         rightIntake.setSmartCurrentLimit(40, 40);
 
         leftIntake.setInverted(true);
-        leftIntake.setInverted(true);
+        rightIntake.setInverted(true);
 
-        belt.setInverted(false);
+        belt.setInverted(true);
 
         TalonFXConfigurator beltConfig = belt.getConfigurator();
         beltConfig.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
@@ -64,6 +65,6 @@ public class IntakeIOSparkMax implements IntakeIO {
 
     @Override
     public void setBeltVoltage(double volts) {
-        // belt.setControl(new VoltageOut(-volts));
+        belt.setControl(new VoltageOut(volts));
     }
 }
