@@ -50,6 +50,7 @@ import frc.robot.subsystems.scoring.ShooterIOTalon;
 import frc.robot.telemetry.Telemetry;
 import frc.robot.telemetry.TelemetryIO;
 import frc.robot.telemetry.TelemetryIOLive;
+import frc.robot.telemetry.TelemetryIOSim;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.feedforward.TuneG;
 import frc.robot.utils.feedforward.TuneS;
@@ -113,7 +114,7 @@ public class RobotContainer {
             case SIM:
                 if (FeatureFlags.runDrive) {
                     driveTelemetry =
-                            new Telemetry(DriveConstants.MaxSpeedMetPerSec, new TelemetryIOLive());
+                            new Telemetry(DriveConstants.MaxSpeedMetPerSec, new TelemetryIOSim());
 
                     drivetrain.seedFieldRelative(DriveConstants.initialPose);
                 }
