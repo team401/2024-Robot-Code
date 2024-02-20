@@ -24,4 +24,6 @@ public interface HoodIO {
     public default void home() {}
 
     public default void setPID(double p, double i, double d) {}
+
+    public default void setBrakeMode(boolean brake) {}
 }

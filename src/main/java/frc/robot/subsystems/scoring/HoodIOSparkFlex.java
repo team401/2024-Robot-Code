@@ -1,6 +1,7 @@
 package frc.robot.subsystems.scoring;
 
 import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import frc.robot.Constants.ScoringConstants;
 
@@ -59,6 +60,12 @@ public class HoodIOSparkFlex implements HoodIO {
         hoodMotor.getPIDController().setP(p);
         hoodMotor.getPIDController().setI(i);
         hoodMotor.getPIDController().setD(d);
+    }
+
+    @Override
+    public void setBrakeMode(boolean brake) {
+        IdleMode sparkMode = brake ? IdleMode.kBrake : IdleMode.kCoast;
+        hoodMotor.setIdleMode(sparkMode);
     }
 
     @Override
