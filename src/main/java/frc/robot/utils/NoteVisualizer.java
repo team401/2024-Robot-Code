@@ -31,13 +31,23 @@ public class NoteVisualizer {
 
     private static Supplier<Pose2d> robotPoseSupplier = () -> new Pose2d();
 
+    private static Supplier<Double> shotRPMSupplier = () -> 0.0;
+    private static Supplier<Double> hoodAngleSupplier = () -> 0.0;
+
     private static Pose3d lastPose = new Pose3d(100, 100, 100, new Rotation3d());
 
-    public static void setRobotPoseSupplier(Supplier<Pose2d> supplier) {
-        robotPoseSupplier = supplier;
+    public static void setSuppliers(
+            Supplier<Pose2d> robotSupplier,
+            Supplier<Double> rpmSupplier,
+            Supplier<Double> hoodSupplierRad) {
+        robotPoseSupplier = robotSupplier;
+        hoodAngleSupplier = hoodSupplierRad;
+        shotRPMSupplier = rpmSupplier;
     }
 
-    public static Command shoot(double shotSpeed, double shotAngleRad) {
+    // flywheels are 3 inches
+
+    public static Command shoot() {
         return new ScheduleCommand( // Branch off and exit immediately
                 Commands.defer(
                                 () -> {
@@ -46,13 +56,17 @@ public class NoteVisualizer {
                                                     .transformBy(launcherTransform);
                                     Timer timeSinceLaunch = new Timer();
                                     timeSinceLaunch.start();
+                                    double shotSpeed =
+                                            shotRPMSupplier.get() * 2 * Math.PI / 60 * 0.0381;
+
                                     return Commands.run(
                                                     () -> {
                                                         lastPose =
                                                                 new Pose3d(
                                                                         shotSpeed
                                                                                         * Math.cos(
-                                                                                                shotAngleRad)
+                                                                                                hoodAngleSupplier
+                                                                                                        .get())
                                                                                         * Math.sin(
                                                                                                 startPose
                                                                                                         .getRotation()
@@ -62,7 +76,8 @@ public class NoteVisualizer {
                                                                                 + startPose.getX(),
                                                                         shotSpeed
                                                                                         * Math.cos(
-                                                                                                shotAngleRad)
+                                                                                                hoodAngleSupplier
+                                                                                                        .get())
                                                                                         * Math.cos(
                                                                                                 startPose
                                                                                                         .getRotation()
@@ -72,7 +87,8 @@ public class NoteVisualizer {
                                                                                 + startPose.getY(),
                                                                         shotSpeed
                                                                                         * Math.sin(
-                                                                                                shotAngleRad)
+                                                                                                hoodAngleSupplier
+                                                                                                        .get())
                                                                                         * timeSinceLaunch
                                                                                                 .get()
                                                                                 + startPose.getZ()

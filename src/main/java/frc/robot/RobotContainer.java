@@ -187,8 +187,9 @@ public class RobotContainer {
     } // spotless:on
 
     public Command launchCommand() {
-        NoteVisualizer.setRobotPoseSupplier(() -> drivetrain.getState().Pose);
-        return Commands.sequence(NoteVisualizer.shoot(10.0, Math.PI / 3), Commands.idle());
+        NoteVisualizer.setSuppliers(
+                () -> drivetrain.getState().Pose, () -> 10.0, () -> Math.PI / 3);
+        return Commands.sequence(NoteVisualizer.shoot(), Commands.idle());
     }
 
     private void configureModes() {}
