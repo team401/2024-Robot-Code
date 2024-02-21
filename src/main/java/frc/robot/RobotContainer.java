@@ -5,6 +5,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -73,6 +74,8 @@ public class RobotContainer {
 
     SendableChooser<String> autoChooser = new SendableChooser<String>();
     SendableChooser<String> testModeChooser = new SendableChooser<String>();
+
+    DigitalInput brakeSwitch = new DigitalInput(0);
 
     LED leds;
 
@@ -317,6 +320,9 @@ public class RobotContainer {
     }
 
     public void enabledInit() {
+        scoringSubsystem.setBrakeMode(true);
+        endgameSubsystem.setBrakeMode(true);
+
         if (FeatureFlags.runScoring) {
             scoringSubsystem.setAction(ScoringAction.WAIT);
             scoringSubsystem.homeHood();
@@ -540,6 +546,17 @@ public class RobotContainer {
                             driveTelemetry.getFieldToRobot().getRotation()));
 
             driveTelemetry.logDataSynchronously();
+        }
+    }
+
+    public void disabledPeriodic() {
+        /* set to coast mode when circuit open */
+        if (brakeSwitch.get()) {
+            scoringSubsystem.setBrakeMode(false);
+            endgameSubsystem.setBrakeMode(false);
+        } else {
+            scoringSubsystem.setBrakeMode(true);
+            endgameSubsystem.setBrakeMode(true);
         }
     }
 
