@@ -51,7 +51,7 @@ public final class Constants {
         public static final boolean runIntake = false;
         public static final boolean runScoring = true;
         public static final boolean runEndgame = true;
-        public static final boolean runDrive = false;
+        public static final boolean runDrive = true;
 
         public static final boolean enableLEDS = false;
     }
@@ -449,6 +449,9 @@ public final class Constants {
 
         public static final double maxElevatorPosition = 0.45;
         public static final double maxAimAngleElevatorLimit = Math.PI / 2;
+
+        public static final double hoodMaxVelocity = 0.5;
+        public static final double hoodMaxAcceleration = 0.5;
 
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters

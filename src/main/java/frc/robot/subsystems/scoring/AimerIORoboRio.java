@@ -13,9 +13,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.Constants.ConversionConstants;
 import frc.robot.Constants.ScoringConstants;
-import org.littletonrobotics.junction.Logger;
 
 public class AimerIORoboRio implements AimerIO {
     private final TalonFX aimerLeft = new TalonFX(ScoringConstants.aimLeftMotorId);
@@ -42,7 +40,7 @@ public class AimerIORoboRio implements AimerIO {
     private boolean override = false;
     private double overrideVolts = 0.0;
 
-    boolean useProfile = false;
+    boolean newProfile = false;
     double previousGoalAngle = 0.0;
 
     double minAngleClamp = 0.0;
@@ -83,22 +81,23 @@ public class AimerIORoboRio implements AimerIO {
     }
 
     @Override
-    public void setAimAngleRad(double goalAngleRad) {
+    public void setAimAngleRad(double goalAngleRad, boolean newProfile) {
         this.goalAngleRad = goalAngleRad;
+        this.newProfile = newProfile;
+    }
 
-        useProfile =
-                (Math.abs(goalAngleRad - getEncoderPosition())
-                        > 5 * ConversionConstants.kDegreesToRadians);
-
-        if (goalAngleRad != previousGoalAngle && useProfile) {
+    @Override
+    public void controlAimAngleRad() {
+        if (goalAngleRad != previousGoalAngle && newProfile) {
             timer.reset();
             timer.start();
 
             initialAngle =
                     MathUtil.clamp(getEncoderPosition(), 0.0, ScoringConstants.aimMaxAngleRadians);
             initialVelocity = velocity;
+
+            previousGoalAngle = goalAngleRad;
         }
-        previousGoalAngle = goalAngleRad;
         goalAngleRad = MathUtil.clamp(goalAngleRad, minAngleClamp, maxAngleClamp);
     }
 
@@ -148,8 +147,6 @@ public class AimerIORoboRio implements AimerIO {
 
     @Override
     public void updateInputs(AimerIOInputs inputs) {
-        double controlSetpoint = MathUtil.clamp(goalAngleRad, minAngleClamp, maxAngleClamp);
-        double velocitySetpoint = 0.0;
         appliedVolts = 0.0;
 
         State trapezoidSetpoint =
@@ -158,14 +155,10 @@ public class AimerIORoboRio implements AimerIO {
                         new State(initialAngle, initialVelocity),
                         new State(goalAngleRad, 0));
 
-        Logger.recordOutput("scoring/useProfile", useProfile);
-        if (useProfile) {
-            controlSetpoint =
-                    MathUtil.clamp(
-                            trapezoidSetpoint.position, 0.0, ScoringConstants.aimMaxAngleRadians);
-
-            velocitySetpoint = trapezoidSetpoint.velocity;
-        }
+        double controlSetpoint =
+                MathUtil.clamp(
+                        trapezoidSetpoint.position, 0.0, ScoringConstants.aimMaxAngleRadians);
+        double velocitySetpoint = trapezoidSetpoint.velocity;
 
         if (override) {
             appliedVolts = overrideVolts;

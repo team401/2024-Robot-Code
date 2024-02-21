@@ -257,11 +257,11 @@ public class RobotContainer {
         if (FeatureFlags.runEndgame) {
             endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.OVERRIDE);
 
-            controller.povUp()
+            controller.a()
                 .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(2.0, 0)))
                 .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
 
-            controller.povDown()
+            controller.x()
                 .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(-2.0, 0)))
                 .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
         }
@@ -277,23 +277,23 @@ public class RobotContainer {
         }
 
         if (FeatureFlags.runScoring) {
-            controller.a()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.INTAKE)));
+            // controller.a()
+            //     .onTrue(new InstantCommand(
+            //         () -> scoringSubsystem.setAction(
+            //             ScoringSubsystem.ScoringAction.INTAKE)));
 
             controller.b()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                          ScoringSubsystem.ScoringAction.AIM)));
 
-            controller.x()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.SHOOT)))
-                .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AIM)));
+            // controller.x()
+            //     .onTrue(new InstantCommand(
+            //         () -> scoringSubsystem.setAction(
+            //             ScoringSubsystem.ScoringAction.SHOOT)))
+            //     .onFalse(new InstantCommand(
+            //         () -> scoringSubsystem.setAction(
+            //             ScoringSubsystem.ScoringAction.AIM)));
 
             controller.y()
                 .onTrue(new InstantCommand(
@@ -661,7 +661,7 @@ public class RobotContainer {
 
         // This is in teleopInit to prevent it from wasting time in auto
         if (FeatureFlags.runScoring) {
-            // scoringSubsystem.homeHood();
+            scoringSubsystem.homeHood();
 
             scoringSubsystem.setAction(ScoringAction.WAIT);
         }

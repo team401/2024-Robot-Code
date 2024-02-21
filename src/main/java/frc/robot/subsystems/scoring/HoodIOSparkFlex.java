@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkFlex;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.ScoringConstants;
 
@@ -16,7 +17,10 @@ public class HoodIOSparkFlex implements HoodIO {
                     ScoringConstants.hoodkS, ScoringConstants.hoodkG, ScoringConstants.hoodkV);
 
     private final TrapezoidProfile profile =
-            new TrapezoidProfile(new TrapezoidProfile.Constraints(0.5, 0.5));
+            new TrapezoidProfile(
+                    new TrapezoidProfile.Constraints(
+                            ScoringConstants.hoodMaxVelocity,
+                            ScoringConstants.hoodMaxAcceleration));
 
     private boolean override = false;
     private boolean homing = false;
@@ -55,7 +59,11 @@ public class HoodIOSparkFlex implements HoodIO {
         if (goalAngleRad != previousGoalAngle) {
             profileTimer.reset();
             profileTimer.start();
-            // X
+
+            initialAngle = hoodMotor.getEncoder().getPosition();
+            initialVelocity = hoodMotor.getEncoder().getVelocity();
+
+            previousGoalAngle = goalAngleRad;
         }
     }
 
@@ -87,9 +95,12 @@ public class HoodIOSparkFlex implements HoodIO {
 
     @Override
     public void updateInputs(HoodIOInputs inputs) {
-        // State trapezoidSetpoint = new State(
-        //     profile.calculate(profileTimer.get(), new State(), )
-        // );
+        State trapezoidSetpoint =
+                profile.calculate(
+                        profileTimer.get(),
+                        new State(initialAngle, initialVelocity),
+                        new State(goalAngleRad, 0.0));
+
         if (homing) {
             if (hoodMotor.getOutputCurrent() > ScoringConstants.hoodHomeAmps
                     && homeTimer.get() > 0.4) {
@@ -102,8 +113,12 @@ public class HoodIOSparkFlex implements HoodIO {
         } else if (override) {
             hoodMotor.setVoltage(overrideVolts);
         } else {
-            hoodMotor.getPIDController().setFF(feedforward.calculate(goalAngleRad, 0.0));
-            hoodMotor.getPIDController().setReference(goalAngleRad, ControlType.kPosition);
+            hoodMotor
+                    .getPIDController()
+                    .setFF(feedforward.calculate(trapezoidSetpoint.position, 0.0));
+            hoodMotor
+                    .getPIDController()
+                    .setReference(trapezoidSetpoint.position, ControlType.kPosition);
         }
 
         inputs.hoodAngleRad = hoodMotor.getEncoder().getPosition();

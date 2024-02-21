@@ -17,7 +17,9 @@ public interface AimerIO {
 
     public default void updateInputs(AimerIOInputs inputs) {}
 
-    public default void setAimAngleRad(double angle) {}
+    public default void setAimAngleRad(double angle, boolean newProfile) {}
+
+    public default void controlAimAngleRad() {}
 
     public default void setAngleClampsRad(double min, double max) {}
 

@@ -78,7 +78,7 @@ public class AimerIOTalon implements AimerIO {
     }
 
     @Override
-    public void setAimAngleRad(double goalAngleRad) {
+    public void setAimAngleRad(double goalAngleRad, boolean newProfile) {
         this.goalAngleRad = MathUtil.clamp(goalAngleRad, minAngleClamp, maxAngleClamp);
     }
 
