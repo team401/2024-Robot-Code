@@ -442,6 +442,7 @@ public class RobotContainer {
                 SmartDashboard.putNumber("Test-Mode/hood/kD", ScoringConstants.hoodkD);
 
                 SmartDashboard.putNumber("Test-Mode/hood/setpointPosition", 0.75);
+                SmartDashboard.putNumber("Test-Mode/hood/volts", 1.0);
 
                 scoringSubsystem.setAction(ScoringAction.OVERRIDE);
 
@@ -462,11 +463,11 @@ public class RobotContainer {
                     .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.OVERRIDE)));
 
                 controller.leftBumper()
-                    .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(1.0, 1)))
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(SmartDashboard.getNumber("Test-Mode/hood/volts", 1.0), 1)))
                     .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 1)));
 
                 controller.rightBumper()
-                    .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(-1.0, 1)))
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(-SmartDashboard.getNumber("Test-Mode/hood/volts", 1.0), 1)))
                     .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 1)));
                 break;
             case "tuning-shooter":
@@ -660,7 +661,7 @@ public class RobotContainer {
 
         // This is in teleopInit to prevent it from wasting time in auto
         if (FeatureFlags.runScoring) {
-            scoringSubsystem.homeHood();
+            // scoringSubsystem.homeHood();
 
             scoringSubsystem.setAction(ScoringAction.WAIT);
         }

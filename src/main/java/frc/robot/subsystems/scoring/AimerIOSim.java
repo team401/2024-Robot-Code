@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.Constants;
 import frc.robot.Constants.ConversionConstants;
 import frc.robot.Constants.ScoringConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class AimerIOSim implements AimerIO {
     private final SingleJointedArmSim sim =
@@ -60,7 +61,7 @@ public class AimerIOSim implements AimerIO {
 
         useProfile =
                 (Math.abs(goalAngleRad - sim.getAngleRads())
-                        > 10 * ConversionConstants.kDegreesToRadians);
+                        > 5 * ConversionConstants.kDegreesToRadians);
 
         if (goalAngleRad != previousGoalAngle && useProfile) {
             timer.reset();
@@ -68,9 +69,8 @@ public class AimerIOSim implements AimerIO {
 
             initialAngle = sim.getAngleRads();
             initialVelocity = sim.getVelocityRadPerSec();
-
-            previousGoalAngle = goalAngleRad;
         }
+        previousGoalAngle = goalAngleRad;
         goalAngleRad = MathUtil.clamp(goalAngleRad, minAngleClamp, maxAngleClamp);
     }
 
@@ -105,8 +105,7 @@ public class AimerIOSim implements AimerIO {
     @Override
     public void updateInputs(AimerIOInputs inputs) {
         sim.update(Constants.loopTime);
-
-        double controlSetpoint = goalAngleRad;
+        double controlSetpoint = MathUtil.clamp(goalAngleRad, minAngleClamp, maxAngleClamp);
 
         State trapezoidSetpoint =
                 profile.calculate(
@@ -114,6 +113,7 @@ public class AimerIOSim implements AimerIO {
                         new State(initialAngle, initialVelocity),
                         new State(goalAngleRad, 0));
 
+        Logger.recordOutput("scoring/useProfile", useProfile);
         if (useProfile) {
             controlSetpoint =
                     MathUtil.clamp(

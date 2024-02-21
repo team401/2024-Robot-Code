@@ -51,7 +51,7 @@ public final class Constants {
         public static final boolean runIntake = false;
         public static final boolean runScoring = true;
         public static final boolean runEndgame = true;
-        public static final boolean runDrive = true;
+        public static final boolean runDrive = false;
 
         public static final boolean enableLEDS = false;
     }
@@ -401,11 +401,14 @@ public final class Constants {
         public static final double hoodkP = 0.05;
         public static final double hoodkI = 0.0;
         public static final double hoodkD = 0.0;
-        public static final double hoodkFF = 0.0; // TODO: Find Imperically
+
+        public static final double hoodkS = 0.1;
+        public static final double hoodkG = 0.4;
+        public static final double hoodkV = 0.0;
 
         public static final double hoodPositionTolerance = 0.01;
 
-        public static final double hoodEncoderToRad = (0.3947368421) * (2.0 * Math.PI);
+        public static final double hoodEncoderToRad = 1.3 * (15.0 / 38.0) * (2.0 * Math.PI);
 
         public static final int aimLeftMotorId = 16;
         public static final int aimRightMotorId = 15;

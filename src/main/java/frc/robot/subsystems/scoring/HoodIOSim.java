@@ -55,7 +55,7 @@ public class HoodIOSim implements HoodIO {
         if (!override) {
             appliedVolts =
                     controller.calculate(sim.getAngleRads(), goalAngleRad)
-                            + Math.signum(controller.getPositionError()) * ScoringConstants.hoodkFF;
+                            + Math.signum(controller.getPositionError()) * ScoringConstants.hoodkS;
         }
 
         sim.setInputVoltage(appliedVolts);

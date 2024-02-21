@@ -2,6 +2,8 @@ package frc.robot.subsystems.scoring;
 
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkFlex;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.ScoringConstants;
 
@@ -9,13 +11,25 @@ public class HoodIOSparkFlex implements HoodIO {
     private final CANSparkFlex hoodMotor =
             new CANSparkFlex(ScoringConstants.hoodId, CANSparkFlex.MotorType.kBrushless);
 
+    private final ArmFeedforward feedforward =
+            new ArmFeedforward(
+                    ScoringConstants.hoodkS, ScoringConstants.hoodkG, ScoringConstants.hoodkV);
+
+    private final TrapezoidProfile profile =
+            new TrapezoidProfile(new TrapezoidProfile.Constraints(0.5, 0.5));
+
     private boolean override = false;
     private boolean homing = false;
 
     double overrideVolts = 0.0;
 
     double goalAngleRad = 0.0;
+    double previousGoalAngle = 0.1;
 
+    double initialAngle = 0.0;
+    double initialVelocity = 0.0;
+
+    private Timer profileTimer = new Timer();
     private Timer homeTimer = new Timer();
 
     public HoodIOSparkFlex() {
@@ -24,7 +38,6 @@ public class HoodIOSparkFlex implements HoodIO {
         hoodMotor.getPIDController().setP(ScoringConstants.hoodkP);
         hoodMotor.getPIDController().setI(ScoringConstants.hoodkI);
         hoodMotor.getPIDController().setD(ScoringConstants.hoodkD);
-        hoodMotor.getPIDController().setFF(ScoringConstants.hoodkFF);
 
         hoodMotor.setInverted(true);
 
@@ -38,6 +51,12 @@ public class HoodIOSparkFlex implements HoodIO {
     @Override
     public void setHoodAngleRad(double angle) {
         goalAngleRad = angle;
+
+        if (goalAngleRad != previousGoalAngle) {
+            profileTimer.reset();
+            profileTimer.start();
+            // X
+        }
     }
 
     @Override
@@ -68,9 +87,12 @@ public class HoodIOSparkFlex implements HoodIO {
 
     @Override
     public void updateInputs(HoodIOInputs inputs) {
+        // State trapezoidSetpoint = new State(
+        //     profile.calculate(profileTimer.get(), new State(), )
+        // );
         if (homing) {
             if (hoodMotor.getOutputCurrent() > ScoringConstants.hoodHomeAmps
-                    && homeTimer.get() > 0.25) {
+                    && homeTimer.get() > 0.4) {
                 hoodMotor.setVoltage(0);
                 hoodMotor.getEncoder().setPosition(ScoringConstants.hoodHomeAngleRad);
                 homing = false;
@@ -80,6 +102,7 @@ public class HoodIOSparkFlex implements HoodIO {
         } else if (override) {
             hoodMotor.setVoltage(overrideVolts);
         } else {
+            hoodMotor.getPIDController().setFF(feedforward.calculate(goalAngleRad, 0.0));
             hoodMotor.getPIDController().setReference(goalAngleRad, ControlType.kPosition);
         }
 
