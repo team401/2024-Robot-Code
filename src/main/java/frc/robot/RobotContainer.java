@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -76,6 +77,8 @@ public class RobotContainer {
     SendableChooser<String> testModeChooser = new SendableChooser<String>();
 
     DigitalInput brakeSwitch = new DigitalInput(0);
+
+    DigitalOutput timeDigitalOutput = new DigitalOutput(0);
 
     LED leds;
 
@@ -320,6 +323,8 @@ public class RobotContainer {
     }
 
     public void enabledInit() {
+        timeDigitalOutput.set(true);
+
         scoringSubsystem.setBrakeMode(true);
         endgameSubsystem.setBrakeMode(true);
 
@@ -330,6 +335,10 @@ public class RobotContainer {
         if (FeatureFlags.runEndgame) {
             endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.CANCEL);
         }
+    }
+
+    public void disabledInit() {
+        timeDigitalOutput.set(false);
     }
 
     public void testInit() {
