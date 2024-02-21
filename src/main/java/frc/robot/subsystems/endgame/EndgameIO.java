@@ -22,5 +22,7 @@ public interface EndgameIO {
 
     public default void setPID(double p, double i, double d) {}
 
-    public default void setVolts(double volts) {}
+    public default void setOverrideMode(boolean override) {}
+    public default void setOverrideVolts(double volts) {}
+    public default void setPosition(double position) {}
 }

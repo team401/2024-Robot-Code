@@ -1,5 +1,6 @@
 package frc.robot.subsystems.endgame;
 
+import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -10,6 +11,8 @@ public class EndgameIOSparkFlex implements EndgameIO {
             new CANSparkFlex(EndgameConstants.leftMotorID, MotorType.kBrushless);
     private final CANSparkFlex rightEndgameMotor =
             new CANSparkFlex(EndgameConstants.rightMotorID, MotorType.kBrushless);
+
+    boolean override = false;
 
     public EndgameIOSparkFlex() {
         leftEndgameMotor.setSmartCurrentLimit(EndgameConstants.smartCurrentLimit);
@@ -33,8 +36,18 @@ public class EndgameIOSparkFlex implements EndgameIO {
     }
 
     @Override
-    public void setVolts(double volts) {
+    public void setOverrideMode(boolean override) {
+        this.override = override;
+    }
+
+    @Override
+    public void setOverrideVolts(double volts) {
         rightEndgameMotor.setVoltage(volts);
+    }
+
+    @Override
+    public void setPosition(double position) {
+        rightEndgameMotor.getPIDController().setReference(position, ControlType.kPosition);
     }
 
     @Override

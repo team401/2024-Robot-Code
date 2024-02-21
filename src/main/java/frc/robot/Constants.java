@@ -212,7 +212,8 @@ public final class Constants {
 
         public static final int smartCurrentLimit = 50;
 
-        public static final TrapezoidProfile.Constraints climberProfileConstraints = new TrapezoidProfile.Constraints(1, 2); // TODO: Find safe values for this
+        public static final TrapezoidProfile.Constraints climberProfileConstraints =
+                new TrapezoidProfile.Constraints(1, 2); // TODO: Find safe values for this
 
         // Constants for the climber PID controller
         public static final double climberkP = 10.0; // TODO: Tune climber PID controller

@@ -1,6 +1,5 @@
 package frc.robot.subsystems.endgame;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -29,7 +28,8 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
     }
 
     private State state = State.NORMAL;
-    private final TrapezoidProfile climberProfile = new TrapezoidProfile(EndgameConstants.climberProfileConstraints);
+    private final TrapezoidProfile climberProfile =
+            new TrapezoidProfile(EndgameConstants.climberProfileConstraints);
 
     private Timer timer = new Timer();
 
@@ -42,15 +42,15 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
     public void setAction(EndgameAction action) {
         switch (action) {
             case GO_UP:
-                endgameIo.setVolts(4.0);
+                endgameIo.setOverrideVolts(4.0);
                 state = State.NORMAL;
                 break;
             case GO_DOWN:
-                endgameIo.setVolts(-4.0);
+                endgameIo.setOverrideVolts(-4.0);
                 state = State.NORMAL;
                 break;
             case CANCEL:
-                endgameIo.setVolts(0.0);
+                endgameIo.setOverrideVolts(0.0);
                 state = State.NORMAL;
                 break;
             case OVERRIDE:
@@ -110,7 +110,7 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
         Logger.recordOutput("endgame/State", state);
 
         if (state == State.OVERRIDE) {
-            endgameIo.setVolts(overrideVolts);
+            endgameIo.setOverrideVolts(overrideVolts);
         }
 
         Logger.recordOutput(

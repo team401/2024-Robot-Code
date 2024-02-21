@@ -11,11 +11,21 @@ public class EndgameIOSim implements EndgameIO {
             new ElevatorSim(DCMotor.getNeoVortex(2), 20, 1.814, 0.02231009, 0.0, 0.45, true, 0.0);
 
     double appliedVolts = 0.0;
+    boolean override = false;
 
-    private PIDController climberController = new PIDController(EndgameConstants.climberkP, EndgameConstants.climberkI, EndgameConstants.climberkD);
+    private PIDController climberController =
+            new PIDController(
+                    EndgameConstants.climberkP,
+                    EndgameConstants.climberkI,
+                    EndgameConstants.climberkD);
 
     @Override
-    public void setVolts(double volts) {
+    public void setOverrideMode(boolean override) {
+        this.override = override;
+    }
+
+    @Override
+    public void setOverrideVolts(double volts) {
         appliedVolts = volts;
     }
 
