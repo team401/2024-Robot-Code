@@ -144,7 +144,7 @@ public final class Constants {
                                 20,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
-                                        new Translation3d(0.33, 0.33, 0.127), new Rotation3d())),
+                                        new Translation3d(0.323, -0.262, 0.216), new Rotation3d())),
                         new CameraParams(
                                 "FrontRight",
                                 640,
@@ -152,7 +152,7 @@ public final class Constants {
                                 20,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
-                                        new Translation3d(0.33, -0.33, 0.127), new Rotation3d())),
+                                        new Translation3d(0.323, 0.262, 0.216), new Rotation3d())),
                         new CameraParams(
                                 "BackLeft",
                                 640,
@@ -160,8 +160,8 @@ public final class Constants {
                                 20,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
-                                        new Translation3d(-0.33, -0.33, 0.127),
-                                        new Rotation3d(0.0, 0.0, 3.14))),
+                                        new Translation3d(-0.327, -0.281, 0.333),
+                                        new Rotation3d(0.0, 0.524, 3.14))),
                         new CameraParams(
                                 "BackRight",
                                 640,
@@ -169,8 +169,8 @@ public final class Constants {
                                 20,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
-                                        new Translation3d(0.33, -0.33, 0.127),
-                                        new Rotation3d(0.0, 0.0, 3.14))));
+                                        new Translation3d(-0.327, 0.281, 0.333),
+                                        new Rotation3d(0.0, 0.524, 3.14))));
 
         public static record CameraParams(
                 String name,
