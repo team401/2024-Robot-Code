@@ -116,7 +116,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                         ScoringConstants.aimerAvoidElevatorTable(), 0.0, Math.PI / 2.0);
 
         // This causes elevator avoidance to work upon enable
-        aimerIo.setAimAngleRad(0.01, true);
+        aimerIo.setAimAngleRad(0.0001, true);
+        aimerIo.setAimAngleRad(0.0, true);
     }
 
     public void setAction(ScoringAction action) {
@@ -361,6 +362,10 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                         FieldLocations.RED_STAGE));
     }
 
+    public void enabledInit() {
+        aimerIo.resetPID();
+    }
+
     @Override
     public void periodic() {
         if (state == ScoringState.TEMPORARY_SETPOINT) {
@@ -505,7 +510,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         switch (slot) {
                 // Aimer
             case 0:
-                return Math.PI / 2.0;
+                return 1.0;
                 // Hood
             case 1:
                 return Math.PI;
