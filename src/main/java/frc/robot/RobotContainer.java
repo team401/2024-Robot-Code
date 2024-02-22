@@ -219,18 +219,9 @@ public class RobotContainer {
         controller = new CommandXboxController(2);
         
         if (FeatureFlags.runDrive) {
-            drivetrain.setDefaultCommand(
-                    new DriveWithJoysticks(
-                            drivetrain,
-                            () -> leftJoystick.getY(),
-                            () -> leftJoystick.getX(),
-                            () -> rightJoystick.getX(),
-                            () -> controller.getHID().getPOV(),
-                            () -> true,
-                            () -> false,
-                            () -> controller.getHID().getLeftBumper()));
+            setUpDriveWithJoysticks();
                 
-            controller.rightBumper()
+            rightJoystick.trigger()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignState(AlignState.ALIGNING)))
                 .onFalse(new InstantCommand(
@@ -354,18 +345,7 @@ public class RobotContainer {
             case "calculate-speaker":
                 drivetrain.seedFieldRelative();
 
-                if (FeatureFlags.runDrive) {
-                    drivetrain.setDefaultCommand(
-                        new DriveWithJoysticks(
-                            drivetrain,
-                            () -> leftJoystick.getY(),
-                            () -> leftJoystick.getX(),
-                            () -> rightJoystick.getX(),
-                            () -> -1,
-                            () -> true,
-                            () -> false,
-                            () -> false));
-                }
+                setUpDriveWithJoysticks();
                 scoringSubsystem.setAction(ScoringAction.TUNING);
 
                 SmartDashboard.putNumber("Test-Mode/aimer/setpointPosition", 1.0);
@@ -385,16 +365,7 @@ public class RobotContainer {
                 break;
             case "tuning-intake":
                 if (FeatureFlags.runDrive) {
-                    drivetrain.setDefaultCommand(
-                        new DriveWithJoysticks(
-                            drivetrain,
-                            () -> leftJoystick.getY(),
-                            () -> leftJoystick.getX(),
-                            () -> rightJoystick.getX(),
-                            () -> -1,
-                            () -> true,
-                            () -> false,
-                            () -> false));
+                    setUpDriveWithJoysticks();
                 }
 
                 SmartDashboard.putNumber("Test-Mode/intake/intakeVolts", 1.0);
@@ -625,6 +596,21 @@ public class RobotContainer {
             }
         }
         throw new RuntimeException("Unreachable branch of switch expression");
+    }
+
+    private void setUpDriveWithJoysticks() {
+        if (FeatureFlags.runDrive) {
+            drivetrain.setDefaultCommand(
+                    new DriveWithJoysticks(
+                            drivetrain,
+                            () -> leftJoystick.getY(),
+                            () -> leftJoystick.getX(),
+                            () -> rightJoystick.getX(),
+                            () -> controller.getHID().getPOV(),
+                            () -> true,
+                            () -> leftJoystick.trigger().getAsBoolean(),
+                            () -> rightJoystick.trigger().getAsBoolean()));
+        }
     }
 
     public void robotPeriodic() {

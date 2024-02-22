@@ -136,7 +136,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
             state = ScoringState.INTAKE;
         } else if (action == ScoringAction.AIM || action == ScoringAction.SHOOT) {
             state = ScoringState.PRIME;
-            aimerIo.setAimAngleRad(aimerInputs.aimAngleRad, true);
+            aimerIo.setAimAngleRad(aimerInputs.aimAngleRad + 0.001, true);
         } else if (action == ScoringAction.AMP_AIM) {
             state = ScoringState.AMP_PRIME;
         } else if (action == ScoringAction.ENDGAME) {
@@ -154,10 +154,9 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         if (!aimerAtIntakePosition()) {
             aimerIo.setAimAngleRad(ScoringConstants.intakeAngleToleranceRadians, true);
         }
-        shooterIo.setKickerVolts(0);
-        hoodIo.setHoodAngleRad(0);
+        shooterIo.setKickerVolts(10);
 
-        if (hasNote() || action == ScoringAction.WAIT) {
+        if ((hasNote() && !overrideIntake) || action != ScoringAction.INTAKE) {
             state = ScoringState.IDLE;
         }
     }
@@ -167,6 +166,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         Logger.recordOutput("scoring/aimGoal", aimerInterpolated.getValue(distancetoGoal));
         shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
         aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal), false);
+        shooterIo.setKickerVolts(hasNote() ? 0.0 : 10.0);
 
         boolean shooterReady =
                 Math.abs(
@@ -184,12 +184,11 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
         if (action != ScoringAction.SHOOT && action != ScoringAction.AIM) {
             state = ScoringState.IDLE;
-        } else if (action == ScoringAction.SHOOT && (primeReady || overrideShoot)) {
+        } else if (action == ScoringAction.SHOOT && (readyToShoot || overrideShoot)) {
             state = ScoringState.SHOOT;
 
             shootTimer.reset();
             shootTimer.start();
-            readyToShoot = false;
         }
     }
 
@@ -217,12 +216,11 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
         if (action != ScoringAction.SHOOT && action != ScoringAction.AMP_AIM) {
             state = ScoringState.IDLE;
-        } else if (action == ScoringAction.SHOOT && (primeReady || overrideShoot)) {
+        } else if (action == ScoringAction.SHOOT && (readyToShoot || overrideShoot)) {
             state = ScoringState.AMP_SHOOT;
 
             shootTimer.reset();
             shootTimer.start();
-            readyToShoot = false;
         }
     }
 
@@ -231,7 +229,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
         aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal), false);
 
-        shooterIo.setKickerVolts(5);
+        shooterIo.setKickerVolts(10);
 
         if (shootTimer.get() > 0.5) { // TODO: Tune time
             state = ScoringState.PRIME;
@@ -241,7 +239,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private void ampShoot() {
-        shooterIo.setKickerVolts(5);
+        shooterIo.setKickerVolts(10);
 
         if (shootTimer.get() > 1.0) { // TODO: Tune time
             state = ScoringState.AMP_PRIME;
@@ -312,11 +310,12 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     public boolean aimerAtIntakePosition() {
-        return aimerInputs.aimAngleRad > ScoringConstants.intakeAngleToleranceRadians;
+        // return aimerInputs.aimAngleRad > ScoringConstants.intakeAngleToleranceRadians;
+        return true;
     }
 
     public boolean canIntake() {
-        return aimerAtIntakePosition() && !hasNote();
+        return aimerAtIntakePosition();
     }
 
     public void homeHood() {
