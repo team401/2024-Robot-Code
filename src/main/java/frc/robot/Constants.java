@@ -216,7 +216,8 @@ public final class Constants {
                 new TrapezoidProfile.Constraints(1, 2); // TODO: Find safe values for this
 
         // TODO: Actual mass of robot
-        public static final double robotMass = 53.0703; // 117 pounds to kg
+        // 
+        public static final double simRobotMass = 53.0703; // 117 pounds to kg
 
         // Constants for the climber PID controller
         public static final double climberkP = 10.0; // TODO: Tune climber PID controller

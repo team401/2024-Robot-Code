@@ -82,7 +82,7 @@ public class EndgameIOSim implements EndgameIO {
                             20,
                             1.814
                                     - EndgameConstants
-                                            .robotMass, // Add in negative robot mass, because the
+                                            .simRobotMass, // Add in negative robot mass, because the
                             // robot will be pulling up on the elevator.
                             0.02231009,
                             0.0,
