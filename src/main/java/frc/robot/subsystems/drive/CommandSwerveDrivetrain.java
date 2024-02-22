@@ -274,6 +274,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                         .plus(
                                 robotAcceleration
                                         .get()
+                                        .times(0.5)
                                         .times(Math.pow(DriveConstants.anticipationTime, 2)));
 
         if (robotVelocityAdjusted.getNorm() < DriveConstants.minimumAnticipationVelocity) {
