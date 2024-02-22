@@ -134,7 +134,6 @@ public final class Constants {
 
         public static final Matrix<N3, N1> driveUncertainty = VecBuilder.fill(0.1, 0.1, 0.1);
 
-        // TODO: set up cameras in PhotonVision
         public static final List<CameraParams> cameras =
                 List.of(
                         new CameraParams(
@@ -144,7 +143,8 @@ public final class Constants {
                                 20,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
-                                        new Translation3d(0.323, -0.262, 0.216), new Rotation3d())),
+                                        new Translation3d(0.323, 0.262, 0.216),
+                                        new Rotation3d(0.0, 1.224, 0.138))),
                         new CameraParams(
                                 "FrontRight",
                                 640,
@@ -152,7 +152,8 @@ public final class Constants {
                                 20,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
-                                        new Translation3d(0.323, 0.262, 0.216), new Rotation3d())),
+                                        new Translation3d(0.323, -0.262, 0.216),
+                                        new Rotation3d(0.0, 1.224, -0.138))),
                         new CameraParams(
                                 "BackLeft",
                                 640,
@@ -160,8 +161,8 @@ public final class Constants {
                                 20,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
-                                        new Translation3d(-0.327, -0.281, 0.333),
-                                        new Rotation3d(0.0, 0.524, 3.14))),
+                                        new Translation3d(-0.327, 0.281, 0.333),
+                                        new Rotation3d(0.0, -1.162, 3.14))),
                         new CameraParams(
                                 "BackRight",
                                 640,
@@ -169,8 +170,8 @@ public final class Constants {
                                 20,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
-                                        new Translation3d(-0.327, 0.281, 0.333),
-                                        new Rotation3d(0.0, 0.524, 3.14))));
+                                        new Translation3d(-0.327, -0.281, 0.333),
+                                        new Rotation3d(0.0, -1.162, 3.14))));
 
         public static record CameraParams(
                 String name,
