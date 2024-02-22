@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
@@ -88,6 +89,14 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         }
 
         thetaController.enableContinuousInput(-180, 180);
+
+        /*
+         * Since we're extending `SwerveDrivetrain`, we can't extend `SubsystemBase`, we can only
+         * implement `Subsystem`. Because of this, we have to register ourself manaully.
+         *
+         * In short, never trust the Command Scheduler.
+         */
+        CommandScheduler.getInstance().registerSubsystem(this);
     }
 
     public CommandSwerveDrivetrain(
@@ -98,6 +107,14 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             startSimThread();
         }
         thetaController.enableContinuousInput(-180, 180);
+
+        /*
+         * Since we're extending `SwerveDrivetrain`, we can't extend `SubsystemBase`, we can only
+         * implement `Subsystem`. Because of this, we have to register ourself manaully.
+         *
+         * In short, never trust the Command Scheduler.
+         */
+        CommandScheduler.getInstance().registerSubsystem(this);
     }
 
     public void setPoseSupplier(Supplier<Pose2d> getFieldToRobot) {
@@ -243,6 +260,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         Logger.recordOutput("Drive/alignTarget", alignTarget);
         Logger.recordOutput("Drive/desiredHeading", desiredHeading);
         Logger.recordOutput("Drive/fieldToSpeaker", getFieldToSpeaker.get());
+        Logger.recordOutput("Drive/goalChassisSpeeds", new ChassisSpeeds(vx, vy, omega));
 
         if (vx == 0 && vy == 0 && omega == 0) {
             setControl(brake);
