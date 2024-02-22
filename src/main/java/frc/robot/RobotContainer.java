@@ -20,8 +20,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 <<<<<<< HEAD
 =======
 import edu.wpi.first.wpilibj2.command.Command;
+<<<<<<< HEAD
 >>>>>>> 65458a3 (still struggling a bit- tried importing NoteVisualizer by Advantagekit, which does work)
 import edu.wpi.first.wpilibj2.command.Commands;
+=======
+>>>>>>> a1e4152 (integrating with scoringsubsystem; interpolate values most likely off atm?)
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -80,6 +83,7 @@ import frc.robot.telemetry.TelemetryIOSim;
 import frc.robot.utils.FieldFinder;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import frc.robot.utils.feedforward.TuneG;
 import frc.robot.utils.feedforward.TuneS;
 =======
@@ -92,6 +96,8 @@ import java.util.Collections;
 >>>>>>> 0720d10 (saving progress)
 =======
 >>>>>>> 5eb9f80 (advantagekit keeps being sad)
+=======
+>>>>>>> a1e4152 (integrating with scoringsubsystem; interpolate values most likely off atm?)
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -193,16 +199,8 @@ public class RobotContainer {
                         ScoringSubsystem.ScoringAction.WAIT)))
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignState(AlignState.MANUAL)));
-
-            controller.rightTrigger().whileTrue(launchCommand());
         }
     } // spotless:on
-
-    public Command launchCommand() {
-        NoteVisualizer.setSuppliers(
-                () -> drivetrain.getState().Pose, () -> 2000.0, () -> Math.PI / 3);
-        return Commands.sequence(NoteVisualizer.shoot(), Commands.idle());
-    }
 
     private void configureModes() {}
 

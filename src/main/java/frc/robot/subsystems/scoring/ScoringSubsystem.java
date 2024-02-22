@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.utils.FieldFinder;
@@ -295,7 +295,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         }
 
         NoteVisualizer.setSuppliers(poseSupplier, () -> shootRPM, () -> aimAngleRad);
-        Commands.sequence(NoteVisualizer.shoot(), Commands.idle());
+        CommandScheduler.getInstance().schedule(NoteVisualizer.shoot());
     }
 
     private void ampShoot() {

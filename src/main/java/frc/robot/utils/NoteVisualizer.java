@@ -57,7 +57,13 @@ public class NoteVisualizer {
                                     Timer timeSinceLaunch = new Timer();
                                     timeSinceLaunch.start();
                                     double shotSpeed =
-                                            shotRPMSupplier.get() * 2 * Math.PI / 60 * 0.0381;
+                                            shotRPMSupplier.get()
+                                                    * 2
+                                                    * Math.PI
+                                                    / 60
+                                                    * 0.5
+                                                    * 1; // * 0.0381; // are the values on the
+                                    // interpolate map correct?
 
                                     return Commands.run(
                                                     () -> {
