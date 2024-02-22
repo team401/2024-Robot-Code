@@ -3,6 +3,9 @@ package frc.robot.subsystems.endgame;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface EndgameIO {
+    boolean override = false;
+    double overrideVolts = 0.0;
+    double targetPosition = 0.0;
 
     @AutoLog
     public static class EndgameIOInputs {
@@ -22,7 +25,11 @@ public interface EndgameIO {
 
     public default void setPID(double p, double i, double d) {}
 
+    public default void setFF(double ff) {}
+
     public default void setOverrideMode(boolean override) {}
+
     public default void setOverrideVolts(double volts) {}
+
     public default void setPosition(double position) {}
 }

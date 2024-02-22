@@ -215,10 +215,20 @@ public final class Constants {
         public static final TrapezoidProfile.Constraints climberProfileConstraints =
                 new TrapezoidProfile.Constraints(1, 2); // TODO: Find safe values for this
 
+        // TODO: Actual mass of robot
+        public static final double robotMass = 10.0;
+
         // Constants for the climber PID controller
         public static final double climberkP = 10.0; // TODO: Tune climber PID controller
         public static final double climberkI = 0.0;
         public static final double climberkD = 0.0;
+
+        // TODO: Tune feedforward values for climber
+        // Feedforward value for raising elevator
+        public static final double climberkFFClimber = 0.0;
+        // Feedforward value for lowering elevator, assuming we are now lifting entire
+        // weight of the robot
+        public static final double climberkFFRobot = 0.0;
 
         public static final double encoderToMeters = Math.PI * Units.inchesToMeters(1.7567) / 80;
     }

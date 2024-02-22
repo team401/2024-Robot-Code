@@ -4,6 +4,9 @@ import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.EndgameConstants;
 
 public class EndgameIOSparkFlex implements EndgameIO {
@@ -12,7 +15,17 @@ public class EndgameIOSparkFlex implements EndgameIO {
     private final CANSparkFlex rightEndgameMotor =
             new CANSparkFlex(EndgameConstants.rightMotorID, MotorType.kBrushless);
 
+    private final TrapezoidProfile profile =
+            new TrapezoidProfile(EndgameConstants.climberProfileConstraints);
+
+    private Timer profileTimer = new Timer();
+
     boolean override = false;
+    double overrideVolts = 0.0;
+    double targetPosition = 0.0;
+
+    double initialPosition = 0.0;
+    double initialVelocity = 0.0;
 
     public EndgameIOSparkFlex() {
         leftEndgameMotor.setSmartCurrentLimit(EndgameConstants.smartCurrentLimit);
@@ -26,13 +39,10 @@ public class EndgameIOSparkFlex implements EndgameIO {
         leftEndgameMotor.getEncoder().setPositionConversionFactor(EndgameConstants.encoderToMeters);
         leftEndgameMotor.getEncoder().setPosition(0.0);
 
-        leftEndgameMotor.getPIDController().setP(EndgameConstants.climberkP);
-        leftEndgameMotor.getPIDController().setI(EndgameConstants.climberkI);
-        leftEndgameMotor.getPIDController().setD(EndgameConstants.climberkD);
-
         rightEndgameMotor.getPIDController().setP(EndgameConstants.climberkP);
         rightEndgameMotor.getPIDController().setI(EndgameConstants.climberkI);
         rightEndgameMotor.getPIDController().setD(EndgameConstants.climberkD);
+        rightEndgameMotor.getPIDController().setFF(EndgameConstants.climberkFFClimber);
     }
 
     @Override
@@ -42,16 +52,45 @@ public class EndgameIOSparkFlex implements EndgameIO {
 
     @Override
     public void setOverrideVolts(double volts) {
-        rightEndgameMotor.setVoltage(volts);
+        overrideVolts = volts;
     }
 
     @Override
     public void setPosition(double position) {
-        rightEndgameMotor.getPIDController().setReference(position, ControlType.kPosition);
+        if (targetPosition != position) {
+            profileTimer.reset();
+            profileTimer.start();
+
+            targetPosition = position;
+
+            initialPosition = rightEndgameMotor.getEncoder().getPosition();
+            initialVelocity = rightEndgameMotor.getEncoder().getVelocity();
+
+            if (position < targetPosition) {
+                // Moving down, assume weight of robot is on the climber now
+                setFF(EndgameConstants.climberkFFRobot);
+            } else {
+                // Moving up, we only have to account for the weight of pushing the climber up
+                setFF(EndgameConstants.climberkFFClimber);
+            }
+        }
     }
 
     @Override
     public void updateInputs(EndgameIOInputs inputs) {
+        if (override) {
+            rightEndgameMotor.setVoltage(overrideVolts);
+        } else {
+            State trapezoidSetpoint =
+                    profile.calculate(
+                            profileTimer.get(),
+                            new State(initialPosition, initialVelocity),
+                            new State(targetPosition, 0.0));
+            rightEndgameMotor
+                    .getPIDController()
+                    .setReference(trapezoidSetpoint.position, ControlType.kPosition);
+        }
+
         inputs.endgameLeftAppliedVolts = leftEndgameMotor.getAppliedOutput();
         inputs.endgameLeftStatorCurrentAmps = leftEndgameMotor.getOutputCurrent();
 
@@ -64,12 +103,13 @@ public class EndgameIOSparkFlex implements EndgameIO {
 
     @Override
     public void setPID(double p, double i, double d) {
-        leftEndgameMotor.getPIDController().setP(p);
-        leftEndgameMotor.getPIDController().setI(i);
-        leftEndgameMotor.getPIDController().setD(d);
-
         rightEndgameMotor.getPIDController().setP(p);
         rightEndgameMotor.getPIDController().setI(i);
         rightEndgameMotor.getPIDController().setD(d);
+    }
+
+    @Override
+    public void setFF(double ff) {
+        rightEndgameMotor.getPIDController().setFF(ff);
     }
 }
