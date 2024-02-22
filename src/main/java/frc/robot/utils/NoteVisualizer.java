@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
@@ -26,8 +27,6 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class NoteVisualizer {
-    private static final Transform3d launcherTransform =
-            new Transform3d(0.35, 0, 0.8, new Rotation3d(0, 1.048, 0));
 
     private static Supplier<Pose2d> robotPoseSupplier = () -> new Pose2d();
 
@@ -46,14 +45,14 @@ public class NoteVisualizer {
     }
 
     // flywheels are 3 inches
-
+    // spotless:off
     public static Command shoot() {
         return new ScheduleCommand( // Branch off and exit immediately
                 Commands.defer(
                                 () -> {
                                     Pose3d startPose =
                                             new Pose3d(robotPoseSupplier.get())
-                                                    .transformBy(launcherTransform);
+                                                    .transformBy(new Transform3d(0.35, 0, 0.8, new Rotation3d()));
                                     Timer timeSinceLaunch = new Timer();
                                     timeSinceLaunch.start();
                                     double shotSpeed =
@@ -66,46 +65,33 @@ public class NoteVisualizer {
                                     // interpolate map correct?
 
                                     return Commands.run(
-                                                    () -> {
-                                                        lastPose =
-                                                                new Pose3d(
-                                                                        shotSpeed
-                                                                                        * Math.cos(
-                                                                                                hoodAngleSupplier
-                                                                                                        .get())
-                                                                                        * Math.sin(
-                                                                                                startPose
-                                                                                                        .getRotation()
-                                                                                                        .getAngle())
-                                                                                        * timeSinceLaunch
-                                                                                                .get()
-                                                                                + startPose.getX(),
-                                                                        shotSpeed
-                                                                                        * Math.cos(
-                                                                                                hoodAngleSupplier
-                                                                                                        .get())
-                                                                                        * Math.cos(
-                                                                                                startPose
-                                                                                                        .getRotation()
-                                                                                                        .getAngle())
-                                                                                        * timeSinceLaunch
-                                                                                                .get()
-                                                                                + startPose.getY(),
-                                                                        shotSpeed
-                                                                                        * Math.sin(
-                                                                                                hoodAngleSupplier
-                                                                                                        .get())
-                                                                                        * timeSinceLaunch
-                                                                                                .get()
-                                                                                + startPose.getZ()
-                                                                                - 4.9
-                                                                                        * Math.pow(
-                                                                                                timeSinceLaunch
-                                                                                                        .get(),
-                                                                                                2),
-                                                                        startPose.getRotation());
-                                                        Logger.recordOutput(
-                                                                "NoteVisualizer", lastPose);
+                                        () -> {
+                                            lastPose =
+                                                new Pose3d(
+                                                    shotSpeed
+                                                        * Math.cos(hoodAngleSupplier.get())
+                                                        * Math.cos(robotPoseSupplier.get().getRotation().getRadians())
+                                                        * timeSinceLaunch.get()
+                                                    + startPose.getX(),
+                                                    shotSpeed
+                                                        * Math.cos(hoodAngleSupplier.get())
+                                                        * Math.sin(robotPoseSupplier.get().getRotation().getRadians())
+                                                        * timeSinceLaunch.get()
+                                                    + startPose.getY(),
+                                                    shotSpeed
+                                                        * Math.sin(hoodAngleSupplier.get())
+                                                        * timeSinceLaunch.get()
+                                                    + startPose.getZ()
+                                                    - 4.9 * Math.pow(timeSinceLaunch.get(),2),
+                                                    startPose.getRotation());
+                                            Logger.recordOutput(
+                                                    "NoteVisualizer", lastPose);
+                                            SmartDashboard.putNumber(
+                                                    "angle",
+                                                    robotPoseSupplier
+                                                            .get()
+                                                            .getRotation()
+                                                            .getDegrees());
                                                     })
                                             .until(() -> lastPose.getZ() < 0)
                                             .finallyDo(
@@ -116,7 +102,7 @@ public class NoteVisualizer {
                                 },
                                 Set.of())
                         .ignoringDisable(true));
-    }
+    }// spotless:on
 
     public boolean withinRange(Pose3d object, Pose3d withinCenter, double radius) {
         double dX = object.getX() - withinCenter.getY();
