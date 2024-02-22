@@ -66,6 +66,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private Supplier<Rotation2d> getFieldToSource = () -> new Rotation2d();
 
     private Supplier<Translation2d> getRobotVelocity = () -> new Translation2d();
+    private Supplier<Translation2d> robotAcceleration = () -> new Translation2d();
 
     private PIDController thetaController = new PIDController(0.13, 0.0, 0.0);
 
@@ -130,6 +131,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public void setVelocitySupplier(Supplier<Translation2d> getRobotVelocity) {
         this.getRobotVelocity = getRobotVelocity;
+    }
+
+    public void setAccelerationSupplier(Supplier<Translation2d> robotAcceleration) {
+        this.robotAcceleration = robotAcceleration;
     }
 
     private void configurePathPlanner() {
@@ -263,7 +268,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private Rotation2d calculateDesiredHeading(Pose2d current, Pose2d target) {
         Translation2d robotVelocityAdjusted =
-                getRobotVelocity.get().times(DriveConstants.anticipationTime);
+                getRobotVelocity
+                        .get()
+                        .times(DriveConstants.anticipationTime)
+                        .plus(
+                                robotAcceleration
+                                        .get()
+                                        .times(Math.pow(DriveConstants.anticipationTime, 2)));
 
         if (robotVelocityAdjusted.getNorm() < DriveConstants.minimumAnticipationVelocity) {
             robotVelocityAdjusted = new Translation2d(0, 0);

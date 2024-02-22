@@ -217,6 +217,10 @@ public class Telemetry {
         return new Translation2d(velocityXFiltered, velocityYFiltered);
     }
 
+    public Translation2d getAcceleration() {
+        return new Translation2d(accelXFiltered, accelYFiltered);
+    }
+
     public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
         for (int i = 0; i < 4; i++) {
