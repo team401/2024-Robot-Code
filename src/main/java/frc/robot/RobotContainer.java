@@ -39,9 +39,13 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignState;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignTarget;
+<<<<<<< HEAD
 import frc.robot.subsystems.endgame.EndgameIO;
 import frc.robot.subsystems.endgame.EndgameIOSim;
 import frc.robot.subsystems.endgame.EndgameIOSparkFlex;
+=======
+import frc.robot.subsystems.endgame.EndgameSparkMaxIO;
+>>>>>>> 5eb9f80 (advantagekit keeps being sad)
 import frc.robot.subsystems.endgame.EndgameSubsystem;
 import frc.robot.subsystems.endgame.EndgameSubsystem.EndgameAction;
 import frc.robot.subsystems.intake.IntakeIO;
@@ -49,9 +53,14 @@ import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem.IntakeAction;
+<<<<<<< HEAD
 import frc.robot.subsystems.localization.CameraContainerReal;
 import frc.robot.subsystems.localization.CameraContainerReplay;
 import frc.robot.subsystems.localization.CameraContainerSim;
+=======
+import frc.robot.subsystems.localization.VisionIOReal;
+// import frc.robot.subsystems.localization.VisionIOSim;
+>>>>>>> 5eb9f80 (advantagekit keeps being sad)
 import frc.robot.subsystems.localization.VisionLocalizer;
 import frc.robot.subsystems.scoring.AimerIO;
 import frc.robot.subsystems.scoring.AimerIORoboRio;
@@ -77,9 +86,12 @@ import frc.robot.utils.feedforward.TuneS;
 import frc.robot.utils.NoteSimSubsystem;
 =======
 import frc.robot.utils.NoteVisualizer;
+<<<<<<< HEAD
 >>>>>>> d1b1751 (argh I don't know how to post data to advantagekit help please)
 import java.util.Collections;
 >>>>>>> 0720d10 (saving progress)
+=======
+>>>>>>> 5eb9f80 (advantagekit keeps being sad)
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -188,7 +200,7 @@ public class RobotContainer {
 
     public Command launchCommand() {
         NoteVisualizer.setSuppliers(
-                () -> drivetrain.getState().Pose, () -> 10.0, () -> Math.PI / 3);
+                () -> drivetrain.getState().Pose, () -> 2000.0, () -> Math.PI / 3);
         return Commands.sequence(NoteVisualizer.shoot(), Commands.idle());
     }
 
@@ -242,13 +254,31 @@ public class RobotContainer {
                                     new ShooterIOSim(), new AimerIOSim(), new HoodIOSim());
                 }
 
+<<<<<<< HEAD
                 if (FeatureFlags.runVision) {
+=======
+                /*if (FeatureFlags.simulateVision) {
+>>>>>>> 5eb9f80 (advantagekit keeps being sad)
                     tagVision =
                             new VisionLocalizer(
                                     new CameraContainerSim(
                                             VisionConstants.cameras,
                                             driveTelemetry::getModuleStates));
+<<<<<<< HEAD
                 }
+=======
+                } else if (FeatureFlags.runVision) {
+                    tagVision =
+                            new VisionLocalizer(
+                                    new VisionIOSim(
+                                            Collections.emptyList(),
+                                            driveTelemetry::getModuleStates));
+                }
+
+                if (FeatureFlags.runEndgame) {
+                    endgameSubsystem = new EndgameSubsystem(new EndgameSimIO());
+                }*/
+>>>>>>> 5eb9f80 (advantagekit keeps being sad)
 
                 if (FeatureFlags.runIntake) {
                     intakeSubsystem = new IntakeSubsystem(new IntakeIOSim());

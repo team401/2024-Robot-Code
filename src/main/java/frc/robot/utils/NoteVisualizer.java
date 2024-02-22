@@ -27,7 +27,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class NoteVisualizer {
     private static final Transform3d launcherTransform =
-            new Transform3d(0.35, 0, 0.8, new Rotation3d(0, Math.PI / 3, 0));
+            new Transform3d(0.35, 0, 0.8, new Rotation3d(0, 1.048, 0));
 
     private static Supplier<Pose2d> robotPoseSupplier = () -> new Pose2d();
 
@@ -120,9 +120,15 @@ public class NoteVisualizer {
         return false;
     }
 
-    public boolean withinRectangle(Pose3d object, int[][] points) {
+    /*public boolean inSpeaker() {
+        boolean isRed = DriverStation.getAlliance().isPresent()
+                          && DriverStation.getAlliance().get().equals(Alliance.Red);
+        double[][] speakerOpening = {{16.317, 5, 1.98}, {16.317, 5.55, 1.98}, {16.317, 5, 2.11}, {16.317, 5.55, 2.11}};
+        double[][] speakerRoof = {{16.317, 5, 2.11}, {16.317, 5.55, 2.11}, {20, 5, 2.5}, {20, 5.55, 2.5}};
+        if ()
 
+                      //new Pose3d(isRed ? redSpeaker : blueSpeaker, startPose.getRotation());
         return false; // in progress, unsure if there's an easy way to do pip for 3d or if there's
         // an existing library or something
-    }
+    }*/
 }
