@@ -294,8 +294,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
             shootTimer.stop();
         }
 
-        NoteVisualizer.setSuppliers(poseSupplier, () -> shootRPM, () -> aimAngleRad);
-        CommandScheduler.getInstance().schedule(NoteVisualizer.shoot());
+        NoteVisualizer newNote = new NoteVisualizer(poseSupplier, () -> 120.0, () -> Math.PI / 3);
+        CommandScheduler.getInstance().schedule(newNote.shoot());
     }
 
     private void ampShoot() {

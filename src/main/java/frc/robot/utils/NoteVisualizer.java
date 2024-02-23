@@ -28,14 +28,14 @@ import org.littletonrobotics.junction.Logger;
 
 public class NoteVisualizer {
 
-    private static Supplier<Pose2d> robotPoseSupplier = () -> new Pose2d();
+    private Supplier<Pose2d> robotPoseSupplier = () -> new Pose2d();
 
-    private static Supplier<Double> shotRPMSupplier = () -> 0.0;
-    private static Supplier<Double> hoodAngleSupplier = () -> 0.0;
+    private Supplier<Double> shotRPMSupplier = () -> 0.0;
+    private Supplier<Double> hoodAngleSupplier = () -> 0.0;
 
-    private static Pose3d lastPose = new Pose3d(100, 100, 100, new Rotation3d());
+    private Pose3d lastPose = new Pose3d(100, 100, 100, new Rotation3d());
 
-    public static void setSuppliers(
+    public NoteVisualizer(
             Supplier<Pose2d> robotSupplier,
             Supplier<Double> rpmSupplier,
             Supplier<Double> hoodSupplierRad) {
@@ -46,7 +46,7 @@ public class NoteVisualizer {
 
     // flywheels are 3 inches
     // spotless:off
-    public static Command shoot() {
+    public Command shoot() {
         return new ScheduleCommand( // Branch off and exit immediately
                 Commands.defer(
                                 () -> {
@@ -93,18 +93,20 @@ public class NoteVisualizer {
                                                             .getRotation()
                                                             .getDegrees());
                                                     })
-                                            .until(() -> lastPose.getZ() < 0)
+                                            .until(() -> inSpeaker() != 1)
                                             .finallyDo(
                                                     () -> {
                                                         Logger.recordOutput(
                                                                 "NoteVisualizer", new Pose3d[] {});
+                                                        if (inSpeaker() == 2) SmartDashboard.putBoolean("inGoal", true);
+                                                        else SmartDashboard.putBoolean("inGoal", false);
                                                     });
                                 },
                                 Set.of())
                         .ignoringDisable(true));
     }// spotless:on
 
-    public boolean withinRange(Pose3d object, Pose3d withinCenter, double radius) {
+    private boolean withinRange(Pose3d object, Pose3d withinCenter, double radius) {
         double dX = object.getX() - withinCenter.getY();
         double dY = object.getY() - withinCenter.getY();
         double dZ = object.getZ() - withinCenter.getZ();
@@ -112,15 +114,36 @@ public class NoteVisualizer {
         return false;
     }
 
-    /*public boolean inSpeaker() {
-        boolean isRed = DriverStation.getAlliance().isPresent()
-                          && DriverStation.getAlliance().get().equals(Alliance.Red);
-        double[][] speakerOpening = {{16.317, 5, 1.98}, {16.317, 5.55, 1.98}, {16.317, 5, 2.11}, {16.317, 5.55, 2.11}};
-        double[][] speakerRoof = {{16.317, 5, 2.11}, {16.317, 5.55, 2.11}, {20, 5, 2.5}, {20, 5.55, 2.5}};
-        if ()
+    private int inSpeaker() {
+        /*boolean isRed = DriverStation.getAlliance().isPresent()
+        && DriverStation.getAlliance().get().equals(Alliance.Red);*/
+        double[][] speakerOpening = {
+            {16.08, 5, 1.98}, {16.08, 5.55, 1.98}, {16.51, 5, 2.11}, {16.51, 5.55, 2.11}
+        };
+        double[][] speakerRoof = {
+            {16.51, 5, 2.11}, {16.51, 5.55, 2.11}, {16.08, 5, 2.5}, {16.08, 5.55, 2.5}
+        };
+        if (passesThroughRectangle(speakerOpening, lastPose)) return 2;
+        if (passesThroughRectangle(speakerRoof, lastPose) || lastPose.getZ() < 0) return 0;
 
-                      //new Pose3d(isRed ? redSpeaker : blueSpeaker, startPose.getRotation());
-        return false; // in progress, unsure if there's an easy way to do pip for 3d or if there's
+        // new Pose3d(isRed ? redSpeaker : blueSpeaker, startPose.getRotation());
+        return 1; // in progress, unsure if there's an easy way to do pip for 3d or if there's
         // an existing library or something
-    }*/
+    }
+
+    // only works on rectangles parallel to z and tilted forward on x
+    private boolean passesThroughRectangle(double[][] rectangle, Pose3d noteLocation) {
+        double x = noteLocation.getX();
+        double y = noteLocation.getY();
+        double z = noteLocation.getZ();
+
+        if (y > rectangle[0][1] && y < rectangle[3][1]) {
+            double slope =
+                    (rectangle[3][2] - rectangle[0][2]) / (rectangle[3][0] - rectangle[0][0]);
+            double predictedZ = slope * (x - rectangle[3][0]) + rectangle[3][2];
+            SmartDashboard.putNumber("difference from goal", Math.abs(predictedZ - z));
+            if (Math.abs(predictedZ - z) < 0.1) return true;
+        }
+        return false;
+    }
 }
