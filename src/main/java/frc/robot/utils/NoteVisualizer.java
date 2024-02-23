@@ -137,7 +137,12 @@ public class NoteVisualizer {
         double y = noteLocation.getY();
         double z = noteLocation.getZ();
 
-        if (y > rectangle[0][1] && y < rectangle[3][1]) {
+        if (x > Math.min(rectangle[0][0], rectangle[3][0])
+                && x < Math.max(rectangle[0][0], rectangle[3][0])
+                && y > Math.min(rectangle[0][1], rectangle[3][1])
+                && y < Math.max(rectangle[0][1], rectangle[3][1])
+                && z > Math.min(rectangle[0][2], rectangle[3][2])
+                && z < Math.max(rectangle[0][2], rectangle[3][2])) {
             double slope =
                     (rectangle[3][2] - rectangle[0][2]) / (rectangle[3][0] - rectangle[0][0]);
             double predictedZ = slope * (x - rectangle[3][0]) + rectangle[3][2];
