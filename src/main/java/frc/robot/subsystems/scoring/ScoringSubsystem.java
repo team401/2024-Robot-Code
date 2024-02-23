@@ -140,7 +140,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         } else if (action == ScoringAction.AMP_AIM) {
             state = ScoringState.AMP_PRIME;
         } else if (action == ScoringAction.ENDGAME) {
-            // state = ScoringState.ENDGAME; TODO: Later
+            state = ScoringState.ENDGAME;
         } else if (action == ScoringAction.TUNING) {
             state = ScoringState.TUNING;
             SmartDashboard.putNumber("Test-Mode/AimerGoal", aimerGoalAngleRadTuning);
@@ -154,9 +154,9 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         if (!aimerAtIntakePosition()) {
             aimerIo.setAimAngleRad(ScoringConstants.intakeAngleToleranceRadians, true);
         }
-        shooterIo.setKickerVolts(10);
+        shooterIo.setKickerVolts(5);
 
-        if ((hasNote() && !overrideIntake) || action != ScoringAction.INTAKE) {
+        if ((hasNote()) || action != ScoringAction.INTAKE) {
             state = ScoringState.IDLE;
         }
     }
@@ -208,7 +208,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         boolean hoodReady =
                 Math.abs(hoodInputs.hoodAngleRad - hoodInputs.hoodGoalAngleRad)
                         < ScoringConstants.hoodAngleMarginRadians; // TODO: Tune
-        boolean driveReady = driveAllignedSupplier.get();
+        // boolean driveReady = driveAllignedSupplier.get();
+        boolean driveReady = true;
         boolean notePresent = hasNote();
 
         boolean primeReady = shooterReady && aimReady && hoodReady && driveReady && notePresent;
@@ -249,7 +250,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private void endgame() {
-        aimerIo.setAimAngleRad(0.0, true);
+        aimerIo.setAimAngleRad(Math.PI / 2, true);
         shooterIo.setShooterVelocityRPM(0);
         shooterIo.setKickerVolts(0);
         hoodIo.setHoodAngleRad(0);
@@ -315,7 +316,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     public boolean canIntake() {
-        return aimerAtIntakePosition();
+        return aimerAtIntakePosition() && !hasNote();
     }
 
     public void homeHood() {
@@ -412,6 +413,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                         0.501360149992 * Math.sin(aimerInputs.aimAngleRad) + 0.483,
                         // Independent position: 0.483 (leave for now, might be used later)
                         new Rotation3d(0, -hoodInputs.hoodAngleRad - aimerInputs.aimAngleRad, 0)));
+
+        Logger.recordOutput("scoring/readyToShoot", readyToShoot);
 
         aimMechanism.setAngle(Units.radiansToDegrees(aimerInputs.aimAngleRad));
         hoodMechanism.setAngle(Units.radiansToDegrees(hoodInputs.hoodAngleRad));
@@ -624,5 +627,10 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     public boolean readyToShoot() {
         return readyToShoot;
+    }
+
+    public void setbrakeMode(boolean brake) {
+        aimerIo.setBrakeMode(brake);
+        hoodIo.setBrakeMode(brake);
     }
 }

@@ -34,4 +34,6 @@ public interface AimerIO {
     public default void setMaxProfile(double maxVelocity, double maxAcceleration) {}
 
     public default void setFF(double kS, double kV, double kA, double kG) {}
+
+    public default void setBrakeMode(boolean brake) {}
 }

@@ -145,6 +145,12 @@ public class AimerIORoboRio implements AimerIO {
         feedforward = new ArmFeedforward(kS, kG, kV, kA);
     }
 
+    @Override
+    public void setBrakeMode(boolean brake) {
+        aimerLeft.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+        aimerRight.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+    }
+
     private double getEncoderPosition() {
         return encoder.getAbsolutePosition() * 2.0 * Math.PI - ScoringConstants.aimerEncoderOffset;
     }

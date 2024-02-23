@@ -72,6 +72,8 @@ public class RobotContainer {
     CommandSwerveDrivetrain drivetrain = FeatureFlags.runDrive ? TunerConstants.DriveTrain : null;
     Telemetry driveTelemetry;
 
+    // private DigitalInput brakeSwitch = new DigitalInput(SensorConstants.brakeSwitchPort);
+
     SendableChooser<String> autoChooser = new SendableChooser<String>();
     SendableChooser<String> testModeChooser = new SendableChooser<String>();
 
@@ -682,6 +684,12 @@ public class RobotContainer {
             // scoringSubsystem.homeHood();
 
             scoringSubsystem.setAction(ScoringAction.WAIT);
+        }
+    }
+
+    public void disabledPeriodic() {
+        if (FeatureFlags.runScoring) {
+            // scoringSubsystem.setbrakeMode(brakeSwitch.get());
         }
     }
 }
