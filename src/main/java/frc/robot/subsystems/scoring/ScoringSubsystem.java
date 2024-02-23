@@ -22,11 +22,15 @@ import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import frc.robot.utils.Tunable;
 import java.util.function.DoubleSupplier;
 =======
 import frc.robot.utils.NoteVisualizer;
 >>>>>>> 5eb9f80 (advantagekit keeps being sad)
+=======
+import frc.robot.utils.notesimulator.Note;
+>>>>>>> 084d91d (committing this last piece of vaguely functioning code before i ruin everything w notemanager)
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -294,7 +298,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
             shootTimer.stop();
         }
 
-        NoteVisualizer newNote = new NoteVisualizer(poseSupplier, () -> 120.0, () -> Math.PI / 3);
+        Note newNote = new Note(poseSupplier, () -> 120.0, () -> Math.PI / 3, true);
         CommandScheduler.getInstance().schedule(newNote.shoot());
     }
 

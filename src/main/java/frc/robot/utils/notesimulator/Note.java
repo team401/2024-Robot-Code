@@ -1,20 +1,8 @@
-// Copyright 2021-2024 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
-package frc.robot.utils;
+package frc.robot.utils.notesimulator;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.Timer;
@@ -26,7 +14,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
-public class NoteVisualizer {
+public class Note {
 
     private Supplier<Pose2d> robotPoseSupplier = () -> new Pose2d();
 
@@ -35,13 +23,57 @@ public class NoteVisualizer {
 
     private Pose3d lastPose = new Pose3d(100, 100, 100, new Rotation3d());
 
-    public NoteVisualizer(
+    private boolean noteInRobot = false;
+
+    public Note(
             Supplier<Pose2d> robotSupplier,
             Supplier<Double> rpmSupplier,
-            Supplier<Double> hoodSupplierRad) {
+            Supplier<Double> hoodSupplierRad,
+            Pose2d noteStartingPosition,
+            boolean noteInRobot) {
         robotPoseSupplier = robotSupplier;
         hoodAngleSupplier = hoodSupplierRad;
         shotRPMSupplier = rpmSupplier;
+
+        this.noteInRobot = noteInRobot;
+        if (noteInRobot) lastPose = new Pose3d(robotPoseSupplier.get());
+        else lastPose = new Pose3d(noteStartingPosition);
+    }
+
+    public Note(
+            Supplier<Pose2d> robotSupplier,
+            Supplier<Double> rpmSupplier,
+            Supplier<Double> hoodSupplierRad,
+            boolean noteInRobot) {
+
+        this(
+                robotSupplier,
+                rpmSupplier,
+                hoodSupplierRad,
+                new Pose2d(Math.random() * 15 + 2, Math.random() * 4 + 2, new Rotation2d()),
+                noteInRobot);
+    }
+
+    public Note(
+            Supplier<Pose2d> robotSupplier,
+            Supplier<Double> rpmSupplier,
+            Supplier<Double> hoodSupplierRad,
+            Pose2d noteStartingPosition) {
+
+        this(robotSupplier, rpmSupplier, hoodSupplierRad, noteStartingPosition, false);
+    }
+
+    public Note(
+            Supplier<Pose2d> robotSupplier,
+            Supplier<Double> rpmSupplier,
+            Supplier<Double> hoodSupplierRad) {
+
+        this(
+                robotSupplier,
+                rpmSupplier,
+                hoodSupplierRad,
+                new Pose2d(Math.random() * 15 + 2, Math.random() * 4 + 2, new Rotation2d()),
+                false);
     }
 
     // flywheels are 3 inches
@@ -137,9 +169,7 @@ public class NoteVisualizer {
         double y = noteLocation.getY();
         double z = noteLocation.getZ();
 
-        if (x > Math.min(rectangle[0][0], rectangle[3][0])
-                && x < Math.max(rectangle[0][0], rectangle[3][0])
-                && y > Math.min(rectangle[0][1], rectangle[3][1])
+        if (y > Math.min(rectangle[0][1], rectangle[3][1])
                 && y < Math.max(rectangle[0][1], rectangle[3][1])
                 && z > Math.min(rectangle[0][2], rectangle[3][2])
                 && z < Math.max(rectangle[0][2], rectangle[3][2])) {
