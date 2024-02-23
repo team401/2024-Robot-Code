@@ -215,8 +215,17 @@ public final class Constants {
         public static final TrapezoidProfile.Constraints climberProfileConstraints =
                 new TrapezoidProfile.Constraints(1, 2); // TODO: Find safe values for this
 
+        // Values used to clamp target position of the climber (could potentially be identical to
+        // our target positions)
+        public static final double climberMinPositionMeters = -0.25;
+        public static final double climberMaxPositionMeters = 0.5;
+
+        // this could be negative if we want to rely on our current limit
+        public static final double climberTargetDownMeters = 0.0;
+        public static final double climberTargetUpMeters = 0.5; // TODO: Tune this value
+
         // TODO: Actual mass of robot
-        // 
+        //
         public static final double simRobotMass = 53.0703; // 117 pounds to kg
 
         // Constants for the climber PID controller

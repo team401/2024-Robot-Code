@@ -82,7 +82,8 @@ public class EndgameIOSim implements EndgameIO {
                             20,
                             1.814
                                     - EndgameConstants
-                                            .simRobotMass, // Add in negative robot mass, because the
+                                            .simRobotMass, // Add in negative robot mass, because
+                            // the
                             // robot will be pulling up on the elevator.
                             0.02231009,
                             0.0,
@@ -113,7 +114,7 @@ public class EndgameIOSim implements EndgameIO {
             movingDownLast = false;
         }
 
-        double appliedVolts;
+        double appliedVolts = 0.0;
 
         if (override) {
             appliedVolts = overrideVolts;
@@ -149,7 +150,6 @@ public class EndgameIOSim implements EndgameIO {
 
     @Override
     public void setFF(double ff) {
-        // TODO: Implement setFF on EndgameIOSim
         this.ff = ff;
     }
 }

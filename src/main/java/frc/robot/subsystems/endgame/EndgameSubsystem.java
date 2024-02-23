@@ -3,6 +3,7 @@ package frc.robot.subsystems.endgame;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.EndgameConstants;
 import frc.robot.utils.Tunable;
 import org.littletonrobotics.junction.Logger;
 
@@ -33,12 +34,12 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
     public void setAction(EndgameAction action) {
         switch (action) {
             case GO_UP:
-                endgameIo.setPosition(1.0);
+                endgameIo.setPosition(EndgameConstants.climberTargetUpMeters);
                 endgameIo.setOverrideMode(false);
                 state = State.NORMAL;
                 break;
             case GO_DOWN:
-                endgameIo.setPosition(0.0);
+                endgameIo.setPosition(EndgameConstants.climberTargetDownMeters);
                 endgameIo.setOverrideMode(false);
                 state = State.NORMAL;
                 break;

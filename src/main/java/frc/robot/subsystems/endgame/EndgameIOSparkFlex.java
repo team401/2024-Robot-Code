@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
@@ -86,9 +87,14 @@ public class EndgameIOSparkFlex implements EndgameIO {
                             profileTimer.get(),
                             new State(initialPosition, initialVelocity),
                             new State(targetPosition, 0.0));
+            double clampedPosition =
+                    MathUtil.clamp(
+                            trapezoidSetpoint.position,
+                            EndgameConstants.climberMinPositionMeters,
+                            EndgameConstants.climberMaxPositionMeters);
             rightEndgameMotor
                     .getPIDController()
-                    .setReference(trapezoidSetpoint.position, ControlType.kPosition);
+                    .setReference(clampedPosition, ControlType.kPosition);
         }
 
         inputs.endgameLeftAppliedVolts = leftEndgameMotor.getAppliedOutput();

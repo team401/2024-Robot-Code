@@ -3,10 +3,6 @@ package frc.robot.subsystems.endgame;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface EndgameIO {
-    boolean override = false;
-    double overrideVolts = 0.0;
-    double targetPosition = 0.0;
-
     @AutoLog
     public static class EndgameIOInputs {
         public double endgameLeftAppliedVolts = 0.0;
