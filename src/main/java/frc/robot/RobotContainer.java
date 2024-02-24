@@ -166,7 +166,9 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignState(AlignState.MANUAL)))
                 .onTrue(new InstantCommand(
-                    () -> intakeSubsystem.toggle()));
+                    () -> intakeSubsystem.toggle()))
+                .onTrue(
+                    new InstantCommand(() -> NoteManager.intake()));
 
             controller.b()
                 .onTrue(new InstantCommand(

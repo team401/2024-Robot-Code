@@ -24,6 +24,7 @@ import frc.robot.utils.InterpolateDouble;
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import frc.robot.utils.Tunable;
 import java.util.function.DoubleSupplier;
 =======
@@ -33,6 +34,9 @@ import frc.robot.utils.NoteVisualizer;
 import frc.robot.utils.notesimulator.Note;
 >>>>>>> 084d91d (committing this last piece of vaguely functioning code before i ruin everything w notemanager)
 =======
+=======
+import frc.robot.utils.notesimulator.Note;
+>>>>>>> a2a9e17 (first draft done, I just need the new interpolate values and then it'll maybe sort of work!)
 import frc.robot.utils.notesimulator.NoteManager;
 >>>>>>> 00eb2c8 (:P)
 import java.util.function.Supplier;
@@ -228,8 +232,6 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         if (action != ScoringAction.SPIT) {
             state = ScoringState.IDLE;
         }
-
-        NoteManager.intake();
     }
 
     private void prime() {
@@ -304,7 +306,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
             shootTimer.stop();
         }
 
-        CommandScheduler.getInstance().schedule(NoteManager.shoot(120, Math.PI / 3));
+        CommandScheduler.getInstance().schedule(NoteManager.shoot(shootRPM, aimAngleRad));
+        NoteManager.addNote(new Note(poseSupplier));
     }
 
     private void ampShoot() {

@@ -103,7 +103,7 @@ public class Note {
                                                             .getRotation()
                                                             .getDegrees());
                                                     })
-                                            .until(() -> inSpeaker() != 1)
+                                            .until(() -> lastPose != null && inSpeaker() != 1)
                                             .finallyDo(
                                                     () -> {
                                                         Logger.recordOutput(
@@ -122,10 +122,9 @@ public class Note {
         if (noteInRobot == false && robotWithinRange(3)) {
             noteInRobot = true;
             lastPose = null;
-            SmartDashboard.putBoolean("success intake", true);
+            Logger.recordOutput("NoteVisualizer", new Pose3d[] {});
             return true;
         }
-        SmartDashboard.putBoolean("success intake", false);
         return false;
     }
 
