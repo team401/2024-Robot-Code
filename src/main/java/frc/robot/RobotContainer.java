@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FeatureFlags;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.IOConstants;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
@@ -76,9 +77,9 @@ public class RobotContainer {
     SendableChooser<String> autoChooser = new SendableChooser<String>();
     SendableChooser<String> testModeChooser = new SendableChooser<String>();
 
-    DigitalInput brakeSwitch = new DigitalInput(0);
+    DigitalInput brakeSwitch = new DigitalInput(IOConstants.brakeSwitchPort);
 
-    DigitalOutput timeDigitalOutput = new DigitalOutput(0);
+    DigitalOutput timeDigitalOutput = new DigitalOutput(IOConstants.timeOutputPort);
 
     LED leds;
 

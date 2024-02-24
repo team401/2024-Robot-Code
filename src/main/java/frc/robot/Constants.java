@@ -527,4 +527,9 @@ public final class Constants {
         public static final int ledPort = 0;
         public static final int ledLength = 1000;
     }
+
+    public static final class IOConstants {
+        public static final int brakeSwitchPort = 0;
+        public static final int timeOutputPort = 1;
+    }
 }
