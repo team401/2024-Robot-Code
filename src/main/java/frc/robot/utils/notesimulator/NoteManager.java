@@ -45,4 +45,8 @@ public class NoteManager {
             return shotNote.shoot(aimRPM, aimAngle);
         } else return null;
     }
+
+    public static boolean noteInRobot() {
+        return noteInRobot != null;
+    }
 }

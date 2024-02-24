@@ -5,6 +5,8 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -36,7 +38,7 @@ public class Note {
 
         this(
                 robotSupplier,
-                new Pose2d(Math.random() * 15 + 2, Math.random() * 4 + 2, new Rotation2d()),
+                new Pose2d(Math.random() * 10 + 5, Math.random() * 2 + 4, new Rotation2d()),
                 noteInRobot);
     }
 
@@ -49,7 +51,7 @@ public class Note {
 
         this(
                 robotSupplier,
-                new Pose2d(Math.random() * 15 + 2, Math.random() * 4 + 2, new Rotation2d()),
+                new Pose2d(Math.random() * 10 + 5, Math.random() * 4 + 1, new Rotation2d()),
                 false);
     }
 
@@ -71,7 +73,7 @@ public class Note {
                                                     * Math.PI
                                                     / 60
                                                     * 0.5
-                                                    * 1; // * 0.0381; // are the values on the
+                                                    * 2 * 0.0381; // are the values on the
                                     // interpolate map correct?
 
                                     return Commands.run(
@@ -119,7 +121,7 @@ public class Note {
     }// spotless:on
 
     public boolean intakeNote() {
-        if (noteInRobot == false && robotWithinRange(3)) {
+        if (noteInRobot == false && robotWithinRange(1)) {
             noteInRobot = true;
             lastPose = null;
             Logger.recordOutput("NoteVisualizer", new Pose3d[] {});
@@ -140,16 +142,25 @@ public class Note {
     }
 
     private int inSpeaker() {
-        /*boolean isRed = DriverStation.getAlliance().isPresent()
-        && DriverStation.getAlliance().get().equals(Alliance.Red);*/
-        double[][] speakerOpening = {
+        boolean isRed =
+                DriverStation.getAlliance().isPresent()
+                        && DriverStation.getAlliance().get().equals(Alliance.Red);
+        double[][] redSpeakerOpening = {
             {16.08, 5, 1.98}, {16.08, 5.55, 1.98}, {16.51, 5, 2.11}, {16.51, 5.55, 2.11}
         };
-        double[][] speakerRoof = {
+        double[][] blueSpeakerOpening = {
+            {0.43, 5, 1.98}, {0.43, 5.55, 1.98}, {0, 5, 2.11}, {0, 5.55, 2.11}
+        };
+        double[][] redSpeakerRoof = {
             {16.51, 5, 2.11}, {16.51, 5.55, 2.11}, {16.08, 5, 2.5}, {16.08, 5.55, 2.5}
         };
-        if (passesThroughRectangle(speakerOpening, lastPose)) return 2;
-        if (passesThroughRectangle(speakerRoof, lastPose) || lastPose.getZ() < 0) return 0;
+        double[][] blueSpeakerRoof = {
+            {0, 5, 2.11}, {0, 5.55, 2.11}, {0.43, 5, 2.5}, {0.43, 5.55, 2.5}
+        };
+        if (passesThroughRectangle(isRed ? redSpeakerOpening : blueSpeakerOpening, lastPose))
+            return 2;
+        if (passesThroughRectangle(isRed ? redSpeakerRoof : blueSpeakerRoof, lastPose)
+                || lastPose.getZ() < 0) return 0;
 
         // new Pose3d(isRed ? redSpeaker : blueSpeaker, startPose.getRotation());
         return 1; // in progress, unsure if there's an easy way to do pip for 3d or if there's
