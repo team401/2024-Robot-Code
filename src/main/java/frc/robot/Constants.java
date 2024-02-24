@@ -402,8 +402,8 @@ public final class Constants {
         public static final double hoodkI = 0.0;
         public static final double hoodkD = 0.0;
 
-        public static final double hoodkS = 0.1;
-        public static final double hoodkG = 0.4;
+        public static final double hoodkS = 0.14; // 0.14
+        public static final double hoodkG = 0.41; // 0.41
         public static final double hoodkV = 0.0;
 
         public static final double hoodPositionTolerance = 0.01;
@@ -435,10 +435,10 @@ public final class Constants {
         public static final double intakeAngleToleranceRadians = 0.0;
         // Math.PI / 2 - Units.degreesToRadians(40);
 
-        public static final double shooterAmpVelocityRPM = 10;
+        public static final double shooterAmpVelocityRPM = 1400;
 
         public static final double hoodHomeAmps = 40.0; // TODO: Find this
-        public static final double hoodHomeAngleRad = Math.PI;
+        public static final double hoodHomeAngleRad = Math.PI - 0.23;
 
         public static final double aimMaxAngleRadians = Math.PI / 2;
 

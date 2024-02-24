@@ -274,7 +274,10 @@ public class RobotContainer {
             controller.a()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.INTAKE)));
+                        ScoringSubsystem.ScoringAction.INTAKE)))
+                .onFalse(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.WAIT)));
 
             controller.b()
                 .onTrue(new InstantCommand(
@@ -284,18 +287,12 @@ public class RobotContainer {
             controller.x()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.SHOOT)))
-                .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AIM)));
+                        ScoringSubsystem.ScoringAction.SHOOT)));
 
             controller.y()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.ENDGAME)))
-                .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)));
+                        ScoringSubsystem.ScoringAction.ENDGAME)));
 
             controller.back()
                 .onTrue(new InstantCommand(
@@ -344,6 +341,20 @@ public class RobotContainer {
         // spotless:off
         switch (testModeChooser.getSelected()) {
             case "tuning":
+                break;
+            case "drive-align":
+                drivetrain.seedFieldRelative();
+                setUpDriveWithJoysticks();
+
+                rightJoystick.trigger()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignState(AlignState.ALIGNING)))
+                .onFalse(new InstantCommand(
+                    () -> drivetrain.setAlignState(AlignState.MANUAL)));
+
+                controller.a()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
                 break;
             case "calculate-speaker":
                 drivetrain.seedFieldRelative();

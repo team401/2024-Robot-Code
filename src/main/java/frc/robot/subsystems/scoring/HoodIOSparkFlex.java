@@ -1,5 +1,6 @@
 package frc.robot.subsystems.scoring;
 
+import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkFlex;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -115,18 +116,18 @@ public class HoodIOSparkFlex implements HoodIO {
                 homeTimer.stop();
             }
         } else if (override) {
-            // hoodMotor.setVoltage(overrideVolts);
+            hoodMotor.setVoltage(overrideVolts);
         } else {
             hoodMotor
                     .getPIDController()
                     .setFF(feedforward.calculate(trapezoidSetpoint.position, 0.0));
-            // hoodMotor
-            //         .getPIDController()
-            //         .setReference(trapezoidSetpoint.position, ControlType.kPosition);
+            hoodMotor
+                    .getPIDController()
+                    .setReference(trapezoidSetpoint.position, ControlType.kPosition);
         }
 
         inputs.hoodAngleRad = hoodMotor.getEncoder().getPosition();
-        inputs.hoodGoalAngleRad = goalAngleRad;
+        inputs.hoodGoalAngleRad = trapezoidSetpoint.position;
 
         inputs.hoodVelocityRadPerSec = hoodMotor.getEncoder().getVelocity();
 

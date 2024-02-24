@@ -68,7 +68,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private Supplier<Translation2d> getRobotVelocity = () -> new Translation2d();
 
-    private PIDController thetaController = new PIDController(0.13, 0.0, 0.0);
+    private PIDController thetaController = new PIDController(0.002, 0.0, 0.005);
 
     private SwerveRequest.FieldCentric driveFieldCentric = new SwerveRequest.FieldCentric();
     private SwerveRequest.RobotCentric driveRobotCentric = new SwerveRequest.RobotCentric();
@@ -293,7 +293,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         Pose2d robotAnticipated =
                 new Pose2d(robotXAnticipated, robotYAnticipated, current.getRotation());
 
-        Pose2d robotToTargetAnticipated = GeomUtil.transformToPose(robotAnticipated.minus(target));
+        Pose2d robotToTargetAnticipated =
+        GeomUtil.transformToPose(robotAnticipated.minus(target));
 
         double distanceToTarget =
                 Math.hypot(
@@ -303,8 +304,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         Rotation2d angle =
                 Rotation2d.fromRadians(
                         Math.atan2(
-                                robotToTargetAnticipated.getY(), robotToTargetAnticipated.getX()));
-        angle = angle.plus(Rotation2d.fromDegrees(180));
+                                robotToTargetAnticipated.getY(),
+        robotToTargetAnticipated.getX()));
 
         double timeToGoal = noteTimeToGoal.getValue(distanceToTarget);
         double noteVelocity = distanceToTarget / timeToGoal;
@@ -313,6 +314,14 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         double phi = (Math.PI / 2) - Math.acos(getRobotVelocity.get().getY() / noteVelocity);
 
         return angle.minus(new Rotation2d(phi));
+
+        // Pose2d robotToTarget = GeomUtil.transformToPose(current.minus(target));
+
+        // Rotation2d angle =
+        //         Rotation2d.fromRadians(Math.atan2(robotToTarget.getY(), robotToTarget.getX()));
+        // // angle = angle.plus(Rotation2d.fromDegrees(180));
+
+        // return angle;
     }
 
     public boolean isAligned() {
