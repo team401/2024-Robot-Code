@@ -28,4 +28,6 @@ public interface EndgameIO {
     public default void setOverrideVolts(double volts) {}
 
     public default void setPosition(double position) {}
+
+    public default void setMaxProfile(double maxVelocity, double maxAcceleration) {}
 }

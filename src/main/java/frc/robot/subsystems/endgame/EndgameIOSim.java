@@ -14,7 +14,7 @@ public class EndgameIOSim implements EndgameIO {
     private ElevatorSim elevatorSim =
             new ElevatorSim(DCMotor.getNeoVortex(2), 20, 1.814, 0.02231009, 0.0, 0.45, true, 0.0);
 
-    private final TrapezoidProfile profile =
+    private TrapezoidProfile profile =
             new TrapezoidProfile(EndgameConstants.climberProfileConstraints);
 
     private Timer profileTimer = new Timer();
@@ -151,5 +151,12 @@ public class EndgameIOSim implements EndgameIO {
     @Override
     public void setFF(double ff) {
         this.ff = ff;
+    }
+
+    @Override
+    public void setMaxProfile(double maxVelocity, double maxAcceleration) {
+        profile =
+                new TrapezoidProfile(
+                        new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration));
     }
 }

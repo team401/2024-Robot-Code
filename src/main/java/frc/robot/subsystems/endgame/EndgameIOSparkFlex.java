@@ -16,7 +16,7 @@ public class EndgameIOSparkFlex implements EndgameIO {
     private final CANSparkFlex rightEndgameMotor =
             new CANSparkFlex(EndgameConstants.rightMotorID, MotorType.kBrushless);
 
-    private final TrapezoidProfile profile =
+    private TrapezoidProfile profile =
             new TrapezoidProfile(EndgameConstants.climberProfileConstraints);
 
     private Timer profileTimer = new Timer();
@@ -117,5 +117,12 @@ public class EndgameIOSparkFlex implements EndgameIO {
     @Override
     public void setFF(double ff) {
         rightEndgameMotor.getPIDController().setFF(ff);
+    }
+
+    @Override
+    public void setMaxProfile(double maxVelocity, double maxAcceleration) {
+        profile =
+                new TrapezoidProfile(
+                        new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration));
     }
 }

@@ -61,12 +61,17 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
         return endgameInputs.position;
     }
 
-    public void home() {}
-
     @Override
     public double getPosition(int slot) {
-        return endgameInputs.position;
+        switch (slot) {
+            case 0:
+                return getPosition();
+            default:
+                throw new IllegalArgumentException("Invalid slot");
+        }
     }
+
+    public void home() {}
 
     @Override
     public double getVelocity(int slot) {
@@ -95,7 +100,12 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
 
     @Override
     public void runToPosition(double position, int slot) {
-        throw new UnsupportedOperationException("Unimplemented method 'runToPosition'");
+        switch (slot) {
+            case 0:
+                endgameIo.setPosition(position);
+            default:
+                throw new IllegalArgumentException("Invalid slot");
+        }
     }
 
     @Override
@@ -119,11 +129,21 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
 
     @Override
     public void setFF(double kS, double kV, double kA, double kG, int slot) {
-        throw new UnsupportedOperationException("Unimplemented method 'setFF'");
+        switch (slot) {
+            case 0:
+                endgameIo.setFF(kG);
+            default:
+                throw new IllegalArgumentException("Invalid slot");
+        }
     }
 
     @Override
     public void setMaxProfileProperties(double maxVelocity, double maxAcceleration, int slot) {
-        throw new UnsupportedOperationException("Unimplemented method 'setMaxProfileVelocity'");
+        switch (slot) {
+            case 0:
+                endgameIo.setMaxProfile(maxVelocity, maxAcceleration);
+            default:
+                throw new IllegalArgumentException("Invalid slot");
+        }
     }
 }
