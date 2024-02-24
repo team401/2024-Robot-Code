@@ -78,6 +78,19 @@ public class EndgameIOSparkFlex implements EndgameIO {
     }
 
     @Override
+    public void setPositionTuning(double position) {
+        if (targetPosition != position) {
+            profileTimer.reset();
+            profileTimer.start();
+
+            targetPosition = position;
+
+            initialPosition = rightEndgameMotor.getEncoder().getPosition();
+            initialVelocity = rightEndgameMotor.getEncoder().getVelocity();
+        }
+    }
+
+    @Override
     public void updateInputs(EndgameIOInputs inputs) {
         if (override) {
             rightEndgameMotor.setVoltage(overrideVolts);

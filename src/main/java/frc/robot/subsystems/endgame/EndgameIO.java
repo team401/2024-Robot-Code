@@ -29,5 +29,7 @@ public interface EndgameIO {
 
     public default void setPosition(double position) {}
 
+    public default void setPositionTuning(double position) {}
+
     public default void setMaxProfile(double maxVelocity, double maxAcceleration) {}
 }

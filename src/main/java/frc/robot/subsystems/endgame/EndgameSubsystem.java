@@ -17,7 +17,8 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
         GO_UP,
         GO_DOWN,
         CANCEL,
-        OVERRIDE
+        OVERRIDE,
+        TEMPORARY_SETPOINT
     }
 
     private enum State {
@@ -51,6 +52,10 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
             case OVERRIDE:
                 endgameIo.setOverrideMode(true);
                 state = State.OVERRIDE;
+                break;
+            case TEMPORARY_SETPOINT:
+                endgameIo.setOverrideMode(false);
+                state = State.NORMAL;
                 break;
         }
 
@@ -102,7 +107,7 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
     public void runToPosition(double position, int slot) {
         switch (slot) {
             case 0:
-                endgameIo.setPosition(position);
+                endgameIo.setPositionTuning(position);
             default:
                 throw new IllegalArgumentException("Invalid slot");
         }

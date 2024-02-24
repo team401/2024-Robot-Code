@@ -65,6 +65,19 @@ public class EndgameIOSim implements EndgameIO {
         }
     }
 
+    @Override
+    public void setPositionTuning(double position) {
+        if (targetPosition != position) {
+            profileTimer.reset();
+            profileTimer.start();
+
+            targetPosition = position;
+
+            initialPosition = elevatorSim.getPositionMeters();
+            initialVelocity = elevatorSim.getVelocityMetersPerSecond();
+        }
+    }
+
     // Were we moving down on last tick?
     // This is used to keep track of whether or not we need to switch the elevatorSim object out.
     boolean movingDownLast = false;
