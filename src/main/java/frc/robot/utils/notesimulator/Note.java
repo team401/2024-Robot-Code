@@ -18,67 +18,45 @@ public class Note {
 
     private Supplier<Pose2d> robotPoseSupplier = () -> new Pose2d();
 
-    private Supplier<Double> shotRPMSupplier = () -> 0.0;
-    private Supplier<Double> hoodAngleSupplier = () -> 0.0;
-
     private Pose3d lastPose = new Pose3d(100, 100, 100, new Rotation3d());
 
     private boolean noteInRobot = false;
 
-    public Note(
-            Supplier<Pose2d> robotSupplier,
-            Supplier<Double> rpmSupplier,
-            Supplier<Double> hoodSupplierRad,
-            Pose2d noteStartingPosition,
-            boolean noteInRobot) {
+    public Note(Supplier<Pose2d> robotSupplier, Pose2d noteStartingPosition, boolean noteInRobot) {
         robotPoseSupplier = robotSupplier;
-        hoodAngleSupplier = hoodSupplierRad;
-        shotRPMSupplier = rpmSupplier;
 
         this.noteInRobot = noteInRobot;
-        if (noteInRobot) lastPose = new Pose3d(robotPoseSupplier.get());
-        else lastPose = new Pose3d(noteStartingPosition);
+        if (!noteInRobot) {
+            lastPose = new Pose3d(noteStartingPosition);
+            Logger.recordOutput("NoteVisualizer", lastPose);
+        }
     }
 
-    public Note(
-            Supplier<Pose2d> robotSupplier,
-            Supplier<Double> rpmSupplier,
-            Supplier<Double> hoodSupplierRad,
-            boolean noteInRobot) {
+    public Note(Supplier<Pose2d> robotSupplier, boolean noteInRobot) {
 
         this(
                 robotSupplier,
-                rpmSupplier,
-                hoodSupplierRad,
                 new Pose2d(Math.random() * 15 + 2, Math.random() * 4 + 2, new Rotation2d()),
                 noteInRobot);
     }
 
-    public Note(
-            Supplier<Pose2d> robotSupplier,
-            Supplier<Double> rpmSupplier,
-            Supplier<Double> hoodSupplierRad,
-            Pose2d noteStartingPosition) {
+    public Note(Supplier<Pose2d> robotSupplier, Pose2d noteStartingPosition) {
 
-        this(robotSupplier, rpmSupplier, hoodSupplierRad, noteStartingPosition, false);
+        this(robotSupplier, noteStartingPosition, false);
     }
 
-    public Note(
-            Supplier<Pose2d> robotSupplier,
-            Supplier<Double> rpmSupplier,
-            Supplier<Double> hoodSupplierRad) {
+    public Note(Supplier<Pose2d> robotSupplier) {
 
         this(
                 robotSupplier,
-                rpmSupplier,
-                hoodSupplierRad,
                 new Pose2d(Math.random() * 15 + 2, Math.random() * 4 + 2, new Rotation2d()),
                 false);
     }
 
     // flywheels are 3 inches
     // spotless:off
-    public Command shoot() {
+    public Command shoot(double aimRPM, double aimAngle) {
+        if (noteInRobot) {
         return new ScheduleCommand( // Branch off and exit immediately
                 Commands.defer(
                                 () -> {
@@ -88,7 +66,7 @@ public class Note {
                                     Timer timeSinceLaunch = new Timer();
                                     timeSinceLaunch.start();
                                     double shotSpeed =
-                                            shotRPMSupplier.get()
+                                            aimRPM
                                                     * 2
                                                     * Math.PI
                                                     / 60
@@ -101,17 +79,17 @@ public class Note {
                                             lastPose =
                                                 new Pose3d(
                                                     shotSpeed
-                                                        * Math.cos(hoodAngleSupplier.get())
+                                                        * Math.cos(aimAngle)
                                                         * Math.cos(robotPoseSupplier.get().getRotation().getRadians())
                                                         * timeSinceLaunch.get()
                                                     + startPose.getX(),
                                                     shotSpeed
-                                                        * Math.cos(hoodAngleSupplier.get())
+                                                        * Math.cos(aimAngle)
                                                         * Math.sin(robotPoseSupplier.get().getRotation().getRadians())
                                                         * timeSinceLaunch.get()
                                                     + startPose.getY(),
                                                     shotSpeed
-                                                        * Math.sin(hoodAngleSupplier.get())
+                                                        * Math.sin(aimAngle)
                                                         * timeSinceLaunch.get()
                                                     + startPose.getZ()
                                                     - 4.9 * Math.pow(timeSinceLaunch.get(),2),
@@ -136,13 +114,29 @@ public class Note {
                                 },
                                 Set.of())
                         .ignoringDisable(true));
+        }
+        else return null;
     }// spotless:on
 
-    private boolean withinRange(Pose3d object, Pose3d withinCenter, double radius) {
-        double dX = object.getX() - withinCenter.getY();
-        double dY = object.getY() - withinCenter.getY();
-        double dZ = object.getZ() - withinCenter.getZ();
-        if (Math.sqrt(dX * dX + dY * dY + dZ * dZ) <= radius) return true;
+    public boolean intakeNote() {
+        if (noteInRobot == false && robotWithinRange(3)) {
+            noteInRobot = true;
+            lastPose = null;
+            SmartDashboard.putBoolean("success intake", true);
+            return true;
+        }
+        SmartDashboard.putBoolean("success intake", false);
+        return false;
+    }
+
+    public boolean inRobot() {
+        return noteInRobot;
+    }
+
+    private boolean robotWithinRange(double radius) {
+        double dX = lastPose.getX() - robotPoseSupplier.get().getX();
+        double dY = lastPose.getY() - robotPoseSupplier.get().getY();
+        if (Math.sqrt(dX * dX + dY * dY) <= radius) return true;
         return false;
     }
 

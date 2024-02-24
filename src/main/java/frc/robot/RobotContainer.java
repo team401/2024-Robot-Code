@@ -84,6 +84,7 @@ import frc.robot.utils.FieldFinder;
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import frc.robot.utils.feedforward.TuneG;
 import frc.robot.utils.feedforward.TuneS;
 =======
@@ -98,6 +99,10 @@ import java.util.Collections;
 >>>>>>> 5eb9f80 (advantagekit keeps being sad)
 =======
 >>>>>>> a1e4152 (integrating with scoringsubsystem; interpolate values most likely off atm?)
+=======
+import frc.robot.utils.notesimulator.Note;
+import frc.robot.utils.notesimulator.NoteManager;
+>>>>>>> 00eb2c8 (:P)
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -126,6 +131,8 @@ public class RobotContainer {
         configureSubsystems();
         configureModes();
         configureAutonomous();
+
+        NoteManager.addNote(new Note(driveTelemetry::getFieldToRobot));
     }
 
 <<<<<<< HEAD

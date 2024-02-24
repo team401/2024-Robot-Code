@@ -23,6 +23,7 @@ import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import frc.robot.utils.Tunable;
 import java.util.function.DoubleSupplier;
 =======
@@ -31,6 +32,9 @@ import frc.robot.utils.NoteVisualizer;
 =======
 import frc.robot.utils.notesimulator.Note;
 >>>>>>> 084d91d (committing this last piece of vaguely functioning code before i ruin everything w notemanager)
+=======
+import frc.robot.utils.notesimulator.NoteManager;
+>>>>>>> 00eb2c8 (:P)
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -224,6 +228,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         if (action != ScoringAction.SPIT) {
             state = ScoringState.IDLE;
         }
+
+        NoteManager.intake();
     }
 
     private void prime() {
@@ -298,8 +304,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
             shootTimer.stop();
         }
 
-        Note newNote = new Note(poseSupplier, () -> 120.0, () -> Math.PI / 3, true);
-        CommandScheduler.getInstance().schedule(newNote.shoot());
+        CommandScheduler.getInstance().schedule(NoteManager.shoot(120, Math.PI / 3));
     }
 
     private void ampShoot() {
