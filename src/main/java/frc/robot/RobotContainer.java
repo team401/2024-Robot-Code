@@ -324,7 +324,9 @@ public class RobotContainer {
     }
 
     public void enabledInit() {
-        timeDigitalOutput.set(true);
+        if (timeDigitalOutput != null) {
+            timeDigitalOutput.set(true);
+        }
 
         scoringSubsystem.setBrakeMode(true);
         endgameSubsystem.setBrakeMode(true);
@@ -339,7 +341,9 @@ public class RobotContainer {
     }
 
     public void disabledInit() {
-        timeDigitalOutput.set(false);
+        if (timeDigitalOutput != null) {
+            timeDigitalOutput.set(false);
+        }
     }
 
     public void testInit() {
@@ -561,7 +565,7 @@ public class RobotContainer {
 
     public void disabledPeriodic() {
         /* set to coast mode when circuit open */
-        if (brakeSwitch.get()) {
+        if (brakeSwitch != null && brakeSwitch.get()) {
             scoringSubsystem.setBrakeMode(false);
             endgameSubsystem.setBrakeMode(false);
         } else {
