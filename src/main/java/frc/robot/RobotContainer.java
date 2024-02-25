@@ -251,6 +251,8 @@ public class RobotContainer {
             controller.back()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.AMP)));
+
+            controller.povRight().onTrue(drivetrain.getDriveToPointCommand());
         }
 
         if (FeatureFlags.runEndgame) {
@@ -699,7 +701,7 @@ public class RobotContainer {
 
         autoChooser.addOption("S2 4-Note", "S1-W1-W2-W3");
 
-        autoChooser.addOption("TEST", "S3-W3");
+        autoChooser.addOption("TEST", "S2-W2-W3");
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
