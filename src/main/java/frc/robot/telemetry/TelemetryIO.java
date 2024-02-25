@@ -5,6 +5,8 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import org.littletonrobotics.junction.AutoLog;
 
+import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+
 public interface TelemetryIO {
     @AutoLog
     public static class TelemetryIOInputs {
@@ -19,6 +21,14 @@ public interface TelemetryIO {
                     new SwerveModuleState(),
                     new SwerveModuleState()
                 };
+        public SwerveModuleState[] moduleTargets = 
+                new SwerveModuleState[] {
+                    new SwerveModuleState(),
+                    new SwerveModuleState(),
+                    new SwerveModuleState(),
+                    new SwerveModuleState()
+                };
+
         public double accelerationX = 0.0;
         public double accelerationY = 0.0;
 
@@ -33,6 +43,8 @@ public interface TelemetryIO {
     public default void setRobotPose(Pose2d pose) {}
 
     public default void setSwerveModuleStates(SwerveModuleState[] moduleStates) {}
+
+    public default void setSwerveModuleTargets(SwerveModuleState[] moduleTargets) {}
 
     public default void setRobotRotation(double rotation) {}
 

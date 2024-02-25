@@ -17,7 +17,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Constants;
@@ -47,14 +46,6 @@ public class Telemetry {
     DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("robotPose").publish();
     StringPublisher fieldTypePub = table.getStringTopic(".type").publish();
 
-    SwerveModuleState[] moduleStates =
-            new SwerveModuleState[] {
-                new SwerveModuleState(),
-                new SwerveModuleState(),
-                new SwerveModuleState(),
-                new SwerveModuleState()
-            };
-
     double robotRotation = 0;
     double robotRotationVelocity = 0;
     double robotRotationLast = 0;
@@ -82,6 +73,7 @@ public class Telemetry {
     double lastTime = Utils.getCurrentTimeSeconds();
 
     SwerveModuleState[] latestModuleStates = new SwerveModuleState[4];
+    SwerveModuleState[] latestModuleTargets = new SwerveModuleState[4];
 
     /* Mechanisms to represent the swerve module states */
     Mechanism2d[] m_moduleMechanisms =
@@ -178,17 +170,7 @@ public class Telemetry {
         odomPeriod.set(state.OdometryPeriod);
 
         latestModuleStates = state.ModuleStates;
-
-        /* Telemeterize the module's states */
-        for (int i = 0; i < 4; ++i) {
-            m_moduleSpeeds[i].setAngle(state.ModuleStates[i].angle);
-            m_moduleDirections[i].setAngle(state.ModuleStates[i].angle);
-            m_moduleSpeeds[i].setLength(
-                    state.ModuleStates[i].speedMetersPerSecond / (2 * maxSpeed));
-
-            moduleStates[i] = state.ModuleStates[i];
-            SmartDashboard.putData("Module " + i, m_moduleMechanisms[i]);
-        }
+        latestModuleTargets = state.ModuleTargets;
     }
 
     /**
@@ -200,7 +182,8 @@ public class Telemetry {
 
         telemetryIo.setRobotPose(getFieldToRobot3d());
         telemetryIo.setRobotPose(pose);
-        telemetryIo.setSwerveModuleStates(moduleStates);
+        telemetryIo.setSwerveModuleStates(latestModuleStates);
+        telemetryIo.setSwerveModuleTargets(latestModuleTargets);
 
         telemetryIo.setRobotRotation(robotRotation);
         telemetryIo.setRobotRotationVelocity(robotRotationVelocity);
@@ -241,6 +224,18 @@ public class Telemetry {
                             Rotation2d.fromRadians(state.angle.getRadians()));
         }
         return states;
+    }
+
+    public SwerveModuleState[] getModuleTargets() {
+        SwerveModuleState[] targets = new SwerveModuleState[4];
+        for (int i = 0; i < 4; i++) {
+            var state = latestModuleTargets[i];
+            targets[i] =
+                    new SwerveModuleState(
+                            state.speedMetersPerSecond,
+                            Rotation2d.fromRadians(state.angle.getRadians()));
+        }
+        return targets;
     }
 
     public double getVelocityX() {
