@@ -56,6 +56,8 @@ public class Telemetry {
             };
 
     double robotRotation = 0;
+    double robotRotationVelocity = 0;
+    double robotRotationLast = 0;
 
     /* Robot speeds for general checking */
     NetworkTable driveStats = inst.getTable("Drive");
@@ -158,6 +160,11 @@ public class Telemetry {
 
         Translation2d velocities = distanceDiff.div(diffTime);
 
+        double robotRotationDiff = robotRotation - robotRotationLast;
+        robotRotationVelocity = robotRotationDiff / diffTime;
+
+        robotRotationLast = robotRotation;
+
         speed.set(velocities.getNorm());
         velocityX.set(velocities.getX());
         velocityY.set(velocities.getY());
@@ -195,12 +202,19 @@ public class Telemetry {
         telemetryIo.setRobotPose(pose);
         telemetryIo.setSwerveModuleStates(moduleStates);
 
+        telemetryIo.setRobotRotation(robotRotation);
+        telemetryIo.setRobotRotationVelocity(robotRotationVelocity);
+
         telemetryIo.updateInputs(telemetryInputs);
         Logger.processInputs("telemetry", telemetryInputs);
     }
 
     public double getRotationRadians() {
         return robotRotation;
+    }
+
+    public double getRobotRotationRadians() {
+        return robotRotationVelocity;
     }
 
     public Pose2d getFieldToRobot() {

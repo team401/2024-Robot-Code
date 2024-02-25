@@ -50,8 +50,8 @@ public final class Constants {
 
         public static final boolean runIntake = false;
         public static final boolean runScoring = true;
-        public static final boolean runEndgame = false;
-        public static final boolean runDrive = false;
+        public static final boolean runEndgame = true;
+        public static final boolean runDrive = true;
 
         public static final boolean enableLEDS = false;
     }
@@ -70,7 +70,9 @@ public final class Constants {
     public static final class CANDevices {}
 
     public static final class SensorConstants {
-        public static final int bannerPort = 1; // TODO: Change this
+        public static final int bannerSensorPort = 1;
+
+        public static final int brakeSwitchPort = 0;
     }
 
     public static final class DriveConstants {
@@ -82,10 +84,15 @@ public final class Constants {
         public static final Pose2d initialPose =
                 new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90));
 
-        public static final double anticipationTime = 0.1;
+        public static final double anticipationTime = 0.01;
         public static final double minimumAnticipationVelocity = 0.0;
 
-        public static final double alignToleranceRadians = Math.PI / 6;
+        public static final double alignToleranceRadians = Math.PI / 12;
+
+        public static final double alignmentkPMax = 7.0;
+        public static final double alignmentkPMin = 5.0;
+        public static final double alignmentkI = 1.0;
+        public static final double alignmentkD = 0.0;
     }
 
     public static final class FieldConstants {
@@ -195,24 +202,21 @@ public final class Constants {
     }
 
     public static final class IntakeConstants {
-        public static final int leftIntakeMotorID = 0;
-        public static final int rightIntakeMotorID = 0;
-        public static final int frontBeltMotorID = 0;
-        public static final int backBeltMotorID = 0;
+        public static final int leftIntakeMotorID = 9;
+        public static final int rightIntakeMotorID = 10;
+        public static final int indexTwoMotorID = 14;
 
-        public static final int bannerSensorID = 0;
-
-        public static final double intakePower = 5.0;
-        public static final double beltPower = 5.0;
+        public static final double intakePower = 10.0;
+        public static final double beltPower = 10.0;
     }
 
     public static final class EndgameConstants {
-        public static final int leftMotorID = 1;
-        public static final int rightMotorID = 2;
+        public static final int leftMotorID = 18;
+        public static final int rightMotorID = 19;
 
-        public static final int smartCurrentLimit = 25; // TODO: Tune this
+        public static final int smartCurrentLimit = 50;
 
-        public static final double encoderToMeters = Math.PI * Units.inchesToMeters(1.7567) / 80;
+        public static final double encoderToMeters = Math.PI * Units.inchesToMeters(1.7567) / 20.0;
     }
 
     public static final class TunerConstants {
@@ -222,7 +226,7 @@ public final class Constants {
         // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
         private static final Slot0Configs steerGains =
                 new Slot0Configs()
-                        .withKP(100)
+                        .withKP(150)
                         .withKI(0)
                         .withKD(0.2)
                         .withKS(0)
@@ -231,7 +235,7 @@ public final class Constants {
         // When using closed-loop control, the drive motor uses the control
         // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
         private static final Slot0Configs driveGains =
-                new Slot0Configs().withKP(3).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
+                new Slot0Configs().withKP(5).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
 
         // The closed-loop output type to use for the steer motors;
         // This affects the PID/FF gains for the steer motors
@@ -297,40 +301,40 @@ public final class Constants {
                         .withSteerMotorInverted(kSteerMotorReversed);
 
         // Front Left
-        private static final int kFrontLeftDriveMotorId = 2;
-        private static final int kFrontLeftSteerMotorId = 1;
-        private static final int kFrontLeftEncoderId = 1;
-        private static final double kFrontLeftEncoderOffset = 0.3486328125;
+        private static final int kBackRightDriveMotorId = 2;
+        private static final int kBackRightSteerMotorId = 1;
+        private static final int kBackRightEncoderId = 1;
+        private static final double kBackRightEncoderOffset = 0.3486328125;
 
-        private static final double kFrontLeftXPosInches = 10.375;
-        private static final double kFrontLeftYPosInches = 10.375;
+        private static final double kBackRightXPosInches = 10.375;
+        private static final double kBackRightYPosInches = 10.375;
 
         // Front Right
-        private static final int kFrontRightDriveMotorId = 4;
-        private static final int kFrontRightSteerMotorId = 3;
-        private static final int kFrontRightEncoderId = 2;
-        private static final double kFrontRightEncoderOffset = 0.096435546875;
+        private static final int kBackLeftDriveMotorId = 4;
+        private static final int kBackLeftSteerMotorId = 3;
+        private static final int kBackLeftEncoderId = 2;
+        private static final double kBackLeftEncoderOffset = 0.096435546875;
 
-        private static final double kFrontRightXPosInches = 10.375;
-        private static final double kFrontRightYPosInches = -10.375;
+        private static final double kBackLeftXPosInches = 10.375;
+        private static final double kBackLeftYPosInches = -10.375;
 
         // Back Left
-        private static final int kBackLeftDriveMotorId = 8;
-        private static final int kBackLeftSteerMotorId = 7;
-        private static final int kBackLeftEncoderId = 4;
-        private static final double kBackLeftEncoderOffset = 0.130859375;
+        private static final int kFrontRightDriveMotorId = 8;
+        private static final int kFrontRightSteerMotorId = 7;
+        private static final int kFrontRightEncoderId = 4;
+        private static final double kFrontRightEncoderOffset = 0.130859375;
 
-        private static final double kBackLeftXPosInches = -10.375;
-        private static final double kBackLeftYPosInches = 10.375;
+        private static final double kFrontRightXPosInches = -10.375;
+        private static final double kFrontRightYPosInches = 10.375;
 
         // Back Right
-        private static final int kBackRightDriveMotorId = 6;
-        private static final int kBackRightSteerMotorId = 5;
-        private static final int kBackRightEncoderId = 3;
-        private static final double kBackRightEncoderOffset = -0.372802734375;
+        private static final int kFrontLeftDriveMotorId = 6;
+        private static final int kFrontLeftSteerMotorId = 5;
+        private static final int kFrontLeftEncoderId = 3;
+        private static final double kFrontLeftEncoderOffset = -0.372802734375;
 
-        private static final double kBackRightXPosInches = -10.375;
-        private static final double kBackRightYPosInches = -10.375;
+        private static final double kFrontLeftXPosInches = -10.375;
+        private static final double kFrontLeftYPosInches = -10.375;
 
         private static final SwerveModuleConstants FrontLeft =
                 ConstantCreator.createModuleConstants(
@@ -382,17 +386,17 @@ public final class Constants {
     }
 
     public static final class ScoringConstants {
-        public static final double aimerkP = 10.0;
-        public static final double aimerkI = 0.0;
+        public static final double aimerkP = 15.0;
+        public static final double aimerkI = 15.0;
         public static final double aimerkD = 0.0;
 
-        public static final double aimerkS = 0.0; // TODO: Find Imperically
-        public static final double aimerkG = 0.17;
+        public static final double aimerkS = 0.265;
+        public static final double aimerkG = 0.1;
         public static final double aimerkV = 1.51;
         public static final double aimerkA = 0.01;
 
         public static final double shooterkP = 0.05;
-        public static final double shooterkI = 0.0;
+        public static final double shooterkI = 0.2;
         public static final double shooterkD = 0.0;
 
         public static final double shooterkS = 0.0; // TODO: Find Imperically
@@ -402,43 +406,46 @@ public final class Constants {
         public static final double hoodkP = 0.05;
         public static final double hoodkI = 0.0;
         public static final double hoodkD = 0.0;
-        public static final double hoodkFF = 0.0; // TODO: Find Imperically
+
+        public static final double hoodkS = 0.14; // 0.14
+        public static final double hoodkG = 0.41; // 0.41
+        public static final double hoodkV = 0.0;
 
         public static final double hoodPositionTolerance = 0.01;
 
-        public static final double hoodEncoderToRad = 0.0;
+        public static final double hoodEncoderToRad = 1.3 * (15.0 / 38.0) * (2.0 * Math.PI);
 
-        public static final int aimLeftMotorId = 9;
-        public static final int aimRightMotorId = 10;
+        public static final int aimLeftMotorId = 16;
+        public static final int aimRightMotorId = 15;
 
         public static final int shooterLeftMotorId = 11;
         public static final int shooterRightMotorId = 12;
 
         public static final int kickerMotorId = 13;
 
-        public static final int hoodId = 14;
+        public static final int hoodId = 17;
 
-        public static final int aimEncoderPort = 0; // TODO: Change
+        public static final int aimEncoderPort = 0;
+        public static final double aimerEncoderOffset = 1.78;
 
-        public static final double aimAcceleration = 10.0;
-        public static final double aimCruiseVelocity = 10.0;
+        public static final double aimPositionTolerance = 0.015;
 
-        public static final double shooterAcceleration = 1;
-        public static final double shooterJerk = 1;
+        public static final double aimAcceleration = 5.0; // TODO: 15.0
+        public static final double aimCruiseVelocity = 7.0; // TODO: 15.0
 
-        public static final double shooterVelocityMarginRPM = 10;
-        public static final double aimAngleMarginRadians = Units.degreesToRadians(5);
+        public static final double shooterVelocityMarginRPM = 50;
+        public static final double aimAngleMarginRadians = Units.degreesToRadians(2);
         public static final double hoodAngleMarginRadians = Units.degreesToRadians(5);
 
-        public static final double intakeAngleToleranceRadians =
-                Math.PI / 2 - Units.degreesToRadians(40);
+        public static final double intakeAngleToleranceRadians = 0.0;
+        // Math.PI / 2 - Units.degreesToRadians(40);
 
-        public static final double shooterAmpVelocityRPM = 10;
+        public static final double shooterAmpVelocityRPM = 2000;
 
-        public static final double hoodHomeAmps = 10.0; // TODO: Find this
-        public static final double hoodHomeAngleRad = Math.PI;
+        public static final double hoodHomeAmps = 40.0; // TODO: Find this
+        public static final double hoodHomeAngleRad = Math.PI - 0.23;
 
-        public static final double aimMaxAngleRadians = Math.PI / 2;
+        public static final double aimMaxAngleRadians = 1.65; // Math.PI / 2
 
         public static final double maxAimIntake = 0.0;
         public static final double minAimIntake = 0.0;
@@ -448,22 +455,25 @@ public final class Constants {
         public static final double maxElevatorPosition = 0.45;
         public static final double maxAimAngleElevatorLimit = Math.PI / 2;
 
+        public static final double hoodMaxVelocity = 0.5;
+        public static final double hoodMaxAcceleration = 0.5;
+
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters
         // Value - Aimer angle in radians
         public static HashMap<Double, Double> getAimerMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
-            map.put(0.0, 1.0);
-            map.put(1.0, 0.9);
-            map.put(2.0, 0.85);
-            map.put(3.0, 0.83);
-            map.put(4.0, 0.64);
-            map.put(5.0, 0.59);
-            map.put(6.0, 0.48);
-            map.put(7.0, 0.34);
-            map.put(8.0, 0.27);
-            map.put(9.0, 0.15);
-            map.put(10.0, 0.1);
+            map.put(0.0, 0.7);
+            map.put(1.45, 0.7);
+            map.put(1.98, 0.62);
+            map.put(2.41, 0.53);
+            map.put(3.02, 0.45);
+            map.put(3.22, 0.425);
+            map.put(3.9, 0.36);
+            map.put(4.55, 0.34);
+            map.put(4.95, 0.31);
+            map.put(5.64, 0.28);
+            map.put(5.82, 0.275);
 
             return map;
         }
@@ -473,17 +483,17 @@ public final class Constants {
         // Value - Shooter RPM
         public static HashMap<Double, Double> getShooterMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
-            map.put(0.0, 20.0);
-            map.put(1.0, 40.0);
-            map.put(2.0, 60.0);
-            map.put(3.0, 80.0);
-            map.put(4.0, 100.0);
-            map.put(5.0, 120.0);
-            map.put(6.0, 140.0);
-            map.put(7.0, 160.0);
-            map.put(8.0, 180.0);
-            map.put(9.0, 190.0);
-            map.put(10.0, 200.0);
+            map.put(0.0, 2500.0);
+            map.put(1.45, 2500.0);
+            map.put(1.98, 2500.0);
+            map.put(2.41, 2900.0);
+            map.put(3.02, 3000.0);
+            map.put(3.22, 3000.0);
+            map.put(3.9, 3300.0);
+            map.put(4.55, 3500.0);
+            map.put(4.95, 4000.0);
+            map.put(5.64, 4100.0);
+            map.put(5.82, 4300.0);
 
             return map;
         }
@@ -493,17 +503,10 @@ public final class Constants {
         // Value - Time in seconds
         public static HashMap<Double, Double> timeToGoalMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
-            map.put(0.0, 0.01);
-            map.put(1.0, 0.02);
-            map.put(2.0, 0.03);
-            map.put(3.0, 0.04);
-            map.put(4.0, 0.05);
-            map.put(5.0, 0.06);
-            map.put(6.0, 0.07);
-            map.put(7.0, 0.1);
-            map.put(8.0, 0.15);
-            map.put(9.0, 0.2);
-            map.put(10.0, 0.3);
+            map.put(0.0, 0.15);
+            map.put(1.3, 0.15);
+            map.put(1.4, 0.16);
+            // map.put(1.3, 0.15);
 
             return map;
         }
@@ -518,6 +521,21 @@ public final class Constants {
             map.put(Math.PI / 4, 0.5);
             map.put(Math.PI / 3, 0.7);
             map.put(Math.PI / 2, 1.0);
+
+            return map;
+        }
+
+        // NOTE - This should be monotonically increasing
+        // Key - Elevator position in meters
+        // Value - Aimer angle in radians
+        public static HashMap<Double, Double> aimerAvoidElevatorTable() {
+            HashMap<Double, Double> map = new HashMap<Double, Double>();
+            map.put(0.0, 0.0);
+            map.put(0.01, Math.PI / 8);
+            map.put(0.05, Math.PI / 6);
+            map.put(0.1, Math.PI / 4);
+            map.put(0.2, Math.PI / 3);
+            map.put(0.4, 1.37);
 
             return map;
         }

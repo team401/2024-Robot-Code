@@ -1,6 +1,5 @@
 package frc.robot.subsystems.scoring;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -21,6 +20,7 @@ import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
 import frc.robot.utils.Tunable;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -36,15 +36,19 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     private final Timer shootTimer = new Timer();
 
+    private final Timer sourceIntakeTimer = new Timer();
+    private boolean sourceTimerStarted = false;
+
     private Supplier<Pose2d> poseSupplier = () -> new Pose2d();
     private Supplier<Vector<N2>> velocitySupplier = () -> VecBuilder.fill(0.0, 0.0);
     private Supplier<Translation2d> speakerSupplier = () -> new Translation2d(0, 0);
-    private Supplier<Double> elevatorPositionSupplier = () -> 0.0;
+    private DoubleSupplier elevatorPositionSupplier = () -> 0.0;
     private Supplier<Boolean> driveAllignedSupplier = () -> true;
 
     private final InterpolateDouble shooterInterpolated;
     private final InterpolateDouble aimerInterpolated;
     private final InterpolateDouble timeToPutAimDown;
+    private final InterpolateDouble aimerAvoidElevator;
 
     private double shooterGoalVelocityRPMTuning = 0.0;
     private double aimerGoalAngleRadTuning = 0.0;
@@ -65,6 +69,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     public enum ScoringState {
         IDLE,
         INTAKE,
+        SOURCE_INTAKE,
         PRIME,
         AMP_PRIME,
         SHOOT,
@@ -78,12 +83,14 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     public enum ScoringAction {
         WAIT,
         INTAKE,
+        SOURCE_INTAKE,
         AIM,
         AMP_AIM,
         SHOOT,
         ENDGAME,
         TUNING,
-        OVERRIDE
+        OVERRIDE,
+        TEMPORARY_SETPOINT
     }
 
     private ScoringState state = ScoringState.IDLE;
@@ -108,6 +115,14 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                         ScoringConstants.getAimerMap(), 0.0, ScoringConstants.aimMaxAngleRadians);
 
         timeToPutAimDown = new InterpolateDouble(ScoringConstants.timeToPutAimDownMap(), 0.0, 2.0);
+
+        aimerAvoidElevator =
+                new InterpolateDouble(
+                        ScoringConstants.aimerAvoidElevatorTable(), 0.0, Math.PI / 2.0);
+
+        // This causes elevator avoidance to work upon enable
+        aimerIo.setAimAngleRad(0.0001, true);
+        aimerIo.setAimAngleRad(0.0, true);
     }
 
     public void setAction(ScoringAction action) {
@@ -120,22 +135,32 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private void idle() {
-        aimerIo.setAimAngleRad(0, true);
+        aimerIo.setAimAngleRad(0.0, true);
         shooterIo.setShooterVelocityRPM(0);
         shooterIo.setKickerVolts(0);
-        hoodIo.setHoodAngleRad(0);
+        // hoodIo.setHoodAngleRad(0);
+        hoodIo.setOverrideVolts(0);
+
+        aimerIo.setOverrideMode(false);
+        hoodIo.setOverrideMode(true); // TODO: Change
+        shooterIo.setOverrideMode(false);
+        shooterIo.setOverrideVolts(0);
 
         Logger.recordOutput("scoring/aimGoal", 0.0);
 
         if ((!hasNote() || overrideIntake) && action == ScoringAction.INTAKE) {
             state = ScoringState.INTAKE;
+        } else if ((!hasNote() || overrideIntake) && action == ScoringAction.SOURCE_INTAKE) {
+            state = ScoringState.SOURCE_INTAKE;
+            sourceTimerStarted = false;
         } else if (action == ScoringAction.AIM || action == ScoringAction.SHOOT) {
             state = ScoringState.PRIME;
-            aimerIo.setAimAngleRad(Math.PI / 4, true);
+            aimerIo.setAimAngleRad(aimerInputs.aimAngleRad + 0.001, true);
+            shooterIo.setShooterVelocityRPM(2000);
         } else if (action == ScoringAction.AMP_AIM) {
             state = ScoringState.AMP_PRIME;
         } else if (action == ScoringAction.ENDGAME) {
-            // state = ScoringState.ENDGAME; TODO: Later
+            state = ScoringState.ENDGAME;
         } else if (action == ScoringAction.TUNING) {
             state = ScoringState.TUNING;
             SmartDashboard.putNumber("Test-Mode/AimerGoal", aimerGoalAngleRadTuning);
@@ -149,10 +174,32 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         if (!aimerAtIntakePosition()) {
             aimerIo.setAimAngleRad(ScoringConstants.intakeAngleToleranceRadians, true);
         }
-        shooterIo.setKickerVolts(0);
-        hoodIo.setHoodAngleRad(0);
+        shooterIo.setKickerVolts(2);
 
-        if (hasNote() || action == ScoringAction.WAIT) {
+        if ((hasNote()) || action != ScoringAction.INTAKE) {
+            state = ScoringState.IDLE;
+        }
+    }
+
+    private void sourceIntake() {
+        aimerIo.setAimAngleRad(Math.PI / 4.0, true);
+        shooterIo.setKickerVolts(-1);
+
+        shooterIo.setOverrideMode(true);
+        shooterIo.setOverrideVolts(-2);
+
+        if (hasNote() && !sourceTimerStarted) {
+            sourceIntakeTimer.reset();
+            sourceIntakeTimer.start();
+
+            sourceTimerStarted = true;
+        }
+
+        if ((sourceIntakeTimer.get() > 0.15 && sourceTimerStarted)
+                || action != ScoringAction.SOURCE_INTAKE) {
+            sourceIntakeTimer.stop();
+
+            sourceTimerStarted = false;
             state = ScoringState.IDLE;
         }
     }
@@ -162,62 +209,45 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         Logger.recordOutput("scoring/aimGoal", aimerInterpolated.getValue(distancetoGoal));
         shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
         aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal), false);
+        shooterIo.setKickerVolts(hasNote() ? 0.0 : 2.0);
 
         boolean shooterReady =
                 Math.abs(
                                 shooterInputs.shooterLeftVelocityRPM
                                         - shooterInputs.shooterLeftGoalVelocityRPM)
-                        < ScoringConstants.shooterVelocityMarginRPM; // TODO: Tune
+                        < ScoringConstants.shooterVelocityMarginRPM;
         boolean aimReady =
                 Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad)
-                        < ScoringConstants.aimAngleMarginRadians; // TODO: Tune
+                        < ScoringConstants.aimAngleMarginRadians;
         boolean driveReady = driveAllignedSupplier.get();
         boolean notePresent = hasNote();
 
-        boolean primeReady = shooterReady && aimReady && driveReady && notePresent;
-        readyToShoot = primeReady;
+        boolean primeReady = shooterReady && aimReady && driveReady;
+        readyToShoot = primeReady && notePresent;
 
         if (action != ScoringAction.SHOOT && action != ScoringAction.AIM) {
             state = ScoringState.IDLE;
-        } else if (action == ScoringAction.SHOOT && (primeReady || overrideShoot)) {
+        } else if (action == ScoringAction.SHOOT && (readyToShoot || overrideShoot)) {
             state = ScoringState.SHOOT;
 
             shootTimer.reset();
             shootTimer.start();
-            readyToShoot = false;
         }
     }
 
     private void ampPrime() {
         shooterIo.setShooterVelocityRPM(ScoringConstants.shooterAmpVelocityRPM);
-        aimerIo.setAimAngleRad(Math.PI / 2, true);
-        hoodIo.setHoodAngleRad(Math.PI);
-
-        boolean shooterReady =
-                Math.abs(
-                                shooterInputs.shooterLeftVelocityRPM
-                                        - shooterInputs.shooterLeftGoalVelocityRPM)
-                        < ScoringConstants.shooterVelocityMarginRPM; // TODO: Tune
-        boolean aimReady =
-                Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad)
-                        < ScoringConstants.aimAngleMarginRadians; // TODO: Tune
-        boolean hoodReady =
-                Math.abs(hoodInputs.hoodAngleRad - hoodInputs.hoodGoalAngleRad)
-                        < ScoringConstants.hoodAngleMarginRadians; // TODO: Tune
-        boolean driveReady = driveAllignedSupplier.get();
-        boolean notePresent = hasNote();
-
-        boolean primeReady = shooterReady && aimReady && hoodReady && driveReady && notePresent;
-        readyToShoot = primeReady;
+        aimerIo.setAimAngleRad(1.65, true);
+        // hoodIo.setHoodAngleRad(Math.PI);
+        hoodIo.setOverrideVolts(3);
 
         if (action != ScoringAction.SHOOT && action != ScoringAction.AMP_AIM) {
             state = ScoringState.IDLE;
-        } else if (action == ScoringAction.SHOOT && (primeReady || overrideShoot)) {
+        } else if (action == ScoringAction.SHOOT) {
             state = ScoringState.AMP_SHOOT;
 
             shootTimer.reset();
             shootTimer.start();
-            readyToShoot = false;
         }
     }
 
@@ -226,7 +256,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
         aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal), false);
 
-        shooterIo.setKickerVolts(5);
+        shooterIo.setKickerVolts(10);
 
         if (shootTimer.get() > 0.5) { // TODO: Tune time
             state = ScoringState.PRIME;
@@ -236,25 +266,35 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private void ampShoot() {
-        shooterIo.setKickerVolts(5);
+        shooterIo.setKickerVolts(10);
 
-        if (shootTimer.get() > 0.5) { // TODO: Tune time
+        if (shootTimer.get() > 1.0) { // TODO: Tune time
             state = ScoringState.AMP_PRIME;
 
             shootTimer.stop();
         }
     }
 
-    private void endgame() { // TODO: Later
-        state = ScoringState.IDLE;
+    private void endgame() {
+        aimerIo.setAimAngleRad(Math.PI / 2, true);
+        shooterIo.setShooterVelocityRPM(0);
+        shooterIo.setKickerVolts(0);
+        // hoodIo.setHoodAngleRad(0);
+        hoodIo.setOverrideVolts(0);
+        if (action == ScoringAction.AMP_AIM) {
+            state = ScoringState.AMP_PRIME;
+        } else if (action != ScoringAction.ENDGAME) {
+            state = ScoringState.IDLE;
+        }
     }
 
     private void tuning() {
         shooterGoalVelocityRPMTuning = SmartDashboard.getNumber("Test-Mode/ShooterGoal", 0.0);
         aimerGoalAngleRadTuning = SmartDashboard.getNumber("Test-Mode/AimerGoal", 0.0);
         shooterIo.setShooterVelocityRPM(shooterGoalVelocityRPMTuning);
-        aimerIo.setAimAngleRad(aimerGoalAngleRadTuning, false);
-        hoodIo.setHoodAngleRad(0.0);
+        aimerIo.setAimAngleRad(aimerGoalAngleRadTuning, true);
+        // hoodIo.setHoodAngleRad(0.0);
+        hoodIo.setOverrideVolts(0);
         shooterIo.setKickerVolts(kickerVoltsTuning);
 
         if (action != ScoringAction.TUNING) {
@@ -263,26 +303,31 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private void override() {
+        shooterIo.setKickerVolts(kickerVoltsTuning);
+
         aimerIo.setOverrideMode(true);
-        hoodIo.setOverrideMode(true);
+        hoodIo.setOverrideMode(true); // TODO: Change
         shooterIo.setOverrideMode(true);
+
+        if (action == ScoringAction.TEMPORARY_SETPOINT) {
+            state = ScoringState.TEMPORARY_SETPOINT;
+        }
 
         if (action != ScoringAction.OVERRIDE) {
             state = ScoringState.IDLE;
-
-            aimerIo.setOverrideMode(false);
-            hoodIo.setOverrideMode(false);
-            shooterIo.setOverrideMode(false);
         }
     }
 
     private void temporarySetpoint() {
-        if (MathUtil.isNear(temporarySetpointPosition, getPosition(temporarySetpointSlot), 0.1)
-                && MathUtil.isNear(0.0, getVelocity(temporarySetpointSlot), 0.01)) {
-            state = ScoringState.OVERRIDE;
+        shooterIo.setKickerVolts(kickerVoltsTuning);
 
-            setVolts(0.0, temporarySetpointSlot);
-        } else if (action != ScoringAction.OVERRIDE) {
+        aimerIo.setOverrideMode(false);
+        hoodIo.setOverrideMode(true); // TODO: Change
+        shooterIo.setOverrideMode(false);
+
+        // if (MathUtil.isNear(temporarySetpointPosition, getPosition(temporarySetpointSlot), 0.1)
+        //         && MathUtil.isNear(0.0, getVelocity(temporarySetpointSlot), 0.01)) {
+        if (action != ScoringAction.TEMPORARY_SETPOINT) {
             state = ScoringState.OVERRIDE;
 
             setVolts(0.0, temporarySetpointSlot);
@@ -305,7 +350,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     public boolean aimerAtIntakePosition() {
-        return aimerInputs.aimAngleRad > ScoringConstants.intakeAngleToleranceRadians;
+        // return aimerInputs.aimAngleRad > ScoringConstants.intakeAngleToleranceRadians;
+        return true;
     }
 
     public boolean canIntake() {
@@ -328,7 +374,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         this.speakerSupplier = speakerSupplier;
     }
 
-    public void setElevatorPositionSupplier(Supplier<Double> elevatorPositionSupplier) {
+    public void setElevatorPositionSupplier(DoubleSupplier elevatorPositionSupplier) {
         this.elevatorPositionSupplier = elevatorPositionSupplier;
     }
 
@@ -336,40 +382,43 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         this.driveAllignedSupplier = driveAllignedSupplier;
     }
 
+    private boolean willHitStage() {
+        return (FieldFinder.willIHitThis(
+                        poseSupplier.get().getX(),
+                        poseSupplier.get().getY(),
+                        velocitySupplier.get().get(0, 0)
+                                * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
+                        velocitySupplier.get().get(1, 0)
+                                * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
+                        FieldLocations.BLUE_STAGE)
+                || FieldFinder.willIHitThis(
+                        poseSupplier.get().getX(),
+                        poseSupplier.get().getY(),
+                        velocitySupplier.get().get(0, 0)
+                                * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
+                        velocitySupplier.get().get(1, 0)
+                                * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
+                        FieldLocations.RED_STAGE));
+    }
+
+    public void enabledInit() {
+        aimerIo.resetPID();
+    }
+
     @Override
     public void periodic() {
         if (state == ScoringState.TEMPORARY_SETPOINT) {
-            aimerIo.setAngleClampsRad(0.0, Math.PI);
+            aimerIo.setAngleClampsRad(0.0, ScoringConstants.aimMaxAngleRadians);
         } else if (state != ScoringState.TUNING
                 && state != ScoringState.ENDGAME
                 && !overrideStageAvoidance
-                && (FieldFinder.willIHitThis(
-                                poseSupplier.get().getX(),
-                                poseSupplier.get().getY(),
-                                velocitySupplier.get().get(0, 0)
-                                        * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
-                                velocitySupplier.get().get(1, 0)
-                                        * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
-                                FieldLocations.BLUE_STAGE)
-                        || FieldFinder.willIHitThis(
-                                poseSupplier.get().getX(),
-                                poseSupplier.get().getY(),
-                                velocitySupplier.get().get(0, 0)
-                                        * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
-                                velocitySupplier.get().get(1, 0)
-                                        * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
-                                FieldLocations.RED_STAGE))) {
+                && willHitStage()) {
             aimerIo.setAngleClampsRad(0, 0);
         } else {
-            // Linear equation in point-slope form to calculate the arm's limit based on the
-            // elevator position
-            double maxElevatorPosition = ScoringConstants.maxElevatorPosition; // x-intercept
-            double maxAimAngle = ScoringConstants.maxAimAngleElevatorLimit; // y-intercept
-
             double elevatorLimit =
-                    (maxAimAngle / maxElevatorPosition)
-                                    * (elevatorPositionSupplier.get() - maxElevatorPosition)
-                            + maxAimAngle;
+                    aimerAvoidElevator.getValue(elevatorPositionSupplier.getAsDouble());
+            Logger.recordOutput("scoring/elevatorPosition", elevatorPositionSupplier.getAsDouble());
+            Logger.recordOutput("scoring/elevatorLimit", elevatorLimit);
             aimerIo.setAngleClampsRad(
                     Math.max(0.0, elevatorLimit), ScoringConstants.aimMaxAngleRadians);
         }
@@ -400,6 +449,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                         // Independent position: 0.483 (leave for now, might be used later)
                         new Rotation3d(0, -hoodInputs.hoodAngleRad - aimerInputs.aimAngleRad, 0)));
 
+        Logger.recordOutput("scoring/readyToShoot", readyToShoot);
+
         aimMechanism.setAngle(Units.radiansToDegrees(aimerInputs.aimAngleRad));
         hoodMechanism.setAngle(Units.radiansToDegrees(hoodInputs.hoodAngleRad));
         Logger.recordOutput("scoring/mechanism2d", mechanism);
@@ -412,6 +463,9 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
             case INTAKE:
                 intake();
                 SmartDashboard.putString("shoot", "intake");
+                break;
+            case SOURCE_INTAKE:
+                sourceIntake();
                 break;
             case PRIME:
                 prime();
@@ -496,13 +550,13 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         switch (slot) {
                 // Aimer
             case 0:
-                return 2 * Math.PI;
+                return 1.0;
                 // Hood
             case 1:
-                return 2 * Math.PI;
+                return Math.PI;
                 // Shooter
             case 2:
-                return 1000.0;
+                return 1.0;
             default:
                 throw new IllegalArgumentException("Invalid slot");
         }
@@ -549,6 +603,34 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     @Override
+    public void setMaxProfileProperties(double maxVelocity, double maxAcceleration, int slot) {
+        switch (slot) {
+                // Aimer
+            case 0:
+                aimerIo.setMaxProfile(maxVelocity, maxAcceleration);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid slot");
+        }
+    }
+
+    @Override
+    public void setFF(double kS, double kV, double kA, double kG, int slot) {
+        switch (slot) {
+                // Aimer
+            case 0:
+                aimerIo.setFF(kS, kV, kA, kG);
+                break;
+                // Shooter
+            case 2:
+                shooterIo.setFF(kS, kV, kA);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid slot");
+        }
+    }
+
+    @Override
     public void runToPosition(double position, int slot) {
         state = ScoringState.TEMPORARY_SETPOINT;
 
@@ -583,5 +665,10 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     public boolean readyToShoot() {
         return readyToShoot;
+    }
+
+    public void setbrakeMode(boolean brake) {
+        aimerIo.setBrakeMode(brake);
+        hoodIo.setBrakeMode(brake);
     }
 }

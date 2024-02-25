@@ -7,13 +7,16 @@ public interface IntakeIO {
     @AutoLog
     public static class IntakeIOInputs {
         public double leftIntakeVoltage = 0.0;
-        public double leftIntakeCurrent = 0.0;
+        public double leftIntakeStatorCurrent = 0.0;
+        public double leftIntakeSupplyCurrent = 0.0;
 
         public double rightIntakeVoltage = 0.0;
-        public double rightIntakeCurrent = 0.0;
+        public double rightIntakeStatorCurrent = 0.0;
+        public double rightIntakeSupplyCurrent = 0.0;
 
         public double beltVoltage = 0.0;
-        public double beltCurrent = 0.0;
+        public double beltStatorCurrent = 0.0;
+        public double beltSupplyCurrent = 0.0;
 
         public boolean noteSensed = false;
     }

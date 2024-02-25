@@ -21,6 +21,9 @@ public interface TelemetryIO {
                 };
         public double accelerationX = 0.0;
         public double accelerationY = 0.0;
+
+        public double robotRotation;
+        public double robotRotationVelocity;
     }
 
     public default void updateInputs(TelemetryIOInputs inputs) {}
@@ -30,4 +33,8 @@ public interface TelemetryIO {
     public default void setRobotPose(Pose2d pose) {}
 
     public default void setSwerveModuleStates(SwerveModuleState[] moduleStates) {}
+
+    public default void setRobotRotation(double rotation) {}
+
+    public default void setRobotRotationVelocity(double rotationVelocity) {}
 }

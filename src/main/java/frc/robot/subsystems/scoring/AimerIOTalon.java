@@ -1,8 +1,10 @@
 package frc.robot.subsystems.scoring;
 
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -38,6 +40,21 @@ public class AimerIOTalon implements AimerIO {
         aimerLeft.setNeutralMode(NeutralModeValue.Brake);
         aimerRight.setNeutralMode(NeutralModeValue.Brake);
 
+        aimerLeft.setInverted(true);
+        aimerRight.setInverted(false);
+
+        TalonFXConfigurator aimerLeftConfig = aimerLeft.getConfigurator();
+        aimerLeftConfig.apply(
+                new CurrentLimitsConfigs()
+                        .withStatorCurrentLimit(60)
+                        .withStatorCurrentLimitEnable(true));
+
+        TalonFXConfigurator aimerRightConfig = aimerRight.getConfigurator();
+        aimerRightConfig.apply(
+                new CurrentLimitsConfigs()
+                        .withStatorCurrentLimit(60)
+                        .withStatorCurrentLimitEnable(true));
+
         slot0.withKP(ScoringConstants.aimerkP);
         slot0.withKI(ScoringConstants.aimerkI);
         slot0.withKD(ScoringConstants.aimerkD);
@@ -57,16 +74,12 @@ public class AimerIOTalon implements AimerIO {
         aimerRight.getConfigurator().apply(configs);
 
         encoder.setDistancePerRotation(2 * Math.PI);
+        encoder.setPositionOffset(ScoringConstants.aimerEncoderOffset);
     }
 
     @Override
     public void setAimAngleRad(double goalAngleRad, boolean newProfile) {
-        this.goalAngleRad = goalAngleRad;
-    }
-
-    @Override
-    public void controlAimAngleRad() {
-        goalAngleRad = MathUtil.clamp(goalAngleRad, minAngleClamp, maxAngleClamp);
+        this.goalAngleRad = MathUtil.clamp(goalAngleRad, minAngleClamp, maxAngleClamp);
     }
 
     @Override
@@ -101,6 +114,17 @@ public class AimerIOTalon implements AimerIO {
         aimerLeft.setNeutralMode(talonMode);
         aimerRight.setNeutralMode(talonMode);
     }
+  
+    @Override
+    public void setFF(double kS, double kV, double kA, double kG) {
+        slot0.withKS(kS);
+        slot0.withKV(kV);
+        slot0.withKA(kA);
+        slot0.withKG(kG);
+
+        aimerLeft.getConfigurator().apply(slot0);
+        aimerRight.getConfigurator().apply(slot0);
+    }
 
     @Override
     public void updateInputs(AimerIOInputs inputs) {
@@ -112,6 +136,7 @@ public class AimerIOTalon implements AimerIO {
 
         inputs.aimGoalAngleRad = goalAngleRad;
         inputs.aimAngleRad = encoder.getAbsolutePosition();
+        inputs.aimAngleRad = 0.0;
 
         double currentTime = Utils.getCurrentTimeSeconds();
         double diffTime = currentTime - lastTime;
@@ -119,8 +144,10 @@ public class AimerIOTalon implements AimerIO {
 
         inputs.aimVelocityRadPerSec = (encoder.getAbsolutePosition() - lastPosition) / diffTime;
         lastPosition = encoder.getAbsolutePosition();
+        inputs.aimVelocityRadPerSec = 0.0;
 
         inputs.aimAppliedVolts = aimerLeft.getMotorVoltage().getValueAsDouble();
-        inputs.aimCurrentAmps = aimerLeft.getSupplyCurrent().getValueAsDouble();
+        inputs.aimStatorCurrentAmps = aimerLeft.getStatorCurrent().getValueAsDouble();
+        inputs.aimSupplyCurrentAmps = aimerLeft.getSupplyCurrent().getValueAsDouble();
     }
 }

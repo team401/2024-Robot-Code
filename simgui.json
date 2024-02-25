@@ -32,6 +32,7 @@
       "/SmartDashboard/Module 2": "Mechanism2d",
       "/SmartDashboard/Module 3": "Mechanism2d",
       "/SmartDashboard/PhotonSimField": "Field2d",
+      "/SmartDashboard/Test Mode Chooser": "String Chooser",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d"
     },
     "windows": {

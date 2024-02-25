@@ -1,23 +1,22 @@
 {
   "hubs": [
     {
-      "x": 133,
-      "y": 35,
-      "width": 1100,
-      "height": 650,
+      "x": -8,
+      "y": -8,
+      "width": 1382,
+      "height": 736,
       "state": {
         "sidebar": {
           "width": 300,
           "expanded": [
             "/AdvantageKit",
-            "/AdvantageKit/RealOutputs",
-            "/AdvantageKit/telemetry",
             "/AdvantageKit/scoring",
-            "/telemetry",
-            "/RealOutputs",
+            "/AdvantageKit/scoring/aimer",
+            "/AdvantageKit/scoring/shooter",
+            "/AdvantageKit/RealOutputs",
+            "/AdvantageKit/RealOutputs/Drive",
+            "/AdvantageKit/telemetry",
             "/AdvantageKit/RealOutputs/scoring",
-            "/telemetry/Pose3d",
-            "/telemetry/Pose3d/translation",
             "/AdvantageKit/RealOutputs/endgame"
           ]
         },
@@ -30,6 +29,7 @@
             },
             {
               "type": 1,
+              "legendHeight": 0.3,
               "legends": {
                 "left": {
                   "lockedRange": null,
@@ -37,10 +37,32 @@
                     "type": null,
                     "factor": 1
                   },
-                  "fields": []
+                  "fields": [
+                    {
+                      "key": "NT:/AdvantageKit/scoring/shooter/ShooterRightSupplyCurrentAmps",
+                      "color": "#2b66a2",
+                      "show": true
+                    },
+                    {
+                      "key": "NT:/AdvantageKit/scoring/shooter/ShooterLeftSupplyCurrentAmps",
+                      "color": "#80588e",
+                      "show": true
+                    },
+                    {
+                      "key": "NT:/AdvantageKit/scoring/shooter/ShooterRightAppliedVolts",
+                      "color": "#e5b31b",
+                      "show": true
+                    }
+                  ]
                 },
                 "discrete": {
-                  "fields": []
+                  "fields": [
+                    {
+                      "key": "NT:/AdvantageKit/RealOutputs/Drive/alignTarget",
+                      "color": "#af2437",
+                      "show": true
+                    }
+                  ]
                 },
                 "right": {
                   "lockedRange": null,
@@ -55,7 +77,7 @@
             },
             {
               "type": 6,
-              "uuid": "q06ytxmrkaenac0ijl343nag2sax99il",
+              "uuid": "f5br5tjfsj4o3zejkk0t9yx5n511f6mx",
               "fields": [],
               "listFields": [
                 [
@@ -98,9 +120,9 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  1.4695761589768194e-15,
-                  5.999999999999987,
-                  -11.999999999999964
+                  1.2599778593027539e-15,
+                  5.215562499999998,
+                  -10.288499999999996
                 ],
                 "cameraTarget": [
                   0,
@@ -116,5 +138,5 @@
     }
   ],
   "satellites": [],
-  "version": "3.1.0"
+  "version": "3.2.0"
 }

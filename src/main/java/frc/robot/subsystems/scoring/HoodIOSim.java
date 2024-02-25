@@ -2,6 +2,9 @@ package frc.robot.subsystems.scoring;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.Constants;
 import frc.robot.Constants.ScoringConstants;
@@ -21,14 +24,37 @@ public class HoodIOSim implements HoodIO {
             new PIDController(
                     ScoringConstants.hoodkP, ScoringConstants.hoodkI, ScoringConstants.hoodkD);
 
+    private final TrapezoidProfile profile =
+            new TrapezoidProfile(
+                    new TrapezoidProfile.Constraints(
+                            ScoringConstants.hoodMaxVelocity,
+                            ScoringConstants.hoodMaxAcceleration));
+
     private boolean override = false;
 
+    private Timer profileTimer = new Timer();
+
+    double initialAngle = 0.0;
+    double initialVelocity = 0.0;
+
     double goalAngleRad = 0.0;
+    double previousGoalAngle = 0.0;
+
     double appliedVolts = 0.0;
 
     @Override
     public void setHoodAngleRad(double angle) {
         goalAngleRad = angle;
+
+        if (goalAngleRad != previousGoalAngle) {
+            profileTimer.reset();
+            profileTimer.start();
+
+            initialAngle = sim.getAngleRads();
+            initialVelocity = sim.getVelocityRadPerSec();
+
+            previousGoalAngle = goalAngleRad;
+        }
     }
 
     @Override
@@ -52,10 +78,16 @@ public class HoodIOSim implements HoodIO {
     public void updateInputs(HoodIOInputs inputs) {
         sim.update(Constants.loopTime);
 
+        State trapezoidSetpoint =
+                profile.calculate(
+                        profileTimer.get(),
+                        new State(initialAngle, initialVelocity),
+                        new State(goalAngleRad, 0.0));
+
         if (!override) {
             appliedVolts =
-                    controller.calculate(sim.getAngleRads(), goalAngleRad)
-                            + Math.signum(controller.getPositionError()) * ScoringConstants.hoodkFF;
+                    controller.calculate(sim.getAngleRads(), trapezoidSetpoint.position)
+                            + Math.signum(controller.getPositionError()) * ScoringConstants.hoodkS;
         }
 
         sim.setInputVoltage(appliedVolts);
@@ -66,6 +98,6 @@ public class HoodIOSim implements HoodIO {
         inputs.hoodVelocityRadPerSec = sim.getVelocityRadPerSec();
 
         inputs.hoodAppliedVolts = appliedVolts;
-        inputs.hoodCurrentAmps = sim.getCurrentDrawAmps();
+        inputs.hoodStatorCurrentAmps = sim.getCurrentDrawAmps();
     }
 }

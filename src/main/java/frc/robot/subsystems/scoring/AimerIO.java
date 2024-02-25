@@ -7,8 +7,10 @@ public interface AimerIO {
     public static class AimerIOInputs {
         public double aimAngleRad = 0.0;
         public double aimGoalAngleRad = 0.0;
+        public double aimProfileGoalAngleRad = 0.0;
         public double aimAppliedVolts = 0.0;
-        public double aimCurrentAmps = 0.0;
+        public double aimStatorCurrentAmps = 0.0;
+        public double aimSupplyCurrentAmps = 0.0;
 
         public double aimVelocityRadPerSec = 0.0;
     }
@@ -26,6 +28,12 @@ public interface AimerIO {
     public default void setOverrideVolts(double volts) {}
 
     public default void setPID(double p, double i, double d) {}
+
+    public default void resetPID() {}
+
+    public default void setMaxProfile(double maxVelocity, double maxAcceleration) {}
+
+    public default void setFF(double kS, double kV, double kA, double kG) {}
 
     public default void setBrakeMode(boolean brake) {}
 }

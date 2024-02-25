@@ -107,4 +107,14 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
                 "endgame/Elevator3d",
                 new Pose3d(0.0, 0.0, endgameInputs.position + 0.1, new Rotation3d(0, 0, 0)));
     }
+
+    @Override
+    public void setFF(double kS, double kV, double kA, double kG, int slot) {
+        throw new UnsupportedOperationException("Unimplemented method 'setFF'");
+    }
+
+    @Override
+    public void setMaxProfileProperties(double maxVelocity, double maxAcceleration, int slot) {
+        throw new UnsupportedOperationException("Unimplemented method 'setMaxProfileVelocity'");
+    }
 }

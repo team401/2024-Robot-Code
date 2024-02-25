@@ -18,7 +18,7 @@ public class EndgameIOSparkFlex implements EndgameIO {
         rightEndgameMotor.setIdleMode(IdleMode.kBrake);
         leftEndgameMotor.setIdleMode(IdleMode.kBrake);
 
-        rightEndgameMotor.follow(leftEndgameMotor, true); // TODO: check if this should be inverted
+        leftEndgameMotor.follow(rightEndgameMotor, true);
 
         leftEndgameMotor.getEncoder().setPositionConversionFactor(EndgameConstants.encoderToMeters);
         leftEndgameMotor.getEncoder().setPosition(0.0);
@@ -26,7 +26,7 @@ public class EndgameIOSparkFlex implements EndgameIO {
 
     @Override
     public void setVolts(double volts) {
-        leftEndgameMotor.setVoltage(volts);
+        rightEndgameMotor.setVoltage(volts);
     }
 
     @Override
@@ -38,10 +38,10 @@ public class EndgameIOSparkFlex implements EndgameIO {
     @Override
     public void updateInputs(EndgameIOInputs inputs) {
         inputs.endgameLeftAppliedVolts = leftEndgameMotor.getAppliedOutput();
-        inputs.endgameLeftCurrentAmps = leftEndgameMotor.getOutputCurrent();
+        inputs.endgameLeftStatorCurrentAmps = leftEndgameMotor.getOutputCurrent();
 
         inputs.endgameRightAppliedVolts = rightEndgameMotor.getAppliedOutput();
-        inputs.endgameRightCurrentAmps = rightEndgameMotor.getOutputCurrent();
+        inputs.endgameRightStatorCurrentAmps = rightEndgameMotor.getOutputCurrent();
 
         inputs.position = leftEndgameMotor.getEncoder().getPosition();
         inputs.velocity = leftEndgameMotor.getEncoder().getVelocity();

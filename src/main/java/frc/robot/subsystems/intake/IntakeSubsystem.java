@@ -16,6 +16,9 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private IntakeAction action = IntakeAction.NONE;
 
+    private double intakeOverrideVolts = 0.0;
+    private double beltOverrideVolts = 0.0;
+
     public IntakeSubsystem(IntakeIO io) {
         this.io = io;
     }
@@ -32,11 +35,11 @@ public class IntakeSubsystem extends SubsystemBase {
             case SEEKING:
                 seeking();
                 break;
-            case PASSING:
-                passing();
-                break;
             case REVERSING:
                 reversing();
+                break;
+            case OVERRIDE:
+                override();
                 break;
         }
 
@@ -62,70 +65,62 @@ public class IntakeSubsystem extends SubsystemBase {
         }
     }
 
-    public boolean hasNote() {
-        return inputs.noteSensed;
-    }
-
     private void idle() {
         if (action == IntakeAction.INTAKE) {
             state = State.SEEKING;
-            io.setIntakeVoltage(IntakeConstants.intakePower);
-            io.setBeltVoltage(IntakeConstants.beltPower);
         } else if (action == IntakeAction.REVERSE) {
             state = State.REVERSING;
-            io.setIntakeVoltage(-IntakeConstants.intakePower);
-            io.setBeltVoltage(-IntakeConstants.beltPower);
+        } else if (action == IntakeAction.OVERRIDE) {
+            state = State.OVERRIDE;
         }
+
+        io.setBeltVoltage(0);
+        io.setIntakeVoltage(0);
     }
 
     private void seeking() {
-        if (inputs.noteSensed) {
-            state = State.PASSING;
-        }
-
-        if (action == IntakeAction.REVERSE) {
-            io.setIntakeVoltage(-IntakeConstants.intakePower);
-            io.setBeltVoltage(-IntakeConstants.beltPower);
-            state = State.REVERSING;
-        }
-    }
-
-    private void passing() {
-        if (scorerWantsNote.getAsBoolean()) {
-            io.setBeltVoltage(IntakeConstants.beltPower);
-        } else {
-            io.setBeltVoltage(0);
-        }
-        if (!inputs.noteSensed && inputs.beltCurrent < 2.0) {
+        if (action != IntakeAction.INTAKE) {
             state = State.IDLE;
-            io.setBeltVoltage(0);
         }
 
-        if (action == IntakeAction.REVERSE) {
-            io.setIntakeVoltage(-IntakeConstants.intakePower);
-            io.setBeltVoltage(-IntakeConstants.beltPower);
-            state = State.REVERSING;
-        }
+        io.setIntakeVoltage(IntakeConstants.intakePower);
+        io.setBeltVoltage(IntakeConstants.beltPower);
     }
 
     private void reversing() {
         if (action != IntakeAction.REVERSE) {
-            io.setBeltVoltage(0);
-            io.setIntakeVoltage(0);
             state = State.IDLE;
         }
+
+        io.setIntakeVoltage(-IntakeConstants.intakePower);
+        io.setBeltVoltage(-IntakeConstants.beltPower);
+    }
+
+    private void override() {
+        if (action != IntakeAction.OVERRIDE) {
+            state = State.IDLE;
+        }
+
+        io.setIntakeVoltage(intakeOverrideVolts);
+        io.setBeltVoltage(beltOverrideVolts);
+    }
+
+    public void setOverrideVolts(double intake, double belt) {
+        intakeOverrideVolts = intake;
+        beltOverrideVolts = belt;
     }
 
     private enum State {
         IDLE, // do nothing
         SEEKING, // run intake wheels until a note is taken in
-        PASSING, // move the belt to pass the note to the shooter when its ready
-        REVERSING // whole intake backwards
+        REVERSING, // whole intake backwards
+        OVERRIDE
     }
 
     public enum IntakeAction {
         NONE, // do nothing
         INTAKE, // Try to intake a note if you don't have one
-        REVERSE // run backwards
+        REVERSE, // run backwards
+        OVERRIDE
     }
 }
