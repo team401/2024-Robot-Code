@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
@@ -17,6 +18,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
@@ -29,6 +31,7 @@ import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.utils.GeomUtil;
 import frc.robot.utils.InterpolateDouble;
+import frc.robot.utils.Tunable;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -36,7 +39,7 @@ import org.littletonrobotics.junction.Logger;
  * Class that extends the Phoenix SwerveDrivetrain class and implements subsystem so it can be used
  * in command-based projects easily.
  */
-public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
+public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Tunable, Subsystem {
     private double vx, vy, omega = 0.0;
     private boolean fieldCentric = true;
 
@@ -54,8 +57,17 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         ALIGNING,
     }
 
+    public enum TuningMode {
+        NONE,
+        DRIVE,
+        ROTATION,
+    }
+
     private AlignTarget alignTarget = AlignTarget.NONE;
     private AlignState alignState = AlignState.MANUAL;
+
+    private TuningMode tuningMode = TuningMode.NONE;
+    private double tuningVolts = 0.0;
 
     private static InterpolateDouble noteTimeToGoal =
             new InterpolateDouble(ScoringConstants.timeToGoalMap(), 0.0, 2.0);
@@ -77,6 +89,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private SwerveRequest.FieldCentric driveFieldCentric = new SwerveRequest.FieldCentric();
     private SwerveRequest.RobotCentric driveRobotCentric = new SwerveRequest.RobotCentric();
     private SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+    private SwerveRequest.SysIdSwerveSteerGains rotationSysId =
+            new SwerveRequest.SysIdSwerveSteerGains();
+    private SwerveRequest.SysIdSwerveTranslation driveSysId =
+            new SwerveRequest.SysIdSwerveTranslation();
 
     private static final double kSimLoopPeriod = 0.02; // Original: 5 ms
     private Notifier simNotifier = null;
@@ -279,28 +295,37 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
         Logger.recordOutput("Drive/alignState", alignState);
         Logger.recordOutput("Drive/alignTarget", alignTarget);
+        Logger.recordOutput("Drive/tuningMode", tuningMode);
         Logger.recordOutput("Drive/desiredHeading", desiredHeading);
         Logger.recordOutput("Drive/fieldToSpeaker", getFieldToSpeaker.get());
         Logger.recordOutput("Drive/goalChassisSpeeds", new ChassisSpeeds(vx, vy, omega));
 
-        // if (vx == 0 && vy == 0 && omega == 0) {
-        //     setControl(brake);
-        if (!fieldCentric) {
-            setControl(
-                    driveRobotCentric
-                            .withVelocityX(vx)
-                            .withVelocityY(vy)
-                            .withRotationalRate(omega)
-                            .withDeadband(0.0)
-                            .withRotationalDeadband(0.0));
-        } else {
-            setControl(
-                    driveFieldCentric
-                            .withVelocityX(vx)
-                            .withVelocityY(vy)
-                            .withRotationalRate(omega)
-                            .withDeadband(0.0)
-                            .withRotationalDeadband(0.0));
+        switch (tuningMode) {
+            case NONE:
+                if (!fieldCentric) {
+                    setControl(
+                            driveRobotCentric
+                                    .withVelocityX(vx)
+                                    .withVelocityY(vy)
+                                    .withRotationalRate(omega)
+                                    .withDeadband(0.0)
+                                    .withRotationalDeadband(0.0));
+                } else {
+                    setControl(
+                            driveFieldCentric
+                                    .withVelocityX(vx)
+                                    .withVelocityY(vy)
+                                    .withRotationalRate(omega)
+                                    .withDeadband(0.0)
+                                    .withRotationalDeadband(0.0));
+                }
+                break;
+            case DRIVE:
+                setControl(driveSysId.withVolts(Units.Volts.of(tuningVolts)));
+                break;
+            case ROTATION:
+                setControl(rotationSysId.withVolts(Units.Volts.of(tuningVolts)));
+                break;
         }
     }
 
@@ -347,5 +372,110 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     @Override
     public void periodic() {
         controlDrivetrain();
+    }
+
+    @Override
+    public double getPosition(int slot) {
+        throw new UnsupportedOperationException("drive does not support position tuning");
+    }
+
+    @Override
+    public double getVelocity(int slot) {
+        throw new UnsupportedOperationException("drive does not support velocity tuning");
+    }
+
+    @Override
+    public double getConversionFactor(int slot) {
+        return 1.0;
+    }
+
+    @Override
+    public void setVolts(double volts, int slot) {
+        switch (slot) {
+            case 0:
+                tuningMode = TuningMode.DRIVE;
+                tuningVolts = volts;
+                break;
+            case 1:
+                tuningMode = TuningMode.ROTATION;
+                tuningVolts = volts;
+                break;
+        }
+    }
+
+    @Override
+    public void setPID(double p, double i, double d, int slot) {
+        Slot0Configs configs;
+        switch (slot) {
+            case 0:
+                configs =
+                        new Slot0Configs()
+                                .withKP(p)
+                                .withKI(i)
+                                .withKD(d)
+                                .withKS(TunerConstants.driveGains.kS)
+                                .withKV(TunerConstants.driveGains.kV)
+                                .withKA(TunerConstants.driveGains.kA);
+                for (int j = 0; j < 4; j++) {
+                    getModule(0).getDriveMotor().getConfigurator().apply(configs);
+                }
+                break;
+            case 1:
+                configs =
+                        new Slot0Configs()
+                                .withKP(p)
+                                .withKI(i)
+                                .withKD(d)
+                                .withKS(TunerConstants.steerGains.kS)
+                                .withKV(TunerConstants.steerGains.kV)
+                                .withKA(TunerConstants.steerGains.kA);
+                for (int j = 0; j < 4; j++) {
+                    getModule(0).getSteerMotor().getConfigurator().apply(configs);
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void setFF(double kS, double kV, double kA, double kG, int slot) {
+        Slot0Configs configs;
+        switch (slot) {
+            case 0:
+                configs =
+                        new Slot0Configs()
+                                .withKP(TunerConstants.driveGains.kP)
+                                .withKI(TunerConstants.driveGains.kI)
+                                .withKD(TunerConstants.driveGains.kD)
+                                .withKS(kS)
+                                .withKV(kV)
+                                .withKA(kA);
+                for (int i = 0; i < 4; i++) {
+                    getModule(0).getDriveMotor().getConfigurator().apply(configs);
+                }
+                break;
+            case 1:
+                configs =
+                        new Slot0Configs()
+                                .withKP(TunerConstants.steerGains.kP)
+                                .withKI(TunerConstants.steerGains.kI)
+                                .withKD(TunerConstants.steerGains.kD)
+                                .withKS(kS)
+                                .withKV(kV)
+                                .withKA(kA);
+                for (int i = 0; i < 4; i++) {
+                    getModule(0).getSteerMotor().getConfigurator().apply(configs);
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void setMaxProfileProperties(double maxVelocity, double maxAcceleration, int slot) {
+        throw new UnsupportedOperationException("drive does not use a motion profile");
+    }
+
+    @Override
+    public void runToPosition(double position, int slot) {
+        throw new UnsupportedOperationException("drive does not support PID tuning");
     }
 }
