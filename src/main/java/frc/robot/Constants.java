@@ -87,7 +87,7 @@ public final class Constants {
         public static final double anticipationTime = 0.01;
         public static final double minimumAnticipationVelocity = 0.0;
 
-        public static final double alignToleranceRadians = Math.PI / 12;
+        public static final double alignToleranceRadians = 0.1;
 
         public static final double alignmentkPMax = 7.0;
         public static final double alignmentkPMin = 5.0;
@@ -248,7 +248,7 @@ public final class Constants {
 
         // The stator current at which the wheels start to slip;
         // This needs to be tuned to your individual robot
-        private static final double kSlipCurrentA = 300.0;
+        private static final double kSlipCurrentA = 200.0;
 
         // Theoretical free speed (m/s) at 12v applied output;
         // This needs to be tuned to your individual robot
@@ -433,8 +433,8 @@ public final class Constants {
         public static final double aimAcceleration = 5.0; // TODO: 15.0
         public static final double aimCruiseVelocity = 7.0; // TODO: 15.0
 
-        public static final double shooterVelocityMarginRPM = 50;
-        public static final double aimAngleMarginRadians = Units.degreesToRadians(2);
+        public static final double shooterVelocityMarginRPM = 10;
+        public static final double aimAngleMarginRadians = Units.degreesToRadians(1);
         public static final double hoodAngleMarginRadians = Units.degreesToRadians(5);
 
         public static final double intakeAngleToleranceRadians = 0.0;
