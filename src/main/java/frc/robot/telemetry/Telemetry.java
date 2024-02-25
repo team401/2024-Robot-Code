@@ -10,11 +10,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.DoubleArrayPublisher;
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.util.Color;
@@ -38,26 +33,9 @@ public class Telemetry {
         this.telemetryIo = telemetryIo;
     }
 
-    /* What to publish over networktables for telemetry */
-    NetworkTableInstance inst = NetworkTableInstance.getDefault();
-
-    /* Robot pose for field positioning */
-    NetworkTable table = inst.getTable("Pose");
-    DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("robotPose").publish();
-    StringPublisher fieldTypePub = table.getStringTopic(".type").publish();
-
     double robotRotation = 0;
     double robotRotationVelocity = 0;
     double robotRotationLast = 0;
-
-    /* Robot speeds for general checking */
-    NetworkTable driveStats = inst.getTable("Drive");
-    DoublePublisher velocityX = driveStats.getDoubleTopic("Velocity X").publish();
-    DoublePublisher velocityY = driveStats.getDoubleTopic("Velocity Y").publish();
-    DoublePublisher speed = driveStats.getDoubleTopic("Speed").publish();
-    DoublePublisher accelX = driveStats.getDoubleTopic("Acceleration X").publish();
-    DoublePublisher accelY = driveStats.getDoubleTopic("Acceleration Y").publish();
-    DoublePublisher odomPeriod = driveStats.getDoubleTopic("Odometry Period").publish();
 
     double velocityXFiltered = 0.0;
     double velocityYFiltered = 0.0;
@@ -133,16 +111,12 @@ public class Telemetry {
          */
         /* Telemeterize the pose */
         Pose2d pose = state.Pose;
-        fieldTypePub.set("Field2d");
-        fieldPub.set(new double[] {pose.getX(), pose.getY(), pose.getRotation().getRadians()});
-
         robotRotation = pose.getRotation().getRadians();
 
         /* Telemeterize the robot's general speeds */
         double currentTime = Utils.getCurrentTimeSeconds();
         double diffTime = currentTime - lastTime;
         lastTime = currentTime;
-        Translation2d distanceDiff = pose.minus(latestPose).getTranslation();
 
         Translation2d velocityFieldRelative =
                 new Translation2d(pose.getX() - latestPose.getX(), pose.getY() - latestPose.getY())
@@ -150,24 +124,15 @@ public class Telemetry {
 
         latestPose = pose;
 
-        Translation2d velocities = distanceDiff.div(diffTime);
-
         double robotRotationDiff = robotRotation - robotRotationLast;
         robotRotationVelocity = robotRotationDiff / diffTime;
 
         robotRotationLast = robotRotation;
 
-        speed.set(velocities.getNorm());
-        velocityX.set(velocities.getX());
-        velocityY.set(velocities.getY());
-        accelX.set(telemetryInputs.accelerationX);
-        accelY.set(telemetryInputs.accelerationY);
-
         velocityXFiltered = velocityXFilter.calculate(velocityFieldRelative.getX());
         velocityYFiltered = velocityYFilter.calculate(velocityFieldRelative.getY());
         accelXFiltered = accelXFilter.calculate(telemetryInputs.accelerationX);
         accelYFiltered = accelYFilter.calculate(telemetryInputs.accelerationY);
-        odomPeriod.set(state.OdometryPeriod);
 
         latestModuleStates = state.ModuleStates;
         latestModuleTargets = state.ModuleTargets;
