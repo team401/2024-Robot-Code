@@ -1,6 +1,5 @@
 package frc.robot.telemetry;
 
-import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -15,7 +14,11 @@ public class TelemetryIOLive implements TelemetryIO {
                 new SwerveModuleState(),
                 new SwerveModuleState()
             };
-    private Pigeon2 pigeon = new Pigeon2(0);
+
+    private double rotation;
+    private double rotationVelocity;
+
+    // private Pigeon2 pigeon = new Pigeon2(0);
 
     public TelemetryIOLive() {}
 
@@ -35,11 +38,25 @@ public class TelemetryIOLive implements TelemetryIO {
     }
 
     @Override
+    public void setRobotRotation(double rotation) {
+        this.rotation = rotation;
+    }
+
+    @Override
+    public void setRobotRotationVelocity(double rotationVelocity) {
+        this.rotationVelocity = rotationVelocity;
+    }
+
+    @Override
     public void updateInputs(TelemetryIOInputs inputs) {
         inputs.pose3d = pose3d;
         inputs.pose2d = pose2d;
         inputs.moduleStates = moduleStates;
-        inputs.accelerationX = pigeon.getAccelerationX().getValueAsDouble();
-        inputs.accelerationY = pigeon.getAccelerationY().getValueAsDouble();
+
+        inputs.robotRotation = rotation;
+        inputs.robotRotationVelocity = rotationVelocity;
+
+        // inputs.accelerationX = pigeon.getAccelerationX().getValueAsDouble();
+        // inputs.accelerationY = pigeon.getAccelerationY().getValueAsDouble();
     }
 }

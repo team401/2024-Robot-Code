@@ -39,6 +39,7 @@ public class AimerIOSim implements AimerIO {
     private final Timer timer = new Timer();
 
     private boolean override = false;
+    private double overrideVolts = 0.0;
 
     boolean newProfile = false;
     double previousGoalAngle = 0.0;
@@ -74,8 +75,13 @@ public class AimerIOSim implements AimerIO {
 
     @Override
     public void setAngleClampsRad(double minAngleClamp, double maxAngleClamp) {
-        this.minAngleClamp = minAngleClamp;
-        this.maxAngleClamp = maxAngleClamp;
+        if (minAngleClamp > maxAngleClamp) {
+            return;
+        }
+        this.minAngleClamp =
+                MathUtil.clamp(minAngleClamp, 0.0, ScoringConstants.aimMaxAngleRadians);
+        this.maxAngleClamp =
+                MathUtil.clamp(maxAngleClamp, 0.0, ScoringConstants.aimMaxAngleRadians);
     }
 
     @Override
@@ -105,19 +111,28 @@ public class AimerIOSim implements AimerIO {
                         new State(initialAngle, initialVelocity),
                         new State(goalAngleRad, 0));
 
-        if (!override) {
+        double controlSetpoint =
+                MathUtil.clamp(
+                        trapezoidSetpoint.position, 0.0, ScoringConstants.aimMaxAngleRadians);
+        double velocitySetpoint = trapezoidSetpoint.velocity;
+
+        if (override) {
+            sim.setInputVoltage(overrideVolts);
+        } else {
             appliedVolts =
-                    feedforward.calculate(trapezoidSetpoint.position, trapezoidSetpoint.velocity)
-                            + controller.calculate(sim.getAngleRads(), trapezoidSetpoint.position);
+                    feedforward.calculate(controlSetpoint, velocitySetpoint)
+                            + controller.calculate(sim.getAngleRads(), controlSetpoint);
+            appliedVolts = MathUtil.clamp(appliedVolts, -12.0, 12.0);
+            sim.setInputVoltage(appliedVolts);
         }
-        sim.setInputVoltage(appliedVolts);
 
         inputs.aimGoalAngleRad = goalAngleRad;
+        inputs.aimProfileGoalAngleRad = trapezoidSetpoint.position;
         inputs.aimAngleRad = sim.getAngleRads();
 
         inputs.aimVelocityRadPerSec = sim.getVelocityRadPerSec();
 
         inputs.aimAppliedVolts = appliedVolts;
-        inputs.aimCurrentAmps = sim.getCurrentDrawAmps();
+        inputs.aimStatorCurrentAmps = sim.getCurrentDrawAmps();
     }
 }

@@ -21,10 +21,10 @@ public class EndgameIOSim implements EndgameIO {
         elevatorSim.setInputVoltage(appliedVolts);
 
         inputs.endgameLeftAppliedVolts = appliedVolts;
-        inputs.endgameLeftCurrentAmps = elevatorSim.getCurrentDrawAmps();
+        inputs.endgameLeftStatorCurrentAmps = elevatorSim.getCurrentDrawAmps();
 
         inputs.endgameRightAppliedVolts = appliedVolts;
-        inputs.endgameRightCurrentAmps = elevatorSim.getCurrentDrawAmps();
+        inputs.endgameRightStatorCurrentAmps = elevatorSim.getCurrentDrawAmps();
 
         inputs.position = elevatorSim.getPositionMeters();
         inputs.velocity = elevatorSim.getVelocityMetersPerSecond();

@@ -7,10 +7,12 @@ public interface EndgameIO {
     @AutoLog
     public static class EndgameIOInputs {
         public double endgameLeftAppliedVolts = 0.0;
-        public double endgameLeftCurrentAmps = 0.0;
+        public double endgameLeftStatorCurrentAmps = 0.0;
+        public double endgameLeftSupplyCurrentAmps = 0.0;
 
         public double endgameRightAppliedVolts = 0.0;
-        public double endgameRightCurrentAmps = 0.0;
+        public double endgameRightStatorCurrentAmps = 0.0;
+        public double endgameRightSupplyCurrentAmps = 0.0;
 
         public double position = 0.0;
         public double velocity = 0.0;

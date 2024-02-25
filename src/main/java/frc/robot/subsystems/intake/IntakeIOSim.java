@@ -26,13 +26,13 @@ public class IntakeIOSim implements IntakeIO {
         noteInBelts = SmartDashboard.getBoolean("noteInBelts", false);
 
         inputs.leftIntakeVoltage = intakeWheelsAppliedVolts;
-        inputs.leftIntakeCurrent = noteInIntakeWheels ? 100000 : 0;
+        inputs.leftIntakeStatorCurrent = noteInIntakeWheels ? 100000 : 0;
 
         inputs.rightIntakeVoltage = intakeWheelsAppliedVolts;
-        inputs.rightIntakeCurrent = noteInIntakeWheels ? 100000 : 0;
+        inputs.rightIntakeStatorCurrent = noteInIntakeWheels ? 100000 : 0;
 
         inputs.beltVoltage = beltAppliedVolts;
-        inputs.beltCurrent = noteInBelts ? 100000 : 0;
+        inputs.beltStatorCurrent = noteInBelts ? 100000 : 0;
 
         inputs.noteSensed = noteInBelts;
     }

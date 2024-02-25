@@ -33,7 +33,7 @@ public class TuneV extends Command {
 
         this.conversionFactor = subsystem.getConversionFactor(slot);
 
-        // this.withTimeout(5); TODO: Maybe add?
+        this.withTimeout(5);
     }
 
     @Override
@@ -68,6 +68,6 @@ public class TuneV extends Command {
 
     @Override
     public boolean isFinished() {
-        return Math.abs(subsystem.getPosition(slot)) > 1 * conversionFactor;
+        return Math.abs(subsystem.getPosition(slot)) > 0.9 * conversionFactor;
     }
 }

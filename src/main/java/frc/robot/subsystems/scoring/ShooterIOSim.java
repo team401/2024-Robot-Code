@@ -35,7 +35,7 @@ public class ShooterIOSim implements ShooterIO {
 
     private boolean override = false;
 
-    DigitalInput bannerSensor = new DigitalInput(Constants.SensorConstants.bannerPort);
+    DigitalInput bannerSensor = new DigitalInput(Constants.SensorConstants.bannerSensorPort);
 
     double shooterLeftGoalVelRPM = 0.0;
     double shooterLeftAppliedVolts = 0.0;
@@ -101,17 +101,17 @@ public class ShooterIOSim implements ShooterIO {
                         * ConversionConstants.kRadiansPerSecondToRPM;
         inputs.shooterLeftGoalVelocityRPM = shooterLeftGoalVelRPM;
         inputs.shooterLeftAppliedVolts = shooterLeftAppliedVolts;
-        inputs.shooterLeftCurrentAmps = shooterLeftSim.getCurrentDrawAmps();
+        inputs.shooterLeftStatorCurrentAmps = shooterLeftSim.getCurrentDrawAmps();
 
         inputs.shooterRightVelocityRPM =
                 shooterRightSim.getAngularVelocityRadPerSec()
                         * ConversionConstants.kRadiansPerSecondToRPM;
         inputs.shooterRightGoalVelocityRPM = shooterRightGoalVelRPM;
         inputs.shooterRightAppliedVolts = shooterRightAppliedVolts;
-        inputs.shooterRightCurrentAmps = shooterRightSim.getCurrentDrawAmps();
+        inputs.shooterRightStatorCurrentAmps = shooterRightSim.getCurrentDrawAmps();
 
         inputs.kickerAppliedVolts = kickerVolts;
-        inputs.kickerCurrentAmps = 0.0;
+        inputs.kickerStatorCurrentAmps = 0.0;
 
         inputs.bannerSensor = bannerSensor.get();
     }

@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
@@ -67,7 +68,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private Supplier<Translation2d> getRobotVelocity = () -> new Translation2d();
 
-    private PIDController thetaController = new PIDController(0.13, 0.0, 0.0);
+    private PIDController thetaController =
+            new PIDController(
+                    DriveConstants.alignmentkPMax,
+                    DriveConstants.alignmentkI,
+                    DriveConstants.alignmentkD);
 
     private SwerveRequest.FieldCentric driveFieldCentric = new SwerveRequest.FieldCentric();
     private SwerveRequest.RobotCentric driveRobotCentric = new SwerveRequest.RobotCentric();
@@ -87,7 +92,15 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             startSimThread();
         }
 
-        thetaController.enableContinuousInput(-180, 180);
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+        /*
+         * Since we're extending `SwerveDrivetrain`, we can't extend `SubsystemBase`, we can only
+         * implement `Subsystem`. Because of this, we have to register ourself manaully.
+         *
+         * In short, never trust the Command Scheduler.
+         */
+        CommandScheduler.getInstance().registerSubsystem(this);
     }
 
     public CommandSwerveDrivetrain(
@@ -97,7 +110,16 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         if (Constants.currentMode == Constants.Mode.SIM) {
             startSimThread();
         }
-        thetaController.enableContinuousInput(-180, 180);
+
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+        /*
+         * Since we're extending `SwerveDrivetrain`, we can't extend `SubsystemBase`, we can only
+         * implement `Subsystem`. Because of this, we have to register ourself manaully.
+         *
+         * In short, never trust the Command Scheduler.
+         */
+        CommandScheduler.getInstance().registerSubsystem(this);
     }
 
     public void setPoseSupplier(Supplier<Pose2d> getFieldToRobot) {
@@ -230,12 +252,28 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     break;
             }
 
-            omega =
-                    thetaController.calculate(
-                            pose.getRotation().getDegrees(), desiredHeading.getDegrees());
-
             alignError = thetaController.getPositionError();
 
+            double t = Math.abs(alignError) / (Math.PI / 4);
+            double minkP = DriveConstants.alignmentkPMin;
+            double maxkP = DriveConstants.alignmentkPMax;
+            double rotationkP = minkP * (1.0 - t) + t * maxkP;
+
+            // double rotationkP1 = (maxkP-minkP)/(Math.PI/4) * (alignError) + 0.1;
+
+            if (t > 1) { //
+                rotationkP = maxkP;
+            }
+
+            Logger.recordOutput("thetaController/rotationkP", rotationkP);
+            thetaController.setP(rotationkP);
+
+            omega =
+                    -thetaController.calculate(
+                            pose.getRotation().getRadians(), desiredHeading.getRadians());
+
+            Logger.recordOutput("Drive/omegaCommand", omega);
+            Logger.recordOutput("Drive/desiredHeading", desiredHeading.getRadians());
             Logger.recordOutput("Drive/rotationError", thetaController.getPositionError());
         }
 
@@ -243,21 +281,26 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         Logger.recordOutput("Drive/alignTarget", alignTarget);
         Logger.recordOutput("Drive/desiredHeading", desiredHeading);
         Logger.recordOutput("Drive/fieldToSpeaker", getFieldToSpeaker.get());
+        Logger.recordOutput("Drive/goalChassisSpeeds", new ChassisSpeeds(vx, vy, omega));
 
-        if (vx == 0 && vy == 0 && omega == 0) {
-            setControl(brake);
-        } else if (!fieldCentric) {
+        // if (vx == 0 && vy == 0 && omega == 0) {
+        //     setControl(brake);
+        if (!fieldCentric) {
             setControl(
                     driveRobotCentric
                             .withVelocityX(vx)
                             .withVelocityY(vy)
-                            .withRotationalRate(omega));
+                            .withRotationalRate(omega)
+                            .withDeadband(0.0)
+                            .withRotationalDeadband(0.0));
         } else {
             setControl(
                     driveFieldCentric
                             .withVelocityX(vx)
                             .withVelocityY(vy)
-                            .withRotationalRate(omega));
+                            .withRotationalRate(omega)
+                            .withDeadband(0.0)
+                            .withRotationalDeadband(0.0));
         }
     }
 
