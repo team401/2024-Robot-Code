@@ -211,23 +211,10 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                                 shooterInputs.shooterLeftVelocityRPM
                                         - shooterInputs.shooterLeftGoalVelocityRPM)
                         < ScoringConstants.shooterVelocityMarginRPM;
-        Logger.recordOutput("TEEEEEEEEEST/shooter/velocity", shooterInputs.shooterLeftVelocityRPM);
-        Logger.recordOutput("TEEEEEEEEEST/shooter/goal", shooterInputs.shooterLeftGoalVelocityRPM);
-        Logger.recordOutput(
-                "TEEEEEEEEEST/shooter/diff",
-                Math.abs(
-                        shooterInputs.shooterLeftVelocityRPM
-                                - shooterInputs.shooterLeftGoalVelocityRPM));
         boolean aimReady =
                 Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad)
                         < ScoringConstants.aimAngleMarginRadians;
-        Logger.recordOutput("TEEEEEEEEEST/aimer/velocity", shooterInputs.shooterLeftVelocityRPM);
-        Logger.recordOutput("TEEEEEEEEEST/aimer/goal", shooterInputs.shooterLeftGoalVelocityRPM);
-        Logger.recordOutput(
-                "TEEEEEEEEEST/aimer/diff",
-                Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad));
-        // boolean driveReady = driveAllignedSupplier.get();
-        boolean driveReady = true;
+        boolean driveReady = driveAllignedSupplier.get();
         boolean notePresent = hasNote();
 
         boolean primeReady = shooterReady && aimReady && driveReady;

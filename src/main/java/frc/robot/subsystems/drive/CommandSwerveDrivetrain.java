@@ -338,14 +338,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         double phi = (Math.PI / 2) - Math.acos(getRobotVelocity.get().getY() / noteVelocity);
 
         return angle.minus(new Rotation2d(phi));
-
-        // Pose2d robotToTarget = GeomUtil.transformToPose(current.minus(target));
-
-        // Rotation2d angle =
-        //         Rotation2d.fromRadians(Math.atan2(robotToTarget.getY(), robotToTarget.getX()));
-        // // angle = angle.plus(Rotation2d.fromDegrees(180));
-
-        // return angle;
     }
 
     public boolean isAligned() {

@@ -87,7 +87,7 @@ public final class Constants {
         public static final double anticipationTime = 0.01;
         public static final double minimumAnticipationVelocity = 0.0;
 
-        public static final double alignToleranceRadians = Math.PI / 6;
+        public static final double alignToleranceRadians = Math.PI / 12;
 
         public static final double alignmentkPMax = 7.0;
         public static final double alignmentkPMin = 5.0;
@@ -484,16 +484,16 @@ public final class Constants {
         public static HashMap<Double, Double> getShooterMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
             map.put(0.0, 2500.0);
-            map.put(1.3, 2500.0);
             map.put(1.45, 2500.0);
-            map.put(1.98, 2900.0);
-            map.put(2.19, 3000.0);
-            map.put(2.72, 3000.0);
-            map.put(3.03, 3300.0);
-            map.put(3.9, 3500.0);
-            map.put(4.8, 4000.0);
-            map.put(4.8, 4100.0);
-            map.put(4.8, 4300.0);
+            map.put(1.98, 2500.0);
+            map.put(2.41, 2900.0);
+            map.put(3.02, 3000.0);
+            map.put(3.22, 3000.0);
+            map.put(3.9, 3300.0);
+            map.put(4.55, 3500.0);
+            map.put(4.95, 4000.0);
+            map.put(5.64, 4100.0);
+            map.put(5.82, 4300.0);
 
             return map;
         }
