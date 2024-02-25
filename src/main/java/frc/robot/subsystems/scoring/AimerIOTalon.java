@@ -114,7 +114,7 @@ public class AimerIOTalon implements AimerIO {
         aimerLeft.setNeutralMode(talonMode);
         aimerRight.setNeutralMode(talonMode);
     }
-  
+
     @Override
     public void setFF(double kS, double kV, double kA, double kG) {
         slot0.withKS(kS);

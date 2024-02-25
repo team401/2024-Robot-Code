@@ -75,14 +75,12 @@ public class RobotContainer {
     CommandSwerveDrivetrain drivetrain = FeatureFlags.runDrive ? TunerConstants.DriveTrain : null;
     Telemetry driveTelemetry;
 
-    // private DigitalInput brakeSwitch = new DigitalInput(SensorConstants.brakeSwitchPort);
-
     SendableChooser<String> autoChooser = new SendableChooser<String>();
     SendableChooser<String> testModeChooser = new SendableChooser<String>();
 
     DigitalInput brakeSwitch = new DigitalInput(IOConstants.brakeSwitchPort);
 
-    DigitalOutput timeDigitalOutput = new DigitalOutput(IOConstants.timeOutputPort);
+    DigitalOutput timeDigitalOutput = null; // new DigitalOutput(IOConstants.timeOutputPort);
 
     LED leds;
 
@@ -339,7 +337,7 @@ public class RobotContainer {
         if (timeDigitalOutput != null) {
             timeDigitalOutput.set(true);
         }
-      
+
         if (FeatureFlags.runIntake) {
             intakeSubsystem.run(IntakeAction.NONE);
         }

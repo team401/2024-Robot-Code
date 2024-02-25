@@ -71,8 +71,6 @@ public final class Constants {
 
     public static final class SensorConstants {
         public static final int bannerSensorPort = 1;
-
-        public static final int brakeSwitchPort = 0;
     }
 
     public static final class DriveConstants {
@@ -547,7 +545,7 @@ public final class Constants {
     }
 
     public static final class IOConstants {
-        public static final int brakeSwitchPort = 0;
-        public static final int timeOutputPort = 1;
+        public static final int brakeSwitchPort = 2;
+        public static final int timeOutputPort = 4;
     }
 }
