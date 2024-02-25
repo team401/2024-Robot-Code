@@ -48,7 +48,7 @@ public final class Constants {
     public static final class FeatureFlags {
         public static final boolean runVision = false;
 
-        public static final boolean runIntake = true;
+        public static final boolean runIntake = false;
         public static final boolean runScoring = true;
         public static final boolean runEndgame = true;
         public static final boolean runDrive = true;
@@ -84,10 +84,15 @@ public final class Constants {
         public static final Pose2d initialPose =
                 new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90));
 
-        public static final double anticipationTime = 0.1;
+        public static final double anticipationTime = 0.01;
         public static final double minimumAnticipationVelocity = 0.0;
 
         public static final double alignToleranceRadians = Math.PI / 6;
+
+        public static final double alignmentkPMax = 7.0;
+        public static final double alignmentkPMin = 5.0;
+        public static final double alignmentkI = 1.0;
+        public static final double alignmentkD = 0.0;
     }
 
     public static final class FieldConstants {
@@ -382,7 +387,7 @@ public final class Constants {
 
     public static final class ScoringConstants {
         public static final double aimerkP = 15.0;
-        public static final double aimerkI = 5.0;
+        public static final double aimerkI = 15.0;
         public static final double aimerkD = 0.0;
 
         public static final double aimerkS = 0.265;
@@ -426,21 +431,21 @@ public final class Constants {
         public static final double aimPositionTolerance = 0.015;
 
         public static final double aimAcceleration = 5.0; // TODO: 15.0
-        public static final double aimCruiseVelocity = 5.0; // TODO: 15.0
+        public static final double aimCruiseVelocity = 7.0; // TODO: 15.0
 
-        public static final double shooterVelocityMarginRPM = 10;
-        public static final double aimAngleMarginRadians = Units.degreesToRadians(5);
+        public static final double shooterVelocityMarginRPM = 50;
+        public static final double aimAngleMarginRadians = Units.degreesToRadians(2);
         public static final double hoodAngleMarginRadians = Units.degreesToRadians(5);
 
         public static final double intakeAngleToleranceRadians = 0.0;
         // Math.PI / 2 - Units.degreesToRadians(40);
 
-        public static final double shooterAmpVelocityRPM = 1400;
+        public static final double shooterAmpVelocityRPM = 2000;
 
         public static final double hoodHomeAmps = 40.0; // TODO: Find this
         public static final double hoodHomeAngleRad = Math.PI - 0.23;
 
-        public static final double aimMaxAngleRadians = Math.PI / 2;
+        public static final double aimMaxAngleRadians = 1.65; // Math.PI / 2
 
         public static final double maxAimIntake = 0.0;
         public static final double minAimIntake = 0.0;
@@ -458,11 +463,17 @@ public final class Constants {
         // Value - Aimer angle in radians
         public static HashMap<Double, Double> getAimerMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
+            map.put(0.0, 0.7);
             map.put(1.45, 0.7);
             map.put(1.98, 0.62);
-            map.put(3.03, 0.45);
+            map.put(2.41, 0.53);
+            map.put(3.02, 0.45);
+            map.put(3.22, 0.425);
             map.put(3.9, 0.36);
-            map.put(4.8, 0.3);
+            map.put(4.55, 0.34);
+            map.put(4.95, 0.31);
+            map.put(5.64, 0.28);
+            map.put(5.82, 0.275);
 
             return map;
         }
@@ -472,11 +483,17 @@ public final class Constants {
         // Value - Shooter RPM
         public static HashMap<Double, Double> getShooterMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
+            map.put(0.0, 2500.0);
+            map.put(1.3, 2500.0);
             map.put(1.45, 2500.0);
-            map.put(1.98, 2500.0);
-            map.put(3.03, 2700.0);
-            map.put(3.9, 3300.0);
-            map.put(4.8, 3300.0);
+            map.put(1.98, 2900.0);
+            map.put(2.19, 3000.0);
+            map.put(2.72, 3000.0);
+            map.put(3.03, 3300.0);
+            map.put(3.9, 3500.0);
+            map.put(4.8, 4000.0);
+            map.put(4.8, 4100.0);
+            map.put(4.8, 4300.0);
 
             return map;
         }
@@ -486,17 +503,10 @@ public final class Constants {
         // Value - Time in seconds
         public static HashMap<Double, Double> timeToGoalMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
-            map.put(0.0, 0.01);
-            map.put(1.0, 0.02);
-            map.put(2.0, 0.03);
-            map.put(3.0, 0.04);
-            map.put(4.0, 0.05);
-            map.put(5.0, 0.06);
-            map.put(6.0, 0.07);
-            map.put(7.0, 0.1);
-            map.put(8.0, 0.15);
-            map.put(9.0, 0.2);
-            map.put(10.0, 0.3);
+            map.put(0.0, 0.15);
+            map.put(1.3, 0.15);
+            map.put(1.4, 0.16);
+            // map.put(1.3, 0.15);
 
             return map;
         }

@@ -48,6 +48,12 @@ public class ShooterIOTalon implements ShooterIO {
                         .withStatorCurrentLimit(120)
                         .withStatorCurrentLimitEnable(true));
 
+        TalonFXConfigurator kickerConfig = kicker.getConfigurator();
+        kickerConfig.apply(
+                new CurrentLimitsConfigs()
+                        .withStatorCurrentLimit(120)
+                        .withStatorCurrentLimitEnable(true));
+
         slot0.withKP(ScoringConstants.shooterkP);
         slot0.withKI(ScoringConstants.shooterkI);
         slot0.withKD(ScoringConstants.shooterkD);

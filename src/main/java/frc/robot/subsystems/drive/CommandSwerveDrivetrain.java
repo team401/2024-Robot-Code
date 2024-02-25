@@ -68,7 +68,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private Supplier<Translation2d> getRobotVelocity = () -> new Translation2d();
 
-    private PIDController thetaController = new PIDController(0.002, 0.0, 0.005);
+    private PIDController thetaController =
+            new PIDController(
+                    DriveConstants.alignmentkPMax,
+                    DriveConstants.alignmentkI,
+                    DriveConstants.alignmentkD);
 
     private SwerveRequest.FieldCentric driveFieldCentric = new SwerveRequest.FieldCentric();
     private SwerveRequest.RobotCentric driveRobotCentric = new SwerveRequest.RobotCentric();
@@ -88,7 +92,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             startSimThread();
         }
 
-        thetaController.enableContinuousInput(-180, 180);
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
         /*
          * Since we're extending `SwerveDrivetrain`, we can't extend `SubsystemBase`, we can only
@@ -106,7 +110,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         if (Constants.currentMode == Constants.Mode.SIM) {
             startSimThread();
         }
-        thetaController.enableContinuousInput(-180, 180);
+
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
         /*
          * Since we're extending `SwerveDrivetrain`, we can't extend `SubsystemBase`, we can only
@@ -247,12 +252,28 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     break;
             }
 
-            omega =
-                    thetaController.calculate(
-                            pose.getRotation().getDegrees(), desiredHeading.getDegrees());
-
             alignError = thetaController.getPositionError();
 
+            double t = Math.abs(alignError) / (Math.PI / 4);
+            double minkP = DriveConstants.alignmentkPMin;
+            double maxkP = DriveConstants.alignmentkPMax;
+            double rotationkP = minkP * (1.0 - t) + t * maxkP;
+
+            // double rotationkP1 = (maxkP-minkP)/(Math.PI/4) * (alignError) + 0.1;
+
+            if (t > 1) { //
+                rotationkP = maxkP;
+            }
+
+            Logger.recordOutput("thetaController/rotationkP", rotationkP);
+            thetaController.setP(rotationkP);
+
+            omega =
+                    -thetaController.calculate(
+                            pose.getRotation().getRadians(), desiredHeading.getRadians());
+
+            Logger.recordOutput("Drive/omegaCommand", omega);
+            Logger.recordOutput("Drive/desiredHeading", desiredHeading.getRadians());
             Logger.recordOutput("Drive/rotationError", thetaController.getPositionError());
         }
 
@@ -262,20 +283,24 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         Logger.recordOutput("Drive/fieldToSpeaker", getFieldToSpeaker.get());
         Logger.recordOutput("Drive/goalChassisSpeeds", new ChassisSpeeds(vx, vy, omega));
 
-        if (vx == 0 && vy == 0 && omega == 0) {
-            setControl(brake);
-        } else if (!fieldCentric) {
+        // if (vx == 0 && vy == 0 && omega == 0) {
+        //     setControl(brake);
+        if (!fieldCentric) {
             setControl(
                     driveRobotCentric
                             .withVelocityX(vx)
                             .withVelocityY(vy)
-                            .withRotationalRate(omega));
+                            .withRotationalRate(omega)
+                            .withDeadband(0.0)
+                            .withRotationalDeadband(0.0));
         } else {
             setControl(
                     driveFieldCentric
                             .withVelocityX(vx)
                             .withVelocityY(vy)
-                            .withRotationalRate(omega));
+                            .withRotationalRate(omega)
+                            .withDeadband(0.0)
+                            .withRotationalDeadband(0.0));
         }
     }
 
@@ -293,8 +318,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         Pose2d robotAnticipated =
                 new Pose2d(robotXAnticipated, robotYAnticipated, current.getRotation());
 
-        Pose2d robotToTargetAnticipated =
-        GeomUtil.transformToPose(robotAnticipated.minus(target));
+        Pose2d robotToTargetAnticipated = GeomUtil.transformToPose(robotAnticipated.minus(target));
 
         double distanceToTarget =
                 Math.hypot(
@@ -304,8 +328,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         Rotation2d angle =
                 Rotation2d.fromRadians(
                         Math.atan2(
-                                robotToTargetAnticipated.getY(),
-        robotToTargetAnticipated.getX()));
+                                robotToTargetAnticipated.getY(), robotToTargetAnticipated.getX()));
+        angle = angle.plus(Rotation2d.fromDegrees(180));
 
         double timeToGoal = noteTimeToGoal.getValue(distanceToTarget);
         double noteVelocity = distanceToTarget / timeToGoal;

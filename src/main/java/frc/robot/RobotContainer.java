@@ -303,6 +303,14 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.WAIT)));
+
+            controller.povLeft()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.SOURCE_INTAKE)))
+                .onFalse(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.WAIT)));
         }
     } // spotless:on
 
@@ -663,14 +671,20 @@ public class RobotContainer {
 
         autoChooser.addOption("S2 4-Note", "S1-W1-W2-W3");
 
+        autoChooser.addOption("TEST", "S3-W3");
+
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         NamedCommands.registerCommand(
                 "Shoot Scoring",
                 new InstantCommand(
                         () -> {
-                            scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT);
-                            intakeSubsystem.run(IntakeAction.INTAKE);
+                            if (FeatureFlags.runScoring) {
+                                scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT);
+                            }
+                            if (FeatureFlags.runIntake) {
+                                intakeSubsystem.run(IntakeAction.INTAKE);
+                            }
                         }));
         NamedCommands.registerCommand(
                 "Aim Scoring",
