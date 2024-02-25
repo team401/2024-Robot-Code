@@ -325,6 +325,9 @@ public class RobotContainer {
         testModeChooser.addOption("Shooter Tuning", "tuning-shooter");
         testModeChooser.addOption("Endgame Tuning", "tuning-endgame");
 
+        testModeChooser.addOption("Swerve Rotation Tuning", "tuning-swerve-rotation");
+        testModeChooser.addOption("Swerve Drive Tuning", "tuning-swerve-drive");
+
         SmartDashboard.putData("Test Mode Chooser", testModeChooser);
     }
 
@@ -562,6 +565,43 @@ public class RobotContainer {
                 controller.rightBumper()
                     .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(-SmartDashboard.getNumber("Test-Mode/endgame/volts", 1.0), 0)))
                     .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0, 0)));
+                break;
+                case "tuning-swerve-drive":
+                    setUpDriveWithJoysticks();
+                    SmartDashboard.putNumber("Test-Mode/swerve/drive-volts", 0);
+
+                    controller.a()
+                        .onTrue(new TuneS(drivetrain, 0));
+
+                    controller.x()
+                        .onTrue(new TuneV(drivetrain, 4, 0));
+
+                    controller.leftBumper()
+                        .onTrue(new InstantCommand(() -> drivetrain.setVolts(-SmartDashboard.getNumber("Test-Mode/swerve/drive-volts", 0), 0)))
+                        .onFalse(new InstantCommand(() -> drivetrain.setVolts(0.0, 0)));
+
+                    controller.rightBumper()
+                        .onTrue(new InstantCommand(() -> drivetrain.setVolts(SmartDashboard.getNumber("Test-Mode/swerve/drive-volts", 0), 0)))
+                        .onFalse(new InstantCommand(() -> drivetrain.setVolts(0.0, 0)));
+                    
+                break;
+                case "tuning-swerve-rotation":
+                    setUpDriveWithJoysticks();
+                    SmartDashboard.putNumber("Test-Mode/swerve/rotation-volts", 0);
+
+                    controller.a()
+                        .onTrue(new TuneS(drivetrain, 1));
+
+                    controller.x()
+                        .onTrue(new TuneV(drivetrain, 4, 1));
+
+                    controller.leftBumper()
+                        .onTrue(new InstantCommand(() -> drivetrain.setVolts(-SmartDashboard.getNumber("Test-Mode/swerve/drive-volts", 0), 1)))
+                        .onFalse(new InstantCommand(() -> drivetrain.setVolts(0.0, 1)));
+
+                    controller.rightBumper()
+                        .onTrue(new InstantCommand(() -> drivetrain.setVolts(SmartDashboard.getNumber("Test-Mode/swerve/drive-volts", 0), 1)))
+                        .onFalse(new InstantCommand(() -> drivetrain.setVolts(0.0, 1)));
                 break;
         }
         // spotless:on

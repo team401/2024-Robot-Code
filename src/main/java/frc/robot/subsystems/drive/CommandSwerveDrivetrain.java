@@ -376,12 +376,35 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Tunable
 
     @Override
     public double getPosition(int slot) {
-        throw new UnsupportedOperationException("drive does not support position tuning");
+        // probe module 1's position to have a consistent output
+        switch (slot) {
+            case 0:
+                return getModule(1).getPosition(false).distanceMeters;
+            case 1:
+                return getModule(1).getPosition(false).angle.getRadians();
+            default:
+                throw new UnsupportedOperationException("getVelocity(): drive has only two slots");
+        }
+
     }
 
     @Override
     public double getVelocity(int slot) {
-        throw new UnsupportedOperationException("drive does not support velocity tuning");
+        double avgVel = 0.0;
+        switch (slot) {
+            case 0:
+                for (int i = 0; i < 4; i++) {
+                    avgVel += getModule(i).getCurrentState().speedMetersPerSecond;
+                }
+                return avgVel / 4;
+            case 1:
+                for (int i = 0; i < 4; i++) {
+                    avgVel += getModule(i).getCurrentState().speedMetersPerSecond;
+                }
+                return avgVel / 4;
+            default:
+                throw new UnsupportedOperationException("getVelocity(): drive has only two slots");
+        }
     }
 
     @Override
