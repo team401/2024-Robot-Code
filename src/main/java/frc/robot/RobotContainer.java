@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -75,7 +76,7 @@ public class RobotContainer {
     CommandSwerveDrivetrain drivetrain = FeatureFlags.runDrive ? TunerConstants.DriveTrain : null;
     Telemetry driveTelemetry;
 
-    SendableChooser<String> autoChooser = new SendableChooser<String>();
+    SendableChooser<Command> autoChooser = new SendableChooser<Command>();
     SendableChooser<String> testModeChooser = new SendableChooser<String>();
 
     DigitalInput brakeSwitch = new DigitalInput(IOConstants.brakeSwitchPort);
@@ -700,19 +701,11 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return drivetrain.getAutoPath(autoChooser.getSelected());
+        return autoChooser.getSelected();
     }
 
     private void configureAutonomous() {
-        autoChooser.setDefaultOption("Default (S3 6-Note)", "S3-W3-W2-W1-C1-C2");
-
-        autoChooser.addOption("S1 5-Note", "S1-W1-W2-W3-C5");
-        autoChooser.addOption("S1 4-Note", "S1-W1-W2-W3");
-
-        autoChooser.addOption("S2 4-Note", "S1-W1-W2-W3");
-
-        autoChooser.addOption("TEST", "S2-W2-W3");
-
+        autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         NamedCommands.registerCommand(

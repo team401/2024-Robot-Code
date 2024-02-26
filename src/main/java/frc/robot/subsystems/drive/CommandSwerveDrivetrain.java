@@ -198,10 +198,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
     }
 
-    public Command getAutoPath(String pathName) {
-        return new PathPlannerAuto(pathName);
-    }
-
     public ChassisSpeeds getCurrentRobotChassisSpeeds() {
         return m_kinematics.toChassisSpeeds(getState().ModuleStates);
     }
