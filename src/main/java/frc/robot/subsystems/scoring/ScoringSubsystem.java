@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -119,10 +120,6 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         aimerAvoidElevator =
                 new InterpolateDouble(
                         ScoringConstants.aimerAvoidElevatorTable(), 0.0, Math.PI / 2.0);
-
-        // This causes elevator avoidance to work upon enable
-        aimerIo.setAimAngleRad(0.0001, true);
-        aimerIo.setAimAngleRad(0.0, true);
     }
 
     public void setAction(ScoringAction action) {
@@ -182,7 +179,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private void sourceIntake() {
-        aimerIo.setAimAngleRad(Math.PI / 4.0, true);
+        aimerIo.setAimAngleRad(0.3, true);
         shooterIo.setKickerVolts(-1);
 
         shooterIo.setOverrideMode(true);
@@ -206,7 +203,9 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     private void prime() {
         double distancetoGoal = findDistanceToGoal();
-        Logger.recordOutput("scoring/aimGoal", aimerInterpolated.getValue(distancetoGoal));
+        Logger.recordOutput(
+                "scoring/aimGoal",
+                aimerInterpolated.getValue(distancetoGoal) + ScoringConstants.aimerStaticOffset);
         shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
         aimerIo.setAimAngleRad(aimerInterpolated.getValue(distancetoGoal), false);
         shooterIo.setKickerVolts(hasNote() ? 0.0 : 2.0);
@@ -403,10 +402,13 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     public void enabledInit() {
         aimerIo.resetPID();
+
+        aimerIo.setAimAngleRad(aimerInputs.aimAngleRad, true);
     }
 
     @Override
     public void periodic() {
+
         if (state == ScoringState.TEMPORARY_SETPOINT) {
             aimerIo.setAngleClampsRad(0.0, ScoringConstants.aimMaxAngleRadians);
         } else if (state != ScoringState.TUNING
@@ -427,14 +429,6 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
         Logger.recordOutput("scoring/State", state.toString());
         Logger.recordOutput("scoring/Action", action.toString());
-
-        shooterIo.updateInputs(shooterInputs);
-        aimerIo.updateInputs(aimerInputs);
-        hoodIo.updateInputs(hoodInputs);
-
-        Logger.processInputs("scoring/shooter", shooterInputs);
-        Logger.processInputs("scoring/aimer", aimerInputs);
-        Logger.processInputs("scoring/hood", hoodInputs);
 
         Logger.recordOutput(
                 "scoring/Aimer3d",
@@ -493,6 +487,20 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                 temporarySetpoint();
                 break;
         }
+
+        // If the robot is disabled, the pid should not be winding up
+        if (DriverStation.isDisabled()) {
+            aimerIo.resetPID();
+            aimerIo.setAimAngleRad(aimerInputs.aimAngleRad, true);
+        }
+
+        shooterIo.updateInputs(shooterInputs);
+        aimerIo.updateInputs(aimerInputs);
+        hoodIo.updateInputs(hoodInputs);
+
+        Logger.processInputs("scoring/shooter", shooterInputs);
+        Logger.processInputs("scoring/aimer", aimerInputs);
+        Logger.processInputs("scoring/hood", hoodInputs);
     }
 
     public void setTuningKickerVolts(double kickerVoltsTuning) {

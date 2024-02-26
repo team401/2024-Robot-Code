@@ -270,7 +270,13 @@ public class RobotContainer {
         if (FeatureFlags.runIntake) {
             controller.a()
                 .onTrue(new InstantCommand(
-                        () -> intakeSubsystem.run(IntakeAction.INTAKE)));
+                        () -> intakeSubsystem.run(IntakeAction.INTAKE)))
+                .onFalse(new InstantCommand(
+                    () -> intakeSubsystem.run(IntakeAction.NONE)));
+
+            controller.rightBumper()
+                .onTrue(new InstantCommand(
+                        () -> intakeSubsystem.run(IntakeAction.REVERSE)));
                 
             controller.start()
                 .onTrue(new InstantCommand(
@@ -739,6 +745,7 @@ public class RobotContainer {
             // scoringSubsystem.homeHood();
 
             scoringSubsystem.setAction(ScoringAction.WAIT);
+            scoringSubsystem.enabledInit();
         }
     }
 }

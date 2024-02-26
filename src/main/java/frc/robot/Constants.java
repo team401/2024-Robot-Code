@@ -48,7 +48,7 @@ public final class Constants {
     public static final class FeatureFlags {
         public static final boolean runVision = false;
 
-        public static final boolean runIntake = false;
+        public static final boolean runIntake = true;
         public static final boolean runScoring = true;
         public static final boolean runEndgame = true;
         public static final boolean runDrive = true;
@@ -431,7 +431,7 @@ public final class Constants {
         public static final double aimAcceleration = 5.0; // TODO: 15.0
         public static final double aimCruiseVelocity = 7.0; // TODO: 15.0
 
-        public static final double shooterVelocityMarginRPM = 10;
+        public static final double shooterVelocityMarginRPM = 50;
         public static final double aimAngleMarginRadians = Units.degreesToRadians(1);
         public static final double hoodAngleMarginRadians = Units.degreesToRadians(5);
 
@@ -461,7 +461,7 @@ public final class Constants {
         // Value - Aimer angle in radians
         public static HashMap<Double, Double> getAimerMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
-            map.put(0.0, 0.7);
+            map.put(0.0, 0.8);
             map.put(1.45, 0.7);
             map.put(1.98, 0.62);
             map.put(2.41, 0.53);
@@ -475,6 +475,8 @@ public final class Constants {
 
             return map;
         }
+
+        public static final double aimerStaticOffset = 0.02;
 
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters

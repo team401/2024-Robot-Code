@@ -174,8 +174,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     this.setAlignTarget(AlignTarget.SPEAKER);
                 }, // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
-                        new PIDConstants(10, 0, 0),
-                        new PIDConstants(10, 0, 0),
+                        new PIDConstants(5, 0, 0),
+                        new PIDConstants(0, 0, 0),
                         TunerConstants.kSpeedAt12VoltsMps,
                         driveBaseRadius,
                         new ReplanningConfig()),
@@ -345,16 +345,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     public Command getDriveToPointCommand() {
         Pose2d targetPose = new Pose2d(11.74, 4.13, Rotation2d.fromDegrees(180));
 
-        PathConstraints constraints = new PathConstraints(
-                3.0, 4.0,
-                Units.degreesToRadians(540), Units.degreesToRadians(720));
+        PathConstraints constraints =
+                new PathConstraints(
+                        3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
 
-        return AutoBuilder.pathfindToPose(
-                targetPose,
-                constraints,
-                0.0,
-                0.0
-        );
+        return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0, 0.0);
     }
 
     public boolean isAligned() {
