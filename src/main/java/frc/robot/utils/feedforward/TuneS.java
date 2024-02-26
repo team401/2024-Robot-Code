@@ -32,6 +32,7 @@ public class TuneS extends Command {
     public void execute() {
         subsystem.setVolts(appliedVolts, slot);
         appliedVolts += 0.001;
+        SmartDashboard.putNumber("Test-Mode/kS", appliedVolts);
     }
 
     @Override

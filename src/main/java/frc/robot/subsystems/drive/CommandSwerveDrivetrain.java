@@ -300,6 +300,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Tunable
         Logger.recordOutput("Drive/fieldToSpeaker", getFieldToSpeaker.get());
         Logger.recordOutput("Drive/goalChassisSpeeds", new ChassisSpeeds(vx, vy, omega));
 
+        Logger.recordOutput("Drive/averageRotationVelocity", getVelocity(1));
+        Logger.recordOutput("Drive/averageDriveVelocity", getVelocity(0));
+
         switch (tuningMode) {
             case NONE:
                 if (!fieldCentric) {
@@ -385,7 +388,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Tunable
             default:
                 throw new UnsupportedOperationException("getVelocity(): drive has only two slots");
         }
-
     }
 
     @Override

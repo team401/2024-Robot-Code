@@ -26,6 +26,11 @@ public class TelemetryIOLive implements TelemetryIO {
     private double rotation;
     private double rotationVelocity;
 
+    private double[] driveCurrents;
+    private double[] driveVoltages;
+    private double[] rotationCurrents;
+    private double[] rotationVoltages;
+
     // private Pigeon2 pigeon = new Pigeon2(0);
 
     public TelemetryIOLive() {}
@@ -70,7 +75,31 @@ public class TelemetryIOLive implements TelemetryIO {
         inputs.robotRotation = rotation;
         inputs.robotRotationVelocity = rotationVelocity;
 
+        inputs.driveCurrents = this.driveCurrents;
+        inputs.driveVoltages = this.driveVoltages;
+        inputs.rotationCurrents = this.rotationCurrents;
+        inputs.rotationVoltages = this.rotationVoltages;
         // inputs.accelerationX = pigeon.getAccelerationX().getValueAsDouble();
         // inputs.accelerationY = pigeon.getAccelerationY().getValueAsDouble();
+    }
+
+    @Override
+    public void setDriveCurrents(double[] driveCurrents) {
+        this.driveCurrents = driveCurrents;
+    }
+
+    @Override
+    public void setDriveVoltages(double[] driveVoltages) {
+        this.driveVoltages = driveVoltages;
+    }
+
+    @Override
+    public void setRotationCurrents(double[] rotationCurrents) {
+        this.rotationCurrents = rotationCurrents;
+    }
+
+    @Override
+    public void setRotationVoltages(double[] rotationVoltages) {
+        this.rotationVoltages = rotationVoltages;
     }
 }

@@ -49,8 +49,8 @@ public final class Constants {
         public static final boolean runVision = false;
 
         public static final boolean runIntake = false;
-        public static final boolean runScoring = true;
-        public static final boolean runEndgame = true;
+        public static final boolean runScoring = false;
+        public static final boolean runEndgame = false;
         public static final boolean runDrive = true;
 
         public static final boolean enableLEDS = false;
@@ -229,7 +229,7 @@ public final class Constants {
                         .withKP(150)
                         .withKI(0)
                         .withKD(0.2)
-                        .withKS(0)
+                        .withKS(0.32)
                         .withKV(1.5)
                         .withKA(0);
         // When using closed-loop control, the drive motor uses the control

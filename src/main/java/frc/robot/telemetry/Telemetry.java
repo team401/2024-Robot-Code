@@ -1,5 +1,6 @@
 package frc.robot.telemetry;
 
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
 import edu.wpi.first.math.filter.LinearFilter;
@@ -10,10 +11,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
 
@@ -53,54 +50,10 @@ public class Telemetry {
     SwerveModuleState[] latestModuleStates = new SwerveModuleState[4];
     SwerveModuleState[] latestModuleTargets = new SwerveModuleState[4];
 
-    /* Mechanisms to represent the swerve module states */
-    Mechanism2d[] m_moduleMechanisms =
-            new Mechanism2d[] {
-                new Mechanism2d(1, 1),
-                new Mechanism2d(1, 1),
-                new Mechanism2d(1, 1),
-                new Mechanism2d(1, 1),
-            };
-    /* A direction and length changing ligament for speed representation */
-    MechanismLigament2d[] m_moduleSpeeds =
-            new MechanismLigament2d[] {
-                m_moduleMechanisms[0]
-                        .getRoot("RootSpeed", 0.5, 0.5)
-                        .append(new MechanismLigament2d("Speed", 0.5, 0)),
-                m_moduleMechanisms[1]
-                        .getRoot("RootSpeed", 0.5, 0.5)
-                        .append(new MechanismLigament2d("Speed", 0.5, 0)),
-                m_moduleMechanisms[2]
-                        .getRoot("RootSpeed", 0.5, 0.5)
-                        .append(new MechanismLigament2d("Speed", 0.5, 0)),
-                m_moduleMechanisms[3]
-                        .getRoot("RootSpeed", 0.5, 0.5)
-                        .append(new MechanismLigament2d("Speed", 0.5, 0)),
-            };
-    /* A direction changing and length constant ligament for module direction */
-    MechanismLigament2d[] m_moduleDirections =
-            new MechanismLigament2d[] {
-                m_moduleMechanisms[0]
-                        .getRoot("RootDirection", 0.5, 0.5)
-                        .append(
-                                new MechanismLigament2d(
-                                        "Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
-                m_moduleMechanisms[1]
-                        .getRoot("RootDirection", 0.5, 0.5)
-                        .append(
-                                new MechanismLigament2d(
-                                        "Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
-                m_moduleMechanisms[2]
-                        .getRoot("RootDirection", 0.5, 0.5)
-                        .append(
-                                new MechanismLigament2d(
-                                        "Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
-                m_moduleMechanisms[3]
-                        .getRoot("RootDirection", 0.5, 0.5)
-                        .append(
-                                new MechanismLigament2d(
-                                        "Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
-            };
+    StatusSignal<Double>[] driveVoltages;
+    StatusSignal<Double>[] driveCurrents;
+    StatusSignal<Double>[] rotationVoltages;
+    StatusSignal<Double>[] rotationCurrents;
 
     /* Accept the swerve drive state and telemeterize it to smartdashboard */
     public void telemeterize(SwerveDriveState state) {
@@ -138,11 +91,38 @@ public class Telemetry {
         latestModuleTargets = state.ModuleTargets;
     }
 
+    public void setStatusSignals(
+            StatusSignal<Double>[] driveVoltages,
+            StatusSignal<Double>[] driveCurrents,
+            StatusSignal<Double>[] rotationVoltages,
+            StatusSignal<Double>[] rotationCurrents) {
+        this.driveVoltages = driveVoltages;
+        this.driveCurrents = driveCurrents;
+        this.rotationVoltages = rotationVoltages;
+        this.rotationCurrents = rotationCurrents;
+    }
+
     /**
      * Calls the Logger to publish telemetry data. Call this method from the same thread as
      * CommandScheduler.
      */
     public void logDataSynchronously() {
+        double[] dCurrent = {0, 0, 0, 0};
+        double[] dVoltage = {0, 0, 0, 0};
+        double[] rCurrent = {0, 0, 0, 0};
+        double[] rVoltage = {0, 0, 0, 0};
+        for (int i = 0; i < 4; i++) {
+            dCurrent[i] = driveCurrents[i].refresh().getValueAsDouble();
+            dVoltage[i] = driveVoltages[i].refresh().getValueAsDouble();
+            rCurrent[i] = rotationCurrents[i].refresh().getValueAsDouble();
+            rVoltage[i] = rotationVoltages[i].refresh().getValueAsDouble();
+        }
+
+        telemetryIo.setDriveCurrents(dCurrent);
+        telemetryIo.setRotationCurrents(rCurrent);
+        telemetryIo.setRotationVoltages(rVoltage);
+        telemetryIo.setDriveVoltages(dVoltage);
+
         Pose2d pose = new Pose2d(latestPose.getX(), latestPose.getY(), latestPose.getRotation());
 
         telemetryIo.setRobotPose(getFieldToRobot3d());

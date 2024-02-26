@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.ctre.phoenix6.StatusSignal;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -181,6 +182,35 @@ public class RobotContainer {
             drivetrain.setSpeakerSupplier(this::getFieldToSpeaker);
             drivetrain.setAmpSupplier(this::getFieldToAmpHeading);
             drivetrain.setSourceSupplier(this::getFieldToSourceHeading);
+
+            StatusSignal[] driveVoltages = {
+                drivetrain.getModule(0).getDriveMotor().getMotorVoltage(),
+                drivetrain.getModule(1).getDriveMotor().getMotorVoltage(),
+                drivetrain.getModule(2).getDriveMotor().getMotorVoltage(),
+                drivetrain.getModule(3).getDriveMotor().getMotorVoltage()
+            };
+
+            StatusSignal[] driveCurrents = {
+                drivetrain.getModule(0).getDriveMotor().getStatorCurrent(),
+                drivetrain.getModule(1).getDriveMotor().getStatorCurrent(),
+                drivetrain.getModule(2).getDriveMotor().getStatorCurrent(),
+                drivetrain.getModule(3).getDriveMotor().getStatorCurrent(),
+            };
+            StatusSignal[] rotationVoltages = {
+                drivetrain.getModule(0).getSteerMotor().getMotorVoltage(),
+                drivetrain.getModule(1).getSteerMotor().getMotorVoltage(),
+                drivetrain.getModule(2).getSteerMotor().getMotorVoltage(),
+                drivetrain.getModule(3).getSteerMotor().getMotorVoltage(),
+            };
+            StatusSignal[] rotationCurrents = {
+                drivetrain.getModule(0).getSteerMotor().getStatorCurrent(),
+                drivetrain.getModule(1).getSteerMotor().getStatorCurrent(),
+                drivetrain.getModule(2).getSteerMotor().getStatorCurrent(),
+                drivetrain.getModule(3).getSteerMotor().getStatorCurrent(),
+            };
+
+            driveTelemetry.setStatusSignals(
+                    driveVoltages, driveCurrents, rotationVoltages, rotationCurrents);
 
             if (FeatureFlags.runVision) {
                 tagVision.setCameraConsumer(
@@ -596,11 +626,11 @@ public class RobotContainer {
                         .onTrue(new TuneV(drivetrain, 4, 1));
 
                     controller.leftBumper()
-                        .onTrue(new InstantCommand(() -> drivetrain.setVolts(-SmartDashboard.getNumber("Test-Mode/swerve/drive-volts", 0), 1)))
+                        .onTrue(new InstantCommand(() -> drivetrain.setVolts(-SmartDashboard.getNumber("Test-Mode/swerve/rotation-volts", 0), 1)))
                         .onFalse(new InstantCommand(() -> drivetrain.setVolts(0.0, 1)));
 
                     controller.rightBumper()
-                        .onTrue(new InstantCommand(() -> drivetrain.setVolts(SmartDashboard.getNumber("Test-Mode/swerve/drive-volts", 0), 1)))
+                        .onTrue(new InstantCommand(() -> drivetrain.setVolts(SmartDashboard.getNumber("Test-Mode/swerve/rotation-volts", 0), 1)))
                         .onFalse(new InstantCommand(() -> drivetrain.setVolts(0.0, 1)));
                 break;
         }

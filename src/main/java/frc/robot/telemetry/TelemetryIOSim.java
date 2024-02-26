@@ -27,6 +27,11 @@ public class TelemetryIOSim implements TelemetryIO {
     private Pigeon2 pigeon = new Pigeon2(0);
     private Pigeon2SimState pigeonSim = pigeon.getSimState();
 
+    private double[] driveCurrents;
+    private double[] driveVoltages;
+    private double[] rotationCurrents;
+    private double[] rotationVoltages;
+
     public TelemetryIOSim() {}
 
     @Override
@@ -59,5 +64,30 @@ public class TelemetryIOSim implements TelemetryIO {
         inputs.moduleTargets = moduleTargets;
         inputs.accelerationX = pigeon.getAccelerationX().getValueAsDouble();
         inputs.accelerationY = pigeon.getAccelerationY().getValueAsDouble();
+
+        inputs.driveCurrents = this.driveCurrents;
+        inputs.driveVoltages = this.driveVoltages;
+        inputs.rotationCurrents = this.rotationCurrents;
+        inputs.rotationVoltages = this.rotationVoltages;
+    }
+
+    @Override
+    public void setDriveCurrents(double[] driveCurrents) {
+        this.driveCurrents = driveCurrents;
+    }
+
+    @Override
+    public void setDriveVoltages(double[] driveVoltages) {
+        this.driveVoltages = driveVoltages;
+    }
+
+    @Override
+    public void setRotationCurrents(double[] rotationCurrents) {
+        this.rotationCurrents = rotationCurrents;
+    }
+
+    @Override
+    public void setRotationVoltages(double[] rotationVoltages) {
+        this.rotationVoltages = rotationVoltages;
     }
 }

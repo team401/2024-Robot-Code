@@ -27,6 +27,14 @@ public interface TelemetryIO {
                     new SwerveModuleState()
                 };
 
+        public double[] rotationVoltages = new double[] {0.0, 0.0, 0.0, 0.0};
+
+        public double[] rotationCurrents = new double[] {0.0, 0.0, 0.0, 0.0};
+
+        public double[] driveVoltages = new double[] {0.0, 0.0, 0.0, 0.0};
+
+        public double[] driveCurrents = new double[] {0.0, 0.0, 0.0, 0.0};
+
         public double accelerationX = 0.0;
         public double accelerationY = 0.0;
 
@@ -47,4 +55,12 @@ public interface TelemetryIO {
     public default void setRobotRotation(double rotation) {}
 
     public default void setRobotRotationVelocity(double rotationVelocity) {}
+
+    public default void setRotationVoltages(double[] rotationVoltages) {}
+
+    public default void setRotationCurrents(double[] rotationCurrents) {}
+
+    public default void setDriveVoltages(double[] driveVoltages) {}
+
+    public default void setDriveCurrents(double[] driveCurrents) {}
 }
