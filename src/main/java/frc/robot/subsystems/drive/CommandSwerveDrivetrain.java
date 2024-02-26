@@ -7,6 +7,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
@@ -31,6 +32,7 @@ import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.utils.GeomUtil;
 import frc.robot.utils.InterpolateDouble;
+import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -170,8 +172,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 this::getCurrentRobotChassisSpeeds,
                 (speeds) -> {
                     this.setGoalChassisSpeeds(speeds, false);
-                    this.setAlignState(AlignState.ALIGNING);
-                    this.setAlignTarget(AlignTarget.SPEAKER);
+                    // this.setAlignState(AlignState.ALIGNING);
+                    // this.setAlignTarget(AlignTarget.SPEAKER);
                 }, // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
                         new PIDConstants(5, 0, 0),
@@ -192,6 +194,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     return false;
                 }, // Change this if the path needs to be flipped on red vs blue
                 this); // Subsystem for requirements
+
+        PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
     }
 
     public Command getAutoPath(String pathName) {
@@ -340,6 +344,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         double phi = (Math.PI / 2) - Math.acos(getRobotVelocity.get().getY() / noteVelocity);
 
         return angle.minus(new Rotation2d(phi));
+    }
+
+    private Optional<Rotation2d> getRotationTargetOverride() {
+        return Optional.of(
+                calculateDesiredHeading(
+                        getFieldToRobot.get(),
+                        new Pose2d(getFieldToSpeaker.get(), new Rotation2d())));
     }
 
     public Command getDriveToPointCommand() {

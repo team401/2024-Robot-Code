@@ -244,6 +244,10 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
 
+            controller.start()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
+
             controller.x()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
