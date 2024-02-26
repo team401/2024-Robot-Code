@@ -132,7 +132,14 @@ public class RobotContainer {
         configureModes();
         configureAutonomous();
 
-        NoteManager.addNote(new Note(driveTelemetry::getFieldToRobot));
+        NoteManager.addNote(
+                new Note(
+                        driveTelemetry::getFieldToRobot,
+                        "" + (NoteManager.numberOfExistingNotes() + 1)));
+        NoteManager.addNote(
+                new Note(
+                        driveTelemetry::getFieldToRobot,
+                        "" + (NoteManager.numberOfExistingNotes() + 1)));
     }
 
 <<<<<<< HEAD

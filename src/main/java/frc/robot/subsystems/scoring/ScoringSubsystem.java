@@ -307,7 +307,9 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         }
 
         CommandScheduler.getInstance().schedule(NoteManager.shoot(shootRPM, aimAngleRad));
-        if (!NoteManager.noteInRobot()) NoteManager.addNote(new Note(poseSupplier, true));
+        if (!NoteManager.noteInRobot())
+            NoteManager.addNote(
+                    new Note(poseSupplier, false, "" + (NoteManager.numberOfExistingNotes() + 1)));
     }
 
     private void ampShoot() {

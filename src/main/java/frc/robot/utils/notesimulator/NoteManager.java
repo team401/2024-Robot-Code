@@ -11,7 +11,9 @@ public class NoteManager {
     private static ArrayList<Note> notesOnField = new ArrayList<Note>();
     private static Note noteInRobot;
 
-    private Supplier<Pose2d> robotPoseSupplier = () -> new Pose2d();
+    private static Supplier<Pose2d> robotPoseSupplier = () -> new Pose2d();
+
+    private static int numberOfExistingNotes = 0;
 
     public NoteManager(Supplier robotPoseSupplier) {
         this.robotPoseSupplier = robotPoseSupplier;
@@ -22,6 +24,7 @@ public class NoteManager {
         else {
             notesOnField.add(note);
         }
+        numberOfExistingNotes++;
     }
 
     public static void intake() {
@@ -48,5 +51,9 @@ public class NoteManager {
 
     public static boolean noteInRobot() {
         return noteInRobot != null;
+    }
+
+    public static int numberOfExistingNotes() {
+        return numberOfExistingNotes;
     }
 }

@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
+import frc.robot.Constants;
 import java.util.Set;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -24,35 +25,46 @@ public class Note {
 
     private boolean noteInRobot = false;
 
-    public Note(Supplier<Pose2d> robotSupplier, Pose2d noteStartingPosition, boolean noteInRobot) {
-        robotPoseSupplier = robotSupplier;
+    private String id = "";
 
+    public Note(
+            Supplier<Pose2d> robotSupplier,
+            Pose2d noteStartingPosition,
+            boolean noteInRobot,
+            String id) {
+        robotPoseSupplier = robotSupplier;
+        this.id = id;
         this.noteInRobot = noteInRobot;
         if (!noteInRobot) {
             lastPose = new Pose3d(noteStartingPosition);
-            Logger.recordOutput("NoteVisualizer", lastPose);
+            Logger.recordOutput("NoteVisualizer" + id, lastPose);
         }
     }
 
-    public Note(Supplier<Pose2d> robotSupplier, boolean noteInRobot) {
+    public Note(Supplier<Pose2d> robotSupplier, boolean noteInRobot, String id) {
 
         this(
                 robotSupplier,
-                new Pose2d(Math.random() * 10 + 5, Math.random() * 2 + 4, new Rotation2d()),
-                noteInRobot);
+                new Pose2d(
+                        Math.random() * Constants.FieldConstants.lengthM,
+                        Math.random() * Math.random() * Constants.FieldConstants.widthM,
+                        new Rotation2d()),
+                noteInRobot,
+                id);
     }
 
-    public Note(Supplier<Pose2d> robotSupplier, Pose2d noteStartingPosition) {
+    public Note(Supplier<Pose2d> robotSupplier, Pose2d noteStartingPosition, String id) {
 
-        this(robotSupplier, noteStartingPosition, false);
+        this(robotSupplier, noteStartingPosition, false, id);
     }
 
-    public Note(Supplier<Pose2d> robotSupplier) {
+    public Note(Supplier<Pose2d> robotSupplier, String id) {
 
         this(
                 robotSupplier,
                 new Pose2d(Math.random() * 10 + 5, Math.random() * 4 + 1, new Rotation2d()),
-                false);
+                false,
+                id);
     }
 
     // flywheels are 3 inches
@@ -97,7 +109,7 @@ public class Note {
                                                     - 4.9 * Math.pow(timeSinceLaunch.get(),2),
                                                     startPose.getRotation());
                                             Logger.recordOutput(
-                                                    "NoteVisualizer", lastPose);
+                                                    "NoteVisualizer" + id, lastPose);
                                             SmartDashboard.putNumber(
                                                     "angle",
                                                     robotPoseSupplier
@@ -109,7 +121,7 @@ public class Note {
                                             .finallyDo(
                                                     () -> {
                                                         Logger.recordOutput(
-                                                                "NoteVisualizer", new Pose3d[] {});
+                                                                "NoteVisualizer" + id, new Pose3d[] {});
                                                         if (inSpeaker() == 2) SmartDashboard.putBoolean("inGoal", true);
                                                         else SmartDashboard.putBoolean("inGoal", false);
                                                     });
@@ -124,7 +136,7 @@ public class Note {
         if (noteInRobot == false && robotWithinRange(1)) {
             noteInRobot = true;
             lastPose = null;
-            Logger.recordOutput("NoteVisualizer", new Pose3d[] {});
+            Logger.recordOutput("NoteVisualizer" + id, new Pose3d[] {});
             return true;
         }
         return false;
@@ -184,5 +196,9 @@ public class Note {
             if (Math.abs(predictedZ - z) < 0.1) return true;
         }
         return false;
+    }
+
+    public String getId() {
+        return id;
     }
 }
