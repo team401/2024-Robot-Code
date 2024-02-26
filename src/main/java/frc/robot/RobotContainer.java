@@ -258,12 +258,12 @@ public class RobotContainer {
             endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.OVERRIDE);
 
             controller.povUp()
-                    .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(2.0, 0)))
-                    .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
+                .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameAction.GO_UP)))
+                .onFalse(new InstantCommand(() -> endgameSubsystem.setAction(EndgameAction.CANCEL)));
 
             controller.povDown()
-                    .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(-2.0, 0)))
-                    .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
+                .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameAction.GO_DOWN)))
+                .onFalse(new InstantCommand(() -> endgameSubsystem.setAction(EndgameAction.CANCEL)));
         }
 
         if (FeatureFlags.runIntake) {

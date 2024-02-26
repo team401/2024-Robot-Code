@@ -213,7 +213,7 @@ public final class Constants {
         public static final int smartCurrentLimit = 50;
 
         public static final TrapezoidProfile.Constraints climberProfileConstraints =
-                new TrapezoidProfile.Constraints(1, 2); // TODO: Find safe values for this
+                new TrapezoidProfile.Constraints(1000, 2000); // TODO: Find safe values for this
 
         // Values used to clamp target position of the climber (could potentially be identical to
         // our target positions)
@@ -229,7 +229,7 @@ public final class Constants {
         public static final double simRobotMass = 53.0703; // 117 pounds to kg
 
         // Constants for the climber PID controller
-        public static final double climberkP = 10.0; // TODO: Tune climber PID controller
+        public static final double climberkP = 1000.0; // TODO: Tune climber PID controller
         public static final double climberkI = 0.0;
         public static final double climberkD = 0.0;
 

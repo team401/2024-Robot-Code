@@ -22,8 +22,8 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
     }
 
     private enum State {
-        OVERRIDE,
-        NORMAL
+        OVERRIDE, // Targetting a voltage
+        NORMAL // Targetting a position
     }
 
     private State state = State.NORMAL;
@@ -47,7 +47,7 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
             case CANCEL:
                 endgameIo.setOverrideVolts(0.0);
                 endgameIo.setOverrideMode(true);
-                state = State.NORMAL;
+                state = State.OVERRIDE;
                 break;
             case OVERRIDE:
                 endgameIo.setOverrideMode(true);
