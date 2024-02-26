@@ -30,6 +30,12 @@ public class EndgameIOSparkFlex implements EndgameIO {
     }
 
     @Override
+    public void setBrakeMode(boolean brake) {
+        IdleMode sparkMode = brake ? IdleMode.kBrake : IdleMode.kCoast;
+        leftEndgameMotor.setIdleMode(sparkMode);
+    }
+
+    @Override
     public void updateInputs(EndgameIOInputs inputs) {
         inputs.endgameLeftAppliedVolts = leftEndgameMotor.getAppliedOutput();
         inputs.endgameLeftStatorCurrentAmps = leftEndgameMotor.getOutputCurrent();

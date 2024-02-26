@@ -5,6 +5,8 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -16,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FeatureFlags;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.IOConstants;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
@@ -72,10 +75,12 @@ public class RobotContainer {
     CommandSwerveDrivetrain drivetrain = FeatureFlags.runDrive ? TunerConstants.DriveTrain : null;
     Telemetry driveTelemetry;
 
-    // private DigitalInput brakeSwitch = new DigitalInput(SensorConstants.brakeSwitchPort);
-
     SendableChooser<String> autoChooser = new SendableChooser<String>();
     SendableChooser<String> testModeChooser = new SendableChooser<String>();
+
+    DigitalInput brakeSwitch = new DigitalInput(IOConstants.brakeSwitchPort);
+
+    DigitalOutput timeDigitalOutput = null; // new DigitalOutput(IOConstants.timeOutputPort);
 
     LED leds;
 
@@ -329,16 +334,28 @@ public class RobotContainer {
     }
 
     public void enabledInit() {
+        if (timeDigitalOutput != null) {
+            timeDigitalOutput.set(true);
+        }
+
         if (FeatureFlags.runIntake) {
             intakeSubsystem.run(IntakeAction.NONE);
         }
 
         if (FeatureFlags.runScoring) {
             scoringSubsystem.enabledInit();
+            scoringSubsystem.setBrakeMode(true);
         }
 
         if (FeatureFlags.runEndgame) {
             endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.CANCEL);
+            endgameSubsystem.setBrakeMode(true);
+        }
+    }
+
+    public void disabledInit() {
+        if (timeDigitalOutput != null) {
+            timeDigitalOutput.set(false);
         }
     }
 
@@ -659,6 +676,17 @@ public class RobotContainer {
         }
     }
 
+    public void disabledPeriodic() {
+        /* set to coast mode when circuit open */
+        if (brakeSwitch != null && brakeSwitch.get()) {
+            scoringSubsystem.setBrakeMode(false);
+            endgameSubsystem.setBrakeMode(false);
+        } else {
+            scoringSubsystem.setBrakeMode(true);
+            endgameSubsystem.setBrakeMode(true);
+        }
+    }
+
     public Command getAutonomousCommand() {
         return drivetrain.getAutoPath(autoChooser.getSelected());
     }
@@ -709,12 +737,6 @@ public class RobotContainer {
             // scoringSubsystem.homeHood();
 
             scoringSubsystem.setAction(ScoringAction.WAIT);
-        }
-    }
-
-    public void disabledPeriodic() {
-        if (FeatureFlags.runScoring) {
-            // scoringSubsystem.setbrakeMode(brakeSwitch.get());
         }
     }
 }

@@ -109,6 +109,13 @@ public class AimerIOTalon implements AimerIO {
     }
 
     @Override
+    public void setBrakeMode(boolean brake) {
+        NeutralModeValue talonMode = brake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+        aimerLeft.setNeutralMode(talonMode);
+        aimerRight.setNeutralMode(talonMode);
+    }
+
+    @Override
     public void setFF(double kS, double kV, double kA, double kG) {
         slot0.withKS(kS);
         slot0.withKV(kV);

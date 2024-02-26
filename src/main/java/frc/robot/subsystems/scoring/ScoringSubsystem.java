@@ -129,6 +129,11 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         this.action = action;
     }
 
+    public void setBrakeMode(boolean brake) {
+        aimerIo.setBrakeMode(brake);
+        hoodIo.setBrakeMode(brake);
+    }
+
     private void idle() {
         aimerIo.setAimAngleRad(0.0, true);
         shooterIo.setShooterVelocityRPM(0);
