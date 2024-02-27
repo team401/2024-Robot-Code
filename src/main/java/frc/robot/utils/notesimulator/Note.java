@@ -171,8 +171,9 @@ public class Note {
         };
         if (passesThroughRectangle(isRed ? redSpeakerOpening : blueSpeakerOpening, lastPose))
             return 2;
-        if (passesThroughRectangle(isRed ? redSpeakerRoof : blueSpeakerRoof, lastPose)
-                || lastPose.getZ() < 0) return 0;
+        if (lastPose.getZ() < 0)
+            return 0; // passesThroughRectangle(isRed ? redSpeakerRoof : blueSpeakerRoof,
+        // lastPose)||
 
         // new Pose3d(isRed ? redSpeaker : blueSpeaker, startPose.getRotation());
         return 1; // in progress, unsure if there's an easy way to do pip for 3d or if there's
@@ -193,7 +194,7 @@ public class Note {
                     (rectangle[3][2] - rectangle[0][2]) / (rectangle[3][0] - rectangle[0][0]);
             double predictedZ = slope * (x - rectangle[3][0]) + rectangle[3][2];
             SmartDashboard.putNumber("difference from goal", Math.abs(predictedZ - z));
-            if (Math.abs(predictedZ - z) < 0.1) return true;
+            if (Math.abs(predictedZ - z) < 0.3) return true;
         }
         return false;
     }

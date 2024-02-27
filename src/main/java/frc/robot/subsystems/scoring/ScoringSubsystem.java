@@ -25,6 +25,7 @@ import frc.robot.utils.InterpolateDouble;
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import frc.robot.utils.Tunable;
 import java.util.function.DoubleSupplier;
 =======
@@ -37,6 +38,8 @@ import frc.robot.utils.notesimulator.Note;
 =======
 import frc.robot.utils.notesimulator.Note;
 >>>>>>> a2a9e17 (first draft done, I just need the new interpolate values and then it'll maybe sort of work!)
+=======
+>>>>>>> 3ddc913 (testing auto advantagekit is sad AGAIN)
 import frc.robot.utils.notesimulator.NoteManager;
 >>>>>>> 00eb2c8 (:P)
 import java.util.function.Supplier;
@@ -307,9 +310,6 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         }
 
         CommandScheduler.getInstance().schedule(NoteManager.shoot(shootRPM, aimAngleRad));
-        if (!NoteManager.noteInRobot())
-            NoteManager.addNote(
-                    new Note(poseSupplier, false, "" + (NoteManager.numberOfExistingNotes() + 1)));
     }
 
     private void ampShoot() {

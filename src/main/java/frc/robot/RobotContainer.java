@@ -132,7 +132,7 @@ public class RobotContainer {
         configureModes();
         configureAutonomous();
 
-        NoteManager.addNote(
+        /*NoteManager.addNote(
                 new Note(
                         driveTelemetry::getFieldToRobot,
                         "" + (NoteManager.numberOfExistingNotes() + 1)));
@@ -140,6 +140,20 @@ public class RobotContainer {
                 new Note(
                         driveTelemetry::getFieldToRobot,
                         "" + (NoteManager.numberOfExistingNotes() + 1)));
+        NoteManager.addNote(
+                new Note(
+                        driveTelemetry::getFieldToRobot,
+                        "" + (NoteManager.numberOfExistingNotes() + 1)));
+        NoteManager.addNote(
+                new Note(
+                        driveTelemetry::getFieldToRobot,
+                        "" + (NoteManager.numberOfExistingNotes() + 1)));*/
+        NoteManager.addNote(new Note(driveTelemetry::getFieldToRobot, true, "1"));
+        NoteManager.addNote(
+                new Note(
+                        driveTelemetry::getFieldToRobot,
+                        new Pose2d(2.69, 4.14, new Rotation2d()),
+                        "2"));
     }
 
 <<<<<<< HEAD
@@ -998,9 +1012,14 @@ public class RobotContainer {
     public void teleopInit() {
         configureBindings();
 
+<<<<<<< HEAD
         // This is in teleopInit to prevent it from wasting time in auto
         if (FeatureFlags.runScoring) {
             // scoringSubsystem.homeHood();
+=======
+        autoChooser.addOption("S2 4-Note", "S1-W1-W2-W3");
+        autoChooser.addOption("S3 2-Note", "S3-W3");
+>>>>>>> 3ddc913 (testing auto advantagekit is sad AGAIN)
 
             scoringSubsystem.setAction(ScoringAction.WAIT);
             scoringSubsystem.enabledInit();
