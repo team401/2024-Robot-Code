@@ -132,28 +132,28 @@ public class RobotContainer {
         configureModes();
         configureAutonomous();
 
-        /*NoteManager.addNote(
-                new Note(
-                        driveTelemetry::getFieldToRobot,
-                        "" + (NoteManager.numberOfExistingNotes() + 1)));
-        NoteManager.addNote(
-                new Note(
-                        driveTelemetry::getFieldToRobot,
-                        "" + (NoteManager.numberOfExistingNotes() + 1)));
-        NoteManager.addNote(
-                new Note(
-                        driveTelemetry::getFieldToRobot,
-                        "" + (NoteManager.numberOfExistingNotes() + 1)));
-        NoteManager.addNote(
-                new Note(
-                        driveTelemetry::getFieldToRobot,
-                        "" + (NoteManager.numberOfExistingNotes() + 1)));*/
         NoteManager.addNote(new Note(driveTelemetry::getFieldToRobot, true, "1"));
         NoteManager.addNote(
                 new Note(
                         driveTelemetry::getFieldToRobot,
                         new Pose2d(2.69, 4.14, new Rotation2d()),
                         "2"));
+        NoteManager.addNote(
+                new Note(
+                        driveTelemetry::getFieldToRobot,
+                        "" + (NoteManager.numberOfExistingNotes() + 1)));
+        NoteManager.addNote(
+                new Note(
+                        driveTelemetry::getFieldToRobot,
+                        "" + (NoteManager.numberOfExistingNotes() + 1)));
+        NoteManager.addNote(
+                new Note(
+                        driveTelemetry::getFieldToRobot,
+                        "" + (NoteManager.numberOfExistingNotes() + 1)));
+        NoteManager.addNote(
+                new Note(
+                        driveTelemetry::getFieldToRobot,
+                        "" + (NoteManager.numberOfExistingNotes() + 1)));
     }
 
 <<<<<<< HEAD
@@ -1025,8 +1025,33 @@ public class RobotContainer {
             scoringSubsystem.enabledInit();
         }
 
+<<<<<<< HEAD
         if (FeatureFlags.runDrive) {
             drivetrain.setAlignState(AlignState.MANUAL);
         }
+=======
+        NamedCommands.registerCommand(
+                "Shoot Scoring",
+                new InstantCommand(
+                        () -> {
+                            scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT);
+                            intakeSubsystem.run(IntakeAction.INTAKE);
+                        }));
+        NamedCommands.registerCommand(
+                "Aim Scoring",
+                new InstantCommand(
+                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.AIM)));
+        NamedCommands.registerCommand(
+                "Intake Scoring",
+                new InstantCommand(
+                        () -> {
+                            scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.INTAKE);
+                            NoteManager.intake();
+                        }));
+        NamedCommands.registerCommand(
+                "Wait Scoring",
+                new InstantCommand(
+                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+>>>>>>> fc46317 (done with adding extra notes, merging w/ main is probably next step ig)
     }
 }
