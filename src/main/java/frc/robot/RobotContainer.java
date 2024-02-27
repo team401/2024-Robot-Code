@@ -43,6 +43,9 @@ import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignState;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignTarget;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1d16c64 (actually the merge messed everything up sorry i'll get it working again soon)
 import frc.robot.subsystems.endgame.EndgameIO;
 import frc.robot.subsystems.endgame.EndgameIOSim;
 import frc.robot.subsystems.endgame.EndgameIOSparkFlex;
@@ -57,6 +60,9 @@ import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem.IntakeAction;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1d16c64 (actually the merge messed everything up sorry i'll get it working again soon)
 import frc.robot.subsystems.localization.CameraContainerReal;
 import frc.robot.subsystems.localization.CameraContainerReplay;
 import frc.robot.subsystems.localization.CameraContainerSim;
@@ -85,6 +91,7 @@ import frc.robot.utils.FieldFinder;
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import frc.robot.utils.feedforward.TuneG;
 import frc.robot.utils.feedforward.TuneS;
 =======
@@ -103,6 +110,13 @@ import java.util.Collections;
 import frc.robot.utils.notesimulator.Note;
 import frc.robot.utils.notesimulator.NoteManager;
 >>>>>>> 00eb2c8 (:P)
+=======
+import frc.robot.utils.feedforward.TuneG;
+import frc.robot.utils.feedforward.TuneS;
+import frc.robot.utils.feedforward.TuneV;
+import frc.robot.utils.notesimulator.Note;
+import frc.robot.utils.notesimulator.NoteManager;
+>>>>>>> 1d16c64 (actually the merge messed everything up sorry i'll get it working again soon)
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -293,6 +307,7 @@ public class RobotContainer {
                                             VisionConstants.cameras,
                                             driveTelemetry::getModuleStates));
 <<<<<<< HEAD
+<<<<<<< HEAD
                 }
 =======
                 } else if (FeatureFlags.runVision) {
@@ -307,6 +322,9 @@ public class RobotContainer {
                     endgameSubsystem = new EndgameSubsystem(new EndgameSimIO());
                 }*/
 >>>>>>> 5eb9f80 (advantagekit keeps being sad)
+=======
+                }
+>>>>>>> 1d16c64 (actually the merge messed everything up sorry i'll get it working again soon)
 
                 if (FeatureFlags.runIntake) {
                     intakeSubsystem = new IntakeSubsystem(new IntakeIOSim());
@@ -464,6 +482,7 @@ public class RobotContainer {
 
             controller.a()
                 .onTrue(new InstantCommand(
+<<<<<<< HEAD
                     () -> intakeSubsystem.run(IntakeAction.REVERSE)))
                 .onFalse(new InstantCommand(
                     () -> intakeSubsystem.run(IntakeAction.NONE)));
@@ -479,6 +498,60 @@ public class RobotContainer {
                 controller.getHID()::getAButton,
                 controller.getHID()::getBButton, scoringSubsystem,
                 FeatureFlags.runDrive ? drivetrain::getAlignTarget : () -> AlignTarget.NONE));
+=======
+                        () -> intakeSubsystem.run(IntakeAction.INTAKE)))
+                .onTrue(
+                    new InstantCommand(() -> NoteManager.intake()));
+                
+            controller.start()
+                .onTrue(new InstantCommand(
+                        () -> intakeSubsystem.run(IntakeAction.NONE)));
+        }
+
+        if (FeatureFlags.runScoring) {
+            controller.a()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.INTAKE)))
+                .onTrue(
+                    new InstantCommand(() -> NoteManager.intake()))
+                .onFalse(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.WAIT)));
+
+            controller.b()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                         ScoringSubsystem.ScoringAction.AIM)));
+
+            controller.x()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.SHOOT)));
+
+            controller.y()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.ENDGAME)));
+
+            controller.back()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.AMP_AIM)));
+
+            controller.start()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.WAIT)));
+
+            controller.povLeft()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.SOURCE_INTAKE)))
+                .onFalse(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.WAIT)));
+>>>>>>> 1d16c64 (actually the merge messed everything up sorry i'll get it working again soon)
         }
     } // spotless:on
 

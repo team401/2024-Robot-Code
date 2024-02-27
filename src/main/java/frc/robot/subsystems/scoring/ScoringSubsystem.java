@@ -26,7 +26,11 @@ import frc.robot.utils.InterpolateDouble;
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1d16c64 (actually the merge messed everything up sorry i'll get it working again soon)
 import frc.robot.utils.Tunable;
+import frc.robot.utils.notesimulator.NoteManager;
 import java.util.function.DoubleSupplier;
 =======
 import frc.robot.utils.NoteVisualizer;
