@@ -227,7 +227,7 @@ public final class Constants {
                         .withKP(150)
                         .withKI(0)
                         .withKD(0.2)
-                        .withKS(0)
+                        .withKS(0.32)
                         .withKV(1.5)
                         .withKA(0);
         // When using closed-loop control, the drive motor uses the control
@@ -246,7 +246,7 @@ public final class Constants {
 
         // The stator current at which the wheels start to slip;
         // This needs to be tuned to your individual robot
-        private static final double kSlipCurrentA = 200.0;
+        private static final double kSlipCurrentA = 180.0;
 
         // Theoretical free speed (m/s) at 12v applied output;
         // This needs to be tuned to your individual robot
@@ -462,16 +462,17 @@ public final class Constants {
         public static HashMap<Double, Double> getAimerMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
             map.put(0.0, 0.8);
-            map.put(1.45, 0.7);
+            map.put(1.45, 0.8); // 0.7
             map.put(1.98, 0.62);
             map.put(2.41, 0.53);
-            map.put(3.02, 0.45);
-            map.put(3.22, 0.425);
+            map.put(3.02, 0.48); // 0.45
+            map.put(3.22, 0.45);
             map.put(3.9, 0.36);
             map.put(4.55, 0.34);
             map.put(4.95, 0.31);
-            map.put(5.64, 0.28);
-            map.put(5.82, 0.275);
+            map.put(5.64, 0.3);
+            // map.put(5.82, 0.275);
+            map.put(6.0, 0.29);
 
             return map;
         }
@@ -483,16 +484,16 @@ public final class Constants {
         // Value - Shooter RPM
         public static HashMap<Double, Double> getShooterMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
-            map.put(0.0, 2500.0);
-            map.put(1.45, 2500.0);
-            map.put(1.98, 2500.0);
-            map.put(2.41, 2900.0);
-            map.put(3.02, 3000.0);
-            map.put(3.22, 3000.0);
+            map.put(0.0, 2700.0);
+            map.put(1.45, 2700.0);
+            map.put(1.98, 2700.0);
+            map.put(2.41, 3000.0);
+            map.put(3.02, 3300.0);
+            map.put(3.22, 3300.0);
             map.put(3.9, 3300.0);
             map.put(4.55, 3500.0);
             map.put(4.95, 4000.0);
-            map.put(5.64, 4100.0);
+            map.put(5.64, 4200.0);
             map.put(5.82, 4300.0);
 
             return map;

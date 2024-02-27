@@ -7,7 +7,6 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
@@ -23,6 +22,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -71,6 +72,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private Supplier<Rotation2d> getFieldToSource = () -> new Rotation2d();
 
     private Supplier<Translation2d> getRobotVelocity = () -> new Translation2d();
+
+    private SendableChooser<String> autoChooser = new SendableChooser<String>();
 
     private PIDController thetaController =
             new PIDController(
@@ -172,11 +175,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 this::getCurrentRobotChassisSpeeds,
                 (speeds) -> {
                     this.setGoalChassisSpeeds(speeds, false);
-                    // this.setAlignState(AlignState.ALIGNING);
-                    // this.setAlignTarget(AlignTarget.SPEAKER);
+                    this.setAlignState(AlignState.ALIGNING);
+                    this.setAlignTarget(AlignTarget.SPEAKER);
                 }, // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
-                        new PIDConstants(5, 0, 0),
+                        new PIDConstants(1, 0, 0),
                         new PIDConstants(0, 0, 0),
                         TunerConstants.kSpeedAt12VoltsMps,
                         driveBaseRadius,
@@ -195,7 +198,17 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 }, // Change this if the path needs to be flipped on red vs blue
                 this); // Subsystem for requirements
 
-        PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
+        // PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
+
+        // autoChooser = AutoBuilder.buildAutoChooser();
+        autoChooser.setDefaultOption("Default", "S1-W1-C1-C2"); // S1-W1-W2-W3
+        autoChooser.addOption("S3 5-note", "S3-W3-W2-W1-C1");
+        autoChooser.addOption("S2 3-note", "S2-W2-W3");
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+    }
+
+    public Command getAutoCommand() {
+        return new PathPlannerAuto(autoChooser.getSelected());
     }
 
     public ChassisSpeeds getCurrentRobotChassisSpeeds() {
