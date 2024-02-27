@@ -254,7 +254,7 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.AMP)));
 
-            controller.povRight().onTrue(drivetrain.getDriveToPointCommand());
+            // controller.povRight().onTrue(drivetrain.getDriveToPointCommand());
         }
 
         if (FeatureFlags.runEndgame) {
