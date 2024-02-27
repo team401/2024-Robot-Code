@@ -238,19 +238,15 @@ public class RobotContainer {
                     () -> drivetrain.seedFieldRelative(getPoseAgainstSpeaker()))
                 );
 
-            controller.b()
+            controller.povUp()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
 
-            controller.start()
+            controller.rightBumper()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
 
-            controller.x()
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
-
-            controller.back()
+            controller.povRight()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.AMP)));
 
@@ -260,33 +256,31 @@ public class RobotContainer {
         if (FeatureFlags.runEndgame) {
             endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.OVERRIDE);
 
-            controller.povUp()
+            controller.leftBumper()
                 .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(2.0, 0)))
                 .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
 
-            controller.povDown()
+            controller.leftTrigger()
                 .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(-2.0, 0)))
                 .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
         }
 
         if (FeatureFlags.runIntake) {
-            controller.a()
+            controller.b()
                 .onTrue(new InstantCommand(
                         () -> intakeSubsystem.run(IntakeAction.INTAKE)))
                 .onFalse(new InstantCommand(
                     () -> intakeSubsystem.run(IntakeAction.NONE)));
 
-            controller.rightBumper()
+            controller.a()
                 .onTrue(new InstantCommand(
-                        () -> intakeSubsystem.run(IntakeAction.REVERSE)));
-                
-            controller.start()
-                .onTrue(new InstantCommand(
-                        () -> intakeSubsystem.run(IntakeAction.NONE)));
+                    () -> intakeSubsystem.run(IntakeAction.REVERSE)))
+                .onFalse(new InstantCommand(
+                    () -> intakeSubsystem.run(IntakeAction.NONE)));
         }
 
         if (FeatureFlags.runScoring) {
-            controller.a()
+            controller.b()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.INTAKE)))
@@ -294,32 +288,40 @@ public class RobotContainer {
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.WAIT)));
 
-            controller.b()
+            controller.a()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.SPIT)))
+                .onFalse(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.WAIT)));
+
+            controller.povUp()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                          ScoringSubsystem.ScoringAction.AIM)));
 
-            controller.x()
+            controller.rightBumper()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.SHOOT)));
 
-            controller.y()
+            controller.povLeft()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.ENDGAME)));
 
-            controller.back()
+            controller.povRight()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.AMP_AIM)));
 
-            controller.start()
+            controller.povDown()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.WAIT)));
 
-            controller.povLeft()
+            controller.y()
                 .onTrue(new InstantCommand(
                     () -> scoringSubsystem.setAction(
                         ScoringSubsystem.ScoringAction.SOURCE_INTAKE)))
