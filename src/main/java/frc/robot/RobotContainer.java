@@ -238,6 +238,10 @@ public class RobotContainer {
                     () -> drivetrain.seedFieldRelative(getPoseAgainstSpeaker()))
                 );
 
+            controller.a()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.NOTE)));
+
             controller.b()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));

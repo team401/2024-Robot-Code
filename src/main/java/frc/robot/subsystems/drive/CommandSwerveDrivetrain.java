@@ -36,6 +36,7 @@ import frc.robot.utils.InterpolateDouble;
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.PhotonCamera;
 
 /**
  * Class that extends the Phoenix SwerveDrivetrain class and implements subsystem so it can be used
@@ -49,6 +50,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public enum AlignTarget {
         NONE,
+        NOTE,
         AMP,
         SPEAKER,
         SOURCE
@@ -58,6 +60,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         MANUAL,
         ALIGNING,
     }
+
+    private PhotonCamera colorCamera = new PhotonCamera("photonvision-orange");
 
     private AlignTarget alignTarget = AlignTarget.NONE;
     private AlignState alignState = AlignState.MANUAL;
@@ -83,7 +87,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private SwerveRequest.FieldCentric driveFieldCentric = new SwerveRequest.FieldCentric();
     private SwerveRequest.RobotCentric driveRobotCentric = new SwerveRequest.RobotCentric();
-    private SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+    // private SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
     private static final double kSimLoopPeriod = 0.02; // Original: 5 ms
     private Notifier simNotifier = null;
@@ -250,6 +254,23 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         Rotation2d desiredHeading = pose.getRotation();
         if (alignState == AlignState.ALIGNING) {
             switch (alignTarget) {
+                case NOTE:
+                    var cameraResult = colorCamera.getLatestResult();
+                    if (cameraResult.hasTargets()) {
+                        double yaw = cameraResult.getBestTarget().getYaw();
+
+                        double lowerArea = 0.5;
+                        double upperArea = 1.0;
+                        double lowerDistance = 0.1;
+                        double upperDistance = 1.0;
+                        double area = cameraResult.getBestTarget().getArea();
+                        double t = (area - lowerArea) / (upperArea - lowerArea);
+                        double distance = lowerDistance * (1.0 - t) + t * upperDistance;
+
+                        double notePosX = distance * Math.cos(yaw);
+                        Logger.recordOutput("NOOOOOTE/notePosX", notePosX);
+                    }
+                    break;
                 case AMP:
                     desiredHeading = getFieldToAmp.get();
                     break;
@@ -355,12 +376,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         return angle.minus(new Rotation2d(phi));
     }
 
-    private Optional<Rotation2d> getRotationTargetOverride() {
-        return Optional.of(
-                calculateDesiredHeading(
-                        getFieldToRobot.get(),
-                        new Pose2d(getFieldToSpeaker.get(), new Rotation2d())));
-    }
+    // private Optional<Rotation2d> getRotationTargetOverride() {
+    //     return Optional.of(
+    //             calculateDesiredHeading(
+    //                     getFieldToRobot.get(),
+    //                     new Pose2d(getFieldToSpeaker.get(), new Rotation2d())));
+    // }
 
     public Command getDriveToPointCommand() {
         Pose2d targetPose = new Pose2d(11.74, 4.13, Rotation2d.fromDegrees(180));
