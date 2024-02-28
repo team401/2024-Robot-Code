@@ -233,7 +233,7 @@ public class RobotContainer {
                 .onFalse(new InstantCommand(
                     () -> drivetrain.setAlignState(AlignState.MANUAL)));
 
-            controller.leftBumper()
+            leftJoystick.top()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.seedFieldRelative(getPoseAgainstSpeaker()))
                 );

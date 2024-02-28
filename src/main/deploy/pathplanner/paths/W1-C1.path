@@ -32,8 +32,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "atNote",
-      "waypointRelativePos": 1.0,
+      "name": "Prime",
+      "waypointRelativePos": 0.55,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Intake Note"
+                "name": "Aim Scoring"
               }
             }
           ]

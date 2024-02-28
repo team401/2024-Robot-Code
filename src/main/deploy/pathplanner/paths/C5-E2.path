@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 2.968725221886938,
-        "y": 2.5846800888592836
+        "x": 3.9379802552091694,
+        "y": 2.0413098429059118
       },
       "prevControl": {
-        "x": 4.070151396116753,
-        "y": 2.1734809838134894
+        "x": 5.039406429438982,
+        "y": 1.6301107378601176
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "shoot",
-      "waypointRelativePos": 0,
+      "waypointRelativePos": 0.55,
       "command": {
         "type": "parallel",
         "data": {
@@ -57,7 +57,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 180.0,
     "rotateFast": false
   },
   "reversed": false,
