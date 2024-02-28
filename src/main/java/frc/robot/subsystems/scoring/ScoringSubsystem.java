@@ -70,6 +70,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     public enum ScoringState {
         IDLE,
         INTAKE,
+        SPIT,
         SOURCE_INTAKE,
         PRIME,
         AMP_PRIME,
@@ -84,6 +85,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     public enum ScoringAction {
         WAIT,
         INTAKE,
+        SPIT,
         SOURCE_INTAKE,
         AIM,
         AMP_AIM,
@@ -150,6 +152,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         } else if ((!hasNote() || overrideIntake) && action == ScoringAction.SOURCE_INTAKE) {
             state = ScoringState.SOURCE_INTAKE;
             sourceTimerStarted = false;
+        } else if (action == ScoringAction.SPIT) {
+            state = ScoringState.SPIT;
         } else if (action == ScoringAction.AIM || action == ScoringAction.SHOOT) {
             state = ScoringState.PRIME;
             aimerIo.setAimAngleRad(aimerInputs.aimAngleRad + 0.001, true);
@@ -198,6 +202,14 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
             shooterIo.setOverrideMode(false);
             sourceTimerStarted = false;
+            state = ScoringState.IDLE;
+        }
+    }
+
+    private void spit() {
+        shooterIo.setKickerVolts(-4.0);
+
+        if (action != ScoringAction.SPIT) {
             state = ScoringState.IDLE;
         }
     }
@@ -466,6 +478,9 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                 break;
             case SOURCE_INTAKE:
                 sourceIntake();
+                break;
+            case SPIT:
+                spit();
                 break;
             case PRIME:
                 prime();
