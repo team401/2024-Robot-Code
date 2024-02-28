@@ -31,6 +31,7 @@ import frc.robot.utils.GeomUtil;
 import frc.robot.utils.InterpolateDouble;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.PhotonCamera;
 
 /**
  * Class that extends the Phoenix SwerveDrivetrain class and implements subsystem so it can be used
@@ -44,6 +45,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public enum AlignTarget {
         NONE,
+        NOTE,
         AMP,
         SPEAKER,
         SOURCE
@@ -56,6 +58,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private AlignTarget alignTarget = AlignTarget.NONE;
     private AlignState alignState = AlignState.MANUAL;
+
+    private PhotonCamera colorCamera = new PhotonCamera("photonvision-orange");
 
     private static InterpolateDouble noteTimeToGoal =
             new InterpolateDouble(ScoringConstants.timeToGoalMap(), 0.0, 2.0);
@@ -76,7 +80,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private SwerveRequest.FieldCentric driveFieldCentric = new SwerveRequest.FieldCentric();
     private SwerveRequest.RobotCentric driveRobotCentric = new SwerveRequest.RobotCentric();
-    private SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+    // private SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
     private static final double kSimLoopPeriod = 0.02; // Original: 5 ms
     private Notifier simNotifier = null;
@@ -235,6 +239,23 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         Rotation2d desiredHeading = pose.getRotation();
         if (alignState == AlignState.ALIGNING) {
             switch (alignTarget) {
+                case NOTE:
+                    var cameraResult = colorCamera.getLatestResult();
+                    if (cameraResult.hasTargets()) {
+                        double yaw = cameraResult.getBestTarget().getYaw();
+
+                        double lowerArea = 0.5;
+                        double upperArea = 1.0;
+                        double lowerDistance = 0.1;
+                        double upperDistance = 1.0;
+                        double area = cameraResult.getBestTarget().getArea();
+                        double t = (area - lowerArea) / (upperArea - lowerArea);
+                        double distance = lowerDistance * (1.0 - t) + t * upperDistance;
+
+                        double notePosX = distance * Math.cos(yaw);
+                        Logger.recordOutput("NOOOOOTE/notePosX", notePosX);
+                    }
+                    break;
                 case AMP:
                     desiredHeading = getFieldToAmp.get();
                     break;
