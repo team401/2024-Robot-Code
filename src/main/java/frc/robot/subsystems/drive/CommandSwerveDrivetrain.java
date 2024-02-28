@@ -33,7 +33,6 @@ import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.utils.GeomUtil;
 import frc.robot.utils.InterpolateDouble;
-import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -83,7 +82,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private SwerveRequest.FieldCentric driveFieldCentric = new SwerveRequest.FieldCentric();
     private SwerveRequest.RobotCentric driveRobotCentric = new SwerveRequest.RobotCentric();
-    private SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+    // private SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
     private static final double kSimLoopPeriod = 0.02; // Original: 5 ms
     private Notifier simNotifier = null;
@@ -355,12 +354,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         return angle.minus(new Rotation2d(phi));
     }
 
-    private Optional<Rotation2d> getRotationTargetOverride() {
-        return Optional.of(
-                calculateDesiredHeading(
-                        getFieldToRobot.get(),
-                        new Pose2d(getFieldToSpeaker.get(), new Rotation2d())));
-    }
+    // private Optional<Rotation2d> getRotationTargetOverride() {
+    //     return Optional.of(
+    //             calculateDesiredHeading(
+    //                     getFieldToRobot.get(),
+    //                     new Pose2d(getFieldToSpeaker.get(), new Rotation2d())));
+    // }
 
     public Command getDriveToPointCommand() {
         Pose2d targetPose = new Pose2d(11.74, 4.13, Rotation2d.fromDegrees(180));
