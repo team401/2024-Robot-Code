@@ -19,7 +19,7 @@ public class ShooterIOTalon implements ShooterIO {
 
     private final Slot0Configs slot0 = new Slot0Configs();
 
-    DigitalInput bannerSensor = new DigitalInput(SensorConstants.upperBannerPort);
+    DigitalInput bannerSensor = new DigitalInput(SensorConstants.bannerSensorPort);
 
     private boolean override = false;
     private double overrideVolts = 0.0;
@@ -48,6 +48,12 @@ public class ShooterIOTalon implements ShooterIO {
                         .withStatorCurrentLimit(120)
                         .withStatorCurrentLimitEnable(true));
 
+        TalonFXConfigurator kickerConfig = kicker.getConfigurator();
+        kickerConfig.apply(
+                new CurrentLimitsConfigs()
+                        .withStatorCurrentLimit(120)
+                        .withStatorCurrentLimitEnable(true));
+
         slot0.withKP(ScoringConstants.shooterkP);
         slot0.withKI(ScoringConstants.shooterkI);
         slot0.withKD(ScoringConstants.shooterkD);
@@ -64,6 +70,18 @@ public class ShooterIOTalon implements ShooterIO {
     public void setShooterVelocityRPM(double velocity) {
         goalLeftVelocityRPM = velocity;
         goalRightVelocityRPM = velocity * ScoringConstants.shooterOffsetAdjustment;
+
+        if (velocity == 0.0) {
+            shooterLeft.setVoltage(0.0);
+            shooterRight.setVoltage(0.0);
+        } else {
+            shooterLeft.setControl(
+                    new VelocityDutyCycle(
+                            goalLeftVelocityRPM / ConversionConstants.kMinutesToSeconds));
+            shooterRight.setControl(
+                    new VelocityDutyCycle(
+                            goalRightVelocityRPM / ConversionConstants.kMinutesToSeconds));
+        }
     }
 
     @Override
@@ -106,9 +124,6 @@ public class ShooterIOTalon implements ShooterIO {
         if (override) {
             shooterLeft.setVoltage(overrideVolts);
             shooterRight.setVoltage(overrideVolts);
-        } else {
-            shooterLeft.setControl(new VelocityDutyCycle(goalLeftVelocityRPM));
-            shooterRight.setControl(new VelocityDutyCycle(goalRightVelocityRPM));
         }
 
         inputs.shooterLeftVelocityRPM =
@@ -130,6 +145,6 @@ public class ShooterIOTalon implements ShooterIO {
         inputs.kickerAppliedVolts = kicker.getMotorVoltage().getValueAsDouble();
         inputs.kickerStatorCurrentAmps = kicker.getStatorCurrent().getValueAsDouble();
 
-        inputs.bannerSensor = bannerSensor.get();
+        inputs.bannerSensor = !bannerSensor.get();
     }
 }

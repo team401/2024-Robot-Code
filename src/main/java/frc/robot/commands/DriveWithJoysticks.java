@@ -4,7 +4,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
-import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignState;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignTarget;
 import frc.robot.utils.Deadband;
 import java.util.function.BooleanSupplier;
@@ -19,9 +18,7 @@ public class DriveWithJoysticks extends Command {
     IntSupplier POV;
     BooleanSupplier fieldCentric;
     BooleanSupplier babyMode;
-    BooleanSupplier toggleAlign;
-
-    boolean lastToggleAlign;
+    BooleanSupplier autoAlign;
 
     double xMpS;
     double yMpS;
@@ -35,7 +32,7 @@ public class DriveWithJoysticks extends Command {
             IntSupplier POV,
             BooleanSupplier fieldCentric,
             BooleanSupplier babyMode,
-            BooleanSupplier toggleAlign) {
+            BooleanSupplier autoAlign) {
         this.drivetrain = drivetrain;
         this.x = x;
         this.y = y;
@@ -43,9 +40,7 @@ public class DriveWithJoysticks extends Command {
         this.rot = rot;
         this.fieldCentric = fieldCentric;
         this.babyMode = babyMode;
-        this.toggleAlign = toggleAlign;
-
-        this.lastToggleAlign = toggleAlign.getAsBoolean();
+        this.autoAlign = autoAlign;
 
         addRequirements(drivetrain);
     }
@@ -71,19 +66,8 @@ public class DriveWithJoysticks extends Command {
             rotRadpS *= 0.5;
         }
 
-        if (toggleAlign.getAsBoolean() && !lastToggleAlign) {
-            switch (drivetrain.getAlignState()) {
-                case ALIGNING:
-                    drivetrain.setAlignState(AlignState.MANUAL);
-                    break;
-                case MANUAL:
-                    drivetrain.setAlignState(AlignState.ALIGNING);
-                    break;
-                default:
-                    break;
-            }
-        }
-        lastToggleAlign = toggleAlign.getAsBoolean();
+        // drivetrain.setAlignState(
+        //         autoAlign.getAsBoolean() ? AlignState.ALIGNING : AlignState.MANUAL);
 
         switch (POV.getAsInt()) {
             case 0:

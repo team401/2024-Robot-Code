@@ -80,6 +80,10 @@ public class AimerIORoboRio implements AimerIO {
         controller.setTolerance(0.015);
     }
 
+    public void resetPID() {
+        controller.reset();
+    }
+
     @Override
     public void setAimAngleRad(double goalAngleRad, boolean newProfile) {
         this.goalAngleRad = goalAngleRad;
@@ -141,6 +145,12 @@ public class AimerIORoboRio implements AimerIO {
         feedforward = new ArmFeedforward(kS, kG, kV, kA);
     }
 
+    @Override
+    public void setBrakeMode(boolean brake) {
+        aimerLeft.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+        aimerRight.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+    }
+
     private double getEncoderPosition() {
         return encoder.getAbsolutePosition() * 2.0 * Math.PI - ScoringConstants.aimerEncoderOffset;
     }
@@ -163,13 +173,7 @@ public class AimerIORoboRio implements AimerIO {
         if (override) {
             appliedVolts = overrideVolts;
         } else {
-            boolean atSetpoint =
-                    MathUtil.isNear(
-                            controlSetpoint,
-                            getEncoderPosition(),
-                            ScoringConstants.aimPositionTolerance);
-            double controllerVolts =
-                    atSetpoint ? 0.0 : controller.calculate(getEncoderPosition(), controlSetpoint);
+            double controllerVolts = controller.calculate(getEncoderPosition(), controlSetpoint);
             appliedVolts =
                     feedforward.calculate(controlSetpoint, velocitySetpoint) + controllerVolts;
         }

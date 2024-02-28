@@ -6,10 +6,12 @@ public interface EndgameIO {
     @AutoLog
     public static class EndgameIOInputs {
         public double endgameLeftAppliedVolts = 0.0;
+
         public double endgameLeftStatorCurrentAmps = 0.0;
         public double endgameLeftSupplyCurrentAmps = 0.0;
 
         public double endgameRightAppliedVolts = 0.0;
+
         public double endgameRightStatorCurrentAmps = 0.0;
         public double endgameRightSupplyCurrentAmps = 0.0;
 
@@ -28,6 +30,8 @@ public interface EndgameIO {
     public default void setOverrideMode(boolean override) {}
 
     public default void setOverrideVolts(double volts) {}
+
+    public default void setBrakeMode(boolean brake) {}
 
     public default void setPosition(double position) {}
 

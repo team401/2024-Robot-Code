@@ -94,6 +94,11 @@ public class HoodIOSparkFlex implements HoodIO {
     }
 
     @Override
+    public void setBrakeMode(boolean brake) {
+        hoodMotor.setIdleMode(brake ? CANSparkFlex.IdleMode.kBrake : CANSparkFlex.IdleMode.kCoast);
+    }
+
+    @Override
     public void updateInputs(HoodIOInputs inputs) {
         State trapezoidSetpoint =
                 profile.calculate(
@@ -122,7 +127,7 @@ public class HoodIOSparkFlex implements HoodIO {
         }
 
         inputs.hoodAngleRad = hoodMotor.getEncoder().getPosition();
-        inputs.hoodGoalAngleRad = goalAngleRad;
+        inputs.hoodGoalAngleRad = trapezoidSetpoint.position;
 
         inputs.hoodVelocityRadPerSec = hoodMotor.getEncoder().getVelocity();
 

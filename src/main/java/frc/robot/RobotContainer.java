@@ -5,10 +5,13 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -16,6 +19,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.EndgameConstants;
 import frc.robot.Constants.FeatureFlags;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.IOConstants;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
@@ -74,6 +78,10 @@ public class RobotContainer {
 
     SendableChooser<String> autoChooser = new SendableChooser<String>();
     SendableChooser<String> testModeChooser = new SendableChooser<String>();
+
+    DigitalInput brakeSwitch = new DigitalInput(IOConstants.brakeSwitchPort);
+
+    DigitalOutput timeDigitalOutput = null; // new DigitalOutput(IOConstants.timeOutputPort);
 
     LED leds;
 
@@ -220,22 +228,13 @@ public class RobotContainer {
         controller = new CommandXboxController(2);
 
         if (FeatureFlags.runDrive) {
-            drivetrain.setDefaultCommand(
-                    new DriveWithJoysticks(
-                            drivetrain,
-                            () -> controller.getLeftY(),
-                            () -> controller.getLeftX(),
-                            () -> -controller.getRightX(),
-                            () -> controller.getHID().getPOV(),
-                            () -> true,
-                            () -> false,
-                            () -> controller.getHID().getLeftBumper()));
-
-            controller.rightBumper()
-                    .onTrue(new InstantCommand(
-                            () -> drivetrain.setAlignState(AlignState.ALIGNING)))
-                    .onFalse(new InstantCommand(
-                            () -> drivetrain.setAlignState(AlignState.MANUAL)));
+            setUpDriveWithJoysticks();
+                
+            rightJoystick.trigger()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignState(AlignState.ALIGNING)))
+                .onFalse(new InstantCommand(
+                    () -> drivetrain.setAlignState(AlignState.MANUAL)));
 
             controller.leftBumper()
                     .onTrue(new InstantCommand(
@@ -278,9 +277,12 @@ public class RobotContainer {
 
         if (FeatureFlags.runScoring) {
             controller.a()
-                    .onTrue(new InstantCommand(
-                            () -> scoringSubsystem.setAction(
-                                    ScoringSubsystem.ScoringAction.INTAKE)));
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.INTAKE)))
+                .onFalse(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.WAIT)));
 
             controller.b()
                     .onTrue(new InstantCommand(
@@ -288,20 +290,14 @@ public class RobotContainer {
                                     ScoringSubsystem.ScoringAction.AIM)));
 
             controller.x()
-                    .onTrue(new InstantCommand(
-                            () -> scoringSubsystem.setAction(
-                                    ScoringSubsystem.ScoringAction.SHOOT)))
-                    .onFalse(new InstantCommand(
-                            () -> scoringSubsystem.setAction(
-                                    ScoringSubsystem.ScoringAction.AIM)));
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.SHOOT)));
 
             controller.y()
-                    .onTrue(new InstantCommand(
-                            () -> scoringSubsystem.setAction(
-                                    ScoringSubsystem.ScoringAction.ENDGAME)))
-                    .onFalse(new InstantCommand(
-                            () -> scoringSubsystem.setAction(
-                                    ScoringSubsystem.ScoringAction.WAIT)));
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.ENDGAME)));
 
             controller.back()
                     .onTrue(new InstantCommand(
@@ -309,9 +305,17 @@ public class RobotContainer {
                                     ScoringSubsystem.ScoringAction.AMP_AIM)));
 
             controller.start()
-                    .onTrue(new InstantCommand(
-                            () -> scoringSubsystem.setAction(
-                                    ScoringSubsystem.ScoringAction.WAIT)));
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.WAIT)));
+
+            controller.povLeft()
+                .onTrue(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.SOURCE_INTAKE)))
+                .onFalse(new InstantCommand(
+                    () -> scoringSubsystem.setAction(
+                        ScoringSubsystem.ScoringAction.WAIT)));
         }
     } // spotless:on
 
@@ -330,12 +334,28 @@ public class RobotContainer {
     }
 
     public void enabledInit() {
+        if (timeDigitalOutput != null) {
+            timeDigitalOutput.set(true);
+        }
+
         if (FeatureFlags.runIntake) {
             intakeSubsystem.run(IntakeAction.NONE);
         }
 
+        if (FeatureFlags.runScoring) {
+            scoringSubsystem.enabledInit();
+            scoringSubsystem.setBrakeMode(true);
+        }
+
         if (FeatureFlags.runEndgame) {
             endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.CANCEL);
+            endgameSubsystem.setBrakeMode(true);
+        }
+    }
+
+    public void disabledInit() {
+        if (timeDigitalOutput != null) {
+            timeDigitalOutput.set(false);
         }
     }
 
@@ -347,27 +367,44 @@ public class RobotContainer {
         switch (testModeChooser.getSelected()) {
             case "tuning":
                 break;
+            case "drive-align":
+                drivetrain.seedFieldRelative();
+                setUpDriveWithJoysticks();
+
+                rightJoystick.trigger()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignState(AlignState.ALIGNING)))
+                .onFalse(new InstantCommand(
+                    () -> drivetrain.setAlignState(AlignState.MANUAL)));
+
+                controller.a()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
+                break;
             case "calculate-speaker":
                 drivetrain.seedFieldRelative();
+
+                setUpDriveWithJoysticks();
                 scoringSubsystem.setAction(ScoringAction.TUNING);
+
+                SmartDashboard.putNumber("Test-Mode/aimer/setpointPosition", 1.0);
+                SmartDashboard.putNumber("Test-Mode/shooter/setpointRPM", 2000);
+
+                controller.y()
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.runToPosition(SmartDashboard.getNumber("Test-Mode/aimer/setpointPosition", 1.0), 0)))
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.runToPosition(SmartDashboard.getNumber("Test-Mode/shooter/setpointRPM", 2000), 2)))
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.TEMPORARY_SETPOINT)))
+                    .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.OVERRIDE)));
+
                 controller.leftBumper()
                         .onTrue(new InstantCommand(
-                                () -> scoringSubsystem.setTuningKickerVolts(5)))
+                            () -> scoringSubsystem.setTuningKickerVolts(10)))
                         .onFalse(new InstantCommand(
                                 () -> scoringSubsystem.setTuningKickerVolts(0)));
                 break;
             case "tuning-intake":
                 if (FeatureFlags.runDrive) {
-                    drivetrain.setDefaultCommand(
-                            new DriveWithJoysticks(
-                                    drivetrain,
-                                    () -> controller.getLeftY(),
-                                    () -> controller.getLeftX(),
-                                    () -> -controller.getRightX(),
-                                    () -> -1,
-                                    () -> true,
-                                    () -> false,
-                                    () -> false));
+                    setUpDriveWithJoysticks();
                 }
 
                 SmartDashboard.putNumber("Test-Mode/intake/intakeVolts", 1.0);
@@ -376,16 +413,16 @@ public class RobotContainer {
                 intakeSubsystem.run(IntakeSubsystem.IntakeAction.OVERRIDE);
 
                 controller.leftBumper()
-                        .onTrue(new InstantCommand(() -> intakeSubsystem.setOverrideVolts(
-                                SmartDashboard.getNumber("Test-Mode/intake/intakeVolts", 1.0),
-                                SmartDashboard.getNumber("Test-Mode/intake/beltVolts", 1.0))))
-                        .onFalse(new InstantCommand(() -> intakeSubsystem.setOverrideVolts(0, 0)));
+                    .onTrue(new InstantCommand(() -> intakeSubsystem.setOverrideVolts(
+                        SmartDashboard.getNumber("Test-Mode/intake/intakeVolts", 1.0),
+                        SmartDashboard.getNumber("Test-Mode/intake/beltVolts", 1.0))))
+                    .onFalse(new InstantCommand(() -> intakeSubsystem.setOverrideVolts(0, 0)));
 
                 controller.rightBumper()
-                        .onTrue(new InstantCommand(() -> intakeSubsystem.setOverrideVolts(
-                                -SmartDashboard.getNumber("Test-Mode/intake/intakeVolts", 1.0),
-                                -SmartDashboard.getNumber("Test-Mode/intake/beltVolts", 1.0))))
-                        .onFalse(new InstantCommand(() -> intakeSubsystem.setOverrideVolts(0, 0)));
+                    .onTrue(new InstantCommand(() -> intakeSubsystem.setOverrideVolts(
+                        -SmartDashboard.getNumber("Test-Mode/intake/intakeVolts", 1.0),
+                        -SmartDashboard.getNumber("Test-Mode/intake/beltVolts", 1.0))))
+                    .onFalse(new InstantCommand(() -> intakeSubsystem.setOverrideVolts(0, 0)));
                 break;
             case "tuning-aimer":
                 SmartDashboard.putNumber("Test-Mode/aimer/kP", ScoringConstants.aimerkP);
@@ -407,45 +444,42 @@ public class RobotContainer {
                         .onTrue(new TuneG(scoringSubsystem, 0));
 
                 controller.y()
-                        .onTrue(new InstantCommand(() -> scoringSubsystem.setPID(
-                                SmartDashboard.getNumber("Test-Mode/aimer/kP", ScoringConstants.aimerkP),
-                                SmartDashboard.getNumber("Test-Mode/aimer/kI", ScoringConstants.aimerkI),
-                                SmartDashboard.getNumber("Test-Mode/aimer/kD", ScoringConstants.aimerkD), 0)))
-                        .onTrue(new InstantCommand(() -> scoringSubsystem.setMaxProfileProperties(
-                                SmartDashboard.getNumber("Test-Mode/aimer/profileMaxVelocity",
-                                        ScoringConstants.aimCruiseVelocity),
-                                SmartDashboard.getNumber("Test-Mode/aimer/profileMaxAcceleration",
-                                        ScoringConstants.aimAcceleration),
-                                0)))
-                        .onTrue(new InstantCommand(() -> scoringSubsystem
-                                .runToPosition(SmartDashboard.getNumber("Test-Mode/aimer/setpointPosition", 0.25), 0)))
-                        .onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.TEMPORARY_SETPOINT)))
-                        .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.OVERRIDE)));
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setPID(
+                        SmartDashboard.getNumber("Test-Mode/aimer/kP", ScoringConstants.aimerkP),
+                        SmartDashboard.getNumber("Test-Mode/aimer/kI", ScoringConstants.aimerkI),
+                        SmartDashboard.getNumber("Test-Mode/aimer/kD", ScoringConstants.aimerkD), 0)))
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setMaxProfileProperties(
+                        SmartDashboard.getNumber("Test-Mode/aimer/profileMaxVelocity", ScoringConstants.aimCruiseVelocity),
+                        SmartDashboard.getNumber("Test-Mode/aimer/profileMaxAcceleration", ScoringConstants.aimAcceleration), 0)))
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.runToPosition(SmartDashboard.getNumber("Test-Mode/aimer/setpointPosition", 0.25), 0)))
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.TEMPORARY_SETPOINT)))
+                    .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.OVERRIDE)));
 
                 controller.povUp()
-                        .onTrue(new InstantCommand(() -> scoringSubsystem.runToPosition(1.1, 0)))
-                        .onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.TEMPORARY_SETPOINT)))
-                        .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.OVERRIDE)));
-
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.runToPosition(1.1, 0)))
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.TEMPORARY_SETPOINT)))
+                    .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.OVERRIDE)));
+                
                 controller.povDown()
-                        .onTrue(new InstantCommand(() -> scoringSubsystem.runToPosition(0.0, 0)))
-                        .onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.TEMPORARY_SETPOINT)))
-                        .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.OVERRIDE)));
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.runToPosition(0.0, 0)))
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.TEMPORARY_SETPOINT)))
+                    .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.OVERRIDE)));
 
                 controller.leftBumper()
-                        .onTrue(new InstantCommand(() -> scoringSubsystem
-                                .setVolts(SmartDashboard.getNumber("Test-Mode/aimer/volts", 2.0), 0)))
-                        .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 0)));
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(SmartDashboard.getNumber("Test-Mode/aimer/volts", 2.0), 0)))
+                    .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 0)));
 
                 controller.rightBumper()
-                        .onTrue(new InstantCommand(() -> scoringSubsystem
-                                .setVolts(-SmartDashboard.getNumber("Test-Mode/aimer/volts", 2.0), 0)))
-                        .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 0)));
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(-SmartDashboard.getNumber("Test-Mode/aimer/volts", 2.0), 0)))
+                    .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 0)));
                 break;
             case "tuning-hood":
                 SmartDashboard.putNumber("Test-Mode/hood/kP", ScoringConstants.hoodkP);
                 SmartDashboard.putNumber("Test-Mode/hood/kI", ScoringConstants.hoodkI);
                 SmartDashboard.putNumber("Test-Mode/hood/kD", ScoringConstants.hoodkD);
+
+                SmartDashboard.putNumber("Test-Mode/hood/maxVelocity", ScoringConstants.hoodMaxVelocity);
+                SmartDashboard.putNumber("Test-Mode/hood/maxAcceleration", ScoringConstants.hoodMaxAcceleration);
 
                 SmartDashboard.putNumber("Test-Mode/hood/setpointPosition", 0.75);
                 SmartDashboard.putNumber("Test-Mode/hood/volts", 1.0);
@@ -455,29 +489,26 @@ public class RobotContainer {
                 controller.x().onTrue(new InstantCommand(() -> scoringSubsystem.homeHood()));
 
                 controller.y()
-                        .onTrue(new InstantCommand(() -> scoringSubsystem.setPID(
-                                SmartDashboard.getNumber("Test-Mode/hood/kP", ScoringConstants.hoodkP),
-                                SmartDashboard.getNumber("Test-Mode/hood/kI", ScoringConstants.hoodkI),
-                                SmartDashboard.getNumber("Test-Mode/hood/kD", ScoringConstants.hoodkD), 1)))
-                        .onTrue(new InstantCommand(() -> scoringSubsystem
-                                .runToPosition(SmartDashboard.getNumber("Test-Mode/hood/setpointPosition", 0.75), 1)))
-                        .onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.TEMPORARY_SETPOINT)))
-                        .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.OVERRIDE)));
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setPID(
+                        SmartDashboard.getNumber("Test-Mode/hood/kP", ScoringConstants.hoodkP),
+                        SmartDashboard.getNumber("Test-Mode/hood/kI", ScoringConstants.hoodkI),
+                        SmartDashboard.getNumber("Test-Mode/hood/kD", ScoringConstants.hoodkD), 1)))
+                    .onTrue(new InstantCommand(() ->scoringSubsystem.runToPosition(SmartDashboard.getNumber("Test-Mode/hood/setpointPosition", 0.75), 1)))
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.TEMPORARY_SETPOINT)))
+                    .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.OVERRIDE)));
 
                 controller.povDown()
-                        .onTrue(new InstantCommand(() -> scoringSubsystem.runToPosition(0.0, 1)))
-                        .onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.TEMPORARY_SETPOINT)))
-                        .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.OVERRIDE)));
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.runToPosition(0.0, 1)))
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.TEMPORARY_SETPOINT)))
+                    .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.OVERRIDE)));
 
                 controller.leftBumper()
-                        .onTrue(new InstantCommand(() -> scoringSubsystem
-                                .setVolts(SmartDashboard.getNumber("Test-Mode/hood/volts", 1.0), 1)))
-                        .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 1)));
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(SmartDashboard.getNumber("Test-Mode/hood/volts", 1.0), 1)))
+                    .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 1)));
 
                 controller.rightBumper()
-                        .onTrue(new InstantCommand(() -> scoringSubsystem
-                                .setVolts(-SmartDashboard.getNumber("Test-Mode/hood/volts", 1.0), 1)))
-                        .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 1)));
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(-SmartDashboard.getNumber("Test-Mode/hood/volts", 1.0), 1)))
+                    .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 1)));
                 break;
             case "tuning-shooter":
                 SmartDashboard.putNumber("Test-Mode/shooter/kP", ScoringConstants.shooterkP);
@@ -493,37 +524,34 @@ public class RobotContainer {
                 scoringSubsystem.setAction(ScoringAction.OVERRIDE);
 
                 controller.y()
-                        .onTrue(new InstantCommand(() -> scoringSubsystem.setPID(
-                                SmartDashboard.getNumber("Test-Mode/shooter/kP", ScoringConstants.shooterkP),
-                                SmartDashboard.getNumber("Test-Mode/shooter/kI", ScoringConstants.shooterkI),
-                                SmartDashboard.getNumber("Test-Mode/shooter/kD", ScoringConstants.shooterkD), 2)))
-                        .onTrue(new InstantCommand(() -> scoringSubsystem.setFF(
-                                SmartDashboard.getNumber("Test-Mode/shooter/kS", ScoringConstants.shooterkS),
-                                SmartDashboard.getNumber("Test-Mode/shooter/kV", ScoringConstants.shooterkV),
-                                SmartDashboard.getNumber("Test-Mode/shooter/kA", ScoringConstants.shooterkA),
-                                0.0, 2)))
-                        .onTrue(new InstantCommand(() -> scoringSubsystem
-                                .runToPosition(SmartDashboard.getNumber("Test-Mode/shooter/setpointRPM", 2000), 2)))
-                        .onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.TEMPORARY_SETPOINT)))
-                        .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.OVERRIDE)));
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setPID(
+                        SmartDashboard.getNumber("Test-Mode/shooter/kP", ScoringConstants.shooterkP),
+                        SmartDashboard.getNumber("Test-Mode/shooter/kI", ScoringConstants.shooterkI),
+                        SmartDashboard.getNumber("Test-Mode/shooter/kD", ScoringConstants.shooterkD), 2)))
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setFF(
+                        SmartDashboard.getNumber("Test-Mode/shooter/kS", ScoringConstants.shooterkS),
+                        SmartDashboard.getNumber("Test-Mode/shooter/kV", ScoringConstants.shooterkV),
+                        SmartDashboard.getNumber("Test-Mode/shooter/kA", ScoringConstants.shooterkA),
+                        0.0, 2)))
+                    .onTrue(new InstantCommand(() ->scoringSubsystem.runToPosition(SmartDashboard.getNumber("Test-Mode/shooter/setpointRPM", 2000), 2)))
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.TEMPORARY_SETPOINT)))
+                    .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.OVERRIDE)));
 
-                controller.povLeft().onTrue(new InstantCommand(() -> scoringSubsystem.setTuningKickerVolts(2.0)))
-                        .onFalse(new InstantCommand(() -> scoringSubsystem.setTuningKickerVolts(0.0)));
-                controller.povRight().onTrue(new InstantCommand(() -> scoringSubsystem.setTuningKickerVolts(-2.0)))
-                        .onFalse(new InstantCommand(() -> scoringSubsystem.setTuningKickerVolts(0.0)));
+                controller.povLeft().onTrue(new InstantCommand(() -> scoringSubsystem.setTuningKickerVolts(2.0))).onFalse(new InstantCommand(() -> scoringSubsystem.setTuningKickerVolts(0.0)));
+                controller.povRight().onTrue(new InstantCommand(() -> scoringSubsystem.setTuningKickerVolts(-2.0))).onFalse(new InstantCommand(() -> scoringSubsystem.setTuningKickerVolts(0.0)));
 
                 controller.povDown()
-                        .onTrue(new InstantCommand(() -> scoringSubsystem.runToPosition(0.0, 2)))
-                        .onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.TEMPORARY_SETPOINT)))
-                        .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.OVERRIDE)));
-
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.runToPosition(0.0, 2)))
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.TEMPORARY_SETPOINT)))
+                    .onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.OVERRIDE)));
+                
                 controller.leftBumper()
-                        .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(10.0, 2)))
-                        .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 2)));
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(12.0, 2)))
+                    .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 2)));
 
                 controller.rightBumper()
-                        .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(-10.0, 2)))
-                        .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 2)));
+                    .onTrue(new InstantCommand(() -> scoringSubsystem.setVolts(-12.0, 2)))
+                    .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 2)));
                 break;
             case "tuning-endgame":
                 // TODO: Add in later
@@ -653,6 +681,21 @@ public class RobotContainer {
         throw new RuntimeException("Unreachable branch of switch expression");
     }
 
+    private void setUpDriveWithJoysticks() {
+        if (FeatureFlags.runDrive) {
+            drivetrain.setDefaultCommand(
+                    new DriveWithJoysticks(
+                            drivetrain,
+                            () -> leftJoystick.getY(),
+                            () -> leftJoystick.getX(),
+                            () -> rightJoystick.getX(),
+                            () -> controller.getHID().getPOV(),
+                            () -> true,
+                            () -> leftJoystick.trigger().getAsBoolean(),
+                            () -> rightJoystick.trigger().getAsBoolean()));
+        }
+    }
+
     public void robotPeriodic() {
         if (FeatureFlags.runDrive) {
             Logger.recordOutput(
@@ -677,6 +720,17 @@ public class RobotContainer {
         }
     }
 
+    public void disabledPeriodic() {
+        /* set to coast mode when circuit open */
+        if (brakeSwitch != null && brakeSwitch.get()) {
+            scoringSubsystem.setBrakeMode(false);
+            endgameSubsystem.setBrakeMode(false);
+        } else {
+            scoringSubsystem.setBrakeMode(true);
+            endgameSubsystem.setBrakeMode(true);
+        }
+    }
+
     public Command getAutonomousCommand() {
         return drivetrain.getAutoPath(autoChooser.getSelected());
     }
@@ -689,14 +743,20 @@ public class RobotContainer {
 
         autoChooser.addOption("S2 4-Note", "S1-W1-W2-W3");
 
+        autoChooser.addOption("TEST", "S3-W3");
+
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         NamedCommands.registerCommand(
                 "Shoot Scoring",
                 new InstantCommand(
                         () -> {
-                            scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT);
-                            intakeSubsystem.run(IntakeAction.INTAKE);
+                            if (FeatureFlags.runScoring) {
+                                scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT);
+                            }
+                            if (FeatureFlags.runIntake) {
+                                intakeSubsystem.run(IntakeAction.INTAKE);
+                            }
                         }));
         NamedCommands.registerCommand(
                 "Aim Scoring",
@@ -710,6 +770,7 @@ public class RobotContainer {
                 "Wait Scoring",
                 new InstantCommand(
                         () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+        NamedCommands.registerCommand("Intake Note", Commands.none());
     }
 
     public void teleopInit() {
@@ -717,7 +778,7 @@ public class RobotContainer {
 
         // This is in teleopInit to prevent it from wasting time in auto
         if (FeatureFlags.runScoring) {
-            scoringSubsystem.homeHood();
+            // scoringSubsystem.homeHood();
 
             scoringSubsystem.setAction(ScoringAction.WAIT);
         }

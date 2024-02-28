@@ -8,7 +8,7 @@ import org.littletonrobotics.junction.Logger;
 public class CameraContainerReal implements CameraContainer {
 
     private List<CameraIO> cameras = new ArrayList<>();
-    private List<CameraIOInputsAutoLogged> inputs;
+    private List<CameraIOInputsAutoLogged> inputs = new ArrayList<>();
 
     public CameraContainerReal(List<CameraParams> params) {
         for (CameraParams param : params) {

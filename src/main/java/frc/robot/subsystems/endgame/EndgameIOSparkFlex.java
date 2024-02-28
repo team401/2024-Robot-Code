@@ -78,6 +78,11 @@ public class EndgameIOSparkFlex implements EndgameIO {
     }
 
     @Override
+    public void setBrakeMode(boolean brake) {
+        IdleMode sparkMode = brake ? IdleMode.kBrake : IdleMode.kCoast;
+        leftEndgameMotor.setIdleMode(sparkMode);
+    }
+
     public void setPositionTuning(double position) {
         if (targetPosition != position) {
             profileTimer.reset();
