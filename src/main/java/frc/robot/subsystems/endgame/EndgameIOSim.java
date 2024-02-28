@@ -11,7 +11,7 @@ import frc.robot.Constants.EndgameConstants;
 
 public class EndgameIOSim implements EndgameIO {
     private ElevatorSim elevatorSim =
-            new ElevatorSim(DCMotor.getNeoVortex(2), 20, 1.814, 0.02231009, 0.0, 1.45, true, 0.0);
+            new ElevatorSim(DCMotor.getNeoVortex(2), 20, 1.814, 0.02231009, 0.0, 0.45, true, 0.0);
 
     private TrapezoidProfile profile =
             new TrapezoidProfile(EndgameConstants.climberProfileConstraints);
@@ -77,55 +77,9 @@ public class EndgameIOSim implements EndgameIO {
         }
     }
 
-    // Were we moving down on last tick?
-    // This is used to keep track of whether or not we need to switch the elevatorSim object out.
-    boolean movingDownLast = false;
-
     @Override
     public void updateInputs(EndgameIOInputs inputs) {
         elevatorSim.update(Constants.loopTime);
-
-        // if (targetPosition < elevatorSim.getPositionMeters() && !movingDownLast) {
-        //     // We were not moving down before, but now we are, so we must update the sim to be
-        //     // simulating lifting the whole weight of the robot up
-        //     ElevatorSim newElevatorSim =
-        //             new ElevatorSim(
-        //                     DCMotor.getNeoVortex(2),
-        //                     20,
-        //                     1.814,
-        //                     // - EndgameConstants
-        //                     //         .simRobotMass, // Add in negative robot mass, because
-        //                     // the
-        //                     // robot will be pulling up on the elevator.
-        //                     0.02231009,
-        //                     0.0,
-        //                     1.45,
-        //                     true,
-        //                     0.0);
-        //     newElevatorSim.setState(
-        //             VecBuilder.fill(
-        //                     elevatorSim.getPositionMeters(),
-        //                     elevatorSim.getVelocityMetersPerSecond()));
-        //     elevatorSim = newElevatorSim;
-
-        //     // Update state of direction we're currently moving
-        //     movingDownLast = true;
-        // } else if (movingDownLast) {
-        // We were moving down before, but now we are not. Create a new simulator without the
-        // weight from lifting the robot.
-        //     ElevatorSim newElevatorSim =
-        //             new ElevatorSim(
-        //                     DCMotor.getNeoVortex(2), 20, 1.814, 0.02231009, 0.0, 1.45, true,
-        // 0.0);
-        //     newElevatorSim.setState(
-        //             VecBuilder.fill(
-        //                     elevatorSim.getPositionMeters(),
-        //                     elevatorSim.getVelocityMetersPerSecond()));
-        //     elevatorSim = newElevatorSim;
-
-        //     // Update state of direction we're currently moving
-        //     movingDownLast = false;
-        // }
 
         double appliedVolts = 0.0;
 
