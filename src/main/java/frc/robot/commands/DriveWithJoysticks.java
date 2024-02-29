@@ -5,21 +5,17 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
-import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignTarget;
 import frc.robot.utils.Deadband;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-import java.util.function.IntSupplier;
 
 public class DriveWithJoysticks extends Command {
     CommandSwerveDrivetrain drivetrain;
     DoubleSupplier x;
     DoubleSupplier y;
     DoubleSupplier rot;
-    IntSupplier POV;
     BooleanSupplier fieldCentric;
     BooleanSupplier babyMode;
-    BooleanSupplier autoAlign;
 
     double xMpS;
     double yMpS;
@@ -30,18 +26,14 @@ public class DriveWithJoysticks extends Command {
             DoubleSupplier x,
             DoubleSupplier y,
             DoubleSupplier rot,
-            IntSupplier POV,
             BooleanSupplier fieldCentric,
-            BooleanSupplier babyMode,
-            BooleanSupplier autoAlign) {
+            BooleanSupplier babyMode) {
         this.drivetrain = drivetrain;
         this.x = x;
         this.y = y;
-        this.POV = POV;
         this.rot = rot;
         this.fieldCentric = fieldCentric;
         this.babyMode = babyMode;
-        this.autoAlign = autoAlign;
 
         addRequirements(drivetrain);
     }
@@ -83,26 +75,6 @@ public class DriveWithJoysticks extends Command {
             xMpS *= 0.5;
             yMpS *= 0.5;
             rotRadpS *= 0.5;
-        }
-
-        // drivetrain.setAlignState(
-        //         autoAlign.getAsBoolean() ? AlignState.ALIGNING : AlignState.MANUAL);
-
-        switch (POV.getAsInt()) {
-            case 0:
-                drivetrain.setAlignTarget(AlignTarget.SPEAKER);
-                break;
-            case 90:
-                drivetrain.setAlignTarget(AlignTarget.AMP);
-                break;
-            case 180:
-                drivetrain.setAlignTarget(AlignTarget.NONE);
-                break;
-            case 270:
-                drivetrain.setAlignTarget(AlignTarget.SOURCE);
-                break;
-            default:
-                break;
         }
 
         drivetrain.setGoalChassisSpeeds(

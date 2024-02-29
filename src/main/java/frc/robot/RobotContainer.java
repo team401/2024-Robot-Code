@@ -630,10 +630,8 @@ public class RobotContainer {
                             () -> leftJoystick.getY(),
                             () -> leftJoystick.getX(),
                             () -> rightJoystick.getX(),
-                            () -> controller.getHID().getPOV(),
                             () -> true,
-                            () -> rightJoystick.top().getAsBoolean(),
-                            () -> rightJoystick.trigger().getAsBoolean()));
+                            () -> rightJoystick.top().getAsBoolean()));
         }
     }
 
