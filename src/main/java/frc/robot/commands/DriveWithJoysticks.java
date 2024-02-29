@@ -71,13 +71,13 @@ public class DriveWithJoysticks extends Command {
         double[] joystickInputsFiltered =
                 Deadband.twoAxisDeadband(allianceX, allianceY, DriveConstants.deadbandPercent);
 
-        joystickInputsFiltered[0] = Math.pow(joystickInputsFiltered[0], 3);
-        joystickInputsFiltered[1] = Math.pow(joystickInputsFiltered[1], 3);
+        joystickInputsFiltered[0] = Math.pow(joystickInputsFiltered[0], 1);
+        joystickInputsFiltered[1] = Math.pow(joystickInputsFiltered[1], 1);
 
         xMpS = joystickInputsFiltered[0] * DriveConstants.MaxSpeedMetPerSec;
         yMpS = joystickInputsFiltered[1] * DriveConstants.MaxSpeedMetPerSec;
         rotRadpS = Deadband.oneAxisDeadband(rot.getAsDouble(), DriveConstants.deadbandPercent);
-        rotRadpS = Math.pow(rotRadpS, 3) * DriveConstants.MaxAngularRateRadiansPerSec;
+        rotRadpS = Math.pow(rotRadpS, 1) * DriveConstants.MaxAngularRateRadiansPerSec;
 
         if (babyMode.getAsBoolean()) {
             xMpS *= 0.5;

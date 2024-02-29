@@ -228,7 +228,7 @@ public class RobotContainer {
         if (FeatureFlags.runDrive) {
             setUpDriveWithJoysticks();
                 
-            rightJoystick.trigger()
+            leftJoystick.trigger()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignState(AlignState.ALIGNING)))
                 .onFalse(new InstantCommand(
@@ -284,10 +284,11 @@ public class RobotContainer {
 
         if (FeatureFlags.runScoring) {
             scoringSubsystem.setDefaultCommand(new ShootWithGamepad(
-                rightJoystick.getHID()::getTop,
+                rightJoystick.getHID()::getTrigger,
                 controller.getHID()::getRightBumper,
                 () -> controller.getRightTriggerAxis() > 0.5,
-                controller.getHID()::getAButton, scoringSubsystem,
+                controller.getHID()::getAButton,
+                controller.getHID()::getBButton, scoringSubsystem,
                 FeatureFlags.runDrive ? drivetrain::getAlignTarget : () -> AlignTarget.NONE));
         }
     } // spotless:on
@@ -620,7 +621,7 @@ public class RobotContainer {
                             () -> rightJoystick.getX(),
                             () -> controller.getHID().getPOV(),
                             () -> true,
-                            () -> leftJoystick.trigger().getAsBoolean(),
+                            () -> rightJoystick.top().getAsBoolean(),
                             () -> rightJoystick.trigger().getAsBoolean()));
         }
     }
@@ -652,11 +653,19 @@ public class RobotContainer {
     public void disabledPeriodic() {
         /* set to coast mode when circuit open */
         if (brakeSwitch != null && brakeSwitch.get()) {
-            scoringSubsystem.setBrakeMode(false);
-            endgameSubsystem.setBrakeMode(false);
+            if (FeatureFlags.runScoring) {
+                scoringSubsystem.setBrakeMode(false);
+            }
+            if (FeatureFlags.runEndgame) {
+                endgameSubsystem.setBrakeMode(false);
+            }
         } else {
-            scoringSubsystem.setBrakeMode(true);
-            endgameSubsystem.setBrakeMode(true);
+            if (FeatureFlags.runScoring) {
+                scoringSubsystem.setBrakeMode(true);
+            }
+            if (FeatureFlags.runEndgame) {
+                endgameSubsystem.setBrakeMode(true);
+            }
         }
     }
 

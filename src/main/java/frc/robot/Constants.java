@@ -103,9 +103,9 @@ public final class Constants {
         public static final Rotation2d fieldToAmpHeading = new Rotation2d(-Math.PI / 2);
 
         public static final Rotation2d fieldToRedSourceHeading =
-                new Rotation2d(Math.PI / 3); // 60 degrees
+                new Rotation2d(Math.PI / 3 + Math.PI); // 60 degrees
         public static final Rotation2d fieldToBlueSourceHeading =
-                new Rotation2d(Math.PI * 2 / 3); // 120 degrees
+                new Rotation2d(Math.PI * 2 / 3 + Math.PI); // 120 degrees
 
         public static final Translation2d fieldToRedSpeaker =
                 new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42));
@@ -206,7 +206,7 @@ public final class Constants {
         public static final int indexTwoMotorID = 14;
 
         public static final double intakePower = 10.0;
-        public static final double beltPower = 10.0;
+        public static final double beltPower = 8.0;
     }
 
     public static final class EndgameConstants {

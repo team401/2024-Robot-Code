@@ -13,6 +13,7 @@ public class ShootWithGamepad extends Command {
     private BooleanSupplier masherShoot;
     private BooleanSupplier warmup;
     private BooleanSupplier reverseIntake;
+    private BooleanSupplier intake;
 
     private ScoringSubsystem scoring;
 
@@ -23,12 +24,14 @@ public class ShootWithGamepad extends Command {
             BooleanSupplier masherShoot,
             BooleanSupplier warmup,
             BooleanSupplier reverseIntake,
+            BooleanSupplier intake,
             ScoringSubsystem scoring,
             Supplier<AlignTarget> getDriveMode) {
         this.driverShoot = driverShoot;
         this.masherShoot = masherShoot;
         this.warmup = warmup;
         this.reverseIntake = reverseIntake;
+        this.intake = intake;
 
         this.scoring = scoring;
         this.getDriveMode = getDriveMode;
@@ -71,6 +74,8 @@ public class ShootWithGamepad extends Command {
             }
         } else if (reverseIntake.getAsBoolean()) {
             scoring.setAction(ScoringAction.SPIT);
+        } else if (intake.getAsBoolean()) {
+            scoring.setAction(ScoringAction.INTAKE);
         } else {
             scoring.setAction(ScoringAction.WAIT);
         }
