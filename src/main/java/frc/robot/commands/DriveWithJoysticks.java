@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
@@ -50,9 +51,25 @@ public class DriveWithJoysticks extends Command {
 
     @Override
     public void execute() {
+        double allianceX = 0.0;
+        double allianceY = 0.0;
+        if (DriverStation.getAlliance().isPresent()) {
+            switch (DriverStation.getAlliance().get()) {
+                case Red:
+                    allianceX = x.getAsDouble();
+                    allianceY = y.getAsDouble();
+                    break;
+                case Blue:
+                    allianceX = -x.getAsDouble();
+                    allianceY = -y.getAsDouble();
+                    break;
+            }
+        } else {
+            allianceX = x.getAsDouble();
+            allianceY = y.getAsDouble();
+        }
         double[] joystickInputsFiltered =
-                Deadband.twoAxisDeadband(
-                        x.getAsDouble(), y.getAsDouble(), DriveConstants.deadbandPercent);
+                Deadband.twoAxisDeadband(allianceX, allianceY, DriveConstants.deadbandPercent);
 
         joystickInputsFiltered[0] = Math.pow(joystickInputsFiltered[0], 3);
         joystickInputsFiltered[1] = Math.pow(joystickInputsFiltered[1], 3);
