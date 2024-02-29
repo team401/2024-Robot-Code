@@ -236,8 +236,11 @@ public class RobotContainer {
 
             leftJoystick.top()
                 .onTrue(new InstantCommand(
-                    () -> drivetrain.seedFieldRelative(getPoseAgainstSpeaker()))
-                );
+                    () -> drivetrain.seedFieldRelative(getPoseAgainstSpeaker())));
+            
+            leftJoystick.button(1) // placeholder button
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.seedFieldRelative(getPoseAgainstPodium())));
 
             controller.povUp()
                 .onTrue(new InstantCommand(
@@ -577,14 +580,12 @@ public class RobotContainer {
     }
 
     private Rotation2d getFieldToAmpHeading() {
-        Logger.recordOutput("Field/amp", FieldConstants.fieldToAmpHeading);
-        return FieldConstants.fieldToAmpHeading;
+        Logger.recordOutput("Field/amp", FieldConstants.ampHeading);
+        return FieldConstants.ampHeading;
     }
 
     private Pose2d getPoseAgainstSpeaker() {
-        if (DriverStation.getAlliance().isEmpty()) {
-            return FieldConstants.robotAgainstRedSpeaker;
-        } else {
+        if (!DriverStation.getAlliance().isEmpty()) {
             switch (DriverStation.getAlliance().get()) {
                 case Blue:
                     return FieldConstants.robotAgainstBlueSpeaker;
@@ -592,23 +593,33 @@ public class RobotContainer {
                     return FieldConstants.robotAgainstRedSpeaker;
             }
         }
-        throw new RuntimeException("Unreachable branch of switch expression");
+        return FieldConstants.robotAgainstRedSpeaker;
+    }
+
+    private Pose2d getPoseAgainstPodium() {
+        if (!DriverStation.getAlliance().isEmpty()) {
+            switch (DriverStation.getAlliance().get()) {
+                case Blue:
+                    return FieldConstants.robotAgainstBluePodium;
+                case Red:
+                    return FieldConstants.robotAgainstRedPodium;
+            }
+        }
+        return FieldConstants.robotAgainstRedPodium;
     }
 
     private Rotation2d getFieldToSourceHeading() {
-        if (DriverStation.getAlliance().isEmpty()) {
-            return FieldConstants.fieldToRedSourceHeading;
-        } else {
+        if (!DriverStation.getAlliance().isEmpty()) {
             switch (DriverStation.getAlliance().get()) {
                 case Blue:
-                    Logger.recordOutput("Field/source", FieldConstants.fieldToBlueSourceHeading);
-                    return FieldConstants.fieldToBlueSourceHeading;
+                    Logger.recordOutput("Field/source", FieldConstants.blueSourceHeading);
+                    return FieldConstants.blueSourceHeading;
                 case Red:
-                    Logger.recordOutput("Field/source", FieldConstants.fieldToRedSourceHeading);
-                    return FieldConstants.fieldToRedSourceHeading;
+                    Logger.recordOutput("Field/source", FieldConstants.redSourceHeading);
+                    return FieldConstants.redSourceHeading;
             }
         }
-        throw new RuntimeException("Unreachable branch of switch expression");
+        return FieldConstants.redSourceHeading;
     }
 
     private void setUpDriveWithJoysticks() {

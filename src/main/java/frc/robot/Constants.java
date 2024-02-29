@@ -100,12 +100,12 @@ public final class Constants {
         public static final double midfieldLowThresholdM = 5.87;
         public static final double midfieldHighThresholdM = 10.72;
 
-        public static final Rotation2d fieldToAmpHeading = new Rotation2d(-Math.PI / 2);
+        public static final Rotation2d ampHeading = new Rotation2d(-Math.PI / 2);
 
-        public static final Rotation2d fieldToRedSourceHeading =
-                new Rotation2d(Math.PI / 3 + Math.PI); // 60 degrees
-        public static final Rotation2d fieldToBlueSourceHeading =
-                new Rotation2d(Math.PI * 2 / 3 + Math.PI); // 120 degrees
+        public static final Rotation2d redSourceHeading =
+                new Rotation2d(Math.PI * 4 / 3); // 60 degrees
+        public static final Rotation2d blueSourceHeading =
+                new Rotation2d(Math.PI * 5 / 3); // 120 degrees
 
         public static final Translation2d fieldToRedSpeaker =
                 new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42));
@@ -118,6 +118,12 @@ public final class Constants {
 
         public static final Pose2d robotAgainstRedSpeaker =
                 new Pose2d(15.19, 5.56, Rotation2d.fromDegrees(0));
+
+        public static final Pose2d robotAgainstBluePodium =
+                new Pose2d(2.57, 4.09, Rotation2d.fromDegrees(180));
+
+        public static final Pose2d robotAgainstRedPodium =
+                new Pose2d(13.93, 4.09, Rotation2d.fromDegrees(0));
     }
 
     public static final class VisionConstants {
