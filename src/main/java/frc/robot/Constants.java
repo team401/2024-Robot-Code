@@ -46,7 +46,7 @@ public final class Constants {
     }
 
     public static final class FeatureFlags {
-        public static final boolean runVision = false;
+        public static final boolean runVision = true;
 
         public static final boolean runIntake = true;
         public static final boolean runScoring = true;
@@ -144,7 +144,7 @@ public final class Constants {
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(0.323, 0.262, 0.216),
-                                        new Rotation3d(0.0, 1.224, 0.138))),
+                                        new Rotation3d(0, -0.349, 0.138))),
                         new CameraParams(
                                 "Front-Right",
                                 640,
@@ -153,7 +153,7 @@ public final class Constants {
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(0.323, -0.262, 0.216),
-                                        new Rotation3d(0.0, 1.224, -0.138))),
+                                        new Rotation3d(0.0, -0.349, -0.138))),
                         new CameraParams(
                                 "Back-Left",
                                 640,
@@ -162,7 +162,7 @@ public final class Constants {
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(-0.327, 0.281, 0.333),
-                                        new Rotation3d(0.0, -1.162, 3.14))),
+                                        new Rotation3d(0.0, -0.409, 3.14))),
                         new CameraParams(
                                 "Back-Right",
                                 640,
@@ -171,7 +171,7 @@ public final class Constants {
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(-0.327, -0.281, 0.333),
-                                        new Rotation3d(0.0, -1.162, 3.14))));
+                                        new Rotation3d(0.0, -0.409, 3.14))));
 
         public static record CameraParams(
                 String name,
