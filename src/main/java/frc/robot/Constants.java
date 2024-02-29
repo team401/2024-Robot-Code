@@ -46,7 +46,7 @@ public final class Constants {
     }
 
     public static final class FeatureFlags {
-        public static final boolean runVision = true;
+        public static final boolean runVision = false;
 
         public static final boolean runIntake = true;
         public static final boolean runScoring = true;
@@ -85,7 +85,7 @@ public final class Constants {
         public static final double anticipationTime = 0.01;
         public static final double minimumAnticipationVelocity = 0.0;
 
-        public static final double alignToleranceRadians = Math.PI / 12;
+        public static final double alignToleranceRadians = 0.1;
 
         public static final double alignmentkPMax = 7.0;
         public static final double alignmentkPMin = 5.0;
@@ -228,7 +228,7 @@ public final class Constants {
                         .withKP(150)
                         .withKI(0)
                         .withKD(0.2)
-                        .withKS(0)
+                        .withKS(0.32)
                         .withKV(1.5)
                         .withKA(0);
         // When using closed-loop control, the drive motor uses the control
@@ -247,7 +247,7 @@ public final class Constants {
 
         // The stator current at which the wheels start to slip;
         // This needs to be tuned to your individual robot
-        private static final double kSlipCurrentA = 300.0;
+        private static final double kSlipCurrentA = 180.0;
 
         // Theoretical free speed (m/s) at 12v applied output;
         // This needs to be tuned to your individual robot
@@ -433,7 +433,7 @@ public final class Constants {
         public static final double aimCruiseVelocity = 7.0; // TODO: 15.0
 
         public static final double shooterVelocityMarginRPM = 50;
-        public static final double aimAngleMarginRadians = Units.degreesToRadians(2);
+        public static final double aimAngleMarginRadians = Units.degreesToRadians(1);
         public static final double hoodAngleMarginRadians = Units.degreesToRadians(5);
 
         public static final double intakeAngleToleranceRadians = 0.0;
@@ -462,36 +462,39 @@ public final class Constants {
         // Value - Aimer angle in radians
         public static HashMap<Double, Double> getAimerMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
-            map.put(0.0, 0.7);
-            map.put(1.45, 0.7);
+            map.put(0.0, 0.8);
+            map.put(1.45, 0.8); // 0.7
             map.put(1.98, 0.62);
             map.put(2.41, 0.53);
-            map.put(3.02, 0.45);
-            map.put(3.22, 0.425);
+            map.put(3.02, 0.48); // 0.45
+            map.put(3.22, 0.45);
             map.put(3.9, 0.36);
             map.put(4.55, 0.34);
             map.put(4.95, 0.31);
-            map.put(5.64, 0.28);
-            map.put(5.82, 0.275);
+            map.put(5.64, 0.3);
+            // map.put(5.82, 0.275);
+            map.put(6.0, 0.29);
 
             return map;
         }
+
+        public static final double aimerStaticOffset = 0.02;
 
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters
         // Value - Shooter RPM
         public static HashMap<Double, Double> getShooterMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
-            map.put(0.0, 2500.0);
-            map.put(1.45, 2500.0);
-            map.put(1.98, 2500.0);
-            map.put(2.41, 2900.0);
-            map.put(3.02, 3000.0);
-            map.put(3.22, 3000.0);
+            map.put(0.0, 2700.0);
+            map.put(1.45, 2700.0);
+            map.put(1.98, 2700.0);
+            map.put(2.41, 3000.0);
+            map.put(3.02, 3300.0);
+            map.put(3.22, 3300.0);
             map.put(3.9, 3300.0);
             map.put(4.55, 3500.0);
             map.put(4.95, 4000.0);
-            map.put(5.64, 4100.0);
+            map.put(5.64, 4200.0);
             map.put(5.82, 4300.0);
 
             return map;

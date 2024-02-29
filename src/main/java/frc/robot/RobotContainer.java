@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -75,7 +74,6 @@ public class RobotContainer {
     CommandSwerveDrivetrain drivetrain = FeatureFlags.runDrive ? TunerConstants.DriveTrain : null;
     Telemetry driveTelemetry;
 
-    SendableChooser<String> autoChooser = new SendableChooser<String>();
     SendableChooser<String> testModeChooser = new SendableChooser<String>();
 
     DigitalInput brakeSwitch = new DigitalInput(IOConstants.brakeSwitchPort);
@@ -235,12 +233,16 @@ public class RobotContainer {
                 .onFalse(new InstantCommand(
                     () -> drivetrain.setAlignState(AlignState.MANUAL)));
 
-            controller.leftBumper()
+            leftJoystick.top()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.seedFieldRelative(getPoseAgainstSpeaker()))
                 );
 
             controller.b()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
+
+            controller.start()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
 
@@ -251,6 +253,8 @@ public class RobotContainer {
             controller.back()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.AMP)));
+
+            // controller.povRight().onTrue(drivetrain.getDriveToPointCommand());
         }
 
         if (FeatureFlags.runEndgame) {
@@ -268,7 +272,13 @@ public class RobotContainer {
         if (FeatureFlags.runIntake) {
             controller.a()
                 .onTrue(new InstantCommand(
-                        () -> intakeSubsystem.run(IntakeAction.INTAKE)));
+                        () -> intakeSubsystem.run(IntakeAction.INTAKE)))
+                .onFalse(new InstantCommand(
+                    () -> intakeSubsystem.run(IntakeAction.NONE)));
+
+            controller.rightBumper()
+                .onTrue(new InstantCommand(
+                        () -> intakeSubsystem.run(IntakeAction.REVERSE)));
                 
             controller.start()
                 .onTrue(new InstantCommand(
@@ -687,22 +697,13 @@ public class RobotContainer {
         }
     }
 
-    public Command getAutonomousCommand() {
-        return drivetrain.getAutoPath(autoChooser.getSelected());
+    public void autoInit() {
+        if (drivetrain.getAutoCommand() != null) {
+            drivetrain.getAutoCommand().schedule();
+        }
     }
 
     private void configureAutonomous() {
-        autoChooser.setDefaultOption("Default (S3 6-Note)", "S3-W3-W2-W1-C1-C2");
-
-        autoChooser.addOption("S1 5-Note", "S1-W1-W2-W3-C5");
-        autoChooser.addOption("S1 4-Note", "S1-W1-W2-W3");
-
-        autoChooser.addOption("S2 4-Note", "S1-W1-W2-W3");
-
-        autoChooser.addOption("TEST", "S3-W3");
-
-        SmartDashboard.putData("Auto Chooser", autoChooser);
-
         NamedCommands.registerCommand(
                 "Shoot Scoring",
                 new InstantCommand(
@@ -737,6 +738,7 @@ public class RobotContainer {
             // scoringSubsystem.homeHood();
 
             scoringSubsystem.setAction(ScoringAction.WAIT);
+            scoringSubsystem.enabledInit();
         }
     }
 }

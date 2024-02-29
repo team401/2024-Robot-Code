@@ -7,6 +7,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -17,9 +18,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -68,6 +72,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private Supplier<Translation2d> getRobotVelocity = () -> new Translation2d();
 
+    private SendableChooser<String> autoChooser = new SendableChooser<String>();
+
     private PIDController thetaController =
             new PIDController(
                     DriveConstants.alignmentkPMax,
@@ -76,7 +82,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private SwerveRequest.FieldCentric driveFieldCentric = new SwerveRequest.FieldCentric();
     private SwerveRequest.RobotCentric driveRobotCentric = new SwerveRequest.RobotCentric();
-    private SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+    // private SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
     private static final double kSimLoopPeriod = 0.02; // Original: 5 ms
     private Notifier simNotifier = null;
@@ -172,8 +178,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     this.setAlignTarget(AlignTarget.SPEAKER);
                 }, // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
-                        new PIDConstants(10, 0, 0),
-                        new PIDConstants(10, 0, 0),
+                        new PIDConstants(1, 0, 0),
+                        new PIDConstants(0, 0, 0),
                         TunerConstants.kSpeedAt12VoltsMps,
                         driveBaseRadius,
                         new ReplanningConfig()),
@@ -190,10 +196,26 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     return false;
                 }, // Change this if the path needs to be flipped on red vs blue
                 this); // Subsystem for requirements
+
+        // PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
+
+        // autoChooser = AutoBuilder.buildAutoChooser();
+        autoChooser.setDefaultOption("Default", "None"); // S1-W1-W2-W3
+        autoChooser.addOption("Amp Side - 4 note (2 from center)", "S1-W1-C1-C2");
+        autoChooser.addOption("Amp Side - 5 note (3 from center)", "S1-W1-C1-C2-C3");
+        autoChooser.addOption("Amp Side - 3 note", "S1-W1-W2");
+        autoChooser.addOption("Amp Side - 4 note (wing)", "S1-W1-W2-W3");
+        autoChooser.addOption("Amp Side - 5 note", "S1-W1-W2-W3-C5");
+        autoChooser.addOption("Center - 3 note", "S2-W2-W3");
+        autoChooser.addOption("Center - 4 note (source side to center)", "S2-W2-W3-C5");
+        autoChooser.addOption("Source Side - 2 note", "S3-W3");
+        autoChooser.addOption("Source Side - 3 note", "S3-W3-C5");
+        autoChooser.addOption("Source Side - 5 note (across)", "S3-W3-W2-W1-C1");
+        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
-    public Command getAutoPath(String pathName) {
-        return new PathPlannerAuto(pathName);
+    public Command getAutoCommand() {
+        return new PathPlannerAuto(autoChooser.getSelected());
     }
 
     public ChassisSpeeds getCurrentRobotChassisSpeeds() {
@@ -338,6 +360,23 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         double phi = (Math.PI / 2) - Math.acos(getRobotVelocity.get().getY() / noteVelocity);
 
         return angle.minus(new Rotation2d(phi));
+    }
+
+    // private Optional<Rotation2d> getRotationTargetOverride() {
+    //     return Optional.of(
+    //             calculateDesiredHeading(
+    //                     getFieldToRobot.get(),
+    //                     new Pose2d(getFieldToSpeaker.get(), new Rotation2d())));
+    // }
+
+    public Command getDriveToPointCommand() {
+        Pose2d targetPose = new Pose2d(11.74, 4.13, Rotation2d.fromDegrees(180));
+
+        PathConstraints constraints =
+                new PathConstraints(
+                        3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+
+        return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0, 0.0);
     }
 
     public boolean isAligned() {
