@@ -22,6 +22,7 @@ import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveWithJoysticks;
+import frc.robot.commands.ShootWithGamepad;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignState;
@@ -242,15 +243,17 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
 
-            controller.rightBumper()
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
-
             controller.povRight()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.AMP)));
 
-            // controller.povRight().onTrue(drivetrain.getDriveToPointCommand());
+            controller.povLeft()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.SOURCE)));
+
+            controller.povDown()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.ENDGAME)));
         }
 
         if (FeatureFlags.runEndgame) {
@@ -280,54 +283,12 @@ public class RobotContainer {
         }
 
         if (FeatureFlags.runScoring) {
-            controller.b()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.INTAKE)))
-                .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)));
-
-            controller.a()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.SPIT)))
-                .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)));
-
-            controller.povUp()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                         ScoringSubsystem.ScoringAction.AIM)));
-
-            controller.rightBumper()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.SHOOT)));
-
-            controller.povLeft()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.ENDGAME)));
-
-            controller.povRight()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AMP_AIM)));
-
-            controller.povDown()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)));
-
-            controller.y()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.SOURCE_INTAKE)))
-                .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)));
+            scoringSubsystem.setDefaultCommand(new ShootWithGamepad(
+                rightJoystick.getHID()::getTop,
+                controller.getHID()::getRightBumper,
+                () -> controller.getRightTriggerAxis() > 0.5,
+                controller.getHID()::getAButton, scoringSubsystem,
+                FeatureFlags.runDrive ? drivetrain::getAlignTarget : () -> AlignTarget.NONE));
         }
     } // spotless:on
 

@@ -50,7 +50,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         NONE,
         AMP,
         SPEAKER,
-        SOURCE
+        SOURCE,
+        ENDGAME
     }
 
     public enum AlignState {
@@ -154,6 +155,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public AlignState getAlignState() {
         return alignState;
+    }
+
+    public AlignTarget getAlignTarget() {
+        return alignTarget;
     }
 
     public void setVelocitySupplier(Supplier<Translation2d> getRobotVelocity) {
@@ -270,7 +275,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     break;
                 case NONE:
                     break;
-                default:
+                case ENDGAME:
                     break;
             }
 
