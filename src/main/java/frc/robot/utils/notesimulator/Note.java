@@ -76,7 +76,7 @@ public class Note {
                                 () -> {
                                     Pose3d startPose =
                                             new Pose3d(robotPoseSupplier.get())
-                                                    .transformBy(new Transform3d(0.35, 0, 0.8, new Rotation3d()));
+                                                    .transformBy(new Transform3d(0.35, 0, 1.2, new Rotation3d()));
                                     Timer timeSinceLaunch = new Timer();
                                     timeSinceLaunch.start();
                                     double shotSpeed =
@@ -84,8 +84,7 @@ public class Note {
                                                     * 2
                                                     * Math.PI
                                                     / 60
-                                                    * 0.5
-                                                    * 2 * 0.0381; // are the values on the
+                                                    * 0.5 * 0.075184; // are the values on the
                                     // interpolate map correct?
 
                                     return Commands.run(
@@ -186,10 +185,10 @@ public class Note {
         double y = noteLocation.getY();
         double z = noteLocation.getZ();
 
-        if (y > Math.min(rectangle[0][1], rectangle[3][1])
-                && y < Math.max(rectangle[0][1], rectangle[3][1])
-                && z > Math.min(rectangle[0][2], rectangle[3][2])
-                && z < Math.max(rectangle[0][2], rectangle[3][2])) {
+        if (y > Math.min(rectangle[0][1], rectangle[3][1]) - 0.3
+                && y < Math.max(rectangle[0][1], rectangle[3][1]) + 0.3
+                && z > Math.min(rectangle[0][2], rectangle[3][2]) - 0.3
+                && z < Math.max(rectangle[0][2], rectangle[3][2]) + 0.3) {
             double slope =
                     (rectangle[3][2] - rectangle[0][2]) / (rectangle[3][0] - rectangle[0][0]);
             double predictedZ = slope * (x - rectangle[3][0]) + rectangle[3][2];
