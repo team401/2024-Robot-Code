@@ -433,7 +433,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                 && state != ScoringState.IDLE
                 && !overrideStageAvoidance
                 && willHitStage()) {
-            aimerIo.setAngleClampsRad(0, 0);
+            aimerIo.setAngleClampsRad(-0.01, 0);
         } else {
             double elevatorLimit =
                     aimerAvoidElevator.getValue(elevatorPositionSupplier.getAsDouble());
@@ -463,6 +463,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
         Logger.recordOutput("scoring/readyToShoot", readyToShoot);
 
+        Logger.recordOutput("aimer/willIHitStage", willHitStage());
+
         aimMechanism.setAngle(Units.radiansToDegrees(aimerInputs.aimAngleRad));
         hoodMechanism.setAngle(Units.radiansToDegrees(hoodInputs.hoodAngleRad));
         Logger.recordOutput("scoring/mechanism2d", mechanism);
@@ -470,11 +472,9 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         switch (state) {
             case IDLE:
                 idle();
-                SmartDashboard.putString("shoot", "idle");
                 break;
             case INTAKE:
                 intake();
-                SmartDashboard.putString("shoot", "intake");
                 break;
             case SOURCE_INTAKE:
                 sourceIntake();
@@ -484,7 +484,6 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                 break;
             case PRIME:
                 prime();
-                SmartDashboard.putString("shoot", "prime");
                 break;
             case AMP_PRIME:
                 ampPrime();

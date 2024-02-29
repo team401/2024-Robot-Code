@@ -200,9 +200,17 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         // PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
 
         // autoChooser = AutoBuilder.buildAutoChooser();
-        autoChooser.setDefaultOption("Default", "S1-W1-C1-C2"); // S1-W1-W2-W3
-        autoChooser.addOption("S3 5-note", "S3-W3-W2-W1-C1");
-        autoChooser.addOption("S2 3-note", "S2-W2-W3");
+        autoChooser.setDefaultOption("Default", "None"); // S1-W1-W2-W3
+        autoChooser.addOption("Amp Side - 4 note (2 from center)", "S1-W1-C1-C2");
+        autoChooser.addOption("Amp Side - 5 note (3 from center)", "S1-W1-C1-C2-C3");
+        autoChooser.addOption("Amp Side - 3 note", "S1-W1-W2");
+        autoChooser.addOption("Amp Side - 4 note (wing)", "S1-W1-W2-W3");
+        autoChooser.addOption("Amp Side - 5 note", "S1-W1-W2-W3-C5");
+        autoChooser.addOption("Center - 3 note", "S2-W2-W3");
+        autoChooser.addOption("Center - 4 note (source side to center)", "S2-W2-W3-C5");
+        autoChooser.addOption("Source Side - 2 note", "S3-W3");
+        autoChooser.addOption("Source Side - 3 note", "S3-W3-C5");
+        autoChooser.addOption("Source Side - 5 note (across)", "S3-W3-W2-W1-C1");
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 

@@ -167,8 +167,7 @@ public class AimerIORoboRio implements AimerIO {
                         new State(goalAngleRad, 0));
 
         double controlSetpoint =
-                MathUtil.clamp(
-                        trapezoidSetpoint.position, 0.0, ScoringConstants.aimMaxAngleRadians);
+                MathUtil.clamp(trapezoidSetpoint.position, minAngleClamp, maxAngleClamp);
         double velocitySetpoint = trapezoidSetpoint.velocity;
 
         if (override) {
