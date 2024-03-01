@@ -238,9 +238,13 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                     () -> drivetrain.seedFieldRelative(getPoseAgainstSpeaker())));
             
-            leftJoystick.button(1) // placeholder button
+            leftJoystick.button(3)
                 .onTrue(new InstantCommand(
                     () -> drivetrain.seedFieldRelative(getPoseAgainstPodium())));
+
+            leftJoystick.button(4)
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.seedFieldRelative(getPoseAgainstAmpZone())));
 
             controller.povUp()
                 .onTrue(new InstantCommand(
@@ -288,7 +292,9 @@ public class RobotContainer {
         if (FeatureFlags.runScoring) {
             scoringSubsystem.setDefaultCommand(new ShootWithGamepad(
                 rightJoystick.getHID()::getTrigger,
+                () -> rightJoystick.getHID().getRawButton(4),
                 controller.getHID()::getRightBumper,
+                controller.getHID()::getYButton,
                 () -> controller.getRightTriggerAxis() > 0.5,
                 controller.getHID()::getAButton,
                 controller.getHID()::getBButton, scoringSubsystem,
@@ -606,6 +612,18 @@ public class RobotContainer {
             }
         }
         return FieldConstants.robotAgainstRedPodium;
+    }
+
+    private Pose2d getPoseAgainstAmpZone() {
+        if (!DriverStation.getAlliance().isEmpty()) {
+            switch (DriverStation.getAlliance().get()) {
+                case Blue:
+                    return FieldConstants.robotAgainstRedAmpZone;
+                case Red:
+                    return FieldConstants.robotAgainstBlueAmpZone;
+            }
+        }
+        return FieldConstants.robotAgainstRedAmpZone;
     }
 
     private Rotation2d getFieldToSourceHeading() {

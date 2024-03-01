@@ -33,6 +33,7 @@ public class EndgameIOSparkFlex implements EndgameIO {
     public void setBrakeMode(boolean brake) {
         IdleMode sparkMode = brake ? IdleMode.kBrake : IdleMode.kCoast;
         leftEndgameMotor.setIdleMode(sparkMode);
+        rightEndgameMotor.setIdleMode(sparkMode);
     }
 
     @Override

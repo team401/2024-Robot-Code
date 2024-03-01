@@ -89,7 +89,7 @@ public final class Constants {
 
         public static final double alignmentkPMax = 7.0;
         public static final double alignmentkPMin = 5.0;
-        public static final double alignmentkI = 1.0;
+        public static final double alignmentkI = 2.0;
         public static final double alignmentkD = 0.0;
     }
 
@@ -124,6 +124,12 @@ public final class Constants {
 
         public static final Pose2d robotAgainstRedPodium =
                 new Pose2d(13.93, 4.09, Rotation2d.fromDegrees(0));
+
+        public static final Pose2d robotAgainstBlueAmpZone =
+                new Pose2d(2.85, 7.68, Rotation2d.fromDegrees(-90));
+
+        public static final Pose2d robotAgainstRedAmpZone =
+                new Pose2d(13.74, 7.68, Rotation2d.fromDegrees(-90));
     }
 
     public static final class VisionConstants {
@@ -442,7 +448,7 @@ public final class Constants {
         public static final double aimAngleMarginRadians = Units.degreesToRadians(1);
         public static final double hoodAngleMarginRadians = Units.degreesToRadians(5);
 
-        public static final double intakeAngleToleranceRadians = 0.0;
+        public static final double intakeAngleToleranceRadians = 0.1;
         // Math.PI / 2 - Units.degreesToRadians(40);
 
         public static final double shooterAmpVelocityRPM = 2000;

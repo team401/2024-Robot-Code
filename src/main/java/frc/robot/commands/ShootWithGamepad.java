@@ -10,7 +10,9 @@ import java.util.function.Supplier;
 public class ShootWithGamepad extends Command {
 
     private BooleanSupplier driverShoot;
+    private BooleanSupplier driverForceShoot;
     private BooleanSupplier masherShoot;
+    private BooleanSupplier masherForceShoot;
     private BooleanSupplier warmup;
     private BooleanSupplier reverseIntake;
     private BooleanSupplier intake;
@@ -21,14 +23,18 @@ public class ShootWithGamepad extends Command {
 
     public ShootWithGamepad(
             BooleanSupplier driverShoot,
+            BooleanSupplier driverForceShoot,
             BooleanSupplier masherShoot,
+            BooleanSupplier masherForceShoot,
             BooleanSupplier warmup,
             BooleanSupplier reverseIntake,
             BooleanSupplier intake,
             ScoringSubsystem scoring,
             Supplier<AlignTarget> getDriveMode) {
         this.driverShoot = driverShoot;
+        this.driverForceShoot = driverForceShoot;
         this.masherShoot = masherShoot;
+        this.masherForceShoot = masherForceShoot;
         this.warmup = warmup;
         this.reverseIntake = reverseIntake;
         this.intake = intake;
@@ -67,10 +73,14 @@ public class ShootWithGamepad extends Command {
              * If the scorer is commanded to shoot from a non-shootable state, it will start trying to
              * shoot at the speaker. We want the shoot button to do nothing in an un-shootable state.
              */
-            if ((driverShoot.getAsBoolean() || masherShoot.getAsBoolean())
-                    && getDriveMode.get() != AlignTarget.SOURCE
+            if (getDriveMode.get() != AlignTarget.SOURCE
                     && getDriveMode.get() != AlignTarget.NONE) {
-                scoring.setAction(ScoringAction.SHOOT);
+                boolean force = driverForceShoot.getAsBoolean() || masherForceShoot.getAsBoolean();
+                scoring.setOverrideShoot(force);
+
+                if (driverShoot.getAsBoolean() || masherShoot.getAsBoolean() || force) {
+                    scoring.setAction(ScoringAction.SHOOT);
+                }
             }
         } else if (reverseIntake.getAsBoolean()) {
             scoring.setAction(ScoringAction.SPIT);
