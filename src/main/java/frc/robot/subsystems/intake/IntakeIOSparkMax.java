@@ -52,7 +52,7 @@ public class IntakeIOSparkMax implements IntakeIO {
     @Override
     public void setIntakeVoltage(double volts) {
         leftIntake.set(volts / 12);
-        rightIntake.set(volts / 12);
+        // rightIntake.set(volts / 12);
     }
 
     @Override
