@@ -260,7 +260,7 @@ public final class Constants {
 
         // The stator current at which the wheels start to slip;
         // This needs to be tuned to your individual robot
-        private static final double kSlipCurrentA = 180.0;
+        private static final double kSlipCurrentA = 45;
 
         // Theoretical free speed (m/s) at 12v applied output;
         // This needs to be tuned to your individual robot
@@ -483,10 +483,10 @@ public final class Constants {
             map.put(3.22, 0.45);
             map.put(3.9, 0.36);
             map.put(4.55, 0.34);
-            map.put(4.95, 0.31);
-            map.put(5.64, 0.3);
+            map.put(4.95, 0.33);
+            map.put(5.64, 0.32);
             // map.put(5.82, 0.275);
-            map.put(6.0, 0.3);
+            map.put(6.0, 0.31);
 
             return map;
         }
