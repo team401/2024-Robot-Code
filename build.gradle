@@ -167,7 +167,7 @@ task(checkAkitInstall, dependsOn: "classes", type: JavaExec) {
 }
 compileJava.finalizedBy checkAkitInstall
 
-task commitOnDeploy {
+task (commitOnDeploy, dependsOn: "spotlessApply") {
 	description = 'Commits when deployed.'
 	doLast {
 		if (true) {
@@ -186,4 +186,4 @@ task commitOnDeploy {
 	}
 }
 
-deployroborio.dependsOn commitOnDeploy
+compileJava.dependsOn commitOnDeploy
