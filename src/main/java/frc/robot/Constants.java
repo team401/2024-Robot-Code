@@ -133,7 +133,7 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
-        public static final String tagLayoutName = "2024-WPI";
+        public static final String tagLayoutName = "vabla";
         public static final AprilTagFieldLayout fieldLayout = initLayout(tagLayoutName);
 
         public static final double singleTagAmbiguityCutoff = 0.05;
@@ -174,16 +174,16 @@ public final class Constants {
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(-0.327, 0.281, 0.333),
-                                        new Rotation3d(0.0, -0.409, 3.14))),
-                        new CameraParams(
-                                "Back-Right",
-                                640,
-                                480,
-                                20,
-                                Rotation2d.fromDegrees(70),
-                                new Transform3d(
-                                        new Translation3d(-0.327, -0.281, 0.333),
                                         new Rotation3d(0.0, -0.409, 3.14))));
+                        // new CameraParams(
+                        //         "Back-Right",
+                        //         640,
+                        //         480,
+                        //         20,
+                        //         Rotation2d.fromDegrees(70),
+                        //         new Transform3d(
+                        //                 new Translation3d(-0.327, -0.281, 0.333),
+                        //                 new Rotation3d(0.0, -0.409, 3.14))));
 
         public static record CameraParams(
                 String name,
@@ -530,9 +530,9 @@ public final class Constants {
         // Value - Time in seconds
         public static HashMap<Double, Double> timeToPutAimDownMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
-            map.put(0.0, 0.0);
-            map.put(Math.PI / 6, 0.2);
-            map.put(Math.PI / 4, 0.5);
+            map.put(0.0, 0.2);
+            map.put(Math.PI / 6, 0.5);
+            map.put(Math.PI / 4, 0.6);
             map.put(Math.PI / 3, 0.7);
             map.put(Math.PI / 2, 1.0);
 

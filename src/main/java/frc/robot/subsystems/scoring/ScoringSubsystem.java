@@ -147,6 +147,10 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
         Logger.recordOutput("scoring/aimGoal", 0.0);
 
+        SmartDashboard.putBoolean("Has Note", shooterInputs.bannerSensor);
+        SmartDashboard.putNumber("Aimer Location", aimerInputs.aimAngleRad);
+
+
         if ((!hasNote() || overrideIntake) && action == ScoringAction.INTAKE) {
             state = ScoringState.INTAKE;
         } else if ((!hasNote() || overrideIntake) && action == ScoringAction.SOURCE_INTAKE) {
@@ -218,10 +222,10 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         double distancetoGoal = findDistanceToGoal();
         Logger.recordOutput(
                 "scoring/aimGoal",
-                aimerInterpolated.getValue(distancetoGoal) + ScoringConstants.aimerStaticOffset);
+                getAimerAngle(distancetoGoal));
         shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
         aimerIo.setAimAngleRad(
-                aimerInterpolated.getValue(distancetoGoal) + ScoringConstants.aimerStaticOffset,
+                getAimerAngle(distancetoGoal),
                 false);
         shooterIo.setKickerVolts(hasNote() ? 0.0 : 1.5);
 
@@ -238,6 +242,11 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
         boolean primeReady = shooterReady && aimReady && driveReady;
         readyToShoot = primeReady && notePresent;
+
+        Logger.recordOutput("scoring/shooterReady", shooterReady);
+        Logger.recordOutput("scoring/aimReady", aimReady);
+        Logger.recordOutput("scoring/driverReady", driveReady);
+        Logger.recordOutput("scoring/notePresent", notePresent);
 
         if (action != ScoringAction.SHOOT && action != ScoringAction.AIM) {
             state = ScoringState.IDLE;
@@ -269,7 +278,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         double distancetoGoal = findDistanceToGoal();
         shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
         aimerIo.setAimAngleRad(
-                aimerInterpolated.getValue(distancetoGoal) + ScoringConstants.aimerStaticOffset,
+                getAimerAngle(distancetoGoal),
                 false);
 
         shooterIo.setKickerVolts(10);
@@ -537,6 +546,10 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     public void setOverrideStageAvoidance(boolean overrideStageAvoidance) {
         this.overrideStageAvoidance = overrideStageAvoidance;
+    }
+
+    public double getAimerAngle(double distance) {
+        return aimerInterpolated.getValue(distance) + SmartDashboard.getNumber("Aimer Offset", ScoringConstants.aimerStaticOffset);
     }
 
     @Override
