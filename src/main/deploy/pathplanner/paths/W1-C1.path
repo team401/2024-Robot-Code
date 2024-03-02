@@ -47,40 +47,6 @@
           ]
         }
       }
-    },
-    {
-      "name": "Override",
-      "waypointRelativePos": 0.15,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Override Shoot"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Un-override",
-      "waypointRelativePos": 0.5,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Un-Override Shoot"
-              }
-            }
-          ]
-        }
-      }
     }
   ],
   "globalConstraints": {
