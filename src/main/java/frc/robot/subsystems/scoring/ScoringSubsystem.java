@@ -21,6 +21,8 @@ import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
 import frc.robot.utils.Tunable;
+
+import java.sql.Driver;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -150,7 +152,6 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         SmartDashboard.putBoolean("Has Note", shooterInputs.bannerSensor);
         SmartDashboard.putNumber("Aimer Location", aimerInputs.aimAngleRad);
 
-
         if ((!hasNote() || overrideIntake) && action == ScoringAction.INTAKE) {
             state = ScoringState.INTAKE;
         } else if ((!hasNote() || overrideIntake) && action == ScoringAction.SOURCE_INTAKE) {
@@ -220,13 +221,9 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     private void prime() {
         double distancetoGoal = findDistanceToGoal();
-        Logger.recordOutput(
-                "scoring/aimGoal",
-                getAimerAngle(distancetoGoal));
+        Logger.recordOutput("scoring/aimGoal", getAimerAngle(distancetoGoal));
         shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
-        aimerIo.setAimAngleRad(
-                getAimerAngle(distancetoGoal),
-                false);
+        aimerIo.setAimAngleRad(getAimerAngle(distancetoGoal), false);
         shooterIo.setKickerVolts(hasNote() ? 0.0 : 1.5);
 
         boolean shooterReady =
@@ -277,9 +274,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     private void shoot() {
         double distancetoGoal = findDistanceToGoal();
         shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
-        aimerIo.setAimAngleRad(
-                getAimerAngle(distancetoGoal),
-                false);
+        aimerIo.setAimAngleRad(getAimerAngle(distancetoGoal), false);
 
         shooterIo.setKickerVolts(10);
 
@@ -434,6 +429,9 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     @Override
     public void periodic() {
+        if (SmartDashboard.containsKey("Aimer Offset")) {
+            SmartDashboard.putNumber("Aimer Offset", ScoringConstants.aimerStaticOffset);
+        }
 
         if (state == ScoringState.TEMPORARY_SETPOINT) {
             aimerIo.setAngleClampsRad(0.0, ScoringConstants.aimMaxAngleRadians);
@@ -549,7 +547,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     public double getAimerAngle(double distance) {
-        return aimerInterpolated.getValue(distance) + SmartDashboard.getNumber("Aimer Offset", ScoringConstants.aimerStaticOffset);
+        return aimerInterpolated.getValue(distance)
+                + SmartDashboard.getNumber("Aimer Offset", ScoringConstants.aimerStaticOffset);
     }
 
     @Override
