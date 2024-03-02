@@ -486,7 +486,7 @@ public final class Constants {
             map.put(4.95, 0.31);
             map.put(5.64, 0.3);
             // map.put(5.82, 0.275);
-            map.put(6.0, 0.29);
+            map.put(6.0, 0.3);
 
             return map;
         }
