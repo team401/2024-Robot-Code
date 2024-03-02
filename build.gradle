@@ -1,8 +1,11 @@
+import java.text.SimpleDateFormat
+
 plugins {
 	id "java"
-	id "edu.wpi.first.GradleRIO" version "2024.2.1"
+	id "edu.wpi.first.GradleRIO" version "2024.3.1"
 	id "com.peterabeles.gversion" version "1.10"
 	id "com.diffplug.spotless" version "6.24.0"
+	id 'org.ajoberstar.grgit' version "5.2.1"
 }
 
 java {
@@ -163,3 +166,24 @@ task(checkAkitInstall, dependsOn: "classes", type: JavaExec) {
 	classpath = sourceSets.main.runtimeClasspath
 }
 compileJava.finalizedBy checkAkitInstall
+
+task commitOnDeploy {
+	description = 'Commits when deployed.'
+	doLast {
+		if (true) {
+			def date = new Date()
+			def sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss")
+			grgit.add(patterns: [
+				'src/',
+				'vendordeps/',
+				'build.gradle',
+				'logs',
+				'gradle',
+				'.wpilib'
+			])
+			grgit.commit(message: "Automated commit at " + sdf.format(date), all: true)
+		}
+	}
+}
+
+deployroborio.dependsOn commitOnDeploy
