@@ -727,6 +727,9 @@ public class RobotContainer {
                 new InstantCommand(
                         () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
         NamedCommands.registerCommand("Intake Note", Commands.none());
+        NamedCommands.registerCommand(
+                "Disable Auto-Align",
+                new InstantCommand(() -> drivetrain.setAlignState(AlignState.MANUAL)));
     }
 
     public void teleopInit() {
@@ -738,6 +741,10 @@ public class RobotContainer {
 
             scoringSubsystem.setAction(ScoringAction.WAIT);
             scoringSubsystem.enabledInit();
+        }
+
+        if (FeatureFlags.runDrive) {
+            drivetrain.setAlignState(AlignState.MANUAL);
         }
     }
 }

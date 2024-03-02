@@ -4,6 +4,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.VisionConstants;
@@ -27,12 +28,16 @@ public class VisionLocalizer extends SubsystemBase {
 
     @Override
     public void periodic() {
+        int i = 0;
         for (CameraIOInputs inputs : io.getInputs()) {
             cameraConsumer.accept(
                     new CameraMeasurement(
                             inputs.latestFieldToRobot,
                             inputs.latestTimestampSeconds,
                             cameraUncertainty(inputs.averageTagDistanceM, inputs.nTags)));
+
+            SmartDashboard.putBoolean("Camera " + i + " Connected", inputs.connected);
+            i++;
         }
 
         Logger.recordOutput("Vision/robotInMidField", robotInMidField());
@@ -54,7 +59,7 @@ public class VisionLocalizer extends SubsystemBase {
          */
         if (nTags < 2) {
             return VisionConstants.singleTagUncertainty;
-        } else if (averageTagDistanceM < 2.0 && this.robotInMidField()) {
+        } else if (averageTagDistanceM < 6.0 && this.robotInMidField()) {
             return VisionConstants.lowCameraUncertainty;
         } else {
             return VisionConstants.highCameraUncertainty;
