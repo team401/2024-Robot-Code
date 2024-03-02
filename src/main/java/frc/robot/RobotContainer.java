@@ -730,6 +730,13 @@ public class RobotContainer {
         NamedCommands.registerCommand(
                 "Disable Auto-Align",
                 new InstantCommand(() -> drivetrain.setAlignState(AlignState.MANUAL)));
+
+        NamedCommands.registerCommand(
+                "Override Shoot",
+                new InstantCommand(() -> scoringSubsystem.setOverrideShoot(true)));
+        NamedCommands.registerCommand(
+                "Un-Override Shoot",
+                new InstantCommand(() -> scoringSubsystem.setOverrideShoot(false)));
     }
 
     public void teleopInit() {
