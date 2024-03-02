@@ -46,7 +46,7 @@ public final class Constants {
     }
 
     public static final class FeatureFlags {
-        public static final boolean runVision = false;
+        public static final boolean runVision = true;
 
         public static final boolean runIntake = true;
         public static final boolean runScoring = true;
@@ -89,7 +89,7 @@ public final class Constants {
 
         public static final double alignmentkPMax = 7.0;
         public static final double alignmentkPMin = 5.0;
-        public static final double alignmentkI = 1.0;
+        public static final double alignmentkI = 2.0;
         public static final double alignmentkD = 0.0;
     }
 
@@ -100,12 +100,12 @@ public final class Constants {
         public static final double midfieldLowThresholdM = 5.87;
         public static final double midfieldHighThresholdM = 10.72;
 
-        public static final Rotation2d fieldToAmpHeading = new Rotation2d(-Math.PI / 2);
+        public static final Rotation2d ampHeading = new Rotation2d(-Math.PI / 2);
 
-        public static final Rotation2d fieldToRedSourceHeading =
-                new Rotation2d(Math.PI / 3); // 60 degrees
-        public static final Rotation2d fieldToBlueSourceHeading =
-                new Rotation2d(Math.PI * 2 / 3); // 120 degrees
+        public static final Rotation2d redSourceHeading =
+                new Rotation2d(Math.PI * 4 / 3); // 60 degrees
+        public static final Rotation2d blueSourceHeading =
+                new Rotation2d(Math.PI * 5 / 3); // 120 degrees
 
         public static final Translation2d fieldToRedSpeaker =
                 new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42));
@@ -118,6 +118,18 @@ public final class Constants {
 
         public static final Pose2d robotAgainstRedSpeaker =
                 new Pose2d(15.19, 5.56, Rotation2d.fromDegrees(0));
+
+        public static final Pose2d robotAgainstBluePodium =
+                new Pose2d(2.57, 4.09, Rotation2d.fromDegrees(180));
+
+        public static final Pose2d robotAgainstRedPodium =
+                new Pose2d(13.93, 4.09, Rotation2d.fromDegrees(0));
+
+        public static final Pose2d robotAgainstBlueAmpZone =
+                new Pose2d(2.85, 7.68, Rotation2d.fromDegrees(-90));
+
+        public static final Pose2d robotAgainstRedAmpZone =
+                new Pose2d(13.74, 7.68, Rotation2d.fromDegrees(-90));
     }
 
     public static final class VisionConstants {
@@ -144,7 +156,7 @@ public final class Constants {
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(0.323, 0.262, 0.216),
-                                        new Rotation3d(0.0, 1.224, 0.138))),
+                                        new Rotation3d(0, -0.349, 0.138))),
                         new CameraParams(
                                 "Front-Right",
                                 640,
@@ -153,7 +165,7 @@ public final class Constants {
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(0.323, -0.262, 0.216),
-                                        new Rotation3d(0.0, 1.224, -0.138))),
+                                        new Rotation3d(0.0, -0.349, -0.138))),
                         new CameraParams(
                                 "Back-Left",
                                 640,
@@ -162,7 +174,7 @@ public final class Constants {
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(-0.327, 0.281, 0.333),
-                                        new Rotation3d(0.0, -1.162, 3.14))),
+                                        new Rotation3d(0.0, -0.409, 3.14))),
                         new CameraParams(
                                 "Back-Right",
                                 640,
@@ -171,7 +183,7 @@ public final class Constants {
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(-0.327, -0.281, 0.333),
-                                        new Rotation3d(0.0, -1.162, 3.14))));
+                                        new Rotation3d(0.0, -0.409, 3.14))));
 
         public static record CameraParams(
                 String name,
@@ -206,7 +218,7 @@ public final class Constants {
         public static final int indexTwoMotorID = 14;
 
         public static final double intakePower = 10.0;
-        public static final double beltPower = 10.0;
+        public static final double beltPower = 8.0;
     }
 
     public static final class EndgameConstants {
@@ -436,7 +448,7 @@ public final class Constants {
         public static final double aimAngleMarginRadians = Units.degreesToRadians(1);
         public static final double hoodAngleMarginRadians = Units.degreesToRadians(5);
 
-        public static final double intakeAngleToleranceRadians = 0.0;
+        public static final double intakeAngleToleranceRadians = 0.1;
         // Math.PI / 2 - Units.degreesToRadians(40);
 
         public static final double shooterAmpVelocityRPM = 2000;

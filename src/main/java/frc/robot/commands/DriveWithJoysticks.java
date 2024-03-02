@@ -1,24 +1,21 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
-import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignTarget;
 import frc.robot.utils.Deadband;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-import java.util.function.IntSupplier;
 
 public class DriveWithJoysticks extends Command {
     CommandSwerveDrivetrain drivetrain;
     DoubleSupplier x;
     DoubleSupplier y;
     DoubleSupplier rot;
-    IntSupplier POV;
     BooleanSupplier fieldCentric;
     BooleanSupplier babyMode;
-    BooleanSupplier autoAlign;
 
     double xMpS;
     double yMpS;
@@ -29,18 +26,14 @@ public class DriveWithJoysticks extends Command {
             DoubleSupplier x,
             DoubleSupplier y,
             DoubleSupplier rot,
-            IntSupplier POV,
             BooleanSupplier fieldCentric,
-            BooleanSupplier babyMode,
-            BooleanSupplier autoAlign) {
+            BooleanSupplier babyMode) {
         this.drivetrain = drivetrain;
         this.x = x;
         this.y = y;
-        this.POV = POV;
         this.rot = rot;
         this.fieldCentric = fieldCentric;
         this.babyMode = babyMode;
-        this.autoAlign = autoAlign;
 
         addRequirements(drivetrain);
     }
@@ -50,42 +43,38 @@ public class DriveWithJoysticks extends Command {
 
     @Override
     public void execute() {
+        double allianceX = 0.0;
+        double allianceY = 0.0;
+        if (DriverStation.getAlliance().isPresent()) {
+            switch (DriverStation.getAlliance().get()) {
+                case Red:
+                    allianceX = x.getAsDouble();
+                    allianceY = y.getAsDouble();
+                    break;
+                case Blue:
+                    allianceX = -x.getAsDouble();
+                    allianceY = -y.getAsDouble();
+                    break;
+            }
+        } else {
+            allianceX = x.getAsDouble();
+            allianceY = y.getAsDouble();
+        }
         double[] joystickInputsFiltered =
-                Deadband.twoAxisDeadband(
-                        x.getAsDouble(), y.getAsDouble(), DriveConstants.deadbandPercent);
+                Deadband.twoAxisDeadband(allianceX, allianceY, DriveConstants.deadbandPercent);
 
-        joystickInputsFiltered[0] = Math.pow(joystickInputsFiltered[0], 3);
-        joystickInputsFiltered[1] = Math.pow(joystickInputsFiltered[1], 3);
+        joystickInputsFiltered[0] = Math.pow(joystickInputsFiltered[0], 1);
+        joystickInputsFiltered[1] = Math.pow(joystickInputsFiltered[1], 1);
 
         xMpS = joystickInputsFiltered[0] * DriveConstants.MaxSpeedMetPerSec;
         yMpS = joystickInputsFiltered[1] * DriveConstants.MaxSpeedMetPerSec;
         rotRadpS = Deadband.oneAxisDeadband(rot.getAsDouble(), DriveConstants.deadbandPercent);
-        rotRadpS = Math.pow(rotRadpS, 3) * DriveConstants.MaxAngularRateRadiansPerSec;
+        rotRadpS = Math.pow(rotRadpS, 1) * DriveConstants.MaxAngularRateRadiansPerSec;
 
         if (babyMode.getAsBoolean()) {
             xMpS *= 0.5;
             yMpS *= 0.5;
             rotRadpS *= 0.5;
-        }
-
-        // drivetrain.setAlignState(
-        //         autoAlign.getAsBoolean() ? AlignState.ALIGNING : AlignState.MANUAL);
-
-        switch (POV.getAsInt()) {
-            case 0:
-                drivetrain.setAlignTarget(AlignTarget.SPEAKER);
-                break;
-            case 90:
-                drivetrain.setAlignTarget(AlignTarget.AMP);
-                break;
-            case 180:
-                drivetrain.setAlignTarget(AlignTarget.NONE);
-                break;
-            case 270:
-                drivetrain.setAlignTarget(AlignTarget.SOURCE);
-                break;
-            default:
-                break;
         }
 
         drivetrain.setGoalChassisSpeeds(

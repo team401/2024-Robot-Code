@@ -22,6 +22,7 @@ import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveWithJoysticks;
+import frc.robot.commands.ShootWithGamepad;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignState;
@@ -227,7 +228,7 @@ public class RobotContainer {
         if (FeatureFlags.runDrive) {
             setUpDriveWithJoysticks();
                 
-            rightJoystick.trigger()
+            leftJoystick.trigger()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignState(AlignState.ALIGNING)))
                 .onFalse(new InstantCommand(
@@ -235,97 +236,69 @@ public class RobotContainer {
 
             leftJoystick.top()
                 .onTrue(new InstantCommand(
-                    () -> drivetrain.seedFieldRelative(getPoseAgainstSpeaker()))
-                );
+                    () -> drivetrain.seedFieldRelative(getPoseAgainstSpeaker())));
+            
+            leftJoystick.button(3)
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.seedFieldRelative(getPoseAgainstPodium())));
 
-            controller.b()
+            leftJoystick.button(4)
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.seedFieldRelative(getPoseAgainstAmpZone())));
+
+            controller.povUp()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
 
-            controller.start()
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
-
-            controller.x()
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
-
-            controller.back()
+            controller.povRight()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.AMP)));
 
-            // controller.povRight().onTrue(drivetrain.getDriveToPointCommand());
+            controller.povLeft()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.SOURCE)));
+
+            controller.povDown()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.ENDGAME)));
         }
 
         if (FeatureFlags.runEndgame) {
             endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.OVERRIDE);
 
-            controller.povUp()
+            controller.leftBumper()
                 .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(2.0, 0)))
                 .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
 
-            controller.povDown()
+            controller.leftTrigger()
                 .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(-2.0, 0)))
                 .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
         }
 
         if (FeatureFlags.runIntake) {
-            controller.a()
+            controller.b()
                 .onTrue(new InstantCommand(
                         () -> intakeSubsystem.run(IntakeAction.INTAKE)))
                 .onFalse(new InstantCommand(
                     () -> intakeSubsystem.run(IntakeAction.NONE)));
 
-            controller.rightBumper()
+            controller.a()
                 .onTrue(new InstantCommand(
-                        () -> intakeSubsystem.run(IntakeAction.REVERSE)));
-                
-            controller.start()
-                .onTrue(new InstantCommand(
-                        () -> intakeSubsystem.run(IntakeAction.NONE)));
+                    () -> intakeSubsystem.run(IntakeAction.REVERSE)))
+                .onFalse(new InstantCommand(
+                    () -> intakeSubsystem.run(IntakeAction.NONE)));
         }
 
         if (FeatureFlags.runScoring) {
-            controller.a()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.INTAKE)))
-                .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)));
-
-            controller.b()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                         ScoringSubsystem.ScoringAction.AIM)));
-
-            controller.x()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.SHOOT)));
-
-            controller.y()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.ENDGAME)));
-
-            controller.back()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AMP_AIM)));
-
-            controller.start()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)));
-
-            controller.povLeft()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.SOURCE_INTAKE)))
-                .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)));
+            scoringSubsystem.setDefaultCommand(new ShootWithGamepad(
+                rightJoystick.getHID()::getTrigger,
+                () -> rightJoystick.getHID().getRawButton(4),
+                controller.getHID()::getRightBumper,
+                controller.getHID()::getYButton,
+                () -> controller.getRightTriggerAxis() > 0.5,
+                controller.getHID()::getAButton,
+                controller.getHID()::getBButton, scoringSubsystem,
+                FeatureFlags.runDrive ? drivetrain::getAlignTarget : () -> AlignTarget.NONE));
         }
     } // spotless:on
 
@@ -613,14 +586,12 @@ public class RobotContainer {
     }
 
     private Rotation2d getFieldToAmpHeading() {
-        Logger.recordOutput("Field/amp", FieldConstants.fieldToAmpHeading);
-        return FieldConstants.fieldToAmpHeading;
+        Logger.recordOutput("Field/amp", FieldConstants.ampHeading);
+        return FieldConstants.ampHeading;
     }
 
     private Pose2d getPoseAgainstSpeaker() {
-        if (DriverStation.getAlliance().isEmpty()) {
-            return FieldConstants.robotAgainstRedSpeaker;
-        } else {
+        if (!DriverStation.getAlliance().isEmpty()) {
             switch (DriverStation.getAlliance().get()) {
                 case Blue:
                     return FieldConstants.robotAgainstBlueSpeaker;
@@ -628,23 +599,45 @@ public class RobotContainer {
                     return FieldConstants.robotAgainstRedSpeaker;
             }
         }
-        throw new RuntimeException("Unreachable branch of switch expression");
+        return FieldConstants.robotAgainstRedSpeaker;
+    }
+
+    private Pose2d getPoseAgainstPodium() {
+        if (!DriverStation.getAlliance().isEmpty()) {
+            switch (DriverStation.getAlliance().get()) {
+                case Blue:
+                    return FieldConstants.robotAgainstBluePodium;
+                case Red:
+                    return FieldConstants.robotAgainstRedPodium;
+            }
+        }
+        return FieldConstants.robotAgainstRedPodium;
+    }
+
+    private Pose2d getPoseAgainstAmpZone() {
+        if (!DriverStation.getAlliance().isEmpty()) {
+            switch (DriverStation.getAlliance().get()) {
+                case Blue:
+                    return FieldConstants.robotAgainstRedAmpZone;
+                case Red:
+                    return FieldConstants.robotAgainstBlueAmpZone;
+            }
+        }
+        return FieldConstants.robotAgainstRedAmpZone;
     }
 
     private Rotation2d getFieldToSourceHeading() {
-        if (DriverStation.getAlliance().isEmpty()) {
-            return FieldConstants.fieldToRedSourceHeading;
-        } else {
+        if (!DriverStation.getAlliance().isEmpty()) {
             switch (DriverStation.getAlliance().get()) {
                 case Blue:
-                    Logger.recordOutput("Field/source", FieldConstants.fieldToBlueSourceHeading);
-                    return FieldConstants.fieldToBlueSourceHeading;
+                    Logger.recordOutput("Field/source", FieldConstants.blueSourceHeading);
+                    return FieldConstants.blueSourceHeading;
                 case Red:
-                    Logger.recordOutput("Field/source", FieldConstants.fieldToRedSourceHeading);
-                    return FieldConstants.fieldToRedSourceHeading;
+                    Logger.recordOutput("Field/source", FieldConstants.redSourceHeading);
+                    return FieldConstants.redSourceHeading;
             }
         }
-        throw new RuntimeException("Unreachable branch of switch expression");
+        return FieldConstants.redSourceHeading;
     }
 
     private void setUpDriveWithJoysticks() {
@@ -655,10 +648,8 @@ public class RobotContainer {
                             () -> leftJoystick.getY(),
                             () -> leftJoystick.getX(),
                             () -> rightJoystick.getX(),
-                            () -> controller.getHID().getPOV(),
                             () -> true,
-                            () -> leftJoystick.trigger().getAsBoolean(),
-                            () -> rightJoystick.trigger().getAsBoolean()));
+                            () -> rightJoystick.top().getAsBoolean()));
         }
     }
 
@@ -689,11 +680,19 @@ public class RobotContainer {
     public void disabledPeriodic() {
         /* set to coast mode when circuit open */
         if (brakeSwitch != null && brakeSwitch.get()) {
-            scoringSubsystem.setBrakeMode(false);
-            endgameSubsystem.setBrakeMode(false);
+            if (FeatureFlags.runScoring) {
+                scoringSubsystem.setBrakeMode(false);
+            }
+            if (FeatureFlags.runEndgame) {
+                endgameSubsystem.setBrakeMode(false);
+            }
         } else {
-            scoringSubsystem.setBrakeMode(true);
-            endgameSubsystem.setBrakeMode(true);
+            if (FeatureFlags.runScoring) {
+                scoringSubsystem.setBrakeMode(true);
+            }
+            if (FeatureFlags.runEndgame) {
+                endgameSubsystem.setBrakeMode(true);
+            }
         }
     }
 
