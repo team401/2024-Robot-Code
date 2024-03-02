@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.utils.GeomUtil;
@@ -52,7 +53,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         SPEAKER,
         SOURCE,
         ENDGAME,
-        SPECIFIC_DIRECTION,
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT
     }
 
     public enum AlignState {
@@ -295,8 +299,64 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 case SOURCE:
                     desiredHeading = getFieldToSource.get();
                     break;
-                case SPECIFIC_DIRECTION:
-                    desiredHeading = Rotation2d.fromRadians(alignDirection);
+                    // case SPECIFIC_DIRECTION:
+                    //     desiredHeading = Rotation2d.fromRadians(alignDirection);
+                case UP:
+                    if (!DriverStation.getAlliance().isPresent()) {
+                        desiredHeading = FieldConstants.blueUpHeading;
+                    } else {
+                        switch (DriverStation.getAlliance().get()) {
+                            case Blue:
+                                desiredHeading = FieldConstants.blueUpHeading;
+                                break;
+                            case Red:
+                                desiredHeading = FieldConstants.redUpHeading;
+                                break;
+                        }
+                    }
+                    break;
+                case DOWN:
+                    if (!DriverStation.getAlliance().isPresent()) {
+                        desiredHeading = FieldConstants.blueDownHeading;
+                    } else {
+                        switch (DriverStation.getAlliance().get()) {
+                            case Blue:
+                                desiredHeading = FieldConstants.blueDownHeading;
+                                break;
+                            case Red:
+                                desiredHeading = FieldConstants.redDownHeading;
+                                break;
+                        }
+                    }
+                    break;
+                case LEFT:
+                    if (!DriverStation.getAlliance().isPresent()) {
+                        desiredHeading = FieldConstants.blueLeftHeading;
+                    } else {
+                        switch (DriverStation.getAlliance().get()) {
+                            case Blue:
+                                desiredHeading = FieldConstants.blueLeftHeading;
+                                break;
+                            case Red:
+                                desiredHeading = FieldConstants.redLeftHeading;
+                                break;
+                        }
+                    }
+                    break;
+                case RIGHT:
+                    if (!DriverStation.getAlliance().isPresent()) {
+                        desiredHeading = FieldConstants.blueRightHeading;
+                    } else {
+                        switch (DriverStation.getAlliance().get()) {
+                            case Blue:
+                                desiredHeading = FieldConstants.blueRightHeading;
+                                break;
+                            case Red:
+                                desiredHeading = FieldConstants.redRightHeading;
+                                break;
+                        }
+                    }
+                    break;
                 case NONE:
                     break;
                 case ENDGAME:

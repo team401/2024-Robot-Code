@@ -102,6 +102,16 @@ public final class Constants {
 
         public static final Rotation2d ampHeading = new Rotation2d(-Math.PI / 2);
 
+        public static final Rotation2d blueUpHeading = Rotation2d.fromRadians(0.0);
+        public static final Rotation2d blueDownHeading = Rotation2d.fromRadians(Math.PI);
+        public static final Rotation2d blueLeftHeading = Rotation2d.fromRadians(-Math.PI / 2.0);
+        public static final Rotation2d blueRightHeading = Rotation2d.fromRadians(Math.PI / 2.0);
+
+        public static final Rotation2d redUpHeading = Rotation2d.fromRadians(Math.PI);
+        public static final Rotation2d redDownHeading = Rotation2d.fromRadians(0.0);
+        public static final Rotation2d redLeftHeading = Rotation2d.fromRadians(Math.PI / 2.0);
+        public static final Rotation2d redRightHeading = Rotation2d.fromRadians(-Math.PI / 2.0);
+
         public static final Rotation2d redSourceHeading =
                 new Rotation2d(Math.PI * 4 / 3); // 60 degrees
         public static final Rotation2d blueSourceHeading =
