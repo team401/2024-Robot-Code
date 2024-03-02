@@ -368,8 +368,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     public boolean aimerAtIntakePosition() {
-        // return aimerInputs.aimAngleRad > ScoringConstants.intakeAngleToleranceRadians;
-        return true;
+        return aimerInputs.aimAngleRad > ScoringConstants.intakeAngleToleranceRadians;
+        // return true;
     }
 
     public boolean canIntake() {
