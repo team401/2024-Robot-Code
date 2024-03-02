@@ -51,7 +51,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         AMP,
         SPEAKER,
         SOURCE,
-        ENDGAME
+        ENDGAME,
+        SPECIFIC_DIRECTION,
     }
 
     public enum AlignState {
@@ -61,6 +62,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private AlignTarget alignTarget = AlignTarget.NONE;
     private AlignState alignState = AlignState.MANUAL;
+
+    private double alignDirection = 0.0;
 
     private static InterpolateDouble noteTimeToGoal =
             new InterpolateDouble(ScoringConstants.timeToGoalMap(), 0.0, 2.0);
@@ -257,6 +260,25 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         setGoalChassisSpeeds(chassisSpeeds, true);
     }
 
+    public void setAlignDirection(double direction, boolean allianceSpecific) {
+        if (allianceSpecific) {
+            if (!DriverStation.getAlliance().isPresent()) {
+                alignDirection = direction;
+            } else {
+                switch (DriverStation.getAlliance().get()) {
+                    case Blue:
+                        alignDirection = direction;
+                        break;
+                    case Red:
+                        alignDirection = direction + 3.14;
+                        break;
+                }
+            }
+        } else {
+            alignDirection = direction;
+        }
+    }
+
     private void controlDrivetrain() {
         Pose2d pose = getFieldToRobot.get();
         Rotation2d desiredHeading = pose.getRotation();
@@ -273,6 +295,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 case SOURCE:
                     desiredHeading = getFieldToSource.get();
                     break;
+                case SPECIFIC_DIRECTION:
+                    desiredHeading = Rotation2d.fromRadians(alignDirection);
                 case NONE:
                     break;
                 case ENDGAME:
