@@ -89,7 +89,7 @@ public final class Constants {
 
         public static final double alignmentkPMax = 7.0;
         public static final double alignmentkPMin = 5.0;
-        public static final double alignmentkI = 2.0;
+        public static final double alignmentkI = 2.5;
         public static final double alignmentkD = 0.0;
     }
 
