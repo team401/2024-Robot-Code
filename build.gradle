@@ -186,4 +186,4 @@ task commitOnDeploy {
 	}
 }
 
-project.compileJava.dependsOn(commitOnDeploy)
+deployroborio.dependsOn commitOnDeploy
