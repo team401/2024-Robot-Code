@@ -436,6 +436,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         } else if (state != ScoringState.TUNING
                 && state != ScoringState.ENDGAME
                 && state != ScoringState.IDLE
+                && Math.abs(elevatorPositionSupplier.getAsDouble()) < 0.2
                 && !overrideStageAvoidance
                 && willHitStage()) {
             aimerIo.setAngleClampsRad(-0.01, 0);
