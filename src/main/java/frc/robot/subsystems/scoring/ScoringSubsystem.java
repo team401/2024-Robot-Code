@@ -427,7 +427,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     @Override
     public void periodic() {
-        if (SmartDashboard.containsKey("Aimer Offset")) {
+        if (!SmartDashboard.containsKey("Aimer Offset")) {
             SmartDashboard.putNumber("Aimer Offset", ScoringConstants.aimerStaticOffset);
         }
 
