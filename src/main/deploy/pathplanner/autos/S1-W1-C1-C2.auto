@@ -20,7 +20,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.75
           }
         },
         {
@@ -32,7 +32,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.1
+            "waitTime": 0.2
           }
         },
         {
@@ -66,15 +66,15 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Aim Scoring"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "E1-C2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Aim Scoring"
           }
         },
         {
