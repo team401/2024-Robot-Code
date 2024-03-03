@@ -262,21 +262,21 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.ENDGAME)));
             
-            // rightJoystick.povUp()
-            //     .onTrue(new InstantCommand(
-            //         () -> drivetrain.setAlignTarget(AlignTarget.UP)));
+            rightJoystick.povUp()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.UP)));
 
-            // rightJoystick.povDown()
-            //     .onTrue(new InstantCommand(
-            //         () -> drivetrain.setAlignTarget(AlignTarget.DOWN)));
+            rightJoystick.povDown()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.DOWN)));
 
-            // rightJoystick.povLeft()
-            //     .onTrue(new InstantCommand(
-            //         () -> drivetrain.setAlignTarget(AlignTarget.LEFT)));
+            rightJoystick.povLeft()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.LEFT)));
 
-            // rightJoystick.povRight()
-            //     .onTrue(new InstantCommand(
-            //         () -> drivetrain.setAlignTarget(AlignTarget.RIGHT)));
+            rightJoystick.povRight()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.RIGHT)));
         }
 
         if (FeatureFlags.runEndgame) {
