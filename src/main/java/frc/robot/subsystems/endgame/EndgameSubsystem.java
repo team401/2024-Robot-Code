@@ -108,7 +108,11 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
         Logger.recordOutput("endgame/State", state);
 
         if (state == State.OVERRIDE) {
-            endgameIo.setVolts(overrideVolts);
+            if (Math.abs(endgameInputs.position) > 0.52 && overrideVolts > 0) {
+                endgameIo.setVolts(0.0);
+            } else {
+                endgameIo.setVolts(overrideVolts);
+            }
         }
 
         Logger.recordOutput(
