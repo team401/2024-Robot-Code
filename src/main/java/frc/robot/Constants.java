@@ -568,7 +568,7 @@ public final class Constants {
 
     public static final class LEDConstants {
         public static final int ledPort = 0;
-        public static final int ledLength = 10;
+        public static final int ledLength = 5;
     }
 
     public static final class IOConstants {
