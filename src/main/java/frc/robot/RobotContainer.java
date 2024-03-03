@@ -283,11 +283,11 @@ public class RobotContainer {
             endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.OVERRIDE);
 
             controller.leftBumper()
-                .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(2.0, 0)))
+                .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(4.0, 0)))
                 .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
 
             controller.leftTrigger()
-                .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(-2.0, 0)))
+                .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(-4.0, 0)))
                 .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
         }
 
