@@ -53,7 +53,7 @@ public final class Constants {
         public static final boolean runEndgame = true;
         public static final boolean runDrive = true;
 
-        public static final boolean enableLEDS = false;
+        public static final boolean enableLEDS = true;
     }
 
     public static final class ConversionConstants {
@@ -568,7 +568,7 @@ public final class Constants {
 
     public static final class LEDConstants {
         public static final int ledPort = 0;
-        public static final int ledLength = 1000;
+        public static final int ledLength = 10;
     }
 
     public static final class IOConstants {
