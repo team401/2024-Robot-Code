@@ -83,11 +83,7 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
 
     @Override
     public void setVolts(double volts, int slot) {
-        if (Math.abs(endgameInputs.position) < 0.52) {
-            overrideVolts = volts;
-        } else {
-            overrideVolts = 0;
-        }
+        overrideVolts = volts;
     }
 
     @Override
