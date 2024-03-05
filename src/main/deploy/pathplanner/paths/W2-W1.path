@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 2.6896972577487204,
-        "y": 6.887585009517068
+        "x": 3.0221706157698036,
+        "y": 7.051199245255634
       },
       "prevControl": {
-        "x": 2.234441105733733,
-        "y": 6.623242727701913
+        "x": 2.1116583117398284,
+        "y": 6.669371504855968
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,40 +30,16 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [
-    {
-      "name": "atNote",
-      "waypointRelativePos": 1.0,
-      "command": {
-        "type": "sequential",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Intake Note"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "Shoot Scoring"
-              }
-            }
-          ]
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 5.0,
-    "maxAcceleration": 5.0,
+    "maxVelocity": 4.5,
+    "maxAcceleration": 2.75,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 180.0,
     "rotateFast": false
   },
   "reversed": false,

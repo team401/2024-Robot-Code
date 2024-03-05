@@ -33,6 +33,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotInit() {
+        // Pathfinding.setPathfinder(new LocalADStarAK());
 
         Logger.recordMetadata("ProjectName", "2024 - 401 Comp Robot"); // TODO: Name the robot!
         Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
@@ -42,7 +43,7 @@ public class Robot extends LoggedRobot {
         if (Constants.currentMode == Constants.Mode.REAL) {
             // TODO: Log data to a USB drive on the RIO
             Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
-            Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+            // Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
             pdh = new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
         } else if (Constants.currentMode == Constants.Mode.SIM) {
             Logger.addDataReceiver(new WPILOGWriter("logs/")); // This folder is gitignored
@@ -77,10 +78,7 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().cancelAll();
 
         robotContainer.enabledInit();
-
-        if (robotContainer.getAutonomousCommand() != null) {
-            robotContainer.getAutonomousCommand().schedule();
-        }
+        robotContainer.autoInit();
     }
 
     @Override

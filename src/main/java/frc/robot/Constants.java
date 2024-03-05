@@ -86,11 +86,11 @@ public final class Constants {
         public static final double anticipationTime = 0.01;
         public static final double minimumAnticipationVelocity = 0.0;
 
-        public static final double alignToleranceRadians = Math.PI / 12;
+        public static final double alignToleranceRadians = 0.1;
 
         public static final double alignmentkPMax = 7.0;
         public static final double alignmentkPMin = 5.0;
-        public static final double alignmentkI = 1.0;
+        public static final double alignmentkI = 2.5;
         public static final double alignmentkD = 0.0;
     }
 
@@ -101,12 +101,22 @@ public final class Constants {
         public static final double midfieldLowThresholdM = 5.87;
         public static final double midfieldHighThresholdM = 10.72;
 
-        public static final Rotation2d fieldToAmpHeading = new Rotation2d(-Math.PI / 2);
+        public static final Rotation2d ampHeading = new Rotation2d(-Math.PI / 2);
 
-        public static final Rotation2d fieldToRedSourceHeading =
-                new Rotation2d(Math.PI / 3); // 60 degrees
-        public static final Rotation2d fieldToBlueSourceHeading =
-                new Rotation2d(Math.PI * 2 / 3); // 120 degrees
+        public static final Rotation2d blueUpHeading = Rotation2d.fromRadians(0.0);
+        public static final Rotation2d blueDownHeading = Rotation2d.fromRadians(Math.PI);
+        public static final Rotation2d blueLeftHeading = Rotation2d.fromRadians(Math.PI / 2.0);
+        public static final Rotation2d blueRightHeading = Rotation2d.fromRadians(-Math.PI / 2.0);
+
+        public static final Rotation2d redUpHeading = Rotation2d.fromRadians(Math.PI);
+        public static final Rotation2d redDownHeading = Rotation2d.fromRadians(0.0);
+        public static final Rotation2d redLeftHeading = Rotation2d.fromRadians(-Math.PI / 2.0);
+        public static final Rotation2d redRightHeading = Rotation2d.fromRadians(Math.PI / 2.0);
+
+        public static final Rotation2d redSourceHeading =
+                new Rotation2d(Math.PI * 4 / 3); // 60 degrees
+        public static final Rotation2d blueSourceHeading =
+                new Rotation2d(Math.PI * 5 / 3); // 120 degrees
 
         public static final Translation2d fieldToRedSpeaker =
                 new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42));
@@ -119,19 +129,31 @@ public final class Constants {
 
         public static final Pose2d robotAgainstRedSpeaker =
                 new Pose2d(15.19, 5.56, Rotation2d.fromDegrees(0));
+
+        public static final Pose2d robotAgainstBluePodium =
+                new Pose2d(2.57, 4.09, Rotation2d.fromDegrees(180));
+
+        public static final Pose2d robotAgainstRedPodium =
+                new Pose2d(13.93, 4.09, Rotation2d.fromDegrees(0));
+
+        public static final Pose2d robotAgainstBlueAmpZone =
+                new Pose2d(2.85, 7.68, Rotation2d.fromDegrees(-90));
+
+        public static final Pose2d robotAgainstRedAmpZone =
+                new Pose2d(13.74, 7.68, Rotation2d.fromDegrees(-90));
     }
 
     public static final class VisionConstants {
-        public static final String tagLayoutName = "2024-WPI";
+        public static final String tagLayoutName = "vabla";
         public static final AprilTagFieldLayout fieldLayout = initLayout(tagLayoutName);
 
         public static final double singleTagAmbiguityCutoff = 0.05;
 
         // 0.45 from 2023
-        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(1.2, 1.2, 2);
+        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(0.8, 0.8, 2);
         // 1.2 from 2023
-        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(3.5, 3.5, 10);
-        public static final Matrix<N3, N1> singleTagUncertainty = VecBuilder.fill(20.0, 20.0, 10);
+        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(2.2, 2.2, 10);
+        public static final Matrix<N3, N1> singleTagUncertainty = VecBuilder.fill(25.0, 25.0, 10);
 
         public static final Matrix<N3, N1> driveUncertainty = VecBuilder.fill(0.1, 0.1, 0.1);
 
@@ -145,7 +167,7 @@ public final class Constants {
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(0.323, 0.262, 0.216),
-                                        new Rotation3d(0.0, 1.224, 0.138))),
+                                        new Rotation3d(0, -0.349, 0.138))),
                         new CameraParams(
                                 "Front-Right",
                                 640,
@@ -154,7 +176,7 @@ public final class Constants {
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(0.323, -0.262, 0.216),
-                                        new Rotation3d(0.0, 1.224, -0.138))),
+                                        new Rotation3d(0.0, -0.349, -0.138))),
                         new CameraParams(
                                 "Back-Left",
                                 640,
@@ -163,16 +185,17 @@ public final class Constants {
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(-0.327, 0.281, 0.333),
-                                        new Rotation3d(0.0, -1.162, 3.14))),
-                        new CameraParams(
-                                "Back-Right",
-                                640,
-                                480,
-                                20,
-                                Rotation2d.fromDegrees(70),
-                                new Transform3d(
-                                        new Translation3d(-0.327, -0.281, 0.333),
-                                        new Rotation3d(0.0, -1.162, 3.14))));
+                                        new Rotation3d(0.0, -0.409, 3.14))));
+
+        // new CameraParams(
+        //         "Back-Right",
+        //         640,
+        //         480,
+        //         20,
+        //         Rotation2d.fromDegrees(70),
+        //         new Transform3d(
+        //                 new Translation3d(-0.327, -0.281, 0.333),
+        //                 new Rotation3d(0.0, -0.409, 3.14))));
 
         public static record CameraParams(
                 String name,
@@ -207,7 +230,7 @@ public final class Constants {
         public static final int indexTwoMotorID = 14;
 
         public static final double intakePower = 10.0;
-        public static final double beltPower = 10.0;
+        public static final double beltPower = 8.0;
     }
 
     public static final class EndgameConstants {
@@ -257,7 +280,7 @@ public final class Constants {
                         .withKP(150)
                         .withKI(0)
                         .withKD(0.2)
-                        .withKS(0)
+                        .withKS(0.32)
                         .withKV(1.5)
                         .withKA(0);
         // When using closed-loop control, the drive motor uses the control
@@ -276,7 +299,7 @@ public final class Constants {
 
         // The stator current at which the wheels start to slip;
         // This needs to be tuned to your individual robot
-        private static final double kSlipCurrentA = 300.0;
+        private static final double kSlipCurrentA = 80;
 
         // Theoretical free speed (m/s) at 12v applied output;
         // This needs to be tuned to your individual robot
@@ -462,10 +485,10 @@ public final class Constants {
         public static final double aimCruiseVelocity = 7.0; // TODO: 15.0
 
         public static final double shooterVelocityMarginRPM = 50;
-        public static final double aimAngleMarginRadians = Units.degreesToRadians(2);
+        public static final double aimAngleMarginRadians = Units.degreesToRadians(1);
         public static final double hoodAngleMarginRadians = Units.degreesToRadians(5);
 
-        public static final double intakeAngleToleranceRadians = 0.0;
+        public static final double intakeAngleToleranceRadians = 0.1;
         // Math.PI / 2 - Units.degreesToRadians(40);
 
         public static final double shooterAmpVelocityRPM = 2000;
@@ -491,36 +514,39 @@ public final class Constants {
         // Value - Aimer angle in radians
         public static HashMap<Double, Double> getAimerMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
-            map.put(0.0, 0.7);
-            map.put(1.45, 0.7);
+            map.put(0.0, 0.8);
+            map.put(1.45, 0.8); // 0.7
             map.put(1.98, 0.62);
             map.put(2.41, 0.53);
-            map.put(3.02, 0.45);
-            map.put(3.22, 0.425);
+            map.put(3.02, 0.48); // 0.45
+            map.put(3.22, 0.45);
             map.put(3.9, 0.36);
             map.put(4.55, 0.34);
-            map.put(4.95, 0.31);
-            map.put(5.64, 0.28);
-            map.put(5.82, 0.275);
+            map.put(4.95, 0.33);
+            map.put(5.64, 0.32);
+            // map.put(5.82, 0.275);
+            map.put(6.0, 0.31);
 
             return map;
         }
+
+        public static final double aimerStaticOffset = 0.02;
 
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters
         // Value - Shooter RPM
         public static HashMap<Double, Double> getShooterMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
-            map.put(0.0, 2500.0);
-            map.put(1.45, 2500.0);
-            map.put(1.98, 2500.0);
-            map.put(2.41, 2900.0);
-            map.put(3.02, 3000.0);
-            map.put(3.22, 3000.0);
+            map.put(0.0, 2700.0);
+            map.put(1.45, 2700.0);
+            map.put(1.98, 2700.0);
+            map.put(2.41, 3000.0);
+            map.put(3.02, 3300.0);
+            map.put(3.22, 3300.0);
             map.put(3.9, 3300.0);
             map.put(4.55, 3500.0);
             map.put(4.95, 4000.0);
-            map.put(5.64, 4100.0);
+            map.put(5.64, 4200.0);
             map.put(5.82, 4300.0);
 
             return map;
@@ -544,9 +570,9 @@ public final class Constants {
         // Value - Time in seconds
         public static HashMap<Double, Double> timeToPutAimDownMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
-            map.put(0.0, 0.0);
-            map.put(Math.PI / 6, 0.2);
-            map.put(Math.PI / 4, 0.5);
+            map.put(0.0, 0.2);
+            map.put(Math.PI / 6, 0.5);
+            map.put(Math.PI / 4, 0.6);
             map.put(Math.PI / 3, 0.7);
             map.put(Math.PI / 2, 1.0);
 
@@ -571,7 +597,7 @@ public final class Constants {
 
     public static final class LEDConstants {
         public static final int ledPort = 0;
-        public static final int ledLength = 1000;
+        public static final int ledLength = 5;
     }
 
     public static final class IOConstants {
