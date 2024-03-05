@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.utils.GeomUtil;
@@ -51,7 +52,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         AMP,
         SPEAKER,
         SOURCE,
-        ENDGAME
+        ENDGAME,
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT
     }
 
     public enum AlignState {
@@ -61,6 +66,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private AlignTarget alignTarget = AlignTarget.NONE;
     private AlignState alignState = AlignState.MANUAL;
+
+    private double alignDirection = 0.0;
 
     private static InterpolateDouble noteTimeToGoal =
             new InterpolateDouble(ScoringConstants.timeToGoalMap(), 0.0, 2.0);
@@ -257,6 +264,25 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         setGoalChassisSpeeds(chassisSpeeds, true);
     }
 
+    public void setAlignDirection(double direction, boolean allianceSpecific) {
+        if (allianceSpecific) {
+            if (!DriverStation.getAlliance().isPresent()) {
+                alignDirection = direction;
+            } else {
+                switch (DriverStation.getAlliance().get()) {
+                    case Blue:
+                        alignDirection = direction;
+                        break;
+                    case Red:
+                        alignDirection = direction + 3.14;
+                        break;
+                }
+            }
+        } else {
+            alignDirection = direction;
+        }
+    }
+
     private void controlDrivetrain() {
         Pose2d pose = getFieldToRobot.get();
         Rotation2d desiredHeading = pose.getRotation();
@@ -272,6 +298,64 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     break;
                 case SOURCE:
                     desiredHeading = getFieldToSource.get();
+                    break;
+                    // case SPECIFIC_DIRECTION:
+                    //     desiredHeading = Rotation2d.fromRadians(alignDirection);
+                case UP:
+                    if (!DriverStation.getAlliance().isPresent()) {
+                        desiredHeading = FieldConstants.blueUpHeading;
+                    } else {
+                        switch (DriverStation.getAlliance().get()) {
+                            case Blue:
+                                desiredHeading = FieldConstants.blueUpHeading;
+                                break;
+                            case Red:
+                                desiredHeading = FieldConstants.redUpHeading;
+                                break;
+                        }
+                    }
+                    break;
+                case DOWN:
+                    if (!DriverStation.getAlliance().isPresent()) {
+                        desiredHeading = FieldConstants.blueDownHeading;
+                    } else {
+                        switch (DriverStation.getAlliance().get()) {
+                            case Blue:
+                                desiredHeading = FieldConstants.blueDownHeading;
+                                break;
+                            case Red:
+                                desiredHeading = FieldConstants.redDownHeading;
+                                break;
+                        }
+                    }
+                    break;
+                case LEFT:
+                    if (!DriverStation.getAlliance().isPresent()) {
+                        desiredHeading = FieldConstants.blueLeftHeading;
+                    } else {
+                        switch (DriverStation.getAlliance().get()) {
+                            case Blue:
+                                desiredHeading = FieldConstants.blueLeftHeading;
+                                break;
+                            case Red:
+                                desiredHeading = FieldConstants.redLeftHeading;
+                                break;
+                        }
+                    }
+                    break;
+                case RIGHT:
+                    if (!DriverStation.getAlliance().isPresent()) {
+                        desiredHeading = FieldConstants.blueRightHeading;
+                    } else {
+                        switch (DriverStation.getAlliance().get()) {
+                            case Blue:
+                                desiredHeading = FieldConstants.blueRightHeading;
+                                break;
+                            case Red:
+                                desiredHeading = FieldConstants.redRightHeading;
+                                break;
+                        }
+                    }
                     break;
                 case NONE:
                     break;

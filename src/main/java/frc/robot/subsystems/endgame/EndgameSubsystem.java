@@ -33,7 +33,11 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
     public void setAction(EndgameAction action) {
         switch (action) {
             case GO_UP:
-                endgameIo.setVolts(4.0);
+                if (Math.abs(endgameInputs.position) < 0.52) {
+                    endgameIo.setVolts(4.0);
+                } else {
+                    endgameIo.setVolts(0.0);
+                }
                 state = State.NORMAL;
                 break;
             case GO_DOWN:
@@ -100,7 +104,11 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
         Logger.recordOutput("endgame/State", state);
 
         if (state == State.OVERRIDE) {
-            endgameIo.setVolts(overrideVolts);
+            if (Math.abs(endgameInputs.position) > 0.52 && overrideVolts > 0) {
+                endgameIo.setVolts(0.0);
+            } else {
+                endgameIo.setVolts(overrideVolts);
+            }
         }
 
         Logger.recordOutput(

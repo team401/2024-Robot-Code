@@ -261,17 +261,33 @@ public class RobotContainer {
             controller.povDown()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.ENDGAME)));
+            
+            rightJoystick.povUp()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.UP)));
+
+            rightJoystick.povDown()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.DOWN)));
+
+            rightJoystick.povLeft()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.LEFT)));
+
+            rightJoystick.povRight()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.setAlignTarget(AlignTarget.RIGHT)));
         }
 
         if (FeatureFlags.runEndgame) {
             endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.OVERRIDE);
 
             controller.leftBumper()
-                .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(2.0, 0)))
+                .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(4.0, 0)))
                 .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
 
             controller.leftTrigger()
-                .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(-2.0, 0)))
+                .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(-4.0, 0)))
                 .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
         }
 
@@ -703,30 +719,62 @@ public class RobotContainer {
     }
 
     private void configureAutonomous() {
-        NamedCommands.registerCommand(
-                "Shoot Scoring",
-                new InstantCommand(
-                        () -> {
-                            if (FeatureFlags.runScoring) {
-                                scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT);
-                            }
-                            if (FeatureFlags.runIntake) {
-                                intakeSubsystem.run(IntakeAction.INTAKE);
-                            }
-                        }));
-        NamedCommands.registerCommand(
-                "Aim Scoring",
-                new InstantCommand(
-                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.AIM)));
-        NamedCommands.registerCommand(
-                "Intake Scoring",
-                new InstantCommand(
-                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.INTAKE)));
-        NamedCommands.registerCommand(
-                "Wait Scoring",
-                new InstantCommand(
-                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
-        NamedCommands.registerCommand("Intake Note", Commands.none());
+        if (FeatureFlags.runScoring) {
+            NamedCommands.registerCommand(
+                    "Shoot Scoring",
+                    new InstantCommand(
+                            () -> {
+                                if (FeatureFlags.runScoring) {
+                                    scoringSubsystem.setAction(
+                                            ScoringSubsystem.ScoringAction.SHOOT);
+                                }
+                                if (FeatureFlags.runIntake) {
+                                    intakeSubsystem.run(IntakeAction.INTAKE);
+                                }
+                            }));
+            NamedCommands.registerCommand(
+                    "Aim Scoring",
+                    new InstantCommand(
+                            () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.AIM)));
+            NamedCommands.registerCommand(
+                    "Intake Scoring",
+                    new InstantCommand(
+                            () ->
+                                    scoringSubsystem.setAction(
+                                            ScoringSubsystem.ScoringAction.INTAKE)));
+            NamedCommands.registerCommand(
+                    "Wait Scoring",
+                    new InstantCommand(
+                            () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+        } else {
+            NamedCommands.registerCommand("Shoot Scoring", Commands.none());
+            NamedCommands.registerCommand("Aim Scoring", Commands.none());
+            NamedCommands.registerCommand("Intake Scoring", Commands.none());
+            NamedCommands.registerCommand("Wait Scoring", Commands.none());
+        }
+        if (FeatureFlags.runIntake) {
+            NamedCommands.registerCommand("Intake Note", Commands.none());
+        } else {
+            NamedCommands.registerCommand("Intake Note", Commands.none());
+        }
+        if (FeatureFlags.runDrive) {
+            NamedCommands.registerCommand(
+                    "Disable Auto-Align",
+                    new InstantCommand(() -> drivetrain.setAlignState(AlignState.MANUAL)));
+        } else {
+            NamedCommands.registerCommand("Disable Auto-ALign", Commands.none());
+        }
+        if (FeatureFlags.runScoring) {
+            NamedCommands.registerCommand(
+                    "Override Shoot",
+                    new InstantCommand(() -> scoringSubsystem.setOverrideShoot(true)));
+            NamedCommands.registerCommand(
+                    "Un-Override Shoot",
+                    new InstantCommand(() -> scoringSubsystem.setOverrideShoot(false)));
+        } else {
+            NamedCommands.registerCommand("Override Shoot", Commands.none());
+            NamedCommands.registerCommand("Un-Override Shoot", Commands.none());
+        }
     }
 
     public void teleopInit() {
@@ -738,6 +786,10 @@ public class RobotContainer {
 
             scoringSubsystem.setAction(ScoringAction.WAIT);
             scoringSubsystem.enabledInit();
+        }
+
+        if (FeatureFlags.runDrive) {
+            drivetrain.setAlignState(AlignState.MANUAL);
         }
     }
 }
