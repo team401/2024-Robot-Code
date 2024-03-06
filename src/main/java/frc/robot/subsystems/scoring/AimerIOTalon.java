@@ -34,6 +34,9 @@ public class AimerIOTalon implements AimerIO {
     double lastPosition = 0.0;
     double lastTime = Utils.getCurrentTimeSeconds();
 
+    boolean motorFailure = false;
+    boolean motorCheckOverriden = false;
+
     public AimerIOTalon() {
         aimerRight.setControl(new Follower(ScoringConstants.aimLeftMotorId, true));
 
@@ -126,6 +129,17 @@ public class AimerIOTalon implements AimerIO {
         aimerRight.getConfigurator().apply(slot0);
     }
 
+    private boolean checkForMotorFailure() {
+        if (!aimerLeft.isAlive() || !aimerRight.isAlive()) {
+            if (!motorCheckOverriden) setFF(ScoringConstants.aimerFaultkS, ScoringConstants.aimerFaultkV, ScoringConstants.aimerFaultkA, ScoringConstants.aimerFaultkG);
+            motorFailure = true;
+        } else if (motorFailure) {
+            if (!motorCheckOverriden) setFF(ScoringConstants.aimerkS, ScoringConstants.aimerkV, ScoringConstants.aimerkA, ScoringConstants.aimerkG);
+            motorFailure = false;
+        }
+        return motorFailure;
+    }
+
     @Override
     public void updateInputs(AimerIOInputs inputs) {
         if (override) {
@@ -149,5 +163,7 @@ public class AimerIOTalon implements AimerIO {
         inputs.aimAppliedVolts = aimerLeft.getMotorVoltage().getValueAsDouble();
         inputs.aimStatorCurrentAmps = aimerLeft.getStatorCurrent().getValueAsDouble();
         inputs.aimSupplyCurrentAmps = aimerLeft.getSupplyCurrent().getValueAsDouble();
+
+        checkForMotorFailure();
     }
 }
