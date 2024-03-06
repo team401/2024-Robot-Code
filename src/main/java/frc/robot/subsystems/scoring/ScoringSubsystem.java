@@ -451,6 +451,10 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
         aimerIo.controlAimAngleRad();
 
+        aimerIo.setOverrideMode(state == ScoringState.OVERRIDE);
+        hoodIo.setOverrideMode(state == ScoringState.OVERRIDE);
+        shooterIo.setOverrideMode(state == ScoringState.OVERRIDE);
+
         Logger.recordOutput("scoring/State", state.toString());
         Logger.recordOutput("scoring/Action", action.toString());
 

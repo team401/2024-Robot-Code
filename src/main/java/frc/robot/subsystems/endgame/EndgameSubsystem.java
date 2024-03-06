@@ -3,6 +3,7 @@ package frc.robot.subsystems.endgame;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.EndgameConstants;
 import frc.robot.utils.Tunable;
 import org.littletonrobotics.junction.Logger;
 
@@ -16,12 +17,13 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
         GO_UP,
         GO_DOWN,
         CANCEL,
-        OVERRIDE
+        OVERRIDE,
+        TEMPORARY_SETPOINT
     }
 
     private enum State {
-        OVERRIDE,
-        NORMAL
+        OVERRIDE, // Targetting a voltage
+        NORMAL // Targetting a position
     }
 
     private State state = State.NORMAL;
@@ -33,23 +35,27 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
     public void setAction(EndgameAction action) {
         switch (action) {
             case GO_UP:
-                if (Math.abs(endgameInputs.position) < 0.52) {
-                    endgameIo.setVolts(4.0);
-                } else {
-                    endgameIo.setVolts(0.0);
-                }
+                endgameIo.setPosition(EndgameConstants.climberTargetUpMeters);
+                endgameIo.setOverrideMode(false);
                 state = State.NORMAL;
                 break;
             case GO_DOWN:
-                endgameIo.setVolts(-4.0);
+                endgameIo.setPosition(EndgameConstants.climberTargetDownMeters);
+                endgameIo.setOverrideMode(false);
                 state = State.NORMAL;
                 break;
             case CANCEL:
-                endgameIo.setVolts(0.0);
-                state = State.NORMAL;
+                endgameIo.setOverrideVolts(0.0);
+                endgameIo.setOverrideMode(true);
+                state = State.OVERRIDE;
                 break;
             case OVERRIDE:
+                endgameIo.setOverrideMode(true);
                 state = State.OVERRIDE;
+                break;
+            case TEMPORARY_SETPOINT:
+                endgameIo.setOverrideMode(false);
+                state = State.NORMAL;
                 break;
         }
 
@@ -64,12 +70,12 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
         return endgameInputs.position;
     }
 
-    public void home() {}
-
     @Override
     public double getPosition(int slot) {
-        return endgameInputs.position;
+        return getPosition();
     }
+
+    public void home() {}
 
     @Override
     public double getVelocity(int slot) {
@@ -88,12 +94,12 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
 
     @Override
     public void setPID(double p, double i, double d, int slot) {
-        throw new UnsupportedOperationException("Unimplemented method 'setPID'");
+        endgameIo.setPID(p, i, d);
     }
 
     @Override
     public void runToPosition(double position, int slot) {
-        throw new UnsupportedOperationException("Unimplemented method 'runToPosition'");
+        endgameIo.setPositionTuning(position);
     }
 
     @Override
@@ -104,11 +110,14 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
         Logger.recordOutput("endgame/State", state);
 
         if (state == State.OVERRIDE) {
+            endgameIo.setOverrideMode(true);
             if (Math.abs(endgameInputs.position) > 0.52 && overrideVolts > 0) {
-                endgameIo.setVolts(0.0);
+                endgameIo.setOverrideVolts(0.0);
             } else {
-                endgameIo.setVolts(overrideVolts);
+                endgameIo.setOverrideVolts(overrideVolts);
             }
+        } else {
+            endgameIo.setOverrideMode(false);
         }
 
         Logger.recordOutput(
@@ -118,11 +127,11 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
 
     @Override
     public void setFF(double kS, double kV, double kA, double kG, int slot) {
-        throw new UnsupportedOperationException("Unimplemented method 'setFF'");
+        endgameIo.setFF(kG);
     }
 
     @Override
     public void setMaxProfileProperties(double maxVelocity, double maxAcceleration, int slot) {
-        throw new UnsupportedOperationException("Unimplemented method 'setMaxProfileVelocity'");
+        endgameIo.setMaxProfile(maxVelocity, maxAcceleration);
     }
 }

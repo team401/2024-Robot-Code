@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.EndgameConstants;
 import frc.robot.Constants.FeatureFlags;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.IOConstants;
@@ -31,6 +32,7 @@ import frc.robot.subsystems.endgame.EndgameIO;
 import frc.robot.subsystems.endgame.EndgameIOSim;
 import frc.robot.subsystems.endgame.EndgameIOSparkFlex;
 import frc.robot.subsystems.endgame.EndgameSubsystem;
+import frc.robot.subsystems.endgame.EndgameSubsystem.EndgameAction;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOSparkMax;
@@ -58,7 +60,6 @@ import frc.robot.telemetry.TelemetryIOSim;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.feedforward.TuneG;
 import frc.robot.utils.feedforward.TuneS;
-import frc.robot.utils.feedforward.TuneV;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -224,7 +225,7 @@ public class RobotContainer {
     private void configureBindings() {
         // Resets bindings
         controller = new CommandXboxController(2);
-        
+
         if (FeatureFlags.runDrive) {
             setUpDriveWithJoysticks();
                 
@@ -234,7 +235,7 @@ public class RobotContainer {
                 .onFalse(new InstantCommand(
                     () -> drivetrain.setAlignState(AlignState.MANUAL)));
 
-            leftJoystick.top()
+          leftJoystick.top()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.seedFieldRelative(getPoseAgainstSpeaker())));
             
@@ -269,7 +270,7 @@ public class RobotContainer {
             rightJoystick.povDown()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.DOWN)));
-
+          
             rightJoystick.povLeft()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.LEFT)));
@@ -399,7 +400,7 @@ public class RobotContainer {
                         .onTrue(new InstantCommand(
                             () -> scoringSubsystem.setTuningKickerVolts(10)))
                         .onFalse(new InstantCommand(
-                            () -> scoringSubsystem.setTuningKickerVolts(0)));
+                                () -> scoringSubsystem.setTuningKickerVolts(0)));
                 break;
             case "tuning-intake":
                 if (FeatureFlags.runDrive) {
@@ -437,10 +438,10 @@ public class RobotContainer {
                 scoringSubsystem.setAction(ScoringAction.OVERRIDE);
 
                 controller.a()
-                    .onTrue(new TuneS(scoringSubsystem, 0));
+                        .onTrue(new TuneS(scoringSubsystem, 0));
 
                 controller.b()
-                    .onTrue(new TuneG(scoringSubsystem, 0));
+                        .onTrue(new TuneG(scoringSubsystem, 0));
 
                 controller.y()
                     .onTrue(new InstantCommand(() -> scoringSubsystem.setPID(
@@ -553,32 +554,100 @@ public class RobotContainer {
                     .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 2)));
                 break;
             case "tuning-endgame":
-                // TODO: Add in later
-                // SmartDashboard.putNumber("Test-Mode/endgame/kP", EndgameConstants.kP);
-                // SmartDashboard.putNumber("Test-Mode/endgame/kI", EndgameConstants.kI);
-                // SmartDashboard.putNumber("Test-Mode/endgame/kD", EndgameConstants.kD);
+                SmartDashboard.putNumber("Test-Mode/endgame/kP", EndgameConstants.climberkP);
+                SmartDashboard.putNumber("Test-Mode/endgame/kI", EndgameConstants.climberkI);
+                SmartDashboard.putNumber("Test-Mode/endgame/kD", EndgameConstants.climberkD);
+
+                SmartDashboard.putNumber("Test-Mode/endgame/kFF", EndgameConstants.climberkFFClimber);
+
+                SmartDashboard.putNumber("Test-Mode/endgame/setpoint", EndgameConstants.climberTargetUpMeters);
+
+                SmartDashboard.putNumber("Test-Mode/endgame/maxVelocity", EndgameConstants.climberProfileConstraints.maxVelocity);
+                SmartDashboard.putNumber("Test-Mode/endgame/maxAcceleration", EndgameConstants.climberProfileConstraints.maxAcceleration);
 
                 SmartDashboard.putNumber("Test-Mode/endgame/volts", 1.0);
 
                 endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.OVERRIDE);
 
+                controller.povUp()
+                        .onTrue(new InstantCommand(() -> endgameSubsystem
+                                .setVolts(SmartDashboard.getNumber("Test-Mode/endgame/volts", 1.0), 0)))
+                        .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0, 0)));
+
+                controller.povDown()
+                        .onTrue(new InstantCommand(() -> endgameSubsystem
+                                .setVolts(-SmartDashboard.getNumber("Test-Mode/endgame/volts", 1.0), 0)))
+                        .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0, 0)));
+
                 controller.a()
-                    .onTrue(new TuneS(endgameSubsystem, 0));
+                        .onTrue(new InstantCommand(() -> endgameSubsystem
+                                .setVolts(SmartDashboard.getNumber("Test-Mode/endgame/volts", 0.0), 0)))
+                        .onFalse(
+                                new InstantCommand(
+                                        () -> {
+                                            endgameSubsystem.setVolts(0, 0);
+                                            endgameSubsystem.setAction(EndgameAction.OVERRIDE);
+                                        }));
 
                 controller.b()
-                    .onTrue(new TuneG(endgameSubsystem, 0));
+                        .onTrue(new TuneG(endgameSubsystem, 0));
+
+                controller.y()
+                        .onTrue(new InstantCommand(() -> endgameSubsystem.setPID(
+                                SmartDashboard.getNumber("Test-Mode/endgame/kP", 0.0),
+                                SmartDashboard.getNumber("Test-Mode/endgame/kI", 0.0),
+                                SmartDashboard.getNumber("Test-Mode/endgame/kD", 0.0), 0)))
+                        .onTrue(new InstantCommand(() -> endgameSubsystem.setFF(
+                                0, 0, 0, SmartDashboard.getNumber("Test-Mode/endgame/kFF", 0), 0)))
+                        .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameAction.TEMPORARY_SETPOINT)))
+                        .onTrue(new InstantCommand(() -> endgameSubsystem.setMaxProfileProperties(SmartDashboard.getNumber("Test-Mode/endgame/maxVelocity", EndgameConstants.climberProfileConstraints.maxVelocity), SmartDashboard.getNumber("Test-Mode/endgame/maxAcceleration", EndgameConstants.climberProfileConstraints.maxAcceleration), 0)))
+                        .onTrue(new InstantCommand(() -> endgameSubsystem
+                                .runToPosition(SmartDashboard.getNumber("Test-Mode/endgame/setpoint", 0), 0)))
+                        .onFalse(
+                                new InstantCommand(
+                                        () -> {
+                                            endgameSubsystem.setVolts(0, 0);
+                                            endgameSubsystem.setAction(EndgameAction.OVERRIDE);
+                                        }));
 
                 controller.x()
-                    .onTrue(new TuneV(endgameSubsystem, 1.0, 0));
-                
+                        .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameAction.TEMPORARY_SETPOINT)))
+                        .onTrue(new InstantCommand(() -> endgameSubsystem
+                                .runToPosition(0.0, 0)))
+                        .onFalse(
+                                new InstantCommand(
+                                        () -> {
+                                            endgameSubsystem.setVolts(0, 0);
+                                            endgameSubsystem.setAction(EndgameAction.OVERRIDE);
+                                        }));
+
                 controller.leftBumper()
-                    .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(SmartDashboard.getNumber("Test-Mode/endgame/volts", 1.0), 0)))
-                    .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0, 0)));
+                        .onTrue(new InstantCommand(() -> endgameSubsystem.setPID(
+                                SmartDashboard.getNumber("Test-Mode/endgame/kP", 0.0),
+                                SmartDashboard.getNumber("Test-Mode/endgame/kI", 0.0),
+                                SmartDashboard.getNumber("Test-Mode/endgame/kD", 0.0), 0)))
+                        .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameAction.GO_DOWN)))
+                        .onFalse(
+                                new InstantCommand(
+                                        () -> {
+                                            endgameSubsystem.setVolts(0, 0);
+                                            endgameSubsystem.setAction(EndgameAction.OVERRIDE);
+                                        }));
+
 
                 controller.rightBumper()
-                    .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(-SmartDashboard.getNumber("Test-Mode/endgame/volts", 1.0), 0)))
-                    .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0, 0)));
-                break;
+                        .onTrue(new InstantCommand(() -> endgameSubsystem.setPID(
+                                SmartDashboard.getNumber("Test-Mode/endgame/kP", 0.0),
+                                SmartDashboard.getNumber("Test-Mode/endgame/kI", 0.0),
+                                SmartDashboard.getNumber("Test-Mode/endgame/kD", 0.0), 0)))
+                        .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameAction.GO_UP)))
+                        .onFalse(
+                                new InstantCommand(
+                                        () -> {
+                                            endgameSubsystem.setVolts(0, 0);
+                                            endgameSubsystem.setAction(EndgameAction.OVERRIDE);
+                                        }));
+               break;
         }
         // spotless:on
     }

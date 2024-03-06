@@ -16,8 +16,12 @@
             "/AdvantageKit/RealOutputs",
             "/AdvantageKit/RealOutputs/Drive",
             "/AdvantageKit/telemetry",
+            "/telemetry",
+            "/RealOutputs",
             "/AdvantageKit/RealOutputs/scoring",
-            "/AdvantageKit/RealOutputs/endgame"
+            "/AdvantageKit/RealOutputs/endgame",
+            "/AdvantageKit/intake",
+            "/AdvantageKit/RealOutputs/Scoring"
           ]
         },
         "tabs": {
@@ -38,6 +42,113 @@
                     "factor": 1
                   },
                   "fields": [
+                    {
+                      "key": "NT:/AdvantageKit/endgame/Position",
+                      "color": "#2b66a2",
+                      "show": true
+                    }
+                  ]
+                },
+                "discrete": {
+                  "fields": [
+                    {
+                      "key": "NT:/AdvantageKit/RealOutputs/scoring/State",
+                      "color": "#e5b31b",
+                      "show": true
+                    }
+                  ]
+                },
+                "right": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": [
+                    {
+                      "key": "NT:/AdvantageKit/RealOutputs/Scoring/elevatorLimit",
+                      "color": "#af2437",
+                      "show": true
+                    },
+                    {
+                      "key": "NT:/AdvantageKit/scoring/aimer/AimAngleRad",
+                      "color": "#80588e",
+                      "show": true
+                    }
+                  ]
+                }
+              },
+              "title": "Line Graph"
+            },
+            {
+              "type": 1,
+              "legendHeight": 0.3,
+              "legends": {
+                "left": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": [
+                    {
+                      "key": "NT:/AdvantageKit/endgame/Position",
+                      "color": "#2b66a2",
+                      "show": true
+                    }
+                  ]
+                },
+                "discrete": {
+                  "fields": [
+                    {
+                      "key": "NT:/AdvantageKit/RealOutputs/scoring/State",
+                      "color": "#e5b31b",
+                      "show": true
+                    }
+                  ]
+                },
+                "right": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": [
+                    {
+                      "key": "NT:/AdvantageKit/RealOutputs/Scoring/elevatorLimit",
+                      "color": "#af2437",
+                      "show": true
+                    },
+                    {
+                      "key": "NT:/AdvantageKit/scoring/aimer/AimAngleRad",
+                      "color": "#80588e",
+                      "show": true
+                    }
+                  ]
+                }
+              },
+              "title": "Line Graph"
+            },
+            {
+              "type": 1,
+              "legends": {
+                "left": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": [
+                    {
+                      "key": "NT:/AdvantageKit/scoring/aimer/AimAngleRad",
+                      "color": "#2b66a2",
+                      "show": true
+                    },
+                    {
+                      "key": "NT:/AdvantageKit/scoring/aimer/AimGoalAngleRad",
+                      "color": "#e5b31b",
+                      "show": true
+                    },
                     {
                       "key": "NT:/AdvantageKit/scoring/shooter/ShooterRightSupplyCurrentAmps",
                       "color": "#2b66a2",
@@ -74,6 +185,27 @@
                 }
               },
               "title": "Line Graph"
+            },
+            {
+              "type": 8,
+              "uuid": "h88lmidg3e3b5f0d0ni8y5fo0ud1a1zn",
+              "fields": [],
+              "listFields": [],
+              "options": {
+                "ids": [
+                  0,
+                  1,
+                  2
+                ],
+                "layouts": [
+                  "None",
+                  "None",
+                  "Xbox Controller (Blue)"
+                ]
+              },
+              "configHidden": false,
+              "visualizer": null,
+              "title": "Joysticks"
             },
             {
               "type": 6,
@@ -125,9 +257,9 @@
                   -10.288499999999996
                 ],
                 "cameraTarget": [
-                  0,
-                  0.5,
-                  0
+                  1.619835703195438,
+                  -0.10624782552698095,
+                  -5.541832675475496
                 ]
               },
               "title": "3D Field"
