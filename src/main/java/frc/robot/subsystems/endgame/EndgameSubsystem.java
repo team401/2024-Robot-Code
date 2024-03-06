@@ -72,12 +72,7 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
 
     @Override
     public double getPosition(int slot) {
-        switch (slot) {
-            case 0:
-                return getPosition();
-            default:
-                throw new IllegalArgumentException("Invalid slot");
-        }
+        return getPosition();
     }
 
     public void home() {}
@@ -99,22 +94,12 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
 
     @Override
     public void setPID(double p, double i, double d, int slot) {
-        switch (slot) {
-            case 0:
-                endgameIo.setPID(p, i, d);
-            default:
-                throw new IllegalArgumentException("Invalid slot");
-        }
+        endgameIo.setPID(p, i, d);
     }
 
     @Override
     public void runToPosition(double position, int slot) {
-        switch (slot) {
-            case 0:
-                endgameIo.setPositionTuning(position);
-            default:
-                throw new IllegalArgumentException("Invalid slot");
-        }
+        endgameIo.setPositionTuning(position);
     }
 
     @Override
@@ -127,9 +112,9 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
         if (state == State.OVERRIDE) {
             endgameIo.setOverrideMode(true);
             if (Math.abs(endgameInputs.position) > 0.52 && overrideVolts > 0) {
-                endgameIo.setVolts(0.0);
+                endgameIo.setOverrideVolts(0.0);
             } else {
-                endgameIo.setVolts(overrideVolts);
+                endgameIo.setOverrideVolts(overrideVolts);
             }
         } else {
             endgameIo.setOverrideMode(false);
@@ -142,21 +127,11 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
 
     @Override
     public void setFF(double kS, double kV, double kA, double kG, int slot) {
-        switch (slot) {
-            case 0:
-                endgameIo.setFF(kG);
-            default:
-                throw new IllegalArgumentException("Invalid slot");
-        }
+        endgameIo.setFF(kG);
     }
 
     @Override
     public void setMaxProfileProperties(double maxVelocity, double maxAcceleration, int slot) {
-        switch (slot) {
-            case 0:
-                endgameIo.setMaxProfile(maxVelocity, maxAcceleration);
-            default:
-                throw new IllegalArgumentException("Invalid slot");
-        }
+        endgameIo.setMaxProfile(maxVelocity, maxAcceleration);
     }
 }

@@ -32,7 +32,7 @@ public class TuneG extends Command {
 
     @Override
     public void execute() {
-        subsystem.setVolts(-kG, slot);
+        subsystem.setVolts(kG, slot);
         kG += 0.001;
     }
 

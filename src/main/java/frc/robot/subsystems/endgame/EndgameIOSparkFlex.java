@@ -8,6 +8,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.EndgameConstants;
 
 public class EndgameIOSparkFlex implements EndgameIO {
@@ -25,6 +26,8 @@ public class EndgameIOSparkFlex implements EndgameIO {
     double overrideVolts = 0.0;
     double targetPosition = 0.0;
 
+    double profileSetpoint = 0.0;
+
     double initialPosition = 0.0;
     double initialVelocity = 0.0;
 
@@ -35,15 +38,23 @@ public class EndgameIOSparkFlex implements EndgameIO {
         rightEndgameMotor.setIdleMode(IdleMode.kBrake);
         leftEndgameMotor.setIdleMode(IdleMode.kBrake);
 
+        rightEndgameMotor.setInverted(false);
         leftEndgameMotor.follow(rightEndgameMotor, true);
 
         leftEndgameMotor.getEncoder().setPositionConversionFactor(EndgameConstants.encoderToMeters);
         leftEndgameMotor.getEncoder().setPosition(0.0);
 
+        rightEndgameMotor
+                .getEncoder()
+                .setPositionConversionFactor(EndgameConstants.encoderToMeters);
+        rightEndgameMotor.getEncoder().setPosition(0.0);
+
         rightEndgameMotor.getPIDController().setP(EndgameConstants.climberkP);
         rightEndgameMotor.getPIDController().setI(EndgameConstants.climberkI);
         rightEndgameMotor.getPIDController().setD(EndgameConstants.climberkD);
         rightEndgameMotor.getPIDController().setFF(EndgameConstants.climberkFFClimber);
+
+        rightEndgameMotor.getPIDController().setFeedbackDevice(rightEndgameMotor.getEncoder());
     }
 
     @Override
@@ -62,8 +73,6 @@ public class EndgameIOSparkFlex implements EndgameIO {
             profileTimer.reset();
             profileTimer.start();
 
-            targetPosition = position;
-
             initialPosition = rightEndgameMotor.getEncoder().getPosition();
             initialVelocity = rightEndgameMotor.getEncoder().getVelocity();
 
@@ -75,6 +84,7 @@ public class EndgameIOSparkFlex implements EndgameIO {
                 setFF(EndgameConstants.climberkFFClimber);
             }
         }
+        targetPosition = position;
     }
 
     @Override
@@ -89,16 +99,16 @@ public class EndgameIOSparkFlex implements EndgameIO {
             profileTimer.reset();
             profileTimer.start();
 
-            targetPosition = position;
-
             initialPosition = rightEndgameMotor.getEncoder().getPosition();
             initialVelocity = rightEndgameMotor.getEncoder().getVelocity();
         }
+        targetPosition = position;
     }
 
     @Override
     public void updateInputs(EndgameIOInputs inputs) {
         if (override) {
+            SmartDashboard.putNumber("endgame/overrideVolts", overrideVolts);
             rightEndgameMotor.setVoltage(overrideVolts);
         } else {
             State trapezoidSetpoint =
@@ -111,6 +121,9 @@ public class EndgameIOSparkFlex implements EndgameIO {
                             trapezoidSetpoint.position,
                             EndgameConstants.climberMinPositionMeters,
                             EndgameConstants.climberMaxPositionMeters);
+
+            profileSetpoint = clampedPosition;
+
             rightEndgameMotor
                     .getPIDController()
                     .setReference(clampedPosition, ControlType.kPosition);
@@ -121,6 +134,8 @@ public class EndgameIOSparkFlex implements EndgameIO {
 
         inputs.endgameRightAppliedVolts = rightEndgameMotor.getAppliedOutput();
         inputs.endgameRightStatorCurrentAmps = rightEndgameMotor.getOutputCurrent();
+
+        inputs.targetPosition = profileSetpoint;
 
         inputs.position = leftEndgameMotor.getEncoder().getPosition();
         inputs.velocity = leftEndgameMotor.getEncoder().getVelocity();

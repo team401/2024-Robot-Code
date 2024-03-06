@@ -554,18 +554,30 @@ public class RobotContainer {
                     .onFalse(new InstantCommand(() -> scoringSubsystem.setVolts(0, 2)));
                 break;
             case "tuning-endgame":
-                // TODO: Add in later
                 SmartDashboard.putNumber("Test-Mode/endgame/kP", EndgameConstants.climberkP);
                 SmartDashboard.putNumber("Test-Mode/endgame/kI", EndgameConstants.climberkI);
                 SmartDashboard.putNumber("Test-Mode/endgame/kD", EndgameConstants.climberkD);
 
                 SmartDashboard.putNumber("Test-Mode/endgame/kFF", EndgameConstants.climberkFFClimber);
 
-                SmartDashboard.putNumber("Test-mode/endgame/setpoint", 0.0);
+                SmartDashboard.putNumber("Test-Mode/endgame/setpoint", EndgameConstants.climberTargetUpMeters);
 
-                SmartDashboard.putNumber("Test-Mode/endgame/volts", 0.0);
+                SmartDashboard.putNumber("Test-Mode/endgame/maxVelocity", EndgameConstants.climberProfileConstraints.maxVelocity);
+                SmartDashboard.putNumber("Test-Mode/endgame/maxAcceleration", EndgameConstants.climberProfileConstraints.maxAcceleration);
+
+                SmartDashboard.putNumber("Test-Mode/endgame/volts", 1.0);
 
                 endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.OVERRIDE);
+
+                controller.povUp()
+                        .onTrue(new InstantCommand(() -> endgameSubsystem
+                                .setVolts(SmartDashboard.getNumber("Test-Mode/endgame/volts", 1.0), 0)))
+                        .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0, 0)));
+
+                controller.povDown()
+                        .onTrue(new InstantCommand(() -> endgameSubsystem
+                                .setVolts(-SmartDashboard.getNumber("Test-Mode/endgame/volts", 1.0), 0)))
+                        .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0, 0)));
 
                 controller.a()
                         .onTrue(new InstantCommand(() -> endgameSubsystem
@@ -588,8 +600,20 @@ public class RobotContainer {
                         .onTrue(new InstantCommand(() -> endgameSubsystem.setFF(
                                 0, 0, 0, SmartDashboard.getNumber("Test-Mode/endgame/kFF", 0), 0)))
                         .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameAction.TEMPORARY_SETPOINT)))
+                        .onTrue(new InstantCommand(() -> endgameSubsystem.setMaxProfileProperties(SmartDashboard.getNumber("Test-Mode/endgame/maxVelocity", EndgameConstants.climberProfileConstraints.maxVelocity), SmartDashboard.getNumber("Test-Mode/endgame/maxAcceleration", EndgameConstants.climberProfileConstraints.maxAcceleration), 0)))
                         .onTrue(new InstantCommand(() -> endgameSubsystem
                                 .runToPosition(SmartDashboard.getNumber("Test-Mode/endgame/setpoint", 0), 0)))
+                        .onFalse(
+                                new InstantCommand(
+                                        () -> {
+                                            endgameSubsystem.setVolts(0, 0);
+                                            endgameSubsystem.setAction(EndgameAction.OVERRIDE);
+                                        }));
+
+                controller.x()
+                        .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameAction.TEMPORARY_SETPOINT)))
+                        .onTrue(new InstantCommand(() -> endgameSubsystem
+                                .runToPosition(0.0, 0)))
                         .onFalse(
                                 new InstantCommand(
                                         () -> {

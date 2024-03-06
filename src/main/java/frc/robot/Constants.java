@@ -167,7 +167,7 @@ public final class Constants {
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(0.323, 0.262, 0.216),
-                                        new Rotation3d(0, -0.349, 0.138))),
+                                        new Rotation3d(0, -0.398, 0.109))),
                         new CameraParams(
                                 "Front-Right",
                                 640,
@@ -176,7 +176,7 @@ public final class Constants {
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(0.323, -0.262, 0.216),
-                                        new Rotation3d(0.0, -0.349, -0.138))),
+                                        new Rotation3d(0.0, -0.398, -0.109))),
                         new CameraParams(
                                 "Back-Left",
                                 640,
@@ -240,32 +240,31 @@ public final class Constants {
         public static final int smartCurrentLimit = 50;
 
         public static final TrapezoidProfile.Constraints climberProfileConstraints =
-                new TrapezoidProfile.Constraints(2, 2); // TODO: Find safe values for this
+                new TrapezoidProfile.Constraints(0.5, 0.3); // TODO: Find safe values for this
 
         // Values used to clamp target position of the climber (could potentially be identical to
         // our target positions)
         public static final double climberMinPositionMeters = 0.0;
-        public static final double climberMaxPositionMeters = 0.3;
+        public static final double climberMaxPositionMeters = 0.52;
 
         // this could be negative if we want to rely on our current limit
         public static final double climberTargetDownMeters = 0.0;
-        public static final double climberTargetUpMeters = 0.3; // TODO: Tune this value
+        public static final double climberTargetUpMeters = 0.52;
 
         // TODO: Actual mass of robot
-        //
         public static final double simRobotMass = 53.0703; // 117 pounds to kg
 
         // Constants for the climber PID controller
-        public static final double climberkP = 0.0; // TODO: Tune climber PID controller
+        public static final double climberkP = 7.0; // TODO: Tune climber PID controller
         public static final double climberkI = 0.0;
         public static final double climberkD = 0.0;
 
         // TODO: Tune feedforward values for climber
         // Feedforward value for raising elevator
-        public static final double climberkFFClimber = 0.0;
+        public static final double climberkFFClimber = 0.125;
         // Feedforward value for lowering elevator, assuming we are now lifting entire
         // weight of the robot
-        public static final double climberkFFRobot = 0.0;
+        public static final double climberkFFRobot = 0.5;
 
         public static final double encoderToMeters = Math.PI * Units.inchesToMeters(1.7567) / 20.0;
     }
