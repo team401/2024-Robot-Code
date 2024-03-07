@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
@@ -34,7 +35,7 @@ public class AimerIOTalon implements AimerIO {
     double lastPosition = 0.0;
     double lastTime = Utils.getCurrentTimeSeconds();
 
-    boolean motorFailure = false;
+    boolean motorLeftFailure = false, motorRightFailure = false;
     boolean motorCheckOverriden = false;
 
     public AimerIOTalon() {
@@ -129,23 +130,60 @@ public class AimerIOTalon implements AimerIO {
         aimerRight.getConfigurator().apply(slot0);
     }
 
-    private boolean checkForMotorFailure() {
-        if (!aimerLeft.isAlive() || !aimerRight.isAlive()) {
+    private boolean checkForAimMotorFailure() {
+        
+        /*if (!aimerLeft.isAlive() || !aimerRight.isAlive()) {
             if (!motorCheckOverriden) setFF(ScoringConstants.aimerFaultkS, ScoringConstants.aimerFaultkV, ScoringConstants.aimerFaultkA, ScoringConstants.aimerFaultkG);
             motorFailure = true;
         } else if (motorFailure) {
             if (!motorCheckOverriden) setFF(ScoringConstants.aimerkS, ScoringConstants.aimerkV, ScoringConstants.aimerkA, ScoringConstants.aimerkG);
             motorFailure = false;
         }
-        return motorFailure;
+        return motorFailure;*/
+
+        //LEFT MOTOR
+        if (
+                (!aimerLeft.isAlive()) || // if motor disconnected
+                (Math.abs(aimerRight.getStatorCurrent().getValueAsDouble()) - Math.abs(aimerLeft.getStatorCurrent().getValueAsDouble()) > 1 && Math.abs(aimerLeft.getMotorVoltage().getValueAsDouble()) > 0.5) || //if motor voltage is really small when it shouldn't be
+                (Math.abs(aimerLeft.getStatorCurrent().getValueAsDouble()) - Math.abs(aimerRight.getStatorCurrent().getValueAsDouble()) > 1 && Math.abs(aimerLeft.getMotorVoltage().getValueAsDouble()) < 0.5) // if motor voltage is really large when it shouldn't be
+            ) {
+            motorLeftFailure = true;
+        }
+
+        //RIGHT MOTOR
+        if (
+                (!aimerRight.isAlive()) || // if motor disconnected
+                (Math.abs(aimerLeft.getStatorCurrent().getValueAsDouble()) - Math.abs(aimerRight.getStatorCurrent().getValueAsDouble()) > 1 && Math.abs(aimerRight.getMotorVoltage().getValueAsDouble()) > 0.5) || //if motor voltage is really small when it shouldn't be
+                (Math.abs(aimerRight.getStatorCurrent().getValueAsDouble()) - Math.abs(aimerLeft.getStatorCurrent().getValueAsDouble()) > 1 && Math.abs(aimerRight.getMotorVoltage().getValueAsDouble()) < 0.5) // if motor voltage is really large when it shouldn't be
+            ) {
+            motorRightFailure = true;
+        }
+
+        if (!motorCheckOverriden) shutOffFaultyAimMotors();
+
+        return motorLeftFailure || motorRightFailure;
+    }
+
+    private void shutOffFaultyAimMotors() {
+        if (motorLeftFailure) {
+            aimerLeft.setVoltage(0);
+        } 
+        if (motorRightFailure) {
+            aimerRight.setVoltage(0);
+        }
+        if (motorLeftFailure || motorRightFailure) {
+            setFF(ScoringConstants.aimerFaultkS, ScoringConstants.aimerFaultkV, ScoringConstants.aimerFaultkA, ScoringConstants.aimerFaultkG);
+        }
     }
 
     @Override
     public void updateInputs(AimerIOInputs inputs) {
         if (override) {
-            aimerLeft.setVoltage(overrideVolts);
+            if (!motorLeftFailure || motorCheckOverriden) aimerLeft.setVoltage(overrideVolts);
+            else aimerRight.setVoltage(overrideVolts);
         } else {
-            aimerLeft.setControl(controller.withPosition(goalAngleRad));
+            if (!motorLeftFailure || motorCheckOverriden) aimerLeft.setControl(controller.withPosition(goalAngleRad));
+            else aimerRight.setControl(controller.withPosition(goalAngleRad));
         }
 
         inputs.aimGoalAngleRad = goalAngleRad;
@@ -160,10 +198,16 @@ public class AimerIOTalon implements AimerIO {
         lastPosition = encoder.getAbsolutePosition();
         inputs.aimVelocityRadPerSec = 0.0;
 
-        inputs.aimAppliedVolts = aimerLeft.getMotorVoltage().getValueAsDouble();
-        inputs.aimStatorCurrentAmps = aimerLeft.getStatorCurrent().getValueAsDouble();
-        inputs.aimSupplyCurrentAmps = aimerLeft.getSupplyCurrent().getValueAsDouble();
-
-        checkForMotorFailure();
+        if (!motorLeftFailure || motorCheckOverriden) {
+            inputs.aimAppliedVolts = aimerLeft.getMotorVoltage().getValueAsDouble();
+            inputs.aimStatorCurrentAmps = aimerLeft.getStatorCurrent().getValueAsDouble();
+            inputs.aimSupplyCurrentAmps = aimerLeft.getSupplyCurrent().getValueAsDouble();
+        } else {
+            inputs.aimAppliedVolts = aimerRight.getMotorVoltage().getValueAsDouble();
+            inputs.aimStatorCurrentAmps = aimerLeft.getStatorCurrent().getValueAsDouble();
+            inputs.aimSupplyCurrentAmps = aimerLeft.getSupplyCurrent().getValueAsDouble();
+        }
+    
+        checkForAimMotorFailure();
     }
 }
