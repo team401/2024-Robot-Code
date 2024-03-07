@@ -49,8 +49,8 @@ public final class Constants {
     public static final class FeatureFlags {
         public static final boolean runVision = true;
 
-        public static final boolean runIntake = true;
-        public static final boolean runScoring = true;
+        public static final boolean runIntake = false;
+        public static final boolean runScoring = false;
         public static final boolean runEndgame = true;
         public static final boolean runDrive = true;
 

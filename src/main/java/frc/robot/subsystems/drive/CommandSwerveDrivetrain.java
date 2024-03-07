@@ -61,7 +61,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public enum AlignState {
         MANUAL,
-        ALIGNING,
+        ALIGNING
     }
 
     private AlignTarget alignTarget = AlignTarget.NONE;
@@ -95,6 +95,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private static final double kSimLoopPeriod = 0.02; // Original: 5 ms
     private Notifier simNotifier = null;
     private double lastSimTime;
+
+    private Command driveToEndgameCommand = null;
 
     public CommandSwerveDrivetrain(
             SwerveDrivetrainConstants driveTrainConstants,
@@ -186,12 +188,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 this::getCurrentRobotChassisSpeeds,
                 (speeds) -> {
                     this.setGoalChassisSpeeds(speeds, false);
-                    this.setAlignState(AlignState.ALIGNING);
-                    this.setAlignTarget(AlignTarget.SPEAKER);
                 }, // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
                         new PIDConstants(1, 0, 0),
-                        new PIDConstants(0, 0, 0),
+                        new PIDConstants(1, 0, 0),
                         TunerConstants.kSpeedAt12VoltsMps,
                         driveBaseRadius,
                         new ReplanningConfig()),
@@ -458,14 +458,63 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     //                     new Pose2d(getFieldToSpeaker.get(), new Rotation2d())));
     // }
 
-    public Command getDriveToPointCommand() {
-        Pose2d targetPose = new Pose2d(11.74, 4.13, Rotation2d.fromDegrees(180));
+    public Command getDriveToEndgameCommand() {
+        // Blue Alliance Poses
+        Pose2d leftClimbPose2d = new Pose2d(4.64, 4.46, Rotation2d.fromDegrees(120));
+        Pose2d rightClimbPose2d = new Pose2d(4.67, 3.72, Rotation2d.fromDegrees(-120));
+        Pose2d farClimbPose2d = new Pose2d(5.35, 4.11, Rotation2d.fromDegrees(0));
+
+        if (DriverStation.getAlliance().isPresent()
+                && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+            // Red Alliance Poses
+            leftClimbPose2d = new Pose2d(11.93, 3.72, Rotation2d.fromDegrees(-60));
+            rightClimbPose2d = new Pose2d(11.9, 4.49, Rotation2d.fromDegrees(60));
+            farClimbPose2d = new Pose2d(11.22, 4.08, Rotation2d.fromDegrees(180));
+        }
+
+        double distanceToTargetLeft =
+                Math.hypot(
+                        getFieldToRobot.get().getX() - leftClimbPose2d.getX(),
+                        getFieldToRobot.get().getY() - leftClimbPose2d.getY());
+        double distanceToTargetRight =
+                Math.hypot(
+                        getFieldToRobot.get().getX() - rightClimbPose2d.getX(),
+                        getFieldToRobot.get().getY() - rightClimbPose2d.getY());
+        double distanceToTargetFar =
+                Math.hypot(
+                        getFieldToRobot.get().getX() - farClimbPose2d.getX(),
+                        getFieldToRobot.get().getY() - farClimbPose2d.getY());
+
+        Pose2d targetPose = new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180));
+
+        if (distanceToTargetLeft < distanceToTargetRight
+                && distanceToTargetLeft < distanceToTargetFar) {
+            targetPose = leftClimbPose2d;
+        } else if (distanceToTargetRight < distanceToTargetLeft
+                && distanceToTargetRight < distanceToTargetFar) {
+            targetPose = rightClimbPose2d;
+        } else {
+            targetPose = farClimbPose2d;
+        }
 
         PathConstraints constraints =
                 new PathConstraints(
                         3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
 
         return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0, 0.0);
+    }
+
+    public void driveToEndgame() {
+        this.setAlignState(AlignState.MANUAL);
+        
+        driveToEndgameCommand = getDriveToEndgameCommand();
+        driveToEndgameCommand.schedule();
+    }
+
+    public void stopDriveToEndgame() {
+        if (driveToEndgameCommand != null) {
+            driveToEndgameCommand.cancel();
+        }
     }
 
     public boolean isAligned() {

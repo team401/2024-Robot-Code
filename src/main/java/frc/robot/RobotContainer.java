@@ -278,6 +278,10 @@ public class RobotContainer {
             rightJoystick.povRight()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.RIGHT)));
+
+            controller.x()
+                .onTrue(new InstantCommand(() -> drivetrain.driveToEndgame()))
+                .onFalse(new InstantCommand(() -> drivetrain.stopDriveToEndgame()));
         }
 
         if (FeatureFlags.runEndgame) {
@@ -730,9 +734,12 @@ public class RobotContainer {
             drivetrain.setDefaultCommand(
                     new DriveWithJoysticks(
                             drivetrain,
-                            () -> leftJoystick.getY(),
-                            () -> leftJoystick.getX(),
-                            () -> rightJoystick.getX(),
+                            // () -> leftJoystick.getY(),
+                            // () -> leftJoystick.getX(),
+                            // () -> rightJoystick.getX(),
+                            () -> controller.getLeftY(),
+                            () -> controller.getLeftX(),
+                            () -> controller.getRightX(),
                             () -> true,
                             () -> rightJoystick.top().getAsBoolean()));
         }
@@ -783,6 +790,8 @@ public class RobotContainer {
 
     public void autoInit() {
         if (drivetrain.getAutoCommand() != null) {
+            drivetrain.setAlignState(AlignState.ALIGNING);
+            drivetrain.setAlignTarget(AlignTarget.SPEAKER);
             drivetrain.getAutoCommand().schedule();
         }
     }
