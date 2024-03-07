@@ -2,6 +2,8 @@ package frc.robot.subsystems.intake;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.subsystems.sensors.SensorIO;
+import frc.robot.subsystems.sensors.SensorIOInputsAutoLogged;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -14,19 +16,25 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private BooleanSupplier scorerWantsNote = () -> false;
 
+    private final SensorIO sensorIo;
+    private final SensorIOInputsAutoLogged sensorInputs = new SensorIOInputsAutoLogged();
+
     private IntakeAction action = IntakeAction.NONE;
 
     private double intakeOverrideVolts = 0.0;
     private double beltOverrideVolts = 0.0;
 
-    public IntakeSubsystem(IntakeIO io) {
+    public IntakeSubsystem(IntakeIO io, SensorIO sensorIo) {
         this.io = io;
+        this.sensorIo = sensorIo;
     }
 
     @Override
     public void periodic() {
         io.updateInputs(inputs);
+        sensorIo.updateInputs(sensorInputs);
         Logger.processInputs("intake", inputs);
+        Logger.processInputs("sensors", sensorInputs);
 
         switch (state) {
             case IDLE:

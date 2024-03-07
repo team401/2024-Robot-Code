@@ -6,10 +6,8 @@ import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants.ConversionConstants;
 import frc.robot.Constants.ScoringConstants;
-import frc.robot.Constants.SensorConstants;
 
 public class ShooterIOTalon implements ShooterIO {
     private final TalonFX kicker = new TalonFX(ScoringConstants.kickerMotorId);
@@ -18,8 +16,6 @@ public class ShooterIOTalon implements ShooterIO {
     private final TalonFX shooterRight = new TalonFX(ScoringConstants.shooterRightMotorId);
 
     private final Slot0Configs slot0 = new Slot0Configs();
-
-    DigitalInput bannerSensor = new DigitalInput(SensorConstants.bannerSensorPort);
 
     private boolean override = false;
     private double overrideVolts = 0.0;
@@ -144,7 +140,5 @@ public class ShooterIOTalon implements ShooterIO {
 
         inputs.kickerAppliedVolts = kicker.getMotorVoltage().getValueAsDouble();
         inputs.kickerStatorCurrentAmps = kicker.getStatorCurrent().getValueAsDouble();
-
-        inputs.bannerSensor = !bannerSensor.get();
     }
 }

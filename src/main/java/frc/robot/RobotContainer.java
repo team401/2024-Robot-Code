@@ -53,6 +53,8 @@ import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringAction;
 import frc.robot.subsystems.scoring.ShooterIO;
 import frc.robot.subsystems.scoring.ShooterIOSim;
 import frc.robot.subsystems.scoring.ShooterIOTalon;
+import frc.robot.subsystems.sensors.SensorIO;
+import frc.robot.subsystems.sensors.SensorIORealAndSim;
 import frc.robot.telemetry.Telemetry;
 import frc.robot.telemetry.TelemetryIO;
 import frc.robot.telemetry.TelemetryIOLive;
@@ -91,6 +93,7 @@ public class RobotContainer {
     }
 
     public void configureSubsystems() {
+        SensorIO sensors = new SensorIORealAndSim();
         switch (Constants.currentMode) {
             case REAL:
                 if (FeatureFlags.runDrive) {
@@ -103,7 +106,8 @@ public class RobotContainer {
                             new ScoringSubsystem(
                                     new ShooterIOTalon(),
                                     new AimerIORoboRio(),
-                                    new HoodIOSparkFlex());
+                                    new HoodIOSparkFlex(),
+                                    sensors);
                 }
 
                 if (FeatureFlags.runEndgame) {
@@ -111,7 +115,7 @@ public class RobotContainer {
                 }
 
                 if (FeatureFlags.runIntake) {
-                    intakeSubsystem = new IntakeSubsystem(new IntakeIOSparkMax());
+                    intakeSubsystem = new IntakeSubsystem(new IntakeIOSparkMax(), sensors);
                 }
 
                 if (FeatureFlags.runVision) {
@@ -134,7 +138,7 @@ public class RobotContainer {
                 if (FeatureFlags.runScoring) {
                     scoringSubsystem =
                             new ScoringSubsystem(
-                                    new ShooterIOSim(), new AimerIOSim(), new HoodIOSim());
+                                    new ShooterIOSim(), new AimerIOSim(), new HoodIOSim(), sensors);
                 }
 
                 if (FeatureFlags.runVision) {
@@ -146,7 +150,7 @@ public class RobotContainer {
                 }
 
                 if (FeatureFlags.runIntake) {
-                    intakeSubsystem = new IntakeSubsystem(new IntakeIOSim());
+                    intakeSubsystem = new IntakeSubsystem(new IntakeIOSim(), sensors);
                 }
                 break;
             case REPLAY:
@@ -164,11 +168,14 @@ public class RobotContainer {
                 if (FeatureFlags.runScoring) {
                     scoringSubsystem =
                             new ScoringSubsystem(
-                                    new ShooterIO() {}, new AimerIO() {}, new HoodIO() {});
+                                    new ShooterIO() {},
+                                    new AimerIO() {},
+                                    new HoodIO() {},
+                                    new SensorIO() {});
                 }
 
                 if (FeatureFlags.runIntake) {
-                    intakeSubsystem = new IntakeSubsystem(new IntakeIO() {});
+                    intakeSubsystem = new IntakeSubsystem(new IntakeIO() {}, new SensorIO() {});
                 }
 
                 if (FeatureFlags.runVision) {
