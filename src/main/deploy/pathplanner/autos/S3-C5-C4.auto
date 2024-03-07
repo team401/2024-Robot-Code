@@ -1,0 +1,49 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.6679855613232356,
+      "y": 4.350348982388106
+    },
+    "rotation": 120.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot Scoring"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "S3-C5"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C5-E2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "E2-C4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C4-E2"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
