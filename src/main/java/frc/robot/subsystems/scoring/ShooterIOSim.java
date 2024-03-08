@@ -3,6 +3,7 @@ package frc.robot.subsystems.scoring;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Constants;
 import frc.robot.Constants.ConversionConstants;
@@ -33,6 +34,8 @@ public class ShooterIOSim implements ShooterIO {
                     ScoringConstants.shooterkA);
 
     private boolean override = false;
+
+    DigitalInput bannerSensor = new DigitalInput(Constants.SensorConstants.bannerSensorPort);
 
     double shooterLeftGoalVelRPM = 0.0;
     double shooterLeftAppliedVolts = 0.0;
@@ -109,5 +112,7 @@ public class ShooterIOSim implements ShooterIO {
 
         inputs.kickerAppliedVolts = kickerVolts;
         inputs.kickerStatorCurrentAmps = 0.0;
+
+        inputs.bannerSensor = bannerSensor.get();
     }
 }

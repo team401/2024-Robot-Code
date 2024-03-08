@@ -17,8 +17,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ScoringConstants;
-import frc.robot.subsystems.sensors.SensorIO;
-import frc.robot.subsystems.sensors.SensorIOInputsAutoLogged;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
@@ -36,9 +34,6 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     private final HoodIO hoodIo;
     private final HoodIOInputsAutoLogged hoodInputs = new HoodIOInputsAutoLogged();
-
-    private final SensorIO sensorIo;
-    private final SensorIOInputsAutoLogged sensorInputs = new SensorIOInputsAutoLogged();
 
     private final Timer shootTimer = new Timer();
 
@@ -110,13 +105,11 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     private boolean readyToShoot = false;
 
-    public ScoringSubsystem(
-            ShooterIO shooterIo, AimerIO aimerIo, HoodIO hoodIo, SensorIO sensorIo) {
+    public ScoringSubsystem(ShooterIO shooterIo, AimerIO aimerIo, HoodIO hoodIo) {
 
         this.shooterIo = shooterIo;
         this.aimerIo = aimerIo;
         this.hoodIo = hoodIo;
-        this.sensorIo = sensorIo;
 
         shooterInterpolated = new InterpolateDouble(ScoringConstants.getShooterMap());
 
@@ -154,7 +147,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
         Logger.recordOutput("scoring/aimGoal", 0.0);
 
-        SmartDashboard.putBoolean("Has Note", sensorInputs.noteInShootDeck);
+        SmartDashboard.putBoolean("Has Note", shooterInputs.bannerSensor);
         SmartDashboard.putNumber("Aimer Location", aimerInputs.aimAngleRad);
 
         if ((!hasNote() || overrideIntake) && action == ScoringAction.INTAKE) {
@@ -371,7 +364,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     public boolean hasNote() {
-        return sensorInputs.noteInShootDeck;
+        return shooterInputs.bannerSensor;
     }
 
     public boolean aimerAtIntakePosition() {
@@ -534,7 +527,6 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         shooterIo.updateInputs(shooterInputs);
         aimerIo.updateInputs(aimerInputs);
         hoodIo.updateInputs(hoodInputs);
-        sensorIo.updateInputs(sensorInputs);
 
         Logger.processInputs("scoring/shooter", shooterInputs);
         Logger.processInputs("scoring/aimer", aimerInputs);
