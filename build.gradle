@@ -15,6 +15,8 @@ java {
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
 
+def VISUALVM_PROFILE = false
+
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
 deploy {
@@ -32,13 +34,17 @@ deploy {
 				// getTargetTypeClass is a shortcut to get the class type using a string
 
 				frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
-					// Enable VisualVM connection
-					jvmArgs.add("-Dcom.sun.management.jmxremote=true")
-					jvmArgs.add("-Dcom.sun.management.jmxremote.port=1198")
-					jvmArgs.add("-Dcom.sun.management.jmxremote.local.only=false")
-					jvmArgs.add("-Dcom.sun.management.jmxremote.ssl=false")
-					jvmArgs.add("-Dcom.sun.management.jmxremote.authenticate=false")
-					jvmArgs.add("-Djava.rmi.server.hostname=10.4.1.2")
+                    // jvmArgs.add("-XX:MaxHeapFreeRatio 40")
+
+                    if (VISUALVM_PROFILE) {
+                        // Enable VisualVM connection
+                        jvmArgs.add("-Dcom.sun.management.jmxremote=true")
+                        jvmArgs.add("-Dcom.sun.management.jmxremote.port=1198")
+                        jvmArgs.add("-Dcom.sun.management.jmxremote.local.only=false")
+                        jvmArgs.add("-Dcom.sun.management.jmxremote.ssl=false")
+                        jvmArgs.add("-Dcom.sun.management.jmxremote.authenticate=false")
+                        jvmArgs.add("-Djava.rmi.server.hostname=10.4.1.2")
+                    }
 				}
 
 				// Static files artifact

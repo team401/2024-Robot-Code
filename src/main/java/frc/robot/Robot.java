@@ -21,6 +21,9 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
+
+    private int cycle = 0;
+
     @SuppressWarnings("unused")
     private RobotContainer robotContainer;
 
@@ -71,6 +74,12 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().run();
 
         robotContainer.robotPeriodic();
+
+        if (cycle % 20 == 0) {
+            Logger.recordOutput("JVM/total memory", Runtime.getRuntime().totalMemory());
+            Logger.recordOutput("JVM/max memory", Runtime.getRuntime().maxMemory());
+            Logger.recordOutput("JVM/free memory", Runtime.getRuntime().freeMemory());
+        }
     }
 
     @Override
