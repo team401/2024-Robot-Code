@@ -734,7 +734,11 @@ public class RobotContainer {
                             () -> leftJoystick.getX(),
                             () -> rightJoystick.getX(),
                             () -> true,
-                            () -> rightJoystick.top().getAsBoolean()));
+                            () -> rightJoystick.top().getAsBoolean(),
+                            () ->
+                                    VecBuilder.fill(
+                                            driveTelemetry.getVelocityX(),
+                                            driveTelemetry.getVelocityY())));
         }
     }
 

@@ -79,6 +79,7 @@ public final class Constants {
         public static final double MaxAngularRateRadiansPerSec = Math.PI * 2; // 2 PI is one full
         // rotation per second
         public static final double deadbandPercent = 0.16;
+        public static final double maxAccelerationMetersPerSecSquared = 2.0;
 
         public static final Pose2d initialPose =
                 new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90));

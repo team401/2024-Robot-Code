@@ -1,6 +1,9 @@
 package frc.robot.commands;
 
+import com.ctre.phoenix6.Utils;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
@@ -8,6 +11,7 @@ import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.utils.Deadband;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 public class DriveWithJoysticks extends Command {
     CommandSwerveDrivetrain drivetrain;
@@ -16,10 +20,16 @@ public class DriveWithJoysticks extends Command {
     DoubleSupplier rot;
     BooleanSupplier fieldCentric;
     BooleanSupplier babyMode;
+    Supplier<Vector<N2>> currentVelocitySupplier;
 
-    double xMpS;
-    double yMpS;
-    double rotRadpS;
+    double commandedXMpS;
+    double commandedYMpS;
+    double commandedRotRadpS;
+
+    double currentXMpS;
+    double currentYMpS;
+
+    double lastTime = Utils.getCurrentTimeSeconds();
 
     public DriveWithJoysticks(
             CommandSwerveDrivetrain drivetrain,
@@ -27,13 +37,15 @@ public class DriveWithJoysticks extends Command {
             DoubleSupplier y,
             DoubleSupplier rot,
             BooleanSupplier fieldCentric,
-            BooleanSupplier babyMode) {
+            BooleanSupplier babyMode,
+            Supplier<Vector<N2>> currentVelocitySupplier) {
         this.drivetrain = drivetrain;
         this.x = x;
         this.y = y;
         this.rot = rot;
         this.fieldCentric = fieldCentric;
         this.babyMode = babyMode;
+        this.currentVelocitySupplier = currentVelocitySupplier;
 
         addRequirements(drivetrain);
     }
@@ -66,19 +78,42 @@ public class DriveWithJoysticks extends Command {
         joystickInputsFiltered[0] = Math.pow(joystickInputsFiltered[0], 1);
         joystickInputsFiltered[1] = Math.pow(joystickInputsFiltered[1], 1);
 
-        xMpS = joystickInputsFiltered[0] * DriveConstants.MaxSpeedMetPerSec;
-        yMpS = joystickInputsFiltered[1] * DriveConstants.MaxSpeedMetPerSec;
-        rotRadpS = Deadband.oneAxisDeadband(rot.getAsDouble(), DriveConstants.deadbandPercent);
-        rotRadpS = Math.pow(rotRadpS, 1) * DriveConstants.MaxAngularRateRadiansPerSec;
+        commandedXMpS = joystickInputsFiltered[0] * DriveConstants.MaxSpeedMetPerSec;
+        commandedYMpS = joystickInputsFiltered[1] * DriveConstants.MaxSpeedMetPerSec;
+        commandedRotRadpS =
+                Deadband.oneAxisDeadband(rot.getAsDouble(), DriveConstants.deadbandPercent);
+        commandedRotRadpS =
+                Math.pow(commandedRotRadpS, 1) * DriveConstants.MaxAngularRateRadiansPerSec;
 
         if (babyMode.getAsBoolean()) {
-            xMpS *= 0.5;
-            yMpS *= 0.5;
-            rotRadpS *= 0.5;
+            commandedXMpS *= 0.5;
+            commandedYMpS *= 0.5;
+            commandedRotRadpS *= 0.5;
+        }
+
+        currentXMpS = currentVelocitySupplier.get().get(0, 0);
+        currentYMpS = currentVelocitySupplier.get().get(1, 0);
+
+        double currentTime = Utils.getCurrentTimeSeconds();
+        double diffTime = currentTime - lastTime;
+        lastTime = currentTime;
+
+        if (Math.hypot(currentXMpS, currentYMpS) < Math.hypot(commandedXMpS, commandedYMpS)) {
+            commandedXMpS =
+                    currentXMpS
+                            + Math.signum(commandedXMpS)
+                                    * DriveConstants.maxAccelerationMetersPerSecSquared
+                                    * diffTime;
+            commandedYMpS =
+                    currentYMpS
+                            + Math.signum(commandedYMpS)
+                                    * DriveConstants.maxAccelerationMetersPerSecSquared
+                                    * diffTime;
         }
 
         drivetrain.setGoalChassisSpeeds(
-                new ChassisSpeeds(xMpS, yMpS, rotRadpS), fieldCentric.getAsBoolean());
+                new ChassisSpeeds(commandedXMpS, commandedYMpS, commandedRotRadpS),
+                fieldCentric.getAsBoolean());
     }
 
     @Override
