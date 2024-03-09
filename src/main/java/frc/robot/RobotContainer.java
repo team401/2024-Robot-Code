@@ -281,7 +281,7 @@ public class RobotContainer {
 
             controller.x()
                 .onTrue(new InstantCommand(() -> drivetrain.driveToEndgame()))
-                .onFalse(new InstantCommand(() -> drivetrain.stopDriveToEndgame()));
+                .onFalse(new InstantCommand(() -> drivetrain.stopDriveToPose()));
         }
 
         if (FeatureFlags.runEndgame) {
@@ -734,12 +734,12 @@ public class RobotContainer {
             drivetrain.setDefaultCommand(
                     new DriveWithJoysticks(
                             drivetrain,
-                            // () -> leftJoystick.getY(),
-                            // () -> leftJoystick.getX(),
-                            // () -> rightJoystick.getX(),
-                            () -> controller.getLeftY(),
-                            () -> controller.getLeftX(),
-                            () -> controller.getRightX(),
+                            () -> leftJoystick.getY(),
+                            () -> leftJoystick.getX(),
+                            () -> rightJoystick.getX(),
+                            // () -> controller.getLeftY(),
+                            // () -> controller.getLeftX(),
+                            // () -> controller.getRightX(),
                             () -> true,
                             () -> rightJoystick.top().getAsBoolean()));
         }

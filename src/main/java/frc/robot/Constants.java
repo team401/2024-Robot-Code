@@ -49,8 +49,8 @@ public final class Constants {
     public static final class FeatureFlags {
         public static final boolean runVision = true;
 
-        public static final boolean runIntake = false;
-        public static final boolean runScoring = false;
+        public static final boolean runIntake = true;
+        public static final boolean runScoring = true;
         public static final boolean runEndgame = true;
         public static final boolean runDrive = true;
 
@@ -85,6 +85,9 @@ public final class Constants {
 
         public static final double anticipationTime = 0.01;
         public static final double minimumAnticipationVelocity = 0.0;
+
+        public static final double pathfindTransformToleranceMeters = 0.1;
+        public static final double pathfindRotationToleranceRadians = 0.1;
 
         public static final double alignToleranceRadians = 0.1;
 
@@ -476,7 +479,7 @@ public final class Constants {
         public static final int hoodId = 17;
 
         public static final int aimEncoderPort = 0;
-        public static final double aimerEncoderOffset = 1.78;
+        public static final double aimerEncoderOffset = 1.75;
 
         public static final double aimPositionTolerance = 0.015;
 

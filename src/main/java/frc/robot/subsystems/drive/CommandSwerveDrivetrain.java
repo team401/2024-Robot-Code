@@ -16,6 +16,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -96,7 +97,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private Notifier simNotifier = null;
     private double lastSimTime;
 
-    private Command driveToEndgameCommand = null;
+    private Command pathfindCommand = null;
+
+    private Pose2d pathfindPose = new Pose2d();
+
+    private ChassisSpeeds stopSpeeds = new ChassisSpeeds(0, 0, 0);
 
     public CommandSwerveDrivetrain(
             SwerveDrivetrainConstants driveTrainConstants,
@@ -458,7 +463,48 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     //                     new Pose2d(getFieldToSpeaker.get(), new Rotation2d())));
     // }
 
-    public Command getDriveToEndgameCommand() {
+    private Command getPathfindCommand(Pose2d targetPose) {
+        pathfindPose = targetPose;
+
+        PathConstraints constraints =
+                new PathConstraints(
+                        3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+
+        return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0, 0.0);
+    }
+
+    public boolean atPathfindPose() {
+        Transform2d translationError = getFieldToRobot.get().minus(pathfindPose);
+        double rotationError =
+                Math.abs(
+                        getFieldToRobot.get().getRotation().getRadians()
+                                - pathfindPose.getRotation().getRadians());
+
+        return translationError.getTranslation().getNorm()
+                        < DriveConstants.pathfindTransformToleranceMeters
+                && rotationError < DriveConstants.pathfindRotationToleranceRadians;
+    }
+
+    public void driveToPose(Pose2d targetPose) {
+        this.setAlignState(AlignState.MANUAL);
+
+        pathfindCommand = getPathfindCommand(targetPose);
+        pathfindCommand.schedule();
+    }
+
+    public void stopDriveToPose() {
+        if (pathfindCommand != null) {
+            pathfindCommand.cancel();
+        }
+
+        setGoalChassisSpeeds(stopSpeeds, true);
+    }
+
+    public void driveToSpeaker() {
+        driveToPose(new Pose2d(getFieldToSpeaker.get(), new Rotation2d()));
+    }
+
+    public Pose2d getEndgamePose() {
         // Blue Alliance Poses
         Pose2d leftClimbPose2d = new Pose2d(4.64, 4.46, Rotation2d.fromDegrees(120));
         Pose2d rightClimbPose2d = new Pose2d(4.67, 3.72, Rotation2d.fromDegrees(-120));
@@ -497,24 +543,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             targetPose = farClimbPose2d;
         }
 
-        PathConstraints constraints =
-                new PathConstraints(
-                        3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
-
-        return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0, 0.0);
+        return targetPose;
     }
 
     public void driveToEndgame() {
-        this.setAlignState(AlignState.MANUAL);
-        
-        driveToEndgameCommand = getDriveToEndgameCommand();
-        driveToEndgameCommand.schedule();
-    }
-
-    public void stopDriveToEndgame() {
-        if (driveToEndgameCommand != null) {
-            driveToEndgameCommand.cancel();
-        }
+        driveToPose(getEndgamePose());
     }
 
     public boolean isAligned() {
