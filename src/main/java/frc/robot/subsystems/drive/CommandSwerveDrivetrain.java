@@ -34,8 +34,6 @@ import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.utils.GeomUtil;
 import frc.robot.utils.InterpolateDouble;
-
-import java.util.Arrays;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -474,13 +472,17 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         return Math.abs(alignError) < DriveConstants.alignToleranceRadians;
     }
 
-    public void runWheelRadiusCharacterization(double omegaSpeed) {
-        currentDriveMode = DriveMode.WHEEL_RADIUS_CHARACTERIZATION;
-        characterizationInput = omegaSpeed;
+    public void runWheelRadiusCharacterization(double speed) {
+        setGoalChassisSpeeds(new ChassisSpeeds(speed, 0, 0));
     }
 
     public double[] getWheelRadiusCharacterizationPosition() {
-        return Arrays.stream(modules).mapToDouble(Module::getPositionRads).toArray();
+        return new double[] {
+            this.getModule(1).getPosition(true).distanceMeters,
+            this.getModule(2).getPosition(true).distanceMeters,
+            this.getModule(3).getPosition(true).distanceMeters,
+            this.getModule(4).getPosition(true).distanceMeters
+        };
     }
 
     @Override

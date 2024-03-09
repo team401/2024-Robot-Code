@@ -6,17 +6,19 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
-
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class WheelRadiusCharacterization extends Command {
     private static final double characterizationSpeed = 0.1;
-    private static final double driveRadius = ();
-    private static final DoubleSupplier gyroYawRadsSupplier =  //need the radius of the drive base
-        () -> RobotState.getInstance().getOdometryPose().getRotation().getRadians(); //need to get pose of the robot; 
+    private static final double driveRadius = 10.375; // probs not correct
+    private DoubleSupplier gyroYawRadsSupplier =
+            () ->
+                    Constants.DriveConstants.initialPose
+                            .getRotation()
+                            .getRadians(); // need to get pose of the robot;
 
-    private final CommandSwerveDrivetrain drive;
+    private final CommandSwerveDrivetrain drivetrain;
     private final SlewRateLimiter omegaLimiter = new SlewRateLimiter(1.0);
 
     private double lastGyroYawRads = 0.0;
@@ -29,7 +31,7 @@ public class WheelRadiusCharacterization extends Command {
     private double currentEffectiveWheelRadius = 0.0;
 
     public WheelRadiusCharacterization(CommandSwerveDrivetrain drive) {
-        this.drive = drive;
+        drivetrain = drive;
         addRequirements(drive);
     }
 
@@ -39,7 +41,7 @@ public class WheelRadiusCharacterization extends Command {
         lastGyroYawRads = gyroYawRadsSupplier.getAsDouble();
         accumGyroYawRads = 0.0;
 
-        startWheelPositions = drive.getWheelRadiusCharacterizationPosition();
+        startWheelPositions = drivetrain.getWheelRadiusCharacterizationPosition();
 
         omegaLimiter.reset(0);
     }
@@ -47,25 +49,26 @@ public class WheelRadiusCharacterization extends Command {
     @Override
     public void execute() {
         // Run drive at velocity
-        drive.runWheelRadiusCharacterization(
-            omegaLimiter.calculate(omegaDirection * characterizationSpeed));
+        drivetrain.runWheelRadiusCharacterization(
+                omegaLimiter.calculate(omegaDirection * characterizationSpeed));
 
         // Get yaw and wheel positions
-        accumGyroYawRads += MathUtil.angleModulus(gyroYawRadsSupplier.getAsDouble() - lastGyroYawRads);
+        accumGyroYawRads +=
+                MathUtil.angleModulus(gyroYawRadsSupplier.getAsDouble() - lastGyroYawRads);
         lastGyroYawRads = gyroYawRadsSupplier.getAsDouble();
         double averageWheelPosition = 0.0;
-        double[] wheelPositiions = drive.getWheelRadiusCharacterizationPosition();
+        double[] wheelPositions = drivetrain.getWheelRadiusCharacterizationPosition();
         for (int i = 0; i < 4; i++) {
-            averageWheelPosition += Math.abs(wheelPositiions[i] - startWheelPositions[i]);
+            averageWheelPosition += Math.abs(wheelPositions[i] - startWheelPositions[i]);
         }
         averageWheelPosition /= 4.0;
 
-        currentEffectiveWheelRadius = (accumGyroYawRads * driveRadius) / averageWheelPosition;
+        currentEffectiveWheelRadius = (accumGyroYawRads * driveRadius) / averageWheelPosition; //is probably not correct, but i don't really get it
         Logger.recordOutput("Drive/RadiusCharacterization/DrivePosition", averageWheelPosition);
         Logger.recordOutput("Drive/RadiusCharacterization/AccumGyroYawRads", accumGyroYawRads);
         Logger.recordOutput(
-        "Drive/RadiusCharacterization/CurrentWheelRadiusInches",
-            Units.metersToInches(currentEffectiveWheelRadius));
+                "Drive/RadiusCharacterization/CurrentWheelRadiusInches",
+                Units.metersToInches(currentEffectiveWheelRadius));
     }
 
     @Override
@@ -74,9 +77,9 @@ public class WheelRadiusCharacterization extends Command {
             System.out.println("Not enough data for characterization");
         } else {
             System.out.println(
-                "Effective Wheel Radius: "
-                    + Units.metersToInches(currentEffectiveWheelRadius)
-                + " inches");
+                    "Effective Wheel Radius: "
+                            + Units.metersToInches(currentEffectiveWheelRadius)
+                            + " inches");
         }
     }
 }
