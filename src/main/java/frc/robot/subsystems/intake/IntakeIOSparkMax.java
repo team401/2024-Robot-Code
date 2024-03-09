@@ -7,10 +7,8 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-
-import edu.wpi.first.wpilibj.Timer;
-
 import com.revrobotics.CANSparkMax;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.IntakeConstants;
 
 public class IntakeIOSparkMax implements IntakeIO {
@@ -80,5 +78,4 @@ public class IntakeIOSparkMax implements IntakeIO {
         }
         return false;
     }
-
 }
