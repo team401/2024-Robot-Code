@@ -31,6 +31,8 @@ public class DriveWithJoysticks extends Command {
 
     double lastTime = Utils.getCurrentTimeSeconds();
 
+    private ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
+
     public DriveWithJoysticks(
             CommandSwerveDrivetrain drivetrain,
             DoubleSupplier x,
@@ -113,10 +115,8 @@ public class DriveWithJoysticks extends Command {
                                             * Math.sin(velocityVectorTheta)
                                             * diffTime);
         }
-
-        drivetrain.setGoalChassisSpeeds(
-                new ChassisSpeeds(commandedXMpS, commandedYMpS, commandedRotRadpS),
-                fieldCentric.getAsBoolean());
+        chassisSpeeds = new ChassisSpeeds(commandedXMpS, commandedYMpS, commandedRotRadpS);
+        drivetrain.setGoalChassisSpeeds(chassisSpeeds, fieldCentric.getAsBoolean());
     }
 
     @Override
