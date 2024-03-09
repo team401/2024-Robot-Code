@@ -7,6 +7,9 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+
+import edu.wpi.first.wpilibj.Timer;
+
 import com.revrobotics.CANSparkMax;
 import frc.robot.Constants.IntakeConstants;
 
@@ -18,6 +21,9 @@ public class IntakeIOSparkMax implements IntakeIO {
             new CANSparkMax(IntakeConstants.rightIntakeMotorID, MotorType.kBrushless);
 
     private TalonFX belt = new TalonFX(IntakeConstants.indexTwoMotorID);
+
+    private Timer inIntakeTime;
+    private double maxRegIntakeCurrent = 5;
 
     public IntakeIOSparkMax() {
         leftIntake.setSmartCurrentLimit(40, 40);
@@ -34,6 +40,10 @@ public class IntakeIOSparkMax implements IntakeIO {
                 new CurrentLimitsConfigs()
                         .withStatorCurrentLimit(60)
                         .withStatorCurrentLimitEnable(true));
+
+        inIntakeTime = new Timer();
+        inIntakeTime.reset();
+        inIntakeTime.start();
     }
 
     @Override
@@ -59,4 +69,16 @@ public class IntakeIOSparkMax implements IntakeIO {
     public void setBeltVoltage(double volts) {
         belt.setControl(new VoltageOut(volts));
     }
+
+    @Override
+    public boolean checkIfStopIntake() {
+        if (leftIntake.getOutputCurrent() <= maxRegIntakeCurrent) {
+            inIntakeTime.reset();
+            inIntakeTime.start();
+        } else if (inIntakeTime.get() > 3) {
+            return true;
+        }
+        return false;
+    }
+
 }

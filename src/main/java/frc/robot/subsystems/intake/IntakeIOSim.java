@@ -46,4 +46,5 @@ public class IntakeIOSim implements IntakeIO {
     public void setBeltVoltage(double volts) {
         beltAppliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
     }
+
 }
