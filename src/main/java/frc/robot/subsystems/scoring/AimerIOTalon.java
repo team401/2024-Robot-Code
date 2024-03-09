@@ -11,6 +11,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import frc.robot.Constants.ScoringConstants;
 
 public class AimerIOTalon implements AimerIO {
@@ -131,52 +132,44 @@ public class AimerIOTalon implements AimerIO {
 
     private boolean checkForAimMotorFailure() {
 
-        /*if (!aimerLeft.isAlive() || !aimerRight.isAlive()) {
-            if (!motorCheckOverriden) setFF(ScoringConstants.aimerFaultkS, ScoringConstants.aimerFaultkV, ScoringConstants.aimerFaultkA, ScoringConstants.aimerFaultkG);
-            motorFailure = true;
-        } else if (motorFailure) {
-            if (!motorCheckOverriden) setFF(ScoringConstants.aimerkS, ScoringConstants.aimerkV, ScoringConstants.aimerkA, ScoringConstants.aimerkG);
-            motorFailure = false;
-        }
-        return motorFailure;*/
-
         // LEFT MOTOR
-        if ((!aimerLeft.isAlive())
-                || // if motor disconnected
-                (Math.abs(aimerRight.getStatorCurrent().getValueAsDouble())
-                                        - Math.abs(aimerLeft.getStatorCurrent().getValueAsDouble())
-                                > 1
-                        && Math.abs(aimerLeft.getMotorVoltage().getValueAsDouble()) > 0.5)
-                || // if motor voltage is really small when it shouldn't be
-                (Math.abs(aimerLeft.getStatorCurrent().getValueAsDouble())
-                                        - Math.abs(aimerRight.getStatorCurrent().getValueAsDouble())
-                                > 1
-                        && Math.abs(aimerLeft.getMotorVoltage().getValueAsDouble())
-                                < 0.5) // if motor voltage is really large when it shouldn't be
-        ) {
+        if (motorFailureCheckPair(aimerLeft, aimerRight)) {
             motorLeftFailure = true;
         }
 
         // RIGHT MOTOR
-        if ((!aimerRight.isAlive())
-                || // if motor disconnected
-                (Math.abs(aimerLeft.getStatorCurrent().getValueAsDouble())
-                                        - Math.abs(aimerRight.getStatorCurrent().getValueAsDouble())
-                                > 1
-                        && Math.abs(aimerRight.getMotorVoltage().getValueAsDouble()) > 0.5)
-                || // if motor voltage is really small when it shouldn't be
-                (Math.abs(aimerRight.getStatorCurrent().getValueAsDouble())
-                                        - Math.abs(aimerLeft.getStatorCurrent().getValueAsDouble())
-                                > 1
-                        && Math.abs(aimerRight.getMotorVoltage().getValueAsDouble())
-                                < 0.5) // if motor voltage is really large when it shouldn't be
-        ) {
+        if (motorFailureCheckPair(aimerRight, aimerLeft)) {
             motorRightFailure = true;
         }
 
-        if (!motorCheckOverriden) shutOffFaultyAimMotors();
+        if (!motorCheckOverriden) {
+            shutOffFaultyAimMotors();
+        }
 
         return motorLeftFailure || motorRightFailure;
+    }
+
+    private boolean motorFailureCheckPair(TalonFX check, TalonFX compare) {
+        if (!check.isAlive()) {
+            //motor no longer communicating with robot
+            return true;
+        }
+
+        if (Math.abs(compare.getStatorCurrent().getValueAsDouble())
+                - Math.abs(check.getStatorCurrent().getValueAsDouble()) > 1
+            && Math.abs(check.getMotorVoltage().getValueAsDouble()) > 0.5) {
+            // motor voltage is really small when it shouldn't be
+            return true;
+        }
+
+        if (Math.abs(check.getStatorCurrent().getValueAsDouble())
+                - Math.abs(compare.getStatorCurrent().getValueAsDouble()) > 1
+            && Math.abs(check.getMotorVoltage().getValueAsDouble()) < 0.5) 
+        {
+            // motor voltage is really large when it shouldn't be
+            return true;
+        }
+        return false;
     }
 
     private void shutOffFaultyAimMotors() {
@@ -197,13 +190,22 @@ public class AimerIOTalon implements AimerIO {
 
     @Override
     public void updateInputs(AimerIOInputs inputs) {
+        checkForAimMotorFailure();
+
         if (override) {
-            if (!motorLeftFailure || motorCheckOverriden) aimerLeft.setVoltage(overrideVolts);
-            else aimerRight.setVoltage(overrideVolts);
+            if (!motorLeftFailure || motorCheckOverriden) {
+                aimerLeft.setVoltage(overrideVolts);
+            }
+            else {
+                aimerRight.setVoltage(overrideVolts);
+            }
         } else {
-            if (!motorLeftFailure || motorCheckOverriden)
+            if (!motorLeftFailure || motorCheckOverriden) {
                 aimerLeft.setControl(controller.withPosition(goalAngleRad));
-            else aimerRight.setControl(controller.withPosition(goalAngleRad));
+            }
+            else {
+                aimerRight.setControl(controller.withPosition(goalAngleRad));
+            }
         }
 
         inputs.aimGoalAngleRad = goalAngleRad;
@@ -228,6 +230,6 @@ public class AimerIOTalon implements AimerIO {
             inputs.aimSupplyCurrentAmps = aimerLeft.getSupplyCurrent().getValueAsDouble();
         }
 
-        checkForAimMotorFailure();
+        
     }
 }
