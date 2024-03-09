@@ -308,7 +308,8 @@ public class RobotContainer {
 
         if (FeatureFlags.runScoring) {
             scoringSubsystem.setDefaultCommand(new ShootWithGamepad(
-                rightJoystick.getHID()::getTrigger,
+                // rightJoystick.getHID()::getTrigger,
+                () -> false,
                 () -> rightJoystick.getHID().getRawButton(4),
                 controller.getHID()::getRightBumper,
                 controller.getHID()::getYButton,
@@ -733,7 +734,7 @@ public class RobotContainer {
                             () -> leftJoystick.getY(),
                             () -> leftJoystick.getX(),
                             () -> rightJoystick.getX(),
-                            () -> true,
+                            () -> !rightJoystick.trigger().getAsBoolean(),
                             () -> rightJoystick.top().getAsBoolean(),
                             () ->
                                     VecBuilder.fill(

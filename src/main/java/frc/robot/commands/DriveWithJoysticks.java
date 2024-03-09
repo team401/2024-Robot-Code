@@ -99,16 +99,19 @@ public class DriveWithJoysticks extends Command {
         lastTime = currentTime;
 
         if (Math.hypot(currentXMpS, currentYMpS) < Math.hypot(commandedXMpS, commandedYMpS)) {
+            double velocityVectorTheta = Math.atan2(commandedYMpS, commandedXMpS);
             commandedXMpS =
                     currentXMpS
                             + Math.signum(commandedXMpS)
-                                    * DriveConstants.maxAccelerationMetersPerSecSquared
-                                    * diffTime;
+                                    * (DriveConstants.maxAccelerationMetersPerSecSquared
+                                            * Math.cos(velocityVectorTheta)
+                                            * diffTime);
             commandedYMpS =
                     currentYMpS
                             + Math.signum(commandedYMpS)
-                                    * DriveConstants.maxAccelerationMetersPerSecSquared
-                                    * diffTime;
+                                    * (DriveConstants.maxAccelerationMetersPerSecSquared
+                                            * Math.sin(velocityVectorTheta)
+                                            * diffTime);
         }
 
         drivetrain.setGoalChassisSpeeds(
