@@ -21,6 +21,8 @@ public class DriveWithJoysticks extends Command {
     double yMpS;
     double rotRadpS;
 
+    ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
+
     public DriveWithJoysticks(
             CommandSwerveDrivetrain drivetrain,
             DoubleSupplier x,
@@ -77,8 +79,10 @@ public class DriveWithJoysticks extends Command {
             rotRadpS *= 0.5;
         }
 
-        drivetrain.setGoalChassisSpeeds(
-                new ChassisSpeeds(xMpS, yMpS, rotRadpS), fieldCentric.getAsBoolean());
+        chassisSpeeds.vxMetersPerSecond = xMpS;
+        chassisSpeeds.vyMetersPerSecond = yMpS;
+        chassisSpeeds.omegaRadiansPerSecond = rotRadpS;
+        drivetrain.setGoalChassisSpeeds(chassisSpeeds, fieldCentric.getAsBoolean());
     }
 
     @Override
