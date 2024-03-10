@@ -152,8 +152,11 @@ public class AimerIORoboRio implements AimerIO {
     }
 
     private double getEncoderPosition() {
+        double position = encoder.getAbsolutePosition();
+        if (position < 0.0)
+        position = 0.0;
         // return aimerRight.getPosition().getValueAsDouble() * 2.0 * Math.PI * (1.0 / 80.0);
-        return encoder.getAbsolutePosition() * 2.0 * Math.PI - ScoringConstants.aimerEncoderOffset;
+        return position * 2.0 * Math.PI - ScoringConstants.aimerEncoderOffset;
     }
 
     @Override
