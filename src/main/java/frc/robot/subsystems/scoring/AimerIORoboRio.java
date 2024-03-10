@@ -6,6 +6,8 @@ import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.google.flatbuffers.Constants;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
@@ -56,6 +58,8 @@ public class AimerIORoboRio implements AimerIO {
 
     double lastPosition = 0.0;
     double lastTime = Utils.getCurrentTimeSeconds();
+
+    double encoderDiff = 0.0;
 
     public AimerIORoboRio() {
         aimerLeft.setControl(new Follower(ScoringConstants.aimRightMotorId, true));
@@ -181,6 +185,14 @@ public class AimerIORoboRio implements AimerIO {
                     feedforward.calculate(controlSetpoint, velocitySetpoint) + controllerVolts;
         }
 
+        encoderDiff = getEncoderPosition() - lastPosition;
+        if (Math.abs(encoderDiff) > (ScoringConstants.aimerEncoderMaxValue)/2){ //checks if difference is ridiculous -> indicates wrapping
+            if (encoderDiff < 0.0)
+                encoderDiff = encoderDiff + ScoringConstants.aimerEncoderMaxValue;
+            if (encoderDiff > 0.0)
+                encoderDiff = encoderDiff - ScoringConstants.aimerEncoderMaxValue;
+        }
+
         appliedVolts = MathUtil.clamp(appliedVolts, -12.0, 12.0);
         aimerRight.setVoltage(appliedVolts);
 
@@ -192,8 +204,8 @@ public class AimerIORoboRio implements AimerIO {
         double diffTime = currentTime - lastTime;
         lastTime = currentTime;
 
-        inputs.aimVelocityRadPerSec = (getEncoderPosition() - lastPosition) / diffTime;
-        velocity = (getEncoderPosition() - lastPosition) / diffTime;
+        inputs.aimVelocityRadPerSec = encoderDiff / diffTime;
+        velocity = encoderDiff / diffTime;
         lastPosition = getEncoderPosition();
 
         inputs.aimAppliedVolts = appliedVolts;
