@@ -2,22 +2,19 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
+import frc.robot.Constants.TunerConstants;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.Logger;
 
 public class WheelRadiusCharacterization extends Command {
-    private static final double characterizationSpeed = 0.1;
-    private static final double driveRadius = 10.375; // probs not correct
-    private DoubleSupplier gyroYawRadsSupplier =
-            () ->
-                    Constants.DriveConstants.initialPose
-                            .getRotation()
-                            .getRadians(); // need to get pose of the robot;
+    private static final double characterizationSpeed = 0.8;
+    private static final double driveRadius = TunerConstants.kModuleRadiusMeters;
 
+    private final DoubleSupplier gyroYawRadsSupplier; // need to get pose of the robot
     private final CommandSwerveDrivetrain drivetrain;
     private final SlewRateLimiter omegaLimiter = new SlewRateLimiter(1.0);
 
@@ -30,8 +27,10 @@ public class WheelRadiusCharacterization extends Command {
 
     private double currentEffectiveWheelRadius = 0.0;
 
-    public WheelRadiusCharacterization(CommandSwerveDrivetrain drive) {
+    public WheelRadiusCharacterization(
+            CommandSwerveDrivetrain drive, DoubleSupplier gyroYawRadsSupplier) {
         drivetrain = drive;
+        this.gyroYawRadsSupplier = gyroYawRadsSupplier;
         addRequirements(drive);
     }
 
@@ -44,6 +43,10 @@ public class WheelRadiusCharacterization extends Command {
         startWheelPositions = drivetrain.getWheelRadiusCharacterizationPosition();
 
         omegaLimiter.reset(0);
+
+        if (!SmartDashboard.containsKey("Effective Wheel Radius")) {
+            SmartDashboard.putNumber("Effective Wheel Radius", 0.0);
+        }
     }
 
     @Override
@@ -63,23 +66,27 @@ public class WheelRadiusCharacterization extends Command {
         }
         averageWheelPosition /= 4.0;
 
-        currentEffectiveWheelRadius = (accumGyroYawRads * driveRadius) / averageWheelPosition; //is probably not correct, but i don't really get it
-        Logger.recordOutput("Drive/RadiusCharacterization/DrivePosition", averageWheelPosition);
-        Logger.recordOutput("Drive/RadiusCharacterization/AccumGyroYawRads", accumGyroYawRads);
-        Logger.recordOutput(
-                "Drive/RadiusCharacterization/CurrentWheelRadiusInches",
+        currentEffectiveWheelRadius =
+                (accumGyroYawRads * driveRadius)
+                        / averageWheelPosition; // is probably not correct, but i don't really get
+        // it
+        SmartDashboard.putNumber(
+                "TestMode/RadiusCharacterization/DrivePosition", averageWheelPosition);
+        SmartDashboard.putNumber(
+                "TestMode/RadiusCharacterization/AccumGyroYawRads", accumGyroYawRads);
+        SmartDashboard.putNumber(
+                "TestMode/RadiusCharacterization/CurrentWheelRadiusInches",
                 Units.metersToInches(currentEffectiveWheelRadius));
     }
 
     @Override
     public void end(boolean interrupted) {
-        if (accumGyroYawRads <= Math.PI * 2.0) {
-            System.out.println("Not enough data for characterization");
+        if (Math.abs(accumGyroYawRads) <= Math.PI * 2.0) {
+            SmartDashboard.putNumber("Effective Wheel Radius", -1.0);
         } else {
-            System.out.println(
-                    "Effective Wheel Radius: "
-                            + Units.metersToInches(currentEffectiveWheelRadius)
-                            + " inches");
+            SmartDashboard.putNumber("Effective Wheel Radius", currentEffectiveWheelRadius);
         }
+
+        drivetrain.setGoalChassisSpeeds(new ChassisSpeeds());
     }
 }

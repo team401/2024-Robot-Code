@@ -473,15 +473,15 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     public void runWheelRadiusCharacterization(double speed) {
-        setGoalChassisSpeeds(new ChassisSpeeds(speed, 0, 0));
+        setGoalChassisSpeeds(new ChassisSpeeds(0, 0, speed));
     }
 
     public double[] getWheelRadiusCharacterizationPosition() {
         return new double[] {
-            this.getModule(1).getPosition(true).distanceMeters,
-            this.getModule(2).getPosition(true).distanceMeters,
-            this.getModule(3).getPosition(true).distanceMeters,
-            this.getModule(4).getPosition(true).distanceMeters
+            this.getModule(0).getDriveMotor().getPosition().getValueAsDouble(),
+            this.getModule(1).getDriveMotor().getPosition().getValueAsDouble(),
+            this.getModule(2).getDriveMotor().getPosition().getValueAsDouble(),
+            this.getModule(3).getDriveMotor().getPosition().getValueAsDouble()
         };
     }
 

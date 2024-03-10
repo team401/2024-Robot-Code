@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.ConversionConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.EndgameConstants;
 import frc.robot.Constants.FeatureFlags;
@@ -650,12 +651,17 @@ public class RobotContainer {
                                             endgameSubsystem.setAction(EndgameAction.OVERRIDE);
                                         }));
                     break;
-                case "characterization-wheel":
-                        controller.a().onTrue(new InstantCommand(() -> new WheelRadiusCharacterization(drivetrain)));
-               break;
+            case "characterization-wheel":
+                controller.a()
+                        .whileTrue(
+                                new WheelRadiusCharacterization(
+                                        drivetrain,
+                                        () -> drivetrain.getPigeon2().getYaw().getValueAsDouble()
+                                                * ConversionConstants.kDegreesToRadians));
+                break;
+            }
         }
         // spotless:on
-    }
 
     public void testPeriodic() {}
 
