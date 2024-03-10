@@ -66,10 +66,7 @@ public class WheelRadiusCharacterization extends Command {
         }
         averageWheelPosition /= 4.0;
 
-        currentEffectiveWheelRadius =
-                (accumGyroYawRads * driveRadius)
-                        / averageWheelPosition; // is probably not correct, but i don't really get
-        // it
+        currentEffectiveWheelRadius = (accumGyroYawRads * driveRadius) / averageWheelPosition;
         SmartDashboard.putNumber(
                 "TestMode/RadiusCharacterization/DrivePosition", averageWheelPosition);
         SmartDashboard.putNumber(
