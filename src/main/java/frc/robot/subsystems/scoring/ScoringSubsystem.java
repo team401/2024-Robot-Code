@@ -21,31 +21,9 @@ import frc.robot.Constants.ScoringConstants;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 1d16c64 (actually the merge messed everything up sorry i'll get it working again soon)
 import frc.robot.utils.Tunable;
-import frc.robot.utils.notesimulator.NoteManager;
 import java.util.function.DoubleSupplier;
-=======
 import frc.robot.utils.NoteVisualizer;
->>>>>>> 5eb9f80 (advantagekit keeps being sad)
-=======
-import frc.robot.utils.notesimulator.Note;
->>>>>>> 084d91d (committing this last piece of vaguely functioning code before i ruin everything w notemanager)
-=======
-=======
-import frc.robot.utils.notesimulator.Note;
->>>>>>> a2a9e17 (first draft done, I just need the new interpolate values and then it'll maybe sort of work!)
-=======
->>>>>>> 3ddc913 (testing auto advantagekit is sad AGAIN)
-import frc.robot.utils.notesimulator.NoteManager;
->>>>>>> 00eb2c8 (:P)
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -295,15 +273,11 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     private void shoot() {
         double distancetoGoal = findDistanceToGoal();
-<<<<<<< HEAD
-        shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
-        aimerIo.setAimAngleRad(getAimerAngle(distancetoGoal), false);
-=======
+        
         double shootRPM = shooterInterpolated.getValue(distancetoGoal);
         shooterIo.setShooterVelocityRPM(shootRPM);
         double aimAngleRad = aimerInterpolated.getValue(distancetoGoal);
         aimerIo.setAimAngleRad(aimAngleRad, false);
->>>>>>> 5eb9f80 (advantagekit keeps being sad)
 
         shooterIo.setKickerVolts(10);
 
@@ -313,7 +287,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
             shootTimer.stop();
         }
 
-        CommandScheduler.getInstance().schedule(NoteManager.shoot(shootRPM, aimAngleRad));
+        NoteManager newNote = new NoteManager(poseSupplier);
+        CommandScheduler.getInstance().schedule(newNote.shoot());
     }
 
     private void ampShoot() {

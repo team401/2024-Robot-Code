@@ -5,26 +5,14 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-<<<<<<< HEAD
-<<<<<<< HEAD
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
-=======
 import edu.wpi.first.math.geometry.Translation3d;
->>>>>>> 0720d10 (saving progress)
-=======
->>>>>>> d1b1751 (argh I don't know how to post data to advantagekit help please)
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-<<<<<<< HEAD
-=======
 import edu.wpi.first.wpilibj2.command.Command;
-<<<<<<< HEAD
->>>>>>> 65458a3 (still struggling a bit- tried importing NoteVisualizer by Advantagekit, which does work)
 import edu.wpi.first.wpilibj2.command.Commands;
-=======
->>>>>>> a1e4152 (integrating with scoringsubsystem; interpolate values most likely off atm?)
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -42,16 +30,9 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignState;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignTarget;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 1d16c64 (actually the merge messed everything up sorry i'll get it working again soon)
 import frc.robot.subsystems.endgame.EndgameIO;
 import frc.robot.subsystems.endgame.EndgameIOSim;
 import frc.robot.subsystems.endgame.EndgameIOSparkFlex;
-=======
-import frc.robot.subsystems.endgame.EndgameSparkMaxIO;
->>>>>>> 5eb9f80 (advantagekit keeps being sad)
 import frc.robot.subsystems.endgame.EndgameSubsystem;
 import frc.robot.subsystems.endgame.EndgameSubsystem.EndgameAction;
 import frc.robot.subsystems.intake.IntakeIO;
@@ -59,17 +40,9 @@ import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem.IntakeAction;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 1d16c64 (actually the merge messed everything up sorry i'll get it working again soon)
 import frc.robot.subsystems.localization.CameraContainerReal;
 import frc.robot.subsystems.localization.CameraContainerReplay;
 import frc.robot.subsystems.localization.CameraContainerSim;
-=======
-import frc.robot.subsystems.localization.VisionIOReal;
-// import frc.robot.subsystems.localization.VisionIOSim;
->>>>>>> 5eb9f80 (advantagekit keeps being sad)
 import frc.robot.subsystems.localization.VisionLocalizer;
 import frc.robot.subsystems.scoring.AimerIO;
 import frc.robot.subsystems.scoring.AimerIORoboRio;
@@ -87,36 +60,9 @@ import frc.robot.telemetry.TelemetryIO;
 import frc.robot.telemetry.TelemetryIOLive;
 import frc.robot.telemetry.TelemetryIOSim;
 import frc.robot.utils.FieldFinder;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 import frc.robot.utils.feedforward.TuneG;
 import frc.robot.utils.feedforward.TuneS;
-=======
-import frc.robot.utils.NoteSimSubsystem;
-=======
-import frc.robot.utils.NoteVisualizer;
-<<<<<<< HEAD
->>>>>>> d1b1751 (argh I don't know how to post data to advantagekit help please)
 import java.util.Collections;
->>>>>>> 0720d10 (saving progress)
-=======
->>>>>>> 5eb9f80 (advantagekit keeps being sad)
-=======
->>>>>>> a1e4152 (integrating with scoringsubsystem; interpolate values most likely off atm?)
-=======
-import frc.robot.utils.notesimulator.Note;
-import frc.robot.utils.notesimulator.NoteManager;
->>>>>>> 00eb2c8 (:P)
-=======
-import frc.robot.utils.feedforward.TuneG;
-import frc.robot.utils.feedforward.TuneS;
-import frc.robot.utils.feedforward.TuneV;
-import frc.robot.utils.notesimulator.Note;
-import frc.robot.utils.notesimulator.NoteManager;
->>>>>>> 1d16c64 (actually the merge messed everything up sorry i'll get it working again soon)
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -145,110 +91,9 @@ public class RobotContainer {
         configureSubsystems();
         configureModes();
         configureAutonomous();
-
-        NoteManager.addNote(new Note(driveTelemetry::getFieldToRobot, true, "1"));
-        NoteManager.addNote(
-                new Note(
-                        driveTelemetry::getFieldToRobot,
-                        new Pose2d(2.69, 4.14, new Rotation2d()),
-                        "2"));
-        NoteManager.addNote(
-                new Note(
-                        driveTelemetry::getFieldToRobot,
-                        "" + (NoteManager.numberOfExistingNotes() + 1)));
-        NoteManager.addNote(
-                new Note(
-                        driveTelemetry::getFieldToRobot,
-                        "" + (NoteManager.numberOfExistingNotes() + 1)));
-        NoteManager.addNote(
-                new Note(
-                        driveTelemetry::getFieldToRobot,
-                        "" + (NoteManager.numberOfExistingNotes() + 1)));
-        NoteManager.addNote(
-                new Note(
-                        driveTelemetry::getFieldToRobot,
-                        "" + (NoteManager.numberOfExistingNotes() + 1)));
     }
 
-<<<<<<< HEAD
-=======
-    // spotless:off
-    private void configureBindings() {
-        if (FeatureFlags.runDrive) {
-            drivetrain.setDefaultCommand(
-                    new DriveWithJoysticks(
-                            drivetrain,
-                            () -> -controller.getLeftY(),
-                            () -> -controller.getLeftX(),
-                            () -> -controller.getRightX(),
-                            () -> controller.getHID().getPOV(),
-                            () -> true,
-                            () -> false,
-                            () -> controller.getHID().getLeftBumper()));
-                
-            controller.rightBumper()
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignState(AlignState.ALIGNING)))
-                .onFalse(new InstantCommand(
-                    () -> drivetrain.setAlignState(AlignState.MANUAL)));
-        }
 
-        if (FeatureFlags.runScoring) {
-            controller.a()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.INTAKE)))
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignState(AlignState.MANUAL)))
-                .onTrue(new InstantCommand(
-                    () -> intakeSubsystem.toggle()))
-                .onTrue(
-                    new InstantCommand(() -> NoteManager.intake()));
-
-            controller.b()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                         ScoringSubsystem.ScoringAction.AIM)))
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
-
-            controller.x()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.SHOOT)))
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)))
-                .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AIM)));
-
-            controller.y()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.ENDGAME)))
-                .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)));
-
-            controller.back()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AMP_AIM)))
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignTarget(AlignTarget.AMP)));
-
-            controller.start()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)))
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignState(AlignState.MANUAL)));
-        }
-    } // spotless:on
-
-    private void configureModes() {}
-
->>>>>>> 65458a3 (still struggling a bit- tried importing NoteVisualizer by Advantagekit, which does work)
     public void configureSubsystems() {
         switch (Constants.currentMode) {
             case REAL:
@@ -296,35 +141,13 @@ public class RobotContainer {
                                     new ShooterIOSim(), new AimerIOSim(), new HoodIOSim());
                 }
 
-<<<<<<< HEAD
                 if (FeatureFlags.runVision) {
-=======
-                /*if (FeatureFlags.simulateVision) {
->>>>>>> 5eb9f80 (advantagekit keeps being sad)
                     tagVision =
                             new VisionLocalizer(
                                     new CameraContainerSim(
                                             VisionConstants.cameras,
                                             driveTelemetry::getModuleStates));
-<<<<<<< HEAD
-<<<<<<< HEAD
                 }
-=======
-                } else if (FeatureFlags.runVision) {
-                    tagVision =
-                            new VisionLocalizer(
-                                    new VisionIOSim(
-                                            Collections.emptyList(),
-                                            driveTelemetry::getModuleStates));
-                }
-
-                if (FeatureFlags.runEndgame) {
-                    endgameSubsystem = new EndgameSubsystem(new EndgameSimIO());
-                }*/
->>>>>>> 5eb9f80 (advantagekit keeps being sad)
-=======
-                }
->>>>>>> 1d16c64 (actually the merge messed everything up sorry i'll get it working again soon)
 
                 if (FeatureFlags.runIntake) {
                     intakeSubsystem = new IntakeSubsystem(new IntakeIOSim());
@@ -482,7 +305,6 @@ public class RobotContainer {
 
             controller.a()
                 .onTrue(new InstantCommand(
-<<<<<<< HEAD
                     () -> intakeSubsystem.run(IntakeAction.REVERSE)))
                 .onFalse(new InstantCommand(
                     () -> intakeSubsystem.run(IntakeAction.NONE)));
@@ -498,60 +320,6 @@ public class RobotContainer {
                 controller.getHID()::getAButton,
                 controller.getHID()::getBButton, scoringSubsystem,
                 FeatureFlags.runDrive ? drivetrain::getAlignTarget : () -> AlignTarget.NONE));
-=======
-                        () -> intakeSubsystem.run(IntakeAction.INTAKE)))
-                .onTrue(
-                    new InstantCommand(() -> NoteManager.intake()));
-                
-            controller.start()
-                .onTrue(new InstantCommand(
-                        () -> intakeSubsystem.run(IntakeAction.NONE)));
-        }
-
-        if (FeatureFlags.runScoring) {
-            controller.a()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.INTAKE)))
-                .onTrue(
-                    new InstantCommand(() -> NoteManager.intake()))
-                .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)));
-
-            controller.b()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                         ScoringSubsystem.ScoringAction.AIM)));
-
-            controller.x()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.SHOOT)));
-
-            controller.y()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.ENDGAME)));
-
-            controller.back()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.AMP_AIM)));
-
-            controller.start()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)));
-
-            controller.povLeft()
-                .onTrue(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.SOURCE_INTAKE)))
-                .onFalse(new InstantCommand(
-                    () -> scoringSubsystem.setAction(
-                        ScoringSubsystem.ScoringAction.WAIT)));
->>>>>>> 1d16c64 (actually the merge messed everything up sorry i'll get it working again soon)
         }
     } // spotless:on
 
@@ -1085,46 +853,16 @@ public class RobotContainer {
     public void teleopInit() {
         configureBindings();
 
-<<<<<<< HEAD
         // This is in teleopInit to prevent it from wasting time in auto
         if (FeatureFlags.runScoring) {
             // scoringSubsystem.homeHood();
-=======
-        autoChooser.addOption("S2 4-Note", "S1-W1-W2-W3");
-        autoChooser.addOption("S3 2-Note", "S3-W3");
->>>>>>> 3ddc913 (testing auto advantagekit is sad AGAIN)
 
             scoringSubsystem.setAction(ScoringAction.WAIT);
             scoringSubsystem.enabledInit();
         }
 
-<<<<<<< HEAD
         if (FeatureFlags.runDrive) {
             drivetrain.setAlignState(AlignState.MANUAL);
         }
-=======
-        NamedCommands.registerCommand(
-                "Shoot Scoring",
-                new InstantCommand(
-                        () -> {
-                            scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT);
-                            intakeSubsystem.run(IntakeAction.INTAKE);
-                        }));
-        NamedCommands.registerCommand(
-                "Aim Scoring",
-                new InstantCommand(
-                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.AIM)));
-        NamedCommands.registerCommand(
-                "Intake Scoring",
-                new InstantCommand(
-                        () -> {
-                            scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.INTAKE);
-                            NoteManager.intake();
-                        }));
-        NamedCommands.registerCommand(
-                "Wait Scoring",
-                new InstantCommand(
-                        () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
->>>>>>> fc46317 (done with adding extra notes, merging w/ main is probably next step ig)
     }
 }
