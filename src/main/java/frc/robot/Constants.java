@@ -55,6 +55,8 @@ public final class Constants {
         public static final boolean runDrive = true;
 
         public static final boolean enableLEDS = false;
+
+        public static final boolean shopMode = true;
     }
 
     public static final class ConversionConstants {
@@ -95,11 +97,11 @@ public final class Constants {
     }
 
     public static final class FieldConstants {
-        public static final double lengthM = 16.451;
-        public static final double widthM = 8.211;
+        public static final double lengthM = !FeatureFlags.shopMode ? 16.451 : 16.451;
+        public static final double widthM = !FeatureFlags.shopMode ? 8.211 : 8.211;
 
-        public static final double midfieldLowThresholdM = 5.87;
-        public static final double midfieldHighThresholdM = 10.72;
+        public static final double midfieldLowThresholdM = !FeatureFlags.shopMode ? 5.87 : 5.87;
+        public static final double midfieldHighThresholdM = !FeatureFlags.shopMode ? 10.72 : 10.72;
 
         public static final Rotation2d ampHeading = new Rotation2d(-Math.PI / 2);
 
@@ -118,7 +120,8 @@ public final class Constants {
         public static final Rotation2d blueSourceHeading =
                 new Rotation2d(Math.PI * 5 / 3); // 120 degrees
 
-        public static final Translation2d fieldToRedSpeaker =
+        public static final Translation2d fieldToRedSpeaker = !FeatureFlags.shopMode ?
+                new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42)) :
                 new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42));
 
         public static final Translation2d fieldToBlueSpeaker =
@@ -127,19 +130,22 @@ public final class Constants {
         public static final Pose2d robotAgainstBlueSpeaker =
                 new Pose2d(1.39, 5.56, Rotation2d.fromDegrees(180));
 
-        public static final Pose2d robotAgainstRedSpeaker =
+        public static final Pose2d robotAgainstRedSpeaker = !FeatureFlags.shopMode ?
+                new Pose2d(15.19, 5.56, Rotation2d.fromDegrees(0)) : 
                 new Pose2d(15.19, 5.56, Rotation2d.fromDegrees(0));
 
         public static final Pose2d robotAgainstBluePodium =
                 new Pose2d(2.57, 4.09, Rotation2d.fromDegrees(180));
 
-        public static final Pose2d robotAgainstRedPodium =
+        public static final Pose2d robotAgainstRedPodium = !FeatureFlags.shopMode ?
+                new Pose2d(13.93, 4.09, Rotation2d.fromDegrees(0)) : 
                 new Pose2d(13.93, 4.09, Rotation2d.fromDegrees(0));
 
         public static final Pose2d robotAgainstBlueAmpZone =
                 new Pose2d(2.85, 7.68, Rotation2d.fromDegrees(-90));
 
-        public static final Pose2d robotAgainstRedAmpZone =
+        public static final Pose2d robotAgainstRedAmpZone = !FeatureFlags.shopMode ?
+                new Pose2d(13.74, 7.68, Rotation2d.fromDegrees(-90)) : 
                 new Pose2d(13.74, 7.68, Rotation2d.fromDegrees(-90));
     }
 
