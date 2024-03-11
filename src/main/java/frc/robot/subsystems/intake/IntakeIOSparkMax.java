@@ -40,7 +40,11 @@ public class IntakeIOSparkMax implements IntakeIO {
                         .withStatorCurrentLimit(60)
                         .withStatorCurrentLimitEnable(true));
 
-        uptakeSensor.setRangeOfInterest(SensorConstants.uptakeTopLeftX, SensorConstants.uptakeTopLeftY, SensorConstants.uptakeBottomRightX, SensorConstants.uptakeBottomRightY);
+        uptakeSensor.setRangeOfInterest(
+                SensorConstants.uptakeTopLeftX,
+                SensorConstants.uptakeTopLeftY,
+                SensorConstants.uptakeBottomRightX,
+                SensorConstants.uptakeBottomRightY);
         uptakeSensor.setRangingMode(RangingMode.Short, 40.0); // runs every other loop
     }
 
@@ -56,8 +60,8 @@ public class IntakeIOSparkMax implements IntakeIO {
         inputs.beltStatorCurrent = belt.getStatorCurrent().getValueAsDouble();
         inputs.beltSupplyCurrent = belt.getSupplyCurrent().getValueAsDouble();
 
-        if(uptakeSensor.isRangeValid()) {
-            inputs.noteSensed = uptakeSensor.getRange() < SensorConstants.maxRange; 
+        if (uptakeSensor.isRangeValid()) {
+            inputs.noteSensed = uptakeSensor.getRange() < SensorConstants.maxRange;
         } else {
             inputs.noteSensed = false; // no distance was measured
         }
