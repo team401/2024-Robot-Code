@@ -1,10 +1,13 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.EndgameConstants;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.endgame.EndgameSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.telemetry.Telemetry;
 import java.util.function.BooleanSupplier;
 
 public class EndgameSequence extends Command {
@@ -12,7 +15,11 @@ public class EndgameSequence extends Command {
     EndgameSubsystem endgameSubsystem;
     CommandSwerveDrivetrain drivetrain;
 
+    Telemetry telemetry;
+
     BooleanSupplier confirmBooleanSupplier;
+
+    Pose2d targetPose;
 
     private enum State {
         DRIVE_TO_START,
@@ -27,23 +34,26 @@ public class EndgameSequence extends Command {
             ScoringSubsystem scoringSubsystem,
             EndgameSubsystem endgameSubsystem,
             CommandSwerveDrivetrain drivetrain,
+            Telemetry telemetry,
             BooleanSupplier confirmBooleanSupplier) {
         this.scoringSubsystem = scoringSubsystem;
         this.endgameSubsystem = endgameSubsystem;
         this.drivetrain = drivetrain;
 
+        this.telemetry = telemetry;
+
         this.confirmBooleanSupplier = confirmBooleanSupplier;
 
         addRequirements(scoringSubsystem);
         addRequirements(endgameSubsystem);
-        addRequirements(drivetrain);
+        // addRequirements(drivetrain);
     }
 
     @Override
     public void initialize() {
         state = State.DRIVE_TO_START;
 
-        drivetrain.driveToEndgame();
+        // drivetrain.driveToEndgame();
         endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_DOWN);
         scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT);
     }
@@ -52,35 +62,57 @@ public class EndgameSequence extends Command {
     public void execute() {
         switch (state) {
             case DRIVE_TO_START:
-                if (drivetrain.atPathfindPose()) {
+                if (
+                /* drivetrain.atPathfindPose() && */ confirmBooleanSupplier.getAsBoolean()) {
                     state = State.MOVE_UP;
 
-                    drivetrain.stopDriveToPose();
-                    drivetrain.setGoalChassisSpeeds(new ChassisSpeeds(0.1, 0.0, 0.0), false);
+                    // drivetrain.stopDriveToPose();
+                    endgameSubsystem.setClimbing(false);
                     endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_UP);
                 }
                 break;
             case MOVE_UP:
-                if (confirmBooleanSupplier.getAsBoolean()) {
+                double result =
+                        0.1
+                                * (endgameSubsystem.getPosition()
+                                        - EndgameConstants.climberTargetDownMeters)
+                                / (EndgameConstants.climberTargetUpMeters
+                                        - EndgameConstants.climberTargetDownMeters);
+
+                targetPose =
+                        new Pose2d(
+                                drivetrain.getEndgamePose().getX()
+                                        + result * Math.cos(telemetry.getRotationRadians()),
+                                drivetrain.getEndgamePose().getY()
+                                        + result * Math.sin(telemetry.getRotationRadians()),
+                                new Rotation2d(telemetry.getRotationRadians()));
+                // drivetrain.driveToPose(targetPose);
+
+                if (endgameSubsystem.atPosition() && confirmBooleanSupplier.getAsBoolean()) {
                     state = State.CLIMB;
 
+                    // drivetrain.stopDriveToPose();
+                    endgameSubsystem.setClimbing(true);
                     endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_DOWN);
                     scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.ENDGAME);
                 }
                 break;
             case CLIMB:
-                if (confirmBooleanSupplier.getAsBoolean()) {
+                if (endgameSubsystem.atPosition() && confirmBooleanSupplier.getAsBoolean()) {
                     state = State.TRAP;
+
+                    scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.TRAP_SCORE);
                 }
                 break;
             case TRAP:
-                endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.TEMPORARY_SETPOINT);
                 break;
         }
     }
 
     @Override
-    public void end(boolean interrupted) {}
+    public void end(boolean interrupted) {
+        drivetrain.stopDriveToPose();
+    }
 
     @Override
     public boolean isFinished() {

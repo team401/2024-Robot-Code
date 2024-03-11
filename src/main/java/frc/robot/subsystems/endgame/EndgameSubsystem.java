@@ -13,6 +13,10 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
 
     private double overrideVolts = 0.0;
 
+    private double setpointPosition = 0.0;
+
+    private boolean climbing = false;
+
     public enum EndgameAction {
         GO_UP,
         GO_DOWN,
@@ -35,12 +39,14 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
     public void setAction(EndgameAction action) {
         switch (action) {
             case GO_UP:
-                endgameIo.setPosition(EndgameConstants.climberTargetUpMeters);
+                setpointPosition = EndgameConstants.climberTargetUpMeters;
+                endgameIo.setPosition(setpointPosition);
                 endgameIo.setOverrideMode(false);
                 state = State.NORMAL;
                 break;
             case GO_DOWN:
-                endgameIo.setPosition(EndgameConstants.climberTargetDownMeters);
+                setpointPosition = EndgameConstants.climberTargetDownMeters;
+                endgameIo.setPosition(setpointPosition);
                 endgameIo.setOverrideMode(false);
                 state = State.NORMAL;
                 break;
@@ -62,12 +68,20 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
         Logger.recordOutput("endgame/Action", action);
     }
 
+    public boolean atPosition() {
+        return Math.abs(setpointPosition - endgameInputs.position) < 0.05;
+    }
+
     public void setBrakeMode(boolean brake) {
         endgameIo.setBrakeMode(brake);
     }
 
     public double getPosition() {
         return endgameInputs.position;
+    }
+
+    public void setClimbing(boolean climbing) {
+        endgameIo.setClimbing(climbing);
     }
 
     @Override

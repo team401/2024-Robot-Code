@@ -4,8 +4,10 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.Utils;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -21,6 +23,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
+    private double lastTime = Utils.getCurrentTimeSeconds();
+
     @SuppressWarnings("unused")
     private RobotContainer robotContainer;
 
@@ -68,9 +72,16 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotPeriodic() {
+        double startTime = Utils.getCurrentTimeSeconds() * 1000;
         CommandScheduler.getInstance().run();
 
         robotContainer.robotPeriodic();
+
+        double currentTime = Utils.getCurrentTimeSeconds() * 1000;
+        double diffTime = currentTime - startTime;
+        // lastTime = currentTime;
+
+        SmartDashboard.putNumber("Loop Time", diffTime);
     }
 
     @Override

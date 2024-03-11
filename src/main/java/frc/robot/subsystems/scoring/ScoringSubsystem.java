@@ -93,7 +93,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         ENDGAME,
         TUNING,
         OVERRIDE,
-        TEMPORARY_SETPOINT
+        TEMPORARY_SETPOINT,
+        TRAP_SCORE
     }
 
     private ScoringState state = ScoringState.IDLE;
@@ -163,7 +164,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
             shooterIo.setShooterVelocityRPM(2000);
         } else if (action == ScoringAction.AMP_AIM) {
             state = ScoringState.AMP_PRIME;
-        } else if (action == ScoringAction.ENDGAME) {
+        } else if (action == ScoringAction.ENDGAME || action == ScoringAction.TRAP_SCORE) {
             state = ScoringState.ENDGAME;
         } else if (action == ScoringAction.TUNING) {
             state = ScoringState.TUNING;
@@ -295,13 +296,11 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     private void endgame() {
         aimerIo.setAimAngleRad(Math.PI / 2, true);
-        shooterIo.setShooterVelocityRPM(0);
-        shooterIo.setKickerVolts(0);
+        shooterIo.setShooterVelocityRPM(ScoringConstants.shooterAmpVelocityRPM);
+        shooterIo.setKickerVolts(action == ScoringAction.TRAP_SCORE ? 10 : 0);
         // hoodIo.setHoodAngleRad(0);
-        hoodIo.setOverrideVolts(0);
-        if (action == ScoringAction.AMP_AIM) {
-            state = ScoringState.AMP_PRIME;
-        } else if (action != ScoringAction.ENDGAME) {
+        hoodIo.setOverrideVolts(3);
+        if (action != ScoringAction.ENDGAME && action != ScoringAction.TRAP_SCORE) {
             state = ScoringState.IDLE;
         }
     }
@@ -436,7 +435,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         } else if (state != ScoringState.TUNING
                 && state != ScoringState.ENDGAME
                 && state != ScoringState.IDLE
-                && Math.abs(elevatorPositionSupplier.getAsDouble()) < 0.2
+                // && Math.abs(elevatorPositionSupplier.getAsDouble()) < 0.2
                 && !overrideStageAvoidance
                 && willHitStage()) {
             aimerIo.setAngleClampsRad(-0.01, 0);

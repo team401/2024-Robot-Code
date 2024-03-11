@@ -23,6 +23,7 @@ import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveWithJoysticks;
+import frc.robot.commands.EndgameSequence;
 import frc.robot.commands.ShootWithGamepad;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
@@ -279,21 +280,31 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.RIGHT)));
 
-            controller.x()
-                .onTrue(new InstantCommand(() -> drivetrain.driveToEndgame()))
-                .onFalse(new InstantCommand(() -> drivetrain.stopDriveToPose()));
+            // controller.x()
+            //     .onTrue(new InstantCommand(() -> drivetrain.driveToEndgame()))
+            //     .onFalse(new InstantCommand(() -> drivetrain.stopDriveToPose()));
         }
 
         if (FeatureFlags.runEndgame) {
-            endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.OVERRIDE);
+            // endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.OVERRIDE);
+            endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.CANCEL);
 
-            controller.leftBumper()
-                .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(4.0, 0)))
-                .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
+            // controller.leftBumper()
+            //     .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(4.0, 0)))
+            //     .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
 
-            controller.leftTrigger()
-                .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(-4.0, 0)))
-                .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
+            // controller.leftTrigger()
+            //     .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(-4.0, 0)))
+            //     .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
+
+            // controller.leftBumper()
+            //     .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_UP)));
+
+            // controller.leftTrigger()
+            //     .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_DOWN)));
+
+            controller.x()
+                .onTrue(new EndgameSequence(scoringSubsystem, endgameSubsystem, drivetrain, driveTelemetry, () -> controller.getHID().getLeftBumper()));
         }
 
         if (FeatureFlags.runIntake) {

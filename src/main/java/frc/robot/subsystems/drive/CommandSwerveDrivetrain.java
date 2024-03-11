@@ -196,7 +196,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 }, // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
                         new PIDConstants(1, 0, 0),
-                        new PIDConstants(1, 0, 0),
+                        new PIDConstants(0.5, 0, 0),
                         TunerConstants.kSpeedAt12VoltsMps,
                         driveBaseRadius,
                         new ReplanningConfig()),
@@ -506,16 +506,16 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public Pose2d getEndgamePose() {
         // Blue Alliance Poses
-        Pose2d leftClimbPose2d = new Pose2d(4.64, 4.46, Rotation2d.fromDegrees(120));
-        Pose2d rightClimbPose2d = new Pose2d(4.67, 3.72, Rotation2d.fromDegrees(-120));
-        Pose2d farClimbPose2d = new Pose2d(5.35, 4.11, Rotation2d.fromDegrees(0));
+        Pose2d leftClimbPose2d = new Pose2d(4.64, 4.46, Rotation2d.fromDegrees(-60));
+        Pose2d rightClimbPose2d = new Pose2d(4.67, 3.72, Rotation2d.fromDegrees(60));
+        Pose2d farClimbPose2d = new Pose2d(5.35, 4.11, Rotation2d.fromDegrees(180));
 
         if (DriverStation.getAlliance().isPresent()
                 && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
             // Red Alliance Poses
-            leftClimbPose2d = new Pose2d(11.93, 3.72, Rotation2d.fromDegrees(-60));
-            rightClimbPose2d = new Pose2d(11.9, 4.49, Rotation2d.fromDegrees(60));
-            farClimbPose2d = new Pose2d(11.22, 4.08, Rotation2d.fromDegrees(180));
+            leftClimbPose2d = new Pose2d(11.93, 3.72, Rotation2d.fromDegrees(120));
+            rightClimbPose2d = new Pose2d(11.9, 4.49, Rotation2d.fromDegrees(-120));
+            farClimbPose2d = new Pose2d(11.22, 4.08, Rotation2d.fromDegrees(0));
         }
 
         double distanceToTargetLeft =
