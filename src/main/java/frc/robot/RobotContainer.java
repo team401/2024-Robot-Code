@@ -7,11 +7,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -62,7 +60,8 @@ import frc.robot.telemetry.TelemetryIOSim;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.feedforward.TuneG;
 import frc.robot.utils.feedforward.TuneS;
-import java.util.Collections;
+import frc.robot.utils.notesimulator.Note;
+import frc.robot.utils.notesimulator.NoteManager;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -91,8 +90,30 @@ public class RobotContainer {
         configureSubsystems();
         configureModes();
         configureAutonomous();
-    }
 
+        NoteManager.addNote(new Note(driveTelemetry::getFieldToRobot, true, "1"));
+        NoteManager.addNote(
+                new Note(
+                        driveTelemetry::getFieldToRobot,
+                        new Pose2d(2.69, 4.14, new Rotation2d()),
+                        "2"));
+        NoteManager.addNote(
+                new Note(
+                        driveTelemetry::getFieldToRobot,
+                        "" + (NoteManager.numberOfExistingNotes() + 1)));
+        NoteManager.addNote(
+                new Note(
+                        driveTelemetry::getFieldToRobot,
+                        "" + (NoteManager.numberOfExistingNotes() + 1)));
+        NoteManager.addNote(
+                new Note(
+                        driveTelemetry::getFieldToRobot,
+                        "" + (NoteManager.numberOfExistingNotes() + 1)));
+        NoteManager.addNote(
+                new Note(
+                        driveTelemetry::getFieldToRobot,
+                        "" + (NoteManager.numberOfExistingNotes() + 1)));
+    }
 
     public void configureSubsystems() {
         switch (Constants.currentMode) {
@@ -300,6 +321,8 @@ public class RobotContainer {
             controller.b()
                 .onTrue(new InstantCommand(
                         () -> intakeSubsystem.run(IntakeAction.INTAKE)))
+                .onTrue(
+                    new InstantCommand(() -> NoteManager.intake()))
                 .onFalse(new InstantCommand(
                     () -> intakeSubsystem.run(IntakeAction.NONE)));
 

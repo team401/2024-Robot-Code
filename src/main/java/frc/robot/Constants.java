@@ -515,7 +515,6 @@ public final class Constants {
         // Value - Aimer angle in radians
         public static HashMap<Double, Double> getAimerMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
-<<<<<<< HEAD
             map.put(0.0, 0.8);
             map.put(1.45, 0.8); // 0.7
             map.put(1.98, 0.62);
@@ -528,13 +527,6 @@ public final class Constants {
             map.put(5.64, 0.32);
             // map.put(5.82, 0.275);
             map.put(6.0, 0.31);
-=======
-            map.put(1.45, 0.7);
-            map.put(1.98, 0.62);
-            map.put(3.03, 0.45);
-            map.put(3.9, 0.36);
-            map.put(4.8, 0.3);
->>>>>>> e2ea362 (added blue speaker)
 
             return map;
         }
@@ -546,7 +538,6 @@ public final class Constants {
         // Value - Shooter RPM
         public static HashMap<Double, Double> getShooterMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
-<<<<<<< HEAD
             map.put(0.0, 2700.0);
             map.put(1.45, 2700.0);
             map.put(1.98, 2700.0);
@@ -558,13 +549,6 @@ public final class Constants {
             map.put(4.95, 4000.0);
             map.put(5.64, 4200.0);
             map.put(5.82, 4300.0);
-=======
-            map.put(1.45, 2500.0);
-            map.put(1.98, 2500.0);
-            map.put(3.03, 2700.0);
-            map.put(3.9, 3300.0);
-            map.put(4.8, 3300.0);
->>>>>>> e2ea362 (added blue speaker)
 
             return map;
         }

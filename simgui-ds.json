@@ -91,28 +91,7 @@
   ],
   "robotJoysticks": [
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-      "guid": "030000004f0400000ab1000000000000",
-      "useGamepad": true
-=======
       "guid": "Keyboard0"
->>>>>>> 1d16c64 (actually the merge messed everything up sorry i'll get it working again soon)
-    },
-    {
-      "guid": "Keyboard2"
-    },
-    {
-      "guid": "78696e70757401000000000000000000",
-      "useGamepad": true
-=======
-      "guid": "Keyboard0"
->>>>>>> d1b1751 (argh I don't know how to post data to advantagekit help please)
-=======
-      "guid": "78696e70757401000000000000000000",
-      "useGamepad": true
->>>>>>> a8d0c38 (combining advantagekit and previous code into one)
     }
   ]
 }

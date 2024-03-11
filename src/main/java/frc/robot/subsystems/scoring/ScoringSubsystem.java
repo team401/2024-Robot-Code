@@ -22,8 +22,8 @@ import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
 import frc.robot.utils.Tunable;
+import frc.robot.utils.notesimulator.NoteManager;
 import java.util.function.DoubleSupplier;
-import frc.robot.utils.NoteVisualizer;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -273,7 +273,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     private void shoot() {
         double distancetoGoal = findDistanceToGoal();
-        
+
         double shootRPM = shooterInterpolated.getValue(distancetoGoal);
         shooterIo.setShooterVelocityRPM(shootRPM);
         double aimAngleRad = aimerInterpolated.getValue(distancetoGoal);
@@ -287,8 +287,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
             shootTimer.stop();
         }
 
-        NoteManager newNote = new NoteManager(poseSupplier);
-        CommandScheduler.getInstance().schedule(newNote.shoot());
+        CommandScheduler.getInstance().schedule(NoteManager.shoot(shootRPM, aimAngleRad));
     }
 
     private void ampShoot() {
