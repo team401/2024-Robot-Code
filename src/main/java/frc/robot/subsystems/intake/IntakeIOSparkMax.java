@@ -6,9 +6,12 @@ import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.playingwithfusion.TimeOfFlight;
+import com.playingwithfusion.TimeOfFlight.RangingMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.SensorConstants;
 
 public class IntakeIOSparkMax implements IntakeIO {
 
@@ -16,6 +19,8 @@ public class IntakeIOSparkMax implements IntakeIO {
             new CANSparkMax(IntakeConstants.leftIntakeMotorID, MotorType.kBrushless);
     private CANSparkMax rightIntake =
             new CANSparkMax(IntakeConstants.rightIntakeMotorID, MotorType.kBrushless);
+
+    private TimeOfFlight uptakeSensor = new TimeOfFlight(SensorConstants.uptakeSensorPort);
 
     private TalonFX belt = new TalonFX(IntakeConstants.indexTwoMotorID);
 
@@ -34,6 +39,9 @@ public class IntakeIOSparkMax implements IntakeIO {
                 new CurrentLimitsConfigs()
                         .withStatorCurrentLimit(60)
                         .withStatorCurrentLimitEnable(true));
+
+        uptakeSensor.setRangeOfInterest(SensorConstants.uptakeTopLeftX, SensorConstants.uptakeTopLeftY, SensorConstants.uptakeBottomRightX, SensorConstants.uptakeBottomRightY);
+        uptakeSensor.setRangingMode(RangingMode.Short, 40.0); // runs every other loop
     }
 
     @Override
@@ -47,6 +55,12 @@ public class IntakeIOSparkMax implements IntakeIO {
         inputs.beltVoltage = belt.getMotorVoltage().getValueAsDouble();
         inputs.beltStatorCurrent = belt.getStatorCurrent().getValueAsDouble();
         inputs.beltSupplyCurrent = belt.getSupplyCurrent().getValueAsDouble();
+
+        if(uptakeSensor.isRangeValid()) {
+            inputs.noteSensed = uptakeSensor.getRange() < SensorConstants.maxRange; 
+        } else {
+            inputs.noteSensed = false; // no distance was measured
+        }
     }
 
     @Override

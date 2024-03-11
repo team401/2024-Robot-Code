@@ -72,6 +72,12 @@ public final class Constants {
 
     public static final class SensorConstants {
         public static final int bannerSensorPort = 1;
+        public static final int uptakeSensorPort = 2;
+        public static final int uptakeTopLeftX = 0;
+        public static final int uptakeTopLeftY = 0;
+        public static final int uptakeBottomRightX = 14;
+        public static final int uptakeBottomRightY = 14;
+        public static final double maxRange = 1.2;
     }
 
     public static final class DriveConstants {
