@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.284709527165534,
-        "y": 2.428101757611967
+        "x": 8.260458118138459,
+        "y": 4.061178844579912
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.087855555992801,
-        "y": 1.5175635985074791
+        "x": 4.782315097037602,
+        "y": 4.627883964101262
       },
       "isLocked": false,
       "linkedName": null
@@ -20,8 +20,8 @@
         "y": 2.0413098429059118
       },
       "prevControl": {
-        "x": 5.1773173968883155,
-        "y": 1.532016585159931
+        "x": 3.8698741286371465,
+        "y": 3.347378620683168
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "Shoot",
-      "waypointRelativePos": 0.55,
+      "waypointRelativePos": 0.65,
       "command": {
         "type": "parallel",
         "data": {

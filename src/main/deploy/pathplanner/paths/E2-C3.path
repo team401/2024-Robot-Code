@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.284709527165534,
-        "y": 2.428101757611967
+        "x": 3.9379802552091694,
+        "y": 2.0413098429059118
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.087855555992801,
-        "y": 1.5175635985074791
+        "x": 4.131402929472526,
+        "y": 4.6301405704663265
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.9379802552091694,
-        "y": 2.0413098429059118
+        "x": 8.279995578509675,
+        "y": 4.093483946227152
       },
       "prevControl": {
-        "x": 5.1773173968883155,
-        "y": 1.532016585159931
+        "x": 6.670678933950461,
+        "y": 4.004407379185129
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,8 +32,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Shoot",
-      "waypointRelativePos": 0.55,
+      "name": "Prime",
+      "waypointRelativePos": 0.2,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Shoot Scoring"
+                "name": "Aim Scoring"
               }
             }
           ]
