@@ -472,6 +472,19 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         return Math.abs(alignError) < DriveConstants.alignToleranceRadians;
     }
 
+    public void runWheelRadiusCharacterization(double speed) {
+        setGoalChassisSpeeds(new ChassisSpeeds(0, 0, speed));
+    }
+
+    public double[] getWheelRadiusCharacterizationPosition() {
+        return new double[] {
+            this.getModule(0).getDriveMotor().getPosition().getValueAsDouble(),
+            this.getModule(1).getDriveMotor().getPosition().getValueAsDouble(),
+            this.getModule(2).getDriveMotor().getPosition().getValueAsDouble(),
+            this.getModule(3).getDriveMotor().getPosition().getValueAsDouble()
+        };
+    }
+
     @Override
     public void periodic() {
         controlDrivetrain();
