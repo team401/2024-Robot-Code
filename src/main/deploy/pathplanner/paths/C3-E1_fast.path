@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.9379802552091694,
-        "y": 2.0413098429059118
+        "x": 7.110087636991016,
+        "y": 4.126676732781015
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.538719628423157,
-        "y": 1.2776543621065786
+        "x": 4.848492559239144,
+        "y": 4.229476509042464
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.284709527165534,
-        "y": 2.442554744264419
+        "x": 3.8939232082399773,
+        "y": 5.609930647410491
       },
       "prevControl": {
-        "x": 7.800314706175031,
-        "y": 2.276280760074938
+        "x": 4.672264371362375,
+        "y": 4.655361296411323
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,8 +32,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Prime",
-      "waypointRelativePos": 0.4,
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.6,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Aim Scoring"
+                "name": "Shoot Scoring"
               }
             }
           ]
@@ -51,7 +51,7 @@
   ],
   "globalConstraints": {
     "maxVelocity": 4.5,
-    "maxAcceleration": 2.75,
+    "maxAcceleration": 3.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
@@ -63,8 +63,8 @@
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": 180.0,
+    "rotation": -178.6028189727036,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

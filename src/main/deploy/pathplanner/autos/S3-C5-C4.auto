@@ -32,13 +32,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "E2-C4"
+            "pathName": "E2-C4_fast"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C4-E2"
+            "pathName": "C4-E2_fast"
           }
         }
       ]

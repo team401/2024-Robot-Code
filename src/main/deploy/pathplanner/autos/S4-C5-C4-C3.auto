@@ -20,37 +20,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "S4-C5"
+            "pathName": "S4-C5_fast"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C5-E2"
+            "pathName": "C5-E2_fast"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "E2-C4"
+            "pathName": "E2-C4_fast"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C4-E2"
+            "pathName": "C4-E2_fast"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "E2-C3"
+            "pathName": "E2-C3_fast"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C3-E1"
+            "pathName": "C3-E1_fast"
           }
         }
       ]
