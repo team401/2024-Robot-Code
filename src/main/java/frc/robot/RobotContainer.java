@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.ConversionConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.EndgameConstants;
 import frc.robot.Constants.FeatureFlags;
@@ -24,6 +25,7 @@ import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.commands.ShootWithGamepad;
+import frc.robot.commands.WheelRadiusCharacterization;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignState;
@@ -329,6 +331,7 @@ public class RobotContainer {
         testModeChooser.addOption("Hood Tuning", "tuning-hood");
         testModeChooser.addOption("Shooter Tuning", "tuning-shooter");
         testModeChooser.addOption("Endgame Tuning", "tuning-endgame");
+        testModeChooser.addOption("Wheel Characterization", "characterization-wheel");
 
         SmartDashboard.putData("Test Mode Chooser", testModeChooser);
     }
@@ -647,10 +650,18 @@ public class RobotContainer {
                                             endgameSubsystem.setVolts(0, 0);
                                             endgameSubsystem.setAction(EndgameAction.OVERRIDE);
                                         }));
-               break;
+                    break;
+            case "characterization-wheel":
+                controller.a()
+                        .whileTrue(
+                                new WheelRadiusCharacterization(
+                                        drivetrain,
+                                        () -> drivetrain.getPigeon2().getYaw().getValueAsDouble()
+                                                * ConversionConstants.kDegreesToRadians));
+                break;
+            }
         }
         // spotless:on
-    }
 
     public void testPeriodic() {}
 
