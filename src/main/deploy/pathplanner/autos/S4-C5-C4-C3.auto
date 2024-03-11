@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.6679855613232356,
-      "y": 4.350348982388106
+      "x": 0.5234556947987139,
+      "y": 2.0523241046482106
     },
-    "rotation": 120.0
+    "rotation": 180.0
   },
   "command": {
     "type": "sequential",
@@ -20,7 +20,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "S3-C5"
+            "pathName": "S4-C5"
           }
         },
         {
