@@ -83,10 +83,10 @@ public class IntakeSubsystem extends SubsystemBase {
             state = State.IDLE;
         }
 
-        if (!io.checkIfStopIntake()) {
+        /*if (!inputs.get("noteSensed")) {
             io.setIntakeVoltage(IntakeConstants.intakePower);
             io.setBeltVoltage(IntakeConstants.beltPower);
-        }
+        }*/
     }
 
     private void reversing() {

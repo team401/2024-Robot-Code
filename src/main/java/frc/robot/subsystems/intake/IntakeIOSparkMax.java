@@ -10,6 +10,8 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.IntakeConstants;
+import com.revrobotics.*;
+//import com.revrobotics.Rev2mDistanceSensor.Port;
 
 public class IntakeIOSparkMax implements IntakeIO {
 
@@ -22,6 +24,8 @@ public class IntakeIOSparkMax implements IntakeIO {
 
     private Timer inIntakeTime;
     private double maxRegIntakeCurrent = 5;
+
+    //private Rev2mDistanceSensor distOnboard; 
 
     public IntakeIOSparkMax() {
         leftIntake.setSmartCurrentLimit(40, 40);
@@ -55,6 +59,8 @@ public class IntakeIOSparkMax implements IntakeIO {
         inputs.beltVoltage = belt.getMotorVoltage().getValueAsDouble();
         inputs.beltStatorCurrent = belt.getStatorCurrent().getValueAsDouble();
         inputs.beltSupplyCurrent = belt.getSupplyCurrent().getValueAsDouble();
+
+        inputs.noteSensed = checkIfStopIntake();
     }
 
     @Override
@@ -68,8 +74,7 @@ public class IntakeIOSparkMax implements IntakeIO {
         belt.setControl(new VoltageOut(volts));
     }
 
-    @Override
-    public boolean checkIfStopIntake() {
+    private boolean checkIfStopIntake() {
         if (leftIntake.getOutputCurrent() <= maxRegIntakeCurrent) {
             inIntakeTime.reset();
             inIntakeTime.start();

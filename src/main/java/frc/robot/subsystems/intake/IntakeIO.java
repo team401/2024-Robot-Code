@@ -27,7 +27,4 @@ public interface IntakeIO {
 
     public default void setBeltVoltage(double volts) {}
 
-    public default boolean checkIfStopIntake() {
-        return false;
-    }
 }
