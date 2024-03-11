@@ -51,7 +51,6 @@ public final class Constants {
         public static final boolean runVision = false;
         public static final boolean runLocalizer = true;
 
-
         public static final boolean runIntake = false;
         public static final boolean runScoring = false;
         public static final boolean runEndgame = false;
