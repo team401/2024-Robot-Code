@@ -8,7 +8,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
+import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.SensorConstants;
 
 public class IntakeIOSparkMax implements IntakeIO {
 
@@ -18,6 +20,8 @@ public class IntakeIOSparkMax implements IntakeIO {
             new CANSparkMax(IntakeConstants.rightIntakeMotorID, MotorType.kBrushless);
 
     private TalonFX belt = new TalonFX(IntakeConstants.indexTwoMotorID);
+
+    private DigitalInput uptakeSensor = new DigitalInput(SensorConstants.uptakeSensorPort);
 
     public IntakeIOSparkMax() {
         leftIntake.setSmartCurrentLimit(40, 40);
@@ -47,6 +51,8 @@ public class IntakeIOSparkMax implements IntakeIO {
         inputs.beltVoltage = belt.getMotorVoltage().getValueAsDouble();
         inputs.beltStatorCurrent = belt.getStatorCurrent().getValueAsDouble();
         inputs.beltSupplyCurrent = belt.getSupplyCurrent().getValueAsDouble();
+
+        inputs.noteSensed = !uptakeSensor.get();
     }
 
     @Override

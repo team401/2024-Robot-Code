@@ -14,6 +14,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private BooleanSupplier scorerWantsNote = () -> false;
 
+    private BooleanSupplier noteInShooterDeck = () -> false;
+
     private IntakeAction action = IntakeAction.NONE;
 
     private double intakeOverrideVolts = 0.0;
@@ -53,6 +55,10 @@ public class IntakeSubsystem extends SubsystemBase {
         this.scorerWantsNote = scorerWantsNote;
     }
 
+    public void setNoteInShooterDeckSupplier(BooleanSupplier noteInShooterDeck) {
+        this.noteInShooterDeck = noteInShooterDeck;
+    }
+
     public void run(IntakeAction action) {
         this.action = action;
     }
@@ -66,9 +72,13 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     private void idle() {
-        if (action == IntakeAction.INTAKE) {
+        if (action == IntakeAction.INTAKE
+                && (!inputs.noteSensed
+                        && !noteInShooterDeck
+                                .getAsBoolean())) { // dont seek if note in uptake or shotoer deck
             state = State.SEEKING;
-        } else if (action == IntakeAction.REVERSE) {
+        } else if (action == IntakeAction.REVERSE
+                || inputs.noteSensed) { // reverse if note is found
             state = State.REVERSING;
         } else if (action == IntakeAction.OVERRIDE) {
             state = State.OVERRIDE;
@@ -88,12 +98,15 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     private void reversing() {
-        if (action != IntakeAction.REVERSE) {
+        if (action != IntakeAction.REVERSE
+                && (!inputs.noteSensed && !noteInShooterDeck.getAsBoolean())) {
             state = State.IDLE;
         }
 
         io.setIntakeVoltage(-IntakeConstants.intakePower);
-        io.setBeltVoltage(-IntakeConstants.beltPower);
+        if (inputs.noteSensed && noteInShooterDeck.getAsBoolean()) {
+            io.setBeltVoltage(-IntakeConstants.beltPower);
+        }
     }
 
     private void override() {
