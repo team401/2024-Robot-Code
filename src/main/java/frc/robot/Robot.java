@@ -21,7 +21,9 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
-    @SuppressWarnings("unused")
+
+    private int cycle = 0;
+
     private RobotContainer robotContainer;
 
     @SuppressWarnings("unused")
@@ -41,7 +43,6 @@ public class Robot extends LoggedRobot {
         Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
 
         if (Constants.currentMode == Constants.Mode.REAL) {
-            // TODO: Log data to a USB drive on the RIO
             Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
             Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
             pdh = new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
@@ -71,6 +72,15 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().run();
 
         robotContainer.robotPeriodic();
+
+        if (cycle % 20 == 0) {
+            Logger.recordOutput("JVM/total memory", Runtime.getRuntime().totalMemory());
+            Logger.recordOutput("JVM/max memory", Runtime.getRuntime().maxMemory());
+            Logger.recordOutput(
+                    "JVM/used memory",
+                    Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
+        }
+        cycle++;
     }
 
     @Override
