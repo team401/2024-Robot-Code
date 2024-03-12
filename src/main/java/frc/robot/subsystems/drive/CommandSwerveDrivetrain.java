@@ -8,6 +8,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -62,13 +63,16 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public enum AlignState {
         MANUAL,
-        ALIGNING
+        ALIGNING,
+        POSE_TARGET
     }
 
     private AlignTarget alignTarget = AlignTarget.NONE;
     private AlignState alignState = AlignState.MANUAL;
 
     private double alignDirection = 0.0;
+
+    private Pose2d targetTightPose;
 
     private static InterpolateDouble noteTimeToGoal =
             new InterpolateDouble(ScoringConstants.timeToGoalMap(), 0.0, 2.0);
@@ -82,6 +86,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private Supplier<Translation2d> getRobotVelocity = () -> new Translation2d();
 
     private SendableChooser<String> autoChooser = new SendableChooser<String>();
+
+    private PIDController vXController =
+            new PIDController(DriveConstants.vXkP, DriveConstants.vXkI, DriveConstants.vXkD);
+
+    private PIDController vYController =
+            new PIDController(DriveConstants.vYkP, DriveConstants.vYkI, DriveConstants.vYkD);
 
     private PIDController thetaController =
             new PIDController(
@@ -391,6 +401,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             Logger.recordOutput("Drive/omegaCommand", omega);
             Logger.recordOutput("Drive/desiredHeading", desiredHeading.getRadians());
             Logger.recordOutput("Drive/rotationError", thetaController.getPositionError());
+        } else if (alignState == AlignState.POSE_TARGET) {
+            vx = vXController.calculate(pose.getX(), targetTightPose.getX());
+            vy = vYController.calculate(pose.getY(), targetTightPose.getY());
+            omega =
+                    -thetaController.calculate(
+                            pose.getRotation().getRadians(),
+                            targetTightPose.getRotation().getRadians());
         }
 
         Logger.recordOutput("Drive/alignState", alignState);
@@ -500,8 +517,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         setGoalChassisSpeeds(stopSpeeds, true);
     }
 
-    public void driveToSpeaker() {
-        driveToPose(new Pose2d(getFieldToSpeaker.get(), new Rotation2d()));
+    public void setPoseTarget(Pose2d pose) {
+        targetTightPose = pose;
     }
 
     public Pose2d getEndgamePose() {
@@ -546,8 +563,57 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         return targetPose;
     }
 
+    public void driveToSpeaker() {
+        driveToPose(new Pose2d(getFieldToSpeaker.get(), new Rotation2d()));
+    }
+
     public void driveToEndgame() {
-        driveToPose(getEndgamePose());
+        // Blue Alliance Poses
+        Pose2d leftClimbPose2d = new Pose2d(4.64, 4.46, Rotation2d.fromDegrees(-60));
+        Pose2d rightClimbPose2d = new Pose2d(4.67, 3.72, Rotation2d.fromDegrees(60));
+        Pose2d farClimbPose2d = new Pose2d(5.35, 4.11, Rotation2d.fromDegrees(180));
+
+        if (DriverStation.getAlliance().isPresent()
+                && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+            // Red Alliance Poses
+            leftClimbPose2d = new Pose2d(11.93, 3.72, Rotation2d.fromDegrees(120));
+            rightClimbPose2d = new Pose2d(11.9, 4.49, Rotation2d.fromDegrees(-120));
+            farClimbPose2d = new Pose2d(11.22, 4.08, Rotation2d.fromDegrees(0));
+        }
+
+        double distanceToTargetLeft =
+                Math.hypot(
+                        getFieldToRobot.get().getX() - leftClimbPose2d.getX(),
+                        getFieldToRobot.get().getY() - leftClimbPose2d.getY());
+        double distanceToTargetRight =
+                Math.hypot(
+                        getFieldToRobot.get().getX() - rightClimbPose2d.getX(),
+                        getFieldToRobot.get().getY() - rightClimbPose2d.getY());
+        double distanceToTargetFar =
+                Math.hypot(
+                        getFieldToRobot.get().getX() - farClimbPose2d.getX(),
+                        getFieldToRobot.get().getY() - farClimbPose2d.getY());
+
+        PathPlannerPath path = null;
+
+        if (distanceToTargetLeft < distanceToTargetRight
+                && distanceToTargetLeft < distanceToTargetFar) {
+            path = PathPlannerPath.fromPathFile("LeftEndgame");
+        } else if (distanceToTargetRight < distanceToTargetLeft
+                && distanceToTargetRight < distanceToTargetFar) {
+            path = PathPlannerPath.fromPathFile("RightEndgame");
+        } else {
+            path = PathPlannerPath.fromPathFile("FarEndgame");
+        }
+
+        this.setAlignState(AlignState.MANUAL);
+
+        PathConstraints constraints =
+                new PathConstraints(
+                        3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+
+        pathfindCommand = AutoBuilder.pathfindThenFollowPath(path, constraints, 0.0);
+        pathfindCommand.schedule();
     }
 
     public boolean isAligned() {

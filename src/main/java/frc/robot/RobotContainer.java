@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -84,6 +85,8 @@ public class RobotContainer {
     DigitalOutput timeDigitalOutput = null; // new DigitalOutput(IOConstants.timeOutputPort);
 
     LED leds;
+
+    Command endgameCommand = Commands.print("Endgame command not constructed");
 
     public RobotContainer() {
         configureSubsystems();
@@ -213,6 +216,16 @@ public class RobotContainer {
             }
             if (FeatureFlags.runEndgame) {
                 scoringSubsystem.setElevatorPositionSupplier(endgameSubsystem::getPosition);
+
+                if (FeatureFlags.runDrive) {
+                    endgameCommand =
+                            new EndgameSequence(
+                                    scoringSubsystem,
+                                    endgameSubsystem,
+                                    drivetrain,
+                                    driveTelemetry,
+                                    () -> controller.getHID().getLeftBumper());
+                }
             }
             if (FeatureFlags.runIntake) {
                 intakeSubsystem.setScoringSupplier(scoringSubsystem::canIntake);
@@ -304,7 +317,10 @@ public class RobotContainer {
             //     .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_DOWN)));
 
             controller.x()
-                .onTrue(new EndgameSequence(scoringSubsystem, endgameSubsystem, drivetrain, driveTelemetry, () -> controller.getHID().getLeftBumper()));
+                .onTrue(/*!endgameCommand.isScheduled() ?*/ endgameCommand);
+
+            controller.leftTrigger()
+                .onTrue(new InstantCommand(() -> endgameCommand.cancel()));
         }
 
         if (FeatureFlags.runIntake) {

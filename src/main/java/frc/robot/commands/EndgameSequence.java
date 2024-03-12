@@ -9,6 +9,7 @@ import frc.robot.subsystems.endgame.EndgameSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.telemetry.Telemetry;
 import java.util.function.BooleanSupplier;
+import org.littletonrobotics.junction.Logger;
 
 public class EndgameSequence extends Command {
     ScoringSubsystem scoringSubsystem;
@@ -54,12 +55,15 @@ public class EndgameSequence extends Command {
         state = State.DRIVE_TO_START;
 
         // drivetrain.driveToEndgame();
+        // drivetrain.setAlignState(AlignState.MANUAL);
         endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_DOWN);
         scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT);
+        scoringSubsystem.forceHood(true);
     }
 
     @Override
     public void execute() {
+        Logger.recordOutput("Endgame/sequenceState", state);
         switch (state) {
             case DRIVE_TO_START:
                 if (
@@ -67,13 +71,15 @@ public class EndgameSequence extends Command {
                     state = State.MOVE_UP;
 
                     // drivetrain.stopDriveToPose();
+                    // drivetrain.setAlignState(AlignState.POSE_TARGET);
                     endgameSubsystem.setClimbing(false);
                     endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_UP);
                 }
                 break;
             case MOVE_UP:
+                double maxDriveDistance = 0.1;
                 double result =
-                        0.1
+                        maxDriveDistance
                                 * (endgameSubsystem.getPosition()
                                         - EndgameConstants.climberTargetDownMeters)
                                 / (EndgameConstants.climberTargetUpMeters
@@ -86,15 +92,17 @@ public class EndgameSequence extends Command {
                                 drivetrain.getEndgamePose().getY()
                                         + result * Math.sin(telemetry.getRotationRadians()),
                                 new Rotation2d(telemetry.getRotationRadians()));
-                // drivetrain.driveToPose(targetPose);
+                // drivetrain.setPoseTarget(targetPose);
 
                 if (endgameSubsystem.atPosition() && confirmBooleanSupplier.getAsBoolean()) {
                     state = State.CLIMB;
 
+                    // drivetrain.setAlignState(AlignState.MANUAL);
                     // drivetrain.stopDriveToPose();
                     endgameSubsystem.setClimbing(true);
                     endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_DOWN);
                     scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.ENDGAME);
+                    scoringSubsystem.forceHood(false);
                 }
                 break;
             case CLIMB:
@@ -111,7 +119,9 @@ public class EndgameSequence extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        drivetrain.stopDriveToPose();
+        // drivetrain.stopDriveToPose();
+        // drivetrain.setAlignState(AlignState.MANUAL);
+        scoringSubsystem.forceHood(false);
     }
 
     @Override

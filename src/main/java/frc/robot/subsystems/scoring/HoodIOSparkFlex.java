@@ -36,7 +36,7 @@ public class HoodIOSparkFlex implements HoodIO {
     private Timer homeTimer = new Timer();
 
     public HoodIOSparkFlex() {
-        hoodMotor.setSmartCurrentLimit(120);
+        // hoodMotor.setSmartCurrentLimit(150);
 
         hoodMotor.getPIDController().setP(ScoringConstants.hoodkP);
         hoodMotor.getPIDController().setI(ScoringConstants.hoodkI);

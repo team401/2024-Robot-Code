@@ -59,6 +59,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     private boolean overrideShoot = false;
     private boolean overrideStageAvoidance = false;
 
+    private boolean hoodForced = false;
+
     private final Mechanism2d mechanism = new Mechanism2d(2.2, 2.0);
     private final MechanismRoot2d rootMechanism = mechanism.getRoot("scoring", 0.6, 0.3);
     private final MechanismLigament2d aimMechanism =
@@ -139,7 +141,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         shooterIo.setShooterVelocityRPM(0);
         shooterIo.setKickerVolts(0);
         // hoodIo.setHoodAngleRad(0);
-        hoodIo.setOverrideVolts(0);
+        hoodIo.setOverrideVolts(hoodForced ? 3 : 0);
 
         aimerIo.setOverrideMode(false);
         hoodIo.setOverrideMode(true); // TODO: Change
@@ -529,7 +531,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
         Logger.processInputs("scoring/shooter", shooterInputs);
         Logger.processInputs("scoring/aimer", aimerInputs);
-        // Logger.processInputs("scoring/hood", hoodInputs);
+        Logger.processInputs("scoring/hood", hoodInputs);
     }
 
     public void setTuningKickerVolts(double kickerVoltsTuning) {
@@ -546,6 +548,10 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     public void setOverrideStageAvoidance(boolean overrideStageAvoidance) {
         this.overrideStageAvoidance = overrideStageAvoidance;
+    }
+
+    public void forceHood(boolean hoodForced) {
+        this.hoodForced = hoodForced;
     }
 
     public double getAimerAngle(double distance) {

@@ -95,6 +95,14 @@ public final class Constants {
         public static final double alignmentkPMin = 5.0;
         public static final double alignmentkI = 2.5;
         public static final double alignmentkD = 0.0;
+
+        public static final double vXkP = 5.0;
+        public static final double vXkI = 2.5;
+        public static final double vXkD = 0.0;
+
+        public static final double vYkP = 5.0;
+        public static final double vYkI = 2.5;
+        public static final double vYkD = 0.0;
     }
 
     public static final class FieldConstants {
