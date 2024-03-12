@@ -15,7 +15,7 @@ public class NoteManager {
 
     private static int numberOfExistingNotes = 0;
 
-    public NoteManager(Supplier robotPoseSupplier) {
+    public NoteManager(Supplier<Pose2d> robotPoseSupplier) {
         this.robotPoseSupplier = robotPoseSupplier;
     }
 

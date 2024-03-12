@@ -346,6 +346,7 @@ public class RobotContainer {
                 controller.getHID()::getBButton, scoringSubsystem,
                 FeatureFlags.runDrive ? drivetrain::getAlignTarget : () -> AlignTarget.NONE));
         }
+        
     } // spotless:on
 
     private void configureModes() {
