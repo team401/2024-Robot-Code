@@ -115,10 +115,12 @@ public final class Constants {
         public static final Rotation2d redLeftHeading = Rotation2d.fromRadians(-Math.PI / 2.0);
         public static final Rotation2d redRightHeading = Rotation2d.fromRadians(Math.PI / 2.0);
 
-        public static final Rotation2d redSourceHeading =
-                new Rotation2d(Math.PI * 4 / 3); // 60 degrees
+        public static final Rotation2d redSourceHeading = !FeatureFlags.shopMode ? 
+                new Rotation2d(Math.PI * 4 / 3) : // 60 degrees 
+                new Rotation2d(Math.toRadians(180-114.3));
         public static final Rotation2d blueSourceHeading =
-                new Rotation2d(Math.PI * 5 / 3); // 120 degrees
+                new Rotation2d(Math.PI * 5 / 3) : // 120 degrees
+                new Rotation2d(Math.toRadians(114.3));
 
         public static final Translation2d fieldToRedSpeaker = !FeatureFlags.shopMode ?
                 new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42)) :

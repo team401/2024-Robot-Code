@@ -186,7 +186,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private void sourceIntake() {
-        aimerIo.setAimAngleRad(0.35, true);
+        aimerIo.setAimAngleRad(0.35, true); 
+        // FIELD ANGLE: 50 DEGREES, SHOP ANGLE: 38.9 DEGREES
         shooterIo.setKickerVolts(-1);
 
         shooterIo.setOverrideMode(true);
