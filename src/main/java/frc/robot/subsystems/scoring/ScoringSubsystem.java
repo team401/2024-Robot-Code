@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
@@ -61,13 +63,10 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     private boolean overrideShoot = false;
     private boolean overrideStageAvoidance = false;
 
-    private final Mechanism2d mechanism = new Mechanism2d(2.2, 2.0);
-    private final MechanismRoot2d rootMechanism = mechanism.getRoot("scoring", 0.6, 0.3);
-    private final MechanismLigament2d aimMechanism =
-            rootMechanism.append(new MechanismLigament2d("aimer", 0.5, 0.0));
-    private final MechanismLigament2d hoodMechanism =
-            aimMechanism.append(
-                    new MechanismLigament2d("hood", 0.2, 0.0, 10.0, new Color8Bit(0, 200, 50)));
+    private Mechanism2d mechanism;
+    private MechanismRoot2d rootMechanism;
+    private MechanismLigament2d aimMechanism;
+    private MechanismLigament2d hoodMechanism;
 
     public enum ScoringState {
         IDLE,
@@ -124,6 +123,16 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         aimerAvoidElevator =
                 new InterpolateDouble(
                         ScoringConstants.aimerAvoidElevatorTable(), 0.0, Math.PI / 2.0);
+
+        if (Constants.currentMode == Mode.SIM) {
+            mechanism = new Mechanism2d(2.2, 2.0);
+            rootMechanism = mechanism.getRoot("scoring", 0.6, 0.3);
+            aimMechanism = rootMechanism.append(new MechanismLigament2d("aimer", 0.5, 0.0));
+            hoodMechanism =
+                    aimMechanism.append(
+                            new MechanismLigament2d(
+                                    "hood", 0.2, 0.0, 10.0, new Color8Bit(0, 200, 50)));
+        }
     }
 
     public void setAction(ScoringAction action) {
@@ -482,9 +491,11 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
         Logger.recordOutput("aimer/willIHitStage", willHitStage());
 
-        aimMechanism.setAngle(Units.radiansToDegrees(aimerInputs.aimAngleRad));
-        hoodMechanism.setAngle(Units.radiansToDegrees(hoodInputs.hoodAngleRad));
-        Logger.recordOutput("scoring/mechanism2d", mechanism);
+        if (Constants.currentMode == Mode.SIM) {
+            aimMechanism.setAngle(Units.radiansToDegrees(aimerInputs.aimAngleRad));
+            hoodMechanism.setAngle(Units.radiansToDegrees(hoodInputs.hoodAngleRad));
+            Logger.recordOutput("scoring/mechanism2d", mechanism);
+        }
 
         switch (state) {
             case IDLE:

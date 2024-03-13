@@ -48,7 +48,7 @@ public final class Constants {
 
     public static final class FeatureFlags {
         public static final boolean simulateVision = true;
-        public static final boolean runVision = false;
+        public static final boolean runVision = true;
         public static final boolean runLocalizer = true;
 
         public static final boolean runIntake = true;
