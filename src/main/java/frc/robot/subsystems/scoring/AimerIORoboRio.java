@@ -63,6 +63,8 @@ public class AimerIORoboRio implements AimerIO {
         aimerLeft.setNeutralMode(NeutralModeValue.Brake);
         aimerRight.setNeutralMode(NeutralModeValue.Brake);
 
+        aimerRight.setInverted(false);
+
         TalonFXConfigurator aimerLeftConfig = aimerLeft.getConfigurator();
         aimerLeftConfig.apply(
                 new CurrentLimitsConfigs()
