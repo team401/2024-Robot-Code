@@ -49,7 +49,7 @@ public final class Constants {
     public static final class FeatureFlags {
         public static final boolean runVision = true;
 
-        public static final boolean runIntake = true;
+        public static final boolean runIntake = false;
         public static final boolean runScoring = true;
         public static final boolean runEndgame = true;
         public static final boolean runDrive = true;
@@ -90,7 +90,7 @@ public final class Constants {
 
         public static final double alignmentkPMax = 7.0;
         public static final double alignmentkPMin = 5.0;
-        public static final double alignmentkI = 2.5;
+        public static final double alignmentkI = 3.5;
         public static final double alignmentkD = 0.0;
     }
 
@@ -129,6 +129,18 @@ public final class Constants {
 
         public static final Pose2d robotAgainstRedSpeaker =
                 new Pose2d(15.19, 5.56, Rotation2d.fromDegrees(0));
+
+        public static final Pose2d robotAgainstBlueSpeakerRight =
+                new Pose2d(0.7, 4.38, Rotation2d.fromDegrees(120));
+
+        public static final Pose2d robotAgainstRedSpeakerRight =
+                new Pose2d(15.83, 6.73, Rotation2d.fromDegrees(-60));
+
+        public static final Pose2d robotAgainstBlueSpeakerLeft =
+                new Pose2d(0.7, 6.73, Rotation2d.fromDegrees(-120));
+
+        public static final Pose2d robotAgainstRedSpeakerLeft =
+                new Pose2d(15.83, 4.38, Rotation2d.fromDegrees(60));
 
         public static final Pose2d robotAgainstBluePodium =
                 new Pose2d(2.57, 4.09, Rotation2d.fromDegrees(180));
@@ -501,6 +513,7 @@ public final class Constants {
         public static final double hoodHomeAngleRad = Math.PI - 0.23;
 
         public static final double aimMaxAngleRadians = 1.65; // Math.PI / 2
+        public static final double aimMinAngleRadians = -0.03;
 
         public static final double maxAimIntake = 0.0;
         public static final double minAimIntake = 0.0;
@@ -522,19 +535,19 @@ public final class Constants {
             map.put(1.45, 0.8); // 0.7
             map.put(1.98, 0.62);
             map.put(2.41, 0.53);
-            map.put(3.02, 0.48); // 0.45
+            map.put(3.02, 0.45); // 0.45
             map.put(3.22, 0.45);
             map.put(3.9, 0.36);
-            map.put(4.55, 0.34);
-            map.put(4.95, 0.33);
-            map.put(5.64, 0.32);
+            map.put(4.55, 0.31);
+            map.put(4.95, 0.28);
+            map.put(5.64, 0.24);
             // map.put(5.82, 0.275);
-            map.put(6.0, 0.31);
+            map.put(6.0, 0.28);
 
             return map;
         }
 
-        public static final double aimerStaticOffset = 0.02;
+        public static final double aimerStaticOffset = 0.00;
 
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters

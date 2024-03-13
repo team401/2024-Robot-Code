@@ -143,7 +143,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private void idle() {
-        aimerIo.setAimAngleRad(0.0, true);
+        aimerIo.setAimAngleRad(-0.03, true);
         shooterIo.setShooterVelocityRPM(0);
         shooterIo.setKickerVolts(0);
         // hoodIo.setHoodAngleRad(0);
@@ -368,7 +368,6 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                 Math.sqrt(
                         Math.pow(Math.abs(robotPose.getX() - speakerPose.getX()), 2)
                                 + Math.pow(Math.abs(robotPose.getY() - speakerPose.getY()), 2));
-        Logger.recordOutput("scoring/distance", distancetoGoal);
         return distancetoGoal;
     }
 
@@ -441,21 +440,23 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         }
 
         if (state == ScoringState.TEMPORARY_SETPOINT) {
-            aimerIo.setAngleClampsRad(0.0, ScoringConstants.aimMaxAngleRadians);
+            aimerIo.setAngleClampsRad(
+                    ScoringConstants.aimMinAngleRadians, ScoringConstants.aimMaxAngleRadians);
         } else if (state != ScoringState.TUNING
                 && state != ScoringState.ENDGAME
                 && state != ScoringState.IDLE
                 && Math.abs(elevatorPositionSupplier.getAsDouble()) < 0.2
                 && !overrideStageAvoidance
                 && willHitStage()) {
-            aimerIo.setAngleClampsRad(-0.01, 0);
+            aimerIo.setAngleClampsRad(ScoringConstants.aimMinAngleRadians, 0);
         } else {
             double elevatorLimit =
                     aimerAvoidElevator.getValue(elevatorPositionSupplier.getAsDouble());
             Logger.recordOutput("scoring/elevatorPosition", elevatorPositionSupplier.getAsDouble());
             Logger.recordOutput("scoring/elevatorLimit", elevatorLimit);
             aimerIo.setAngleClampsRad(
-                    Math.max(0.0, elevatorLimit), ScoringConstants.aimMaxAngleRadians);
+                    Math.max(ScoringConstants.aimMinAngleRadians, elevatorLimit),
+                    ScoringConstants.aimMaxAngleRadians);
         }
 
         aimerIo.controlAimAngleRad();
@@ -483,6 +484,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         Logger.recordOutput("scoring/readyToShoot", readyToShoot);
 
         Logger.recordOutput("aimer/willIHitStage", willHitStage());
+
+        Logger.recordOutput("scoring/distance", findDistanceToGoal());
 
         if (Constants.currentMode == Mode.SIM) {
             aimMechanism.setAngle(Units.radiansToDegrees(aimerInputs.aimAngleRad));
