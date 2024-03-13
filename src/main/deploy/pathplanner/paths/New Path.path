@@ -3,7 +3,6 @@
   "waypoints": [
     {
       "anchor": {
-<<<<<<< HEAD
         "x": 1.8175927319320395,
         "y": 7.543619911726125
       },
@@ -11,59 +10,24 @@
       "nextControl": {
         "x": 3.924497587865042,
         "y": 7.873410648362394
-=======
-        "x": 16.083039536383186,
-        "y": 6.094558164071605
-      },
-      "prevControl": null,
-      "nextControl": {
-        "x": 17.083039536383204,
-        "y": 5.594558164071605
->>>>>>> a1705d0 (speaker detection but only for red and also its really bad i think i don't have the right numbers)
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-<<<<<<< HEAD
         "x": 4.0,
         "y": 6.0
       },
       "prevControl": {
         "x": 3.0,
         "y": 6.0
-=======
-        "x": 5.0,
-        "y": 5.0
-      },
-      "prevControl": {
-        "x": 4.0,
-        "y": 6.0
-      },
-      "nextControl": {
-        "x": 6.0,
-        "y": 4.0
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 16.508924323752044,
-        "y": 6.094558164071605
-      },
-      "prevControl": {
-        "x": 16.258924323752044,
-        "y": 7.594558164071597
->>>>>>> a1705d0 (speaker detection but only for red and also its really bad i think i don't have the right numbers)
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-<<<<<<< HEAD
   "rotationTargets": [
     {
       "waypointRelativePos": 0,
@@ -76,14 +40,6 @@
   "globalConstraints": {
     "maxVelocity": 4.5,
     "maxAcceleration": 2.75,
-=======
-  "rotationTargets": [],
-  "constraintZones": [],
-  "eventMarkers": [],
-  "globalConstraints": {
-    "maxVelocity": 5.0,
-    "maxAcceleration": 5.0,
->>>>>>> a1705d0 (speaker detection but only for red and also its really bad i think i don't have the right numbers)
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
@@ -94,14 +50,9 @@
   },
   "reversed": false,
   "folder": null,
-<<<<<<< HEAD
   "previewStartingState": {
     "rotation": 89.69981140519788,
     "velocity": 0
   },
   "useDefaultConstraints": true
-=======
-  "previewStartingState": null,
-  "useDefaultConstraints": false
->>>>>>> a1705d0 (speaker detection but only for red and also its really bad i think i don't have the right numbers)
 }

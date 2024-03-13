@@ -1,22 +1,21 @@
 package frc.robot.utils.notesimulator;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import java.util.ArrayList;
-import java.util.function.Supplier;
 
 public class NoteManager {
 
     private static ArrayList<Note> notesOnField = new ArrayList<Note>();
     private static Note noteInRobot;
 
-    private static Supplier<Pose2d> robotPoseSupplier = () -> new Pose2d();
-
     private static int numberOfExistingNotes = 0;
 
-    public NoteManager(Supplier<Pose2d> robotPoseSupplier) {
-        this.robotPoseSupplier = robotPoseSupplier;
+    private static NoteManager instance;
+
+    public static NoteManager getInstance() {
+        if (instance == null) instance = new NoteManager();
+        return instance;
     }
 
     public static void addNote(Note note) {

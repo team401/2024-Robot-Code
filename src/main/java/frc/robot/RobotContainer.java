@@ -20,6 +20,7 @@ import frc.robot.Constants.EndgameConstants;
 import frc.robot.Constants.FeatureFlags;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.IOConstants;
+import frc.robot.Constants.Mode;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
@@ -93,28 +94,30 @@ public class RobotContainer {
         configureModes();
         configureAutonomous();
 
-        NoteManager.addNote(new Note(driveTelemetry::getFieldToRobot, true, "1"));
-        NoteManager.addNote(
-                new Note(
-                        driveTelemetry::getFieldToRobot,
-                        new Pose2d(2.69, 4.14, new Rotation2d()),
-                        "2"));
-        NoteManager.addNote(
-                new Note(
-                        driveTelemetry::getFieldToRobot,
-                        "" + (NoteManager.numberOfExistingNotes() + 1)));
-        NoteManager.addNote(
-                new Note(
-                        driveTelemetry::getFieldToRobot,
-                        "" + (NoteManager.numberOfExistingNotes() + 1)));
-        NoteManager.addNote(
-                new Note(
-                        driveTelemetry::getFieldToRobot,
-                        "" + (NoteManager.numberOfExistingNotes() + 1)));
-        NoteManager.addNote(
-                new Note(
-                        driveTelemetry::getFieldToRobot,
-                        "" + (NoteManager.numberOfExistingNotes() + 1)));
+        if (Constants.currentMode == Mode.SIM) {
+            NoteManager.addNote(new Note(driveTelemetry::getFieldToRobot, true, "1"));
+            NoteManager.addNote(
+                    new Note(
+                            driveTelemetry::getFieldToRobot,
+                            new Pose2d(2.69, 4.14, new Rotation2d()),
+                            "2"));
+            NoteManager.addNote(
+                    new Note(
+                            driveTelemetry::getFieldToRobot,
+                            "" + (NoteManager.numberOfExistingNotes() + 1)));
+            NoteManager.addNote(
+                    new Note(
+                            driveTelemetry::getFieldToRobot,
+                            "" + (NoteManager.numberOfExistingNotes() + 1)));
+            NoteManager.addNote(
+                    new Note(
+                            driveTelemetry::getFieldToRobot,
+                            "" + (NoteManager.numberOfExistingNotes() + 1)));
+            NoteManager.addNote(
+                    new Note(
+                            driveTelemetry::getFieldToRobot,
+                            "" + (NoteManager.numberOfExistingNotes() + 1)));
+        }
     }
 
     public void configureSubsystems() {
@@ -346,7 +349,7 @@ public class RobotContainer {
                 controller.getHID()::getBButton, scoringSubsystem,
                 FeatureFlags.runDrive ? drivetrain::getAlignTarget : () -> AlignTarget.NONE));
         }
-        
+
     } // spotless:on
 
     private void configureModes() {
