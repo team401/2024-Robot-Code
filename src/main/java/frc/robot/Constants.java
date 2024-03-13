@@ -599,7 +599,7 @@ public final class Constants {
             return map;
         }
 
-        //TODO: tune
+        // TODO: tune
         public static final double allotedArmMotorErrorTime = 3.0;
         public static final double allottedArmMotorCurrentDifference = 10;
         public static final double voltageErrorCheckingThreshold = 2;

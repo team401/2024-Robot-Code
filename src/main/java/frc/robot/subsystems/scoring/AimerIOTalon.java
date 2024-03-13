@@ -176,7 +176,8 @@ public class AimerIOTalon implements AimerIO {
         if (Math.abs(compare.getStatorCurrent().getValueAsDouble())
                                 - Math.abs(check.getStatorCurrent().getValueAsDouble())
                         > ScoringConstants.allottedArmMotorCurrentDifference
-                && Math.abs(check.getMotorVoltage().getValueAsDouble()) > ScoringConstants.voltageErrorCheckingThreshold) {
+                && Math.abs(check.getMotorVoltage().getValueAsDouble())
+                        > ScoringConstants.voltageErrorCheckingThreshold) {
             // motor voltage is really small when it shouldn't be
             return true;
         }
@@ -184,7 +185,8 @@ public class AimerIOTalon implements AimerIO {
         if (Math.abs(check.getStatorCurrent().getValueAsDouble())
                                 - Math.abs(compare.getStatorCurrent().getValueAsDouble())
                         > ScoringConstants.allottedArmMotorCurrentDifference
-                && Math.abs(check.getMotorVoltage().getValueAsDouble()) < ScoringConstants.voltageErrorCheckingThreshold) {
+                && Math.abs(check.getMotorVoltage().getValueAsDouble())
+                        < ScoringConstants.voltageErrorCheckingThreshold) {
             // motor voltage is really large when it shouldn't be
             return true;
         }
