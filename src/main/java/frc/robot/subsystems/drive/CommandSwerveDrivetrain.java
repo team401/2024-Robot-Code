@@ -508,16 +508,16 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public Pose2d getEndgamePose() {
         // Blue Alliance Poses
-        Pose2d leftClimbPose2d = new Pose2d(4.64, 4.46, Rotation2d.fromDegrees(-60));
-        Pose2d rightClimbPose2d = new Pose2d(4.67, 3.72, Rotation2d.fromDegrees(60));
-        Pose2d farClimbPose2d = new Pose2d(5.35, 4.11, Rotation2d.fromDegrees(180));
+        Pose2d leftClimbPose2d = new Pose2d(4.61, 4.48, Rotation2d.fromDegrees(-60));
+        Pose2d rightClimbPose2d = new Pose2d(4.66, 3.67, Rotation2d.fromDegrees(60));
+        Pose2d farClimbPose2d = new Pose2d(5.38, 4.11, Rotation2d.fromDegrees(180));
 
         if (DriverStation.getAlliance().isPresent()
                 && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
             // Red Alliance Poses
-            leftClimbPose2d = new Pose2d(11.93, 3.72, Rotation2d.fromDegrees(120));
-            rightClimbPose2d = new Pose2d(11.9, 4.49, Rotation2d.fromDegrees(-120));
-            farClimbPose2d = new Pose2d(11.22, 4.08, Rotation2d.fromDegrees(0));
+            leftClimbPose2d = new Pose2d(11.882, 3.67, Rotation2d.fromDegrees(120));
+            rightClimbPose2d = new Pose2d(11.932, 4.48, Rotation2d.fromDegrees(-120));
+            farClimbPose2d = new Pose2d(11.162, 4.11, Rotation2d.fromDegrees(0));
         }
 
         double distanceToTargetLeft =
