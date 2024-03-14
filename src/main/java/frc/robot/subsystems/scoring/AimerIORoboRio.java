@@ -63,6 +63,8 @@ public class AimerIORoboRio implements AimerIO {
         aimerLeft.setNeutralMode(NeutralModeValue.Brake);
         aimerRight.setNeutralMode(NeutralModeValue.Brake);
 
+        aimerRight.setInverted(false);
+
         TalonFXConfigurator aimerLeftConfig = aimerLeft.getConfigurator();
         aimerLeftConfig.apply(
                 new CurrentLimitsConfigs()
@@ -111,9 +113,15 @@ public class AimerIORoboRio implements AimerIO {
             return;
         }
         this.minAngleClamp =
-                MathUtil.clamp(minAngleClamp, 0.0, ScoringConstants.aimMaxAngleRadians);
+                MathUtil.clamp(
+                        minAngleClamp,
+                        ScoringConstants.aimMinAngleRadians,
+                        ScoringConstants.aimMaxAngleRadians);
         this.maxAngleClamp =
-                MathUtil.clamp(maxAngleClamp, 0.0, ScoringConstants.aimMaxAngleRadians);
+                MathUtil.clamp(
+                        maxAngleClamp,
+                        ScoringConstants.aimMinAngleRadians,
+                        ScoringConstants.aimMaxAngleRadians);
     }
 
     @Override
