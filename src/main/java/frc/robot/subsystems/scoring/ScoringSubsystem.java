@@ -62,7 +62,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     private boolean overrideStageAvoidance = false;
 
     private boolean hoodForced = false;
-  
+
     private Mechanism2d mechanism;
     private MechanismRoot2d rootMechanism;
     private MechanismLigament2d aimMechanism;

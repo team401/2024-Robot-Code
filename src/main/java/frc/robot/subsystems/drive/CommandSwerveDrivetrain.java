@@ -549,7 +549,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     public void driveToSpeaker() {
-        driveToPose(new Pose2d(getFieldToSpeaker.get(), new Rotation2d()));
+        driveToPose(new Pose2d(AllianceUtil.getFieldToSpeaker(), new Rotation2d()));
     }
 
     public void driveToEndgame() {

@@ -82,7 +82,7 @@ public class Robot extends LoggedRobot {
         // lastTime = currentTime;
 
         SmartDashboard.putNumber("Loop Time", diffTime);
-      
+
         if (cycle % 20 == 0) {
             Logger.recordOutput("JVM/total memory", Runtime.getRuntime().totalMemory());
             Logger.recordOutput("JVM/max memory", Runtime.getRuntime().maxMemory());
