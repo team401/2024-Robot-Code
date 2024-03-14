@@ -61,6 +61,8 @@ public class AimerIORoboRio implements AimerIO {
 
     double encoderDiff = 0.0;
 
+    int greatestExpectedAngle = 0;
+
     public AimerIORoboRio() {
         aimerLeft.setControl(new Follower(ScoringConstants.aimRightMotorId, true));
 
@@ -157,7 +159,7 @@ public class AimerIORoboRio implements AimerIO {
 
     private double getEncoderPosition() {
         double position = encoder.getAbsolutePosition();
-        if (position < 0.0)
+        if (position < ScoringConstants.aimerLowerLimit)
         position = 0.0;
         // return aimerRight.getPosition().getValueAsDouble() * 2.0 * Math.PI * (1.0 / 80.0);
         return position * 2.0 * Math.PI - ScoringConstants.aimerEncoderOffset;
@@ -185,12 +187,16 @@ public class AimerIORoboRio implements AimerIO {
                     feedforward.calculate(controlSetpoint, velocitySetpoint) + controllerVolts;
         }
 
-        encoderDiff = getEncoderPosition() - lastPosition;
+        /*encoderDiff = getEncoderPosition() - lastPosition;
         if (Math.abs(encoderDiff) > (ScoringConstants.aimerEncoderMaxValue)/2){ //checks if difference is ridiculous -> indicates wrapping
             if (encoderDiff < 0.0)
                 encoderDiff = encoderDiff + ScoringConstants.aimerEncoderMaxValue;
             if (encoderDiff > 0.0)
                 encoderDiff = encoderDiff - ScoringConstants.aimerEncoderMaxValue;
+        }*/
+
+        if (getEncoderPosition() > greatestExpectedAngle){
+            controller.SetContinuous();
         }
 
         appliedVolts = MathUtil.clamp(appliedVolts, -12.0, 12.0);
