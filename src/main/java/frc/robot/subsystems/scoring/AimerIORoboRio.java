@@ -187,7 +187,7 @@ public class AimerIORoboRio implements AimerIO {
         }
 
         appliedVolts = MathUtil.clamp(appliedVolts, -12.0, 12.0);
-        aimerRight.setVoltage(-appliedVolts);
+        aimerRight.setVoltage(appliedVolts);
 
         inputs.aimGoalAngleRad = goalAngleRad;
         inputs.aimProfileGoalAngleRad = controlSetpoint;
