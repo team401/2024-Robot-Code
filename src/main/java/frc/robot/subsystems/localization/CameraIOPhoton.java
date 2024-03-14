@@ -88,11 +88,7 @@ public class CameraIOPhoton implements CameraIO {
 
     private static boolean filterPhotonPose(EstimatedRobotPose photonPose) {
         if (photonPose.targetsUsed.size() == 1) {
-            // if we only see one tag, filter strictly
-            double ambiguity = photonPose.targetsUsed.get(0).getPoseAmbiguity();
-            if (ambiguity > VisionConstants.singleTagAmbiguityCutoff || ambiguity == -1) {
-                return false;
-            }
+            return false;
         }
 
         Pose3d pose = photonPose.estimatedPose;
