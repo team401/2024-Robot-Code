@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.ScoringConstants;
+import frc.robot.utils.AllianceUtil;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
@@ -44,7 +45,6 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     private Supplier<Pose2d> poseSupplier = () -> new Pose2d();
     private Supplier<Vector<N2>> velocitySupplier = () -> VecBuilder.fill(0.0, 0.0);
-    private Supplier<Translation2d> speakerSupplier = () -> new Translation2d(0, 0);
     private DoubleSupplier elevatorPositionSupplier = () -> 0.0;
     private Supplier<Boolean> driveAllignedSupplier = () -> true;
 
@@ -143,7 +143,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private void idle() {
-        aimerIo.setAimAngleRad(0.0, true);
+        aimerIo.setAimAngleRad(-0.03, true);
         shooterIo.setShooterVelocityRPM(0);
         shooterIo.setKickerVolts(0);
         // hoodIo.setHoodAngleRad(0);
@@ -362,13 +362,12 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private double findDistanceToGoal() {
-        Translation2d speakerPose = speakerSupplier.get();
+        Translation2d speakerPose = AllianceUtil.getFieldToSpeaker();
         Pose2d robotPose = poseSupplier.get();
         double distancetoGoal =
                 Math.sqrt(
                         Math.pow(Math.abs(robotPose.getX() - speakerPose.getX()), 2)
                                 + Math.pow(Math.abs(robotPose.getY() - speakerPose.getY()), 2));
-        Logger.recordOutput("scoring/distance", distancetoGoal);
         return distancetoGoal;
     }
 
@@ -395,10 +394,6 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     public void setVelocitySupplier(Supplier<Vector<N2>> velocitySupplier) {
         this.velocitySupplier = velocitySupplier;
-    }
-
-    public void setSpeakerSupplier(Supplier<Translation2d> speakerSupplier) {
-        this.speakerSupplier = speakerSupplier;
     }
 
     public void setElevatorPositionSupplier(DoubleSupplier elevatorPositionSupplier) {
@@ -441,21 +436,23 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         }
 
         if (state == ScoringState.TEMPORARY_SETPOINT) {
-            aimerIo.setAngleClampsRad(0.0, ScoringConstants.aimMaxAngleRadians);
+            aimerIo.setAngleClampsRad(
+                    ScoringConstants.aimMinAngleRadians, ScoringConstants.aimMaxAngleRadians);
         } else if (state != ScoringState.TUNING
                 && state != ScoringState.ENDGAME
                 && state != ScoringState.IDLE
                 && Math.abs(elevatorPositionSupplier.getAsDouble()) < 0.2
                 && !overrideStageAvoidance
                 && willHitStage()) {
-            aimerIo.setAngleClampsRad(-0.01, 0);
+            aimerIo.setAngleClampsRad(ScoringConstants.aimMinAngleRadians, 0);
         } else {
             double elevatorLimit =
                     aimerAvoidElevator.getValue(elevatorPositionSupplier.getAsDouble());
             Logger.recordOutput("scoring/elevatorPosition", elevatorPositionSupplier.getAsDouble());
             Logger.recordOutput("scoring/elevatorLimit", elevatorLimit);
             aimerIo.setAngleClampsRad(
-                    Math.max(0.0, elevatorLimit), ScoringConstants.aimMaxAngleRadians);
+                    Math.max(ScoringConstants.aimMinAngleRadians, elevatorLimit),
+                    ScoringConstants.aimMaxAngleRadians);
         }
 
         aimerIo.controlAimAngleRad();
@@ -483,6 +480,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         Logger.recordOutput("scoring/readyToShoot", readyToShoot);
 
         Logger.recordOutput("aimer/willIHitStage", willHitStage());
+
+        Logger.recordOutput("scoring/distance", findDistanceToGoal());
 
         if (Constants.currentMode == Mode.SIM) {
             aimMechanism.setAngle(Units.radiansToDegrees(aimerInputs.aimAngleRad));

@@ -82,7 +82,13 @@ public class DriveWithJoysticks extends Command {
         chassisSpeeds.vxMetersPerSecond = xMpS;
         chassisSpeeds.vyMetersPerSecond = yMpS;
         chassisSpeeds.omegaRadiansPerSecond = rotRadpS;
-        drivetrain.setGoalChassisSpeeds(chassisSpeeds, fieldCentric.getAsBoolean());
+        if (fieldCentric.getAsBoolean()) {
+            drivetrain.setGoalChassisSpeeds(chassisSpeeds, true);
+        } else {
+            chassisSpeeds.vxMetersPerSecond = -chassisSpeeds.vxMetersPerSecond;
+            chassisSpeeds.vyMetersPerSecond = -chassisSpeeds.vyMetersPerSecond;
+            drivetrain.setGoalChassisSpeeds(chassisSpeeds, false);
+        }
     }
 
     @Override
