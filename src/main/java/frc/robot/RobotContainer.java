@@ -236,17 +236,21 @@ public class RobotContainer {
                 .onFalse(new InstantCommand(
                     () -> drivetrain.setAlignState(AlignState.MANUAL)));
 
-          leftJoystick.top()
+            leftJoystick.top()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.seedFieldRelative(getPoseAgainstSpeaker())));
-            
+
             leftJoystick.button(3)
                 .onTrue(new InstantCommand(
-                    () -> drivetrain.seedFieldRelative(getPoseAgainstPodium())));
+                    () -> drivetrain.seedFieldRelative(getPoseAgainstSpeakerLeft())));
 
             leftJoystick.button(4)
                 .onTrue(new InstantCommand(
-                    () -> drivetrain.seedFieldRelative(getPoseAgainstAmpZone())));
+                    () -> drivetrain.seedFieldRelative(getPoseAgainstSpeakerRight())));
+            
+            leftJoystick.povDown()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.seedFieldRelative(getPoseAgainstPodium())));
 
             controller.povUp()
                 .onTrue(new InstantCommand(
@@ -309,7 +313,6 @@ public class RobotContainer {
 
         if (FeatureFlags.runScoring) {
             scoringSubsystem.setDefaultCommand(new ShootWithGamepad(
-                rightJoystick.getHID()::getTrigger,
                 () -> rightJoystick.getHID().getRawButton(4),
                 controller.getHID()::getRightBumper,
                 controller.getHID()::getYButton,
@@ -697,6 +700,30 @@ public class RobotContainer {
         return FieldConstants.robotAgainstRedSpeaker;
     }
 
+    private Pose2d getPoseAgainstSpeakerLeft() {
+        if (!DriverStation.getAlliance().isEmpty()) {
+            switch (DriverStation.getAlliance().get()) {
+                case Blue:
+                    return FieldConstants.robotAgainstBlueSpeakerLeft;
+                case Red:
+                    return FieldConstants.robotAgainstRedSpeakerLeft;
+            }
+        }
+        return FieldConstants.robotAgainstRedSpeakerLeft;
+    }
+
+    private Pose2d getPoseAgainstSpeakerRight() {
+        if (!DriverStation.getAlliance().isEmpty()) {
+            switch (DriverStation.getAlliance().get()) {
+                case Blue:
+                    return FieldConstants.robotAgainstBlueSpeakerRight;
+                case Red:
+                    return FieldConstants.robotAgainstRedSpeakerRight;
+            }
+        }
+        return FieldConstants.robotAgainstRedSpeakerRight;
+    }
+
     private Pose2d getPoseAgainstPodium() {
         if (!DriverStation.getAlliance().isEmpty()) {
             switch (DriverStation.getAlliance().get()) {
@@ -743,7 +770,7 @@ public class RobotContainer {
                             () -> leftJoystick.getY(),
                             () -> leftJoystick.getX(),
                             () -> rightJoystick.getX(),
-                            () -> true,
+                            () -> !rightJoystick.getHID().getTrigger(),
                             () -> rightJoystick.top().getAsBoolean()));
         }
     }

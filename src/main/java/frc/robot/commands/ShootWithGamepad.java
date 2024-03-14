@@ -10,7 +10,6 @@ import java.util.function.Supplier;
 public class ShootWithGamepad extends Command {
 
     private BooleanSupplier driverShoot;
-    private BooleanSupplier driverForceShoot;
     private BooleanSupplier masherShoot;
     private BooleanSupplier masherForceShoot;
     private BooleanSupplier warmup;
@@ -23,7 +22,6 @@ public class ShootWithGamepad extends Command {
 
     public ShootWithGamepad(
             BooleanSupplier driverShoot,
-            BooleanSupplier driverForceShoot,
             BooleanSupplier masherShoot,
             BooleanSupplier masherForceShoot,
             BooleanSupplier warmup,
@@ -32,7 +30,6 @@ public class ShootWithGamepad extends Command {
             ScoringSubsystem scoring,
             Supplier<AlignTarget> getDriveMode) {
         this.driverShoot = driverShoot;
-        this.driverForceShoot = driverForceShoot;
         this.masherShoot = masherShoot;
         this.masherForceShoot = masherForceShoot;
         this.warmup = warmup;
@@ -75,7 +72,7 @@ public class ShootWithGamepad extends Command {
              */
             if (getDriveMode.get() != AlignTarget.SOURCE
                     && getDriveMode.get() != AlignTarget.NONE) {
-                boolean force = driverForceShoot.getAsBoolean() || masherForceShoot.getAsBoolean();
+                boolean force = masherForceShoot.getAsBoolean();
                 scoring.setOverrideShoot(force);
 
                 if (driverShoot.getAsBoolean() || masherShoot.getAsBoolean() || force) {
