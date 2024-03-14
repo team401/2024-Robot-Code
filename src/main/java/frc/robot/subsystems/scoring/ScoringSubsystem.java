@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.ScoringConstants;
+import frc.robot.utils.AllianceUtil;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
@@ -44,7 +45,6 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     private Supplier<Pose2d> poseSupplier = () -> new Pose2d();
     private Supplier<Vector<N2>> velocitySupplier = () -> VecBuilder.fill(0.0, 0.0);
-    private Supplier<Translation2d> speakerSupplier = () -> new Translation2d(0, 0);
     private DoubleSupplier elevatorPositionSupplier = () -> 0.0;
     private Supplier<Boolean> driveAllignedSupplier = () -> true;
 
@@ -362,7 +362,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private double findDistanceToGoal() {
-        Translation2d speakerPose = speakerSupplier.get();
+        Translation2d speakerPose = AllianceUtil.getFieldToSpeaker();
         Pose2d robotPose = poseSupplier.get();
         double distancetoGoal =
                 Math.sqrt(
@@ -394,10 +394,6 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     public void setVelocitySupplier(Supplier<Vector<N2>> velocitySupplier) {
         this.velocitySupplier = velocitySupplier;
-    }
-
-    public void setSpeakerSupplier(Supplier<Translation2d> speakerSupplier) {
-        this.speakerSupplier = speakerSupplier;
     }
 
     public void setElevatorPositionSupplier(DoubleSupplier elevatorPositionSupplier) {

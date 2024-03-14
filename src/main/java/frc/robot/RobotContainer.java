@@ -3,11 +3,8 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -18,7 +15,6 @@ import frc.robot.Constants.ConversionConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.EndgameConstants;
 import frc.robot.Constants.FeatureFlags;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.IOConstants;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
@@ -59,6 +55,7 @@ import frc.robot.telemetry.Telemetry;
 import frc.robot.telemetry.TelemetryIO;
 import frc.robot.telemetry.TelemetryIOLive;
 import frc.robot.telemetry.TelemetryIOSim;
+import frc.robot.utils.AllianceUtil;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.feedforward.TuneG;
 import frc.robot.utils.feedforward.TuneS;
@@ -185,9 +182,6 @@ public class RobotContainer {
             drivetrain.registerTelemetry(driveTelemetry::telemeterize);
             drivetrain.setPoseSupplier(driveTelemetry::getFieldToRobot);
             drivetrain.setVelocitySupplier(driveTelemetry::getVelocity);
-            drivetrain.setSpeakerSupplier(this::getFieldToSpeaker);
-            drivetrain.setAmpSupplier(this::getFieldToAmpHeading);
-            drivetrain.setSourceSupplier(this::getFieldToSourceHeading);
 
             if (FeatureFlags.runVision) {
                 tagVision.setCameraConsumer(
@@ -206,8 +200,6 @@ public class RobotContainer {
                                 VecBuilder.fill(
                                         driveTelemetry.getVelocityX(),
                                         driveTelemetry.getVelocityY()));
-
-                scoringSubsystem.setSpeakerSupplier(this::getFieldToSpeaker);
 
                 scoringSubsystem.setDriveAllignedSupplier(() -> drivetrain.isAligned());
             }
@@ -238,19 +230,19 @@ public class RobotContainer {
 
             leftJoystick.top()
                 .onTrue(new InstantCommand(
-                    () -> drivetrain.seedFieldRelative(getPoseAgainstSpeaker())));
+                    () -> drivetrain.seedFieldRelative(AllianceUtil.getPoseAgainstSpeaker())));
 
             leftJoystick.button(3)
                 .onTrue(new InstantCommand(
-                    () -> drivetrain.seedFieldRelative(getPoseAgainstSpeakerLeft())));
+                    () -> drivetrain.seedFieldRelative(AllianceUtil.getPoseAgainstSpeakerLeft())));
 
             leftJoystick.button(4)
                 .onTrue(new InstantCommand(
-                    () -> drivetrain.seedFieldRelative(getPoseAgainstSpeakerRight())));
+                    () -> drivetrain.seedFieldRelative(AllianceUtil.getPoseAgainstSpeakerRight())));
             
             leftJoystick.povDown()
                 .onTrue(new InstantCommand(
-                    () -> drivetrain.seedFieldRelative(getPoseAgainstPodium())));
+                    () -> drivetrain.seedFieldRelative(AllianceUtil.getPoseAgainstPodium())));
 
             controller.povUp()
                 .onTrue(new InstantCommand(
@@ -666,101 +658,6 @@ public class RobotContainer {
         // spotless:on
 
     public void testPeriodic() {}
-
-    private Translation2d getFieldToSpeaker() {
-        if (DriverStation.getAlliance().isEmpty()) {
-            return FieldConstants.fieldToBlueSpeaker;
-        } else {
-            switch (DriverStation.getAlliance().get()) {
-                case Blue:
-                    Logger.recordOutput("Field/speaker", FieldConstants.fieldToBlueSpeaker);
-                    return FieldConstants.fieldToBlueSpeaker;
-                case Red:
-                    Logger.recordOutput("Field/speaker", FieldConstants.fieldToRedSpeaker);
-                    return FieldConstants.fieldToRedSpeaker;
-            }
-        }
-        throw new RuntimeException("Unreachable branch of switch expression");
-    }
-
-    private Rotation2d getFieldToAmpHeading() {
-        Logger.recordOutput("Field/amp", FieldConstants.ampHeading);
-        return FieldConstants.ampHeading;
-    }
-
-    private Pose2d getPoseAgainstSpeaker() {
-        if (!DriverStation.getAlliance().isEmpty()) {
-            switch (DriverStation.getAlliance().get()) {
-                case Blue:
-                    return FieldConstants.robotAgainstBlueSpeaker;
-                case Red:
-                    return FieldConstants.robotAgainstRedSpeaker;
-            }
-        }
-        return FieldConstants.robotAgainstRedSpeaker;
-    }
-
-    private Pose2d getPoseAgainstSpeakerLeft() {
-        if (!DriverStation.getAlliance().isEmpty()) {
-            switch (DriverStation.getAlliance().get()) {
-                case Blue:
-                    return FieldConstants.robotAgainstBlueSpeakerLeft;
-                case Red:
-                    return FieldConstants.robotAgainstRedSpeakerLeft;
-            }
-        }
-        return FieldConstants.robotAgainstRedSpeakerLeft;
-    }
-
-    private Pose2d getPoseAgainstSpeakerRight() {
-        if (!DriverStation.getAlliance().isEmpty()) {
-            switch (DriverStation.getAlliance().get()) {
-                case Blue:
-                    return FieldConstants.robotAgainstBlueSpeakerRight;
-                case Red:
-                    return FieldConstants.robotAgainstRedSpeakerRight;
-            }
-        }
-        return FieldConstants.robotAgainstRedSpeakerRight;
-    }
-
-    private Pose2d getPoseAgainstPodium() {
-        if (!DriverStation.getAlliance().isEmpty()) {
-            switch (DriverStation.getAlliance().get()) {
-                case Blue:
-                    return FieldConstants.robotAgainstBluePodium;
-                case Red:
-                    return FieldConstants.robotAgainstRedPodium;
-            }
-        }
-        return FieldConstants.robotAgainstRedPodium;
-    }
-
-    private Pose2d getPoseAgainstAmpZone() {
-        if (!DriverStation.getAlliance().isEmpty()) {
-            switch (DriverStation.getAlliance().get()) {
-                case Blue:
-                    return FieldConstants.robotAgainstRedAmpZone;
-                case Red:
-                    return FieldConstants.robotAgainstBlueAmpZone;
-            }
-        }
-        return FieldConstants.robotAgainstRedAmpZone;
-    }
-
-    private Rotation2d getFieldToSourceHeading() {
-        if (!DriverStation.getAlliance().isEmpty()) {
-            switch (DriverStation.getAlliance().get()) {
-                case Blue:
-                    Logger.recordOutput("Field/source", FieldConstants.blueSourceHeading);
-                    return FieldConstants.blueSourceHeading;
-                case Red:
-                    Logger.recordOutput("Field/source", FieldConstants.redSourceHeading);
-                    return FieldConstants.redSourceHeading;
-            }
-        }
-        return FieldConstants.redSourceHeading;
-    }
 
     private void setUpDriveWithJoysticks() {
         if (FeatureFlags.runDrive) {

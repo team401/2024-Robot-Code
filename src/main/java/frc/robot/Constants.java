@@ -49,7 +49,7 @@ public final class Constants {
     public static final class FeatureFlags {
         public static final boolean runVision = true;
 
-        public static final boolean runIntake = false;
+        public static final boolean runIntake = true;
         public static final boolean runScoring = true;
         public static final boolean runEndgame = true;
         public static final boolean runDrive = true;
@@ -529,13 +529,13 @@ public final class Constants {
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters
         // Value - Aimer angle in radians
-        public static HashMap<Double, Double> getAimerMap() { // TODO: Find this
+        public static HashMap<Double, Double> getAimerMap() {
             HashMap<Double, Double> map = new HashMap<Double, Double>();
             map.put(0.0, 0.8);
-            map.put(1.45, 0.8); // 0.7
+            map.put(1.45, 0.8);
             map.put(1.98, 0.62);
             map.put(2.41, 0.53);
-            map.put(3.02, 0.45); // 0.45
+            map.put(3.02, 0.45);
             map.put(3.22, 0.45);
             map.put(3.9, 0.36);
             map.put(4.55, 0.31);
@@ -552,7 +552,7 @@ public final class Constants {
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters
         // Value - Shooter RPM
-        public static HashMap<Double, Double> getShooterMap() { // TODO: Find this
+        public static HashMap<Double, Double> getShooterMap() {
             HashMap<Double, Double> map = new HashMap<Double, Double>();
             map.put(0.0, 2700.0);
             map.put(1.45, 2700.0);
@@ -572,7 +572,7 @@ public final class Constants {
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters
         // Value - Time in seconds
-        public static HashMap<Double, Double> timeToGoalMap() { // TODO: Find this
+        public static HashMap<Double, Double> timeToGoalMap() {
             HashMap<Double, Double> map = new HashMap<Double, Double>();
             map.put(0.0, 0.15);
             map.put(1.3, 0.15);

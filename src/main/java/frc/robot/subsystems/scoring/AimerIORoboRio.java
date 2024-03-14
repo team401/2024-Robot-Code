@@ -113,9 +113,15 @@ public class AimerIORoboRio implements AimerIO {
             return;
         }
         this.minAngleClamp =
-                MathUtil.clamp(minAngleClamp, 0.0, ScoringConstants.aimMaxAngleRadians);
+                MathUtil.clamp(
+                        minAngleClamp,
+                        ScoringConstants.aimMinAngleRadians,
+                        ScoringConstants.aimMaxAngleRadians);
         this.maxAngleClamp =
-                MathUtil.clamp(maxAngleClamp, 0.0, ScoringConstants.aimMaxAngleRadians);
+                MathUtil.clamp(
+                        maxAngleClamp,
+                        ScoringConstants.aimMinAngleRadians,
+                        ScoringConstants.aimMaxAngleRadians);
     }
 
     @Override
