@@ -293,9 +293,9 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.RIGHT)));
 
-            // controller.x()
-            //     .onTrue(new InstantCommand(() -> drivetrain.driveToEndgame()))
-            //     .onFalse(new InstantCommand(() -> drivetrain.stopDriveToPose()));
+            controller.x()
+                .onTrue(new InstantCommand(() -> drivetrain.driveToEndgame()))
+                .onFalse(new InstantCommand(() -> drivetrain.stopDriveToPose()));
         }
 
         if (FeatureFlags.runEndgame) {
@@ -316,8 +316,8 @@ public class RobotContainer {
             // controller.leftTrigger()
             //     .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_DOWN)));
 
-            controller.x()
-                .onTrue(/*!endgameCommand.isScheduled() ?*/ endgameCommand);
+            // controller.x()
+            //     .onTrue(/*!endgameCommand.isScheduled() ?*/ endgameCommand);
 
             controller.leftTrigger()
                 .onTrue(new InstantCommand(() -> endgameCommand.cancel()));
