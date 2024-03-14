@@ -118,7 +118,7 @@ public final class Constants {
         public static final Rotation2d redSourceHeading = !FeatureFlags.shopMode ? 
                 new Rotation2d(Math.PI * 4 / 3) : // 60 degrees 
                 new Rotation2d(Math.toRadians(180-114.3));
-        public static final Rotation2d blueSourceHeading =
+        public static final Rotation2d blueSourceHeading = !FeatureFlags.shopMode ?
                 new Rotation2d(Math.PI * 5 / 3) : // 120 degrees
                 new Rotation2d(Math.toRadians(114.3));
 
@@ -500,6 +500,9 @@ public final class Constants {
 
         public static final double intakeAngleToleranceRadians = 0.1;
         // Math.PI / 2 - Units.degreesToRadians(40);
+
+        public static final double sourceIntakeAngleRad = !FeatureFlags.shopMode ?
+            0.35 : 0.35; // FIELD ANGLE: 50 DEGREES, SHOP ANGLE: 38.9 DEGREES
 
         public static final double shooterAmpVelocityRPM = 2000;
 
