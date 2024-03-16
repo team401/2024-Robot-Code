@@ -161,12 +161,12 @@ public final class Constants {
 
         public static final double singleTagAmbiguityCutoff = 0.05;
 
-        public static final double lowUncertaintyCutoffDistance = 5.5;
+        public static final double lowUncertaintyCutoffDistance = 4.5;
 
         // 0.45 from 2023
         public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(0.8, 0.8, 2);
         // 1.2 from 2023
-        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(2.5, 2.5, 10);
+        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(6.0, 6.0, 20);
 
         public static final Matrix<N3, N1> driveUncertainty = VecBuilder.fill(0.1, 0.1, 0.1);
 
