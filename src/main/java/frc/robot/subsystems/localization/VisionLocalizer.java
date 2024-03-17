@@ -2,6 +2,7 @@ package frc.robot.subsystems.localization;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -25,11 +26,14 @@ public class VisionLocalizer extends SubsystemBase {
     public void periodic() {
         int i = 0;
         for (CameraIOInputs inputs : io.getInputs()) {
-            cameraConsumer.accept(
-                    new CameraMeasurement(
-                            inputs.latestFieldToRobot,
-                            inputs.latestTimestampSeconds,
-                            cameraUncertainty(inputs.averageTagDistanceM)));
+            if (inputs.isNew) {
+                cameraConsumer.accept(
+                        new CameraMeasurement(
+                                inputs.latestFieldToRobot,
+                                inputs.latestTimestampSeconds,
+                                cameraUncertainty(
+                                        inputs.averageTagDistanceM, inputs.averageTagYaw)));
+            }
 
             SmartDashboard.putBoolean("Camera " + i + " Connected", inputs.connected);
             i++;
@@ -40,8 +44,11 @@ public class VisionLocalizer extends SubsystemBase {
         this.cameraConsumer = cameraConsumer;
     }
 
-    private Matrix<N3, N1> cameraUncertainty(double averageTagDistanceM) {
-        if (averageTagDistanceM < VisionConstants.lowUncertaintyCutoffDistance) {
+    private Matrix<N3, N1> cameraUncertainty(double averageTagDistanceM, Rotation2d averageTagYaw) {
+        if (averageTagDistanceM < VisionConstants.skewCutoffDistance) {
+            return VisionConstants.lowCameraUncertainty;
+        } else if (averageTagDistanceM < VisionConstants.lowUncertaintyCutoffDistance
+                && Math.abs(averageTagYaw.getDegrees()) < VisionConstants.skewCutoffRotation) {
             return VisionConstants.lowCameraUncertainty;
         } else {
             return VisionConstants.highCameraUncertainty;

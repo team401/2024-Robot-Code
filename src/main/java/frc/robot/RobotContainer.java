@@ -718,6 +718,12 @@ public class RobotContainer {
     public void autoInit() {
         if (drivetrain.getAutoCommand() != null) {
             drivetrain.getAutoCommand().schedule();
+            if (FeatureFlags.runScoring) {
+                scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT);
+            }
+            if (FeatureFlags.runIntake) {
+                intakeSubsystem.run(IntakeAction.INTAKE);
+            }
         }
     }
 
