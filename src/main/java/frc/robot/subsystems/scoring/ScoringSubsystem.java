@@ -405,22 +405,28 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private boolean willHitStage() {
-        return (FieldFinder.willIHitThis(
-                        poseSupplier.get().getX(),
-                        poseSupplier.get().getY(),
-                        velocitySupplier.get().get(0, 0)
-                                * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
-                        velocitySupplier.get().get(1, 0)
-                                * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
-                        FieldLocations.BLUE_STAGE)
-                || FieldFinder.willIHitThis(
-                        poseSupplier.get().getX(),
-                        poseSupplier.get().getY(),
-                        velocitySupplier.get().get(0, 0)
-                                * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
-                        velocitySupplier.get().get(1, 0)
-                                * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
-                        FieldLocations.RED_STAGE));
+        if (FieldFinder.willIHitThis(
+                poseSupplier.get().getX(),
+                poseSupplier.get().getY(),
+                velocitySupplier.get().get(0, 0)
+                        * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
+                velocitySupplier.get().get(1, 0)
+                        * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
+                FieldLocations.BLUE_STAGE)) {
+            return true;
+        }
+        if (FieldFinder.willIHitThis(
+                poseSupplier.get().getX(),
+                poseSupplier.get().getY(),
+                velocitySupplier.get().get(0, 0)
+                        * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
+                velocitySupplier.get().get(1, 0)
+                        * timeToPutAimDown.getValue(aimerInputs.aimAngleRad),
+                FieldLocations.RED_STAGE)) {
+            return true;
+        }
+
+        return false;
     }
 
     public void enabledInit() {
