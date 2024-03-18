@@ -170,13 +170,16 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 this::seedFieldRelative, // Consumer for seeding pose against auto
                 this::getCurrentRobotChassisSpeeds,
                 (speeds) -> {
+                    speeds.omegaRadiansPerSecond *= -1;
                     this.setGoalChassisSpeeds(speeds, false);
-                    this.setAlignState(AlignState.ALIGNING);
                     this.setAlignTarget(AlignTarget.SPEAKER);
                 }, // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
-                        new PIDConstants(1, 0, 0),
-                        new PIDConstants(0, 0, 0),
+                        new PIDConstants(2, 0, 0),
+                        new PIDConstants(
+                                DriveConstants.alignmentkPMax,
+                                DriveConstants.alignmentkI,
+                                DriveConstants.alignmentkD),
                         TunerConstants.kSpeedAt12VoltsMps,
                         driveBaseRadius,
                         new ReplanningConfig()),
@@ -204,6 +207,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         autoChooser.addOption("Amp Side - 4 note (wing)", "S1-W1-W2-W3");
         autoChooser.addOption("Amp Side - 5 note", "S1-W1-W2-W3-C5");
         autoChooser.addOption("Center - 3 note", "S2-W2-W3");
+        autoChooser.addOption("Center - 3 note (2 from center - avoids wing notes)", "S2-C1-C2");
         autoChooser.addOption("Center - 4 note (source side to center)", "S2-W2-W3-C5");
         autoChooser.addOption("Source Side - 2 note", "S3-W3");
         autoChooser.addOption("Source Side - 3 note", "S3-W3-C5");

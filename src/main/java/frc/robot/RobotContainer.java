@@ -718,6 +718,13 @@ public class RobotContainer {
     public void autoInit() {
         if (drivetrain.getAutoCommand() != null) {
             drivetrain.getAutoCommand().schedule();
+            drivetrain.setAlignState(AlignState.ALIGNING);
+            if (FeatureFlags.runScoring) {
+                scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT);
+            }
+            if (FeatureFlags.runIntake) {
+                intakeSubsystem.run(IntakeAction.INTAKE);
+            }
         }
     }
 
@@ -745,15 +752,10 @@ public class RobotContainer {
                             () ->
                                     scoringSubsystem.setAction(
                                             ScoringSubsystem.ScoringAction.INTAKE)));
-            NamedCommands.registerCommand(
-                    "Wait Scoring",
-                    new InstantCommand(
-                            () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
         } else {
             NamedCommands.registerCommand("Shoot Scoring", Commands.none());
             NamedCommands.registerCommand("Aim Scoring", Commands.none());
             NamedCommands.registerCommand("Intake Scoring", Commands.none());
-            NamedCommands.registerCommand("Wait Scoring", Commands.none());
         }
         if (FeatureFlags.runIntake) {
             NamedCommands.registerCommand("Intake Note", Commands.none());
@@ -764,8 +766,12 @@ public class RobotContainer {
             NamedCommands.registerCommand(
                     "Disable Auto-Align",
                     new InstantCommand(() -> drivetrain.setAlignState(AlignState.MANUAL)));
+            NamedCommands.registerCommand(
+                    "Enable Auto-Align",
+                    new InstantCommand(() -> drivetrain.setAlignState(AlignState.ALIGNING)));
         } else {
-            NamedCommands.registerCommand("Disable Auto-ALign", Commands.none());
+            NamedCommands.registerCommand("Disable Auto-Align", Commands.none());
+            NamedCommands.registerCommand("Enable Auto-Align", Commands.none());
         }
         if (FeatureFlags.runScoring) {
             NamedCommands.registerCommand(
