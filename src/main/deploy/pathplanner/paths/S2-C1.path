@@ -32,12 +32,12 @@
     },
     {
       "anchor": {
-        "x": 8.284942222836145,
-        "y": 7.445640937793504
+        "x": 8.472216302309318,
+        "y": 7.656405488324675
       },
       "prevControl": {
-        "x": 5.83243327488444,
-        "y": 6.946327738809324
+        "x": 3.229427712975432,
+        "y": 6.246579985310521
       },
       "nextControl": null,
       "isLocked": false,
@@ -49,9 +49,9 @@
   "eventMarkers": [
     {
       "name": "Aim",
-      "waypointRelativePos": 1.25,
+      "waypointRelativePos": 0.85,
       "command": {
-        "type": "sequential",
+        "type": "parallel",
         "data": {
           "commands": [
             {

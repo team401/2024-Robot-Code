@@ -209,6 +209,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         autoChooser.addOption("Center - 3 note", "S2-W2-W3");
         autoChooser.addOption("Center - 3 note (2 from center - avoids wing notes)", "S2-C1-C2");
         autoChooser.addOption("Center - 4 note (source side to center)", "S2-W2-W3-C5");
+        autoChooser.addOption("Center - 3 note - special", "S2-C1-C2-Special");
         autoChooser.addOption("Source Side - 2 note", "S3-W3");
         autoChooser.addOption("Source Side - 3 note", "S3-W3-C5");
         autoChooser.addOption("Source Side - 5 note (across)", "S3-W3-W2-W1-C1");

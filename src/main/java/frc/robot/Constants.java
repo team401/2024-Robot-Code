@@ -159,14 +159,15 @@ public final class Constants {
         public static final String tagLayoutName = "2024-WPI";
         public static final AprilTagFieldLayout fieldLayout = initLayout(tagLayoutName);
 
-        public static final double singleTagAmbiguityCutoff = 0.05;
+        public static final double lowUncertaintyCutoffDistance = 6.5;
 
-        public static final double lowUncertaintyCutoffDistance = 4.5;
+        public static final double skewCutoffDistance = 4.5;
+        public static final double skewCutoffRotation = Units.degreesToRadians(30);
 
         // 0.45 from 2023
-        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(0.8, 0.8, 2);
+        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(6.0, 6.0, 6);
         // 1.2 from 2023
-        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(6.0, 6.0, 20);
+        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(35.0, 35.0, 40);
 
         public static final Matrix<N3, N1> driveUncertainty = VecBuilder.fill(0.1, 0.1, 0.1);
 
@@ -180,7 +181,7 @@ public final class Constants {
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(0.323, 0.262, 0.216),
-                                        new Rotation3d(0, -0.398, 0.109))),
+                                        new Rotation3d(0, -0.382, 0.209))),
                         new CameraParams(
                                 "Front-Right",
                                 640,
@@ -324,7 +325,7 @@ public final class Constants {
 
         private static final double kDriveGearRatio = 6.122448979591837;
         private static final double kSteerGearRatio = 21.428571428571427;
-        private static final double kWheelRadiusInches = 1.925;
+        private static final double kWheelRadiusInches = 1.939;
 
         private static final boolean kSteerMotorReversed = true;
         private static final boolean kInvertLeftSide = false;
