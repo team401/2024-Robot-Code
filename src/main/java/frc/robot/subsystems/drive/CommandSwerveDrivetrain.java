@@ -270,7 +270,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                         alignDirection = direction;
                         break;
                     case Red:
-                        alignDirection = direction + 3.14;
+                        alignDirection = direction + Math.PI;
                         break;
                 }
             }

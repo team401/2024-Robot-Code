@@ -507,7 +507,7 @@ public final class Constants {
         public static final double aimAngleVelocityMargin = 2.0; // Units.degreesToRadians(5);
         public static final double hoodAngleMarginRadians = Units.degreesToRadians(5);
 
-        public static final double intakeAngleToleranceRadians = 0.1;
+        public static final double intakeAngleToleranceRadians = 0.0;
         // Math.PI / 2 - Units.degreesToRadians(40);
 
         public static final double shooterAmpVelocityRPM = 2000;

@@ -1,6 +1,8 @@
 package frc.robot.utils;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+
 import java.awt.geom.Line2D;
 
 public class FieldFinder {
@@ -68,6 +70,16 @@ public class FieldFinder {
         } else {
             return FieldLocations.MIDDLE;
         }
+    }
+
+    /**
+     * This method is used to determine where the robot is on the field
+     *
+     * @param pose The x pose of the robot
+     * @return The location on the field
+     */
+    public static FieldLocations whereAmI(Pose2d pose) {
+        return whereAmI(pose.getX(), pose.getY());
     }
 
     /**

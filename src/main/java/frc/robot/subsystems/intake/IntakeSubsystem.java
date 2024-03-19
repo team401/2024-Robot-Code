@@ -12,7 +12,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private State state = State.IDLE;
 
-    private BooleanSupplier scorerWantsNote = () -> false;
+    private BooleanSupplier scorerWantsNote = () -> true;
 
     private IntakeAction action = IntakeAction.NONE;
 
@@ -83,7 +83,7 @@ public class IntakeSubsystem extends SubsystemBase {
             state = State.IDLE;
         }
 
-        io.setIntakeVoltage(IntakeConstants.intakePower);
+        io.setIntakeVoltage(scorerWantsNote.getAsBoolean() ? IntakeConstants.intakePower : 0.0);
         io.setBeltVoltage(IntakeConstants.beltPower);
     }
 

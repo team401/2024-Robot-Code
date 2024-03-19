@@ -165,6 +165,20 @@ public class AimerIORoboRio implements AimerIO {
         return encoder.getAbsolutePosition() * 2.0 * Math.PI - ScoringConstants.aimerEncoderOffset;
     }
 
+    public void setStatorCurrentLimit(double limit) {
+        TalonFXConfigurator aimerLeftConfig = aimerLeft.getConfigurator();
+        aimerLeftConfig.apply(
+                new CurrentLimitsConfigs()
+                        .withStatorCurrentLimit(limit)
+                        .withStatorCurrentLimitEnable(true));
+
+        TalonFXConfigurator aimerRightConfig = aimerRight.getConfigurator();
+        aimerRightConfig.apply(
+                new CurrentLimitsConfigs()
+                        .withStatorCurrentLimit(limit)
+                        .withStatorCurrentLimitEnable(true));
+    }
+
     @Override
     public void updateInputs(AimerIOInputs inputs) {
         appliedVolts = 0.0;
