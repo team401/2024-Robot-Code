@@ -13,6 +13,7 @@ public interface AimerIO {
         public double aimSupplyCurrentAmps = 0.0;
 
         public double aimVelocityRadPerSec = 0.0;
+        public double aimVelocityErrorRadPerSec = 0.0;
     }
 
     public default void updateInputs(AimerIOInputs inputs) {}

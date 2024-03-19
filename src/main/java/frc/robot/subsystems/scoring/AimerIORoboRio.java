@@ -54,6 +54,7 @@ public class AimerIORoboRio implements AimerIO {
 
     double velocity = 0.0;
 
+    double lastError = 0.0;
     double lastPosition = 0.0;
     double lastTime = Utils.getCurrentTimeSeconds();
 
@@ -200,6 +201,10 @@ public class AimerIORoboRio implements AimerIO {
         inputs.aimVelocityRadPerSec = (getEncoderPosition() - lastPosition) / diffTime;
         velocity = (getEncoderPosition() - lastPosition) / diffTime;
         lastPosition = getEncoderPosition();
+
+        inputs.aimVelocityErrorRadPerSec =
+                ((getEncoderPosition() - controlSetpoint) - lastError) / diffTime;
+        lastError = getEncoderPosition() - controlSetpoint;
 
         inputs.aimAppliedVolts = appliedVolts;
         inputs.aimStatorCurrentAmps = aimerRight.getStatorCurrent().getValueAsDouble();
