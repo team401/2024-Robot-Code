@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.765872873427322,
-      "y": 6.726042503963363
+      "x": 0.7071301441350655,
+      "y": 4.376333332273105
     },
-    "rotation": -120.0
+    "rotation": 120.0
   },
   "command": {
     "type": "sequential",
@@ -20,19 +20,43 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.8
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "S1-W1"
+            "pathName": "S3-W3"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.2
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "W3-W2"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "W2-W1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         },
         {
@@ -42,27 +66,15 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Aim Scoring"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "C1-E1"
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Shoot Scoring"
-          }
-        },
-        {
           "type": "wait",
           "data": {
-            "waitTime": 0.3
+            "waitTime": 0.5
           }
         },
         {
@@ -72,21 +84,9 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Aim Scoring"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "C2-E1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot Scoring"
           }
         }
       ]

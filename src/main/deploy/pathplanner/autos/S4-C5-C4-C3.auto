@@ -2,67 +2,55 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7071301441350655,
-      "y": 4.376333332273105
+      "x": 0.5234556947987139,
+      "y": 2.0523241046482106
     },
-    "rotation": 120.0
+    "rotation": 180.0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 1.0
+            "name": "Shoot Scoring"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "S3-W3"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.3
+            "pathName": "S4-C5_fast"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "W3-W2"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.3
+            "pathName": "C5-E2_fast"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "W2-W1"
+            "pathName": "E2-C4_fast"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "W1-C1"
+            "pathName": "C4-E2_fast"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C1-E1"
+            "pathName": "E2-C3_fast"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "E1-C2"
+            "pathName": "C3-E1_fast"
           }
         }
       ]

@@ -231,7 +231,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         Logger.recordOutput("scoring/aimGoal", getAimerAngle(distancetoGoal));
         shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
         aimerIo.setAimAngleRad(getAimerAngle(distancetoGoal), false);
-        shooterIo.setKickerVolts(hasNote() ? 0.0 : 1.5);
+        shooterIo.setKickerVolts(hasNote() ? 0.0 : 3.0);
 
         boolean shooterReady =
                 Math.abs(
@@ -240,7 +240,9 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                         < ScoringConstants.shooterVelocityMarginRPM;
         boolean aimReady =
                 Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad)
-                        < ScoringConstants.aimAngleMarginRadians;
+                                < ScoringConstants.aimAngleMarginRadians
+                        && Math.abs(aimerInputs.aimVelocityErrorRadPerSec)
+                                < ScoringConstants.aimAngleVelocityMargin;
         boolean driveReady = driveAllignedSupplier.get();
         boolean notePresent = hasNote();
 
