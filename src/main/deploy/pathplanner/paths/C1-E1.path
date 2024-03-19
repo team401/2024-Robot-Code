@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "shoot",
-      "waypointRelativePos": 0.75,
+      "waypointRelativePos": 1.0,
       "command": {
         "type": "parallel",
         "data": {

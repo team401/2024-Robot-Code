@@ -188,6 +188,7 @@ public class RobotContainer {
                         (m) ->
                                 drivetrain.addVisionMeasurement(
                                         m.pose(), m.timestamp(), m.variance()));
+                tagVision.setFieldToRobotSupplier(() -> driveTelemetry.getFieldToRobot());
             }
         }
 

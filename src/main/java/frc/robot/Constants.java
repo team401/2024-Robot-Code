@@ -90,7 +90,7 @@ public final class Constants {
 
         public static final double alignmentkPMax = 7.0;
         public static final double alignmentkPMin = 5.0;
-        public static final double alignmentkI = 3.5;
+        public static final double alignmentkI = 4.5;
         public static final double alignmentkD = 0.0;
     }
 
@@ -165,9 +165,9 @@ public final class Constants {
         public static final double skewCutoffRotation = Units.degreesToRadians(30);
 
         // 0.45 from 2023
-        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(6.0, 6.0, 6);
+        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(4.0, 6.0, 6);
         // 1.2 from 2023
-        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(35.0, 35.0, 40);
+        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(32.0, 40.0, 40);
 
         public static final Matrix<N3, N1> driveUncertainty = VecBuilder.fill(0.1, 0.1, 0.1);
 
@@ -552,7 +552,7 @@ public final class Constants {
             return map;
         }
 
-        public static final double aimerStaticOffset = 0.00;
+        public static final double aimerStaticOffset = 0.01;
 
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters

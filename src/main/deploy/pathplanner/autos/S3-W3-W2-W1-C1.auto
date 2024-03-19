@@ -14,7 +14,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.4
+            "waitTime": 1.0
           }
         },
         {
@@ -57,6 +57,12 @@
           "type": "path",
           "data": {
             "pathName": "C1-E1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "E1-C2"
           }
         }
       ]

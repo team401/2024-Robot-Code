@@ -16,6 +16,8 @@ public interface CameraIO {
         public double latestTimestampSeconds = 0.0;
         public boolean connected = false;
         public boolean isNew = false;
+
+        public String name = "";
     }
 
     public default void updateInputs(CameraIOInputs inputs) {}

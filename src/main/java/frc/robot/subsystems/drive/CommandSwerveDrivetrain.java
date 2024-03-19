@@ -77,7 +77,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private Supplier<Translation2d> getRobotVelocity = () -> new Translation2d();
 
-    private SendableChooser<String> autoChooser = new SendableChooser<String>();
+    private SendableChooser<Command> autoChooser = new SendableChooser<Command>();
 
     private PIDController thetaController =
             new PIDController(
@@ -200,24 +200,30 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         // PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
 
         // autoChooser = AutoBuilder.buildAutoChooser();
-        autoChooser.setDefaultOption("Default", "None"); // S1-W1-W2-W3
-        autoChooser.addOption("Amp Side - 4 note (2 from center)", "S1-W1-C1-C2");
-        autoChooser.addOption("Amp Side - 5 note (3 from center)", "S1-W1-C1-C2-C3");
-        autoChooser.addOption("Amp Side - 3 note", "S1-W1-W2");
-        autoChooser.addOption("Amp Side - 4 note (wing)", "S1-W1-W2-W3");
-        autoChooser.addOption("Amp Side - 5 note", "S1-W1-W2-W3-C5");
-        autoChooser.addOption("Center - 3 note", "S2-W2-W3");
-        autoChooser.addOption("Center - 3 note (2 from center - avoids wing notes)", "S2-C1-C2");
-        autoChooser.addOption("Center - 4 note (source side to center)", "S2-W2-W3-C5");
-        autoChooser.addOption("Center - 3 note - special", "S2-C1-C2-Special");
-        autoChooser.addOption("Source Side - 2 note", "S3-W3");
-        autoChooser.addOption("Source Side - 3 note", "S3-W3-C5");
-        autoChooser.addOption("Source Side - 5 note (across)", "S3-W3-W2-W1-C1");
+        autoChooser.setDefaultOption("Default", new PathPlannerAuto("None")); // S1-W1-W2-W3
+        autoChooser.addOption(
+                "Amp Side - 4 note (2 from center)", new PathPlannerAuto("S1-W1-C1-C2"));
+        autoChooser.addOption(
+                "Amp Side - 5 note (3 from center)", new PathPlannerAuto("S1-W1-C1-C2-C3"));
+        autoChooser.addOption("Amp Side - 3 note", new PathPlannerAuto("S1-W1-W2"));
+        autoChooser.addOption("Amp Side - 4 note (wing)", new PathPlannerAuto("S1-W1-W2-W3"));
+        autoChooser.addOption("Amp Side - 5 note", new PathPlannerAuto("S1-W1-W2-W3-C5"));
+        autoChooser.addOption("Center - 3 note", new PathPlannerAuto("S2-W2-W3"));
+        autoChooser.addOption(
+                "Center - 3 note (2 from center - avoids wing notes)",
+                new PathPlannerAuto("S2-C1-C2"));
+        autoChooser.addOption(
+                "Center - 4 note (source side to center)", new PathPlannerAuto("S2-W2-W3-C5"));
+        autoChooser.addOption("Center - 3 note - special", new PathPlannerAuto("S2-C1-C2-Special"));
+        autoChooser.addOption("Source Side - 2 note", new PathPlannerAuto("S3-W3"));
+        autoChooser.addOption("Source Side - 3 note", new PathPlannerAuto("S3-W3-C5"));
+        autoChooser.addOption(
+                "Source Side - 5 note (across)", new PathPlannerAuto("S3-W3-W2-W1-C1"));
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     public Command getAutoCommand() {
-        return new PathPlannerAuto(autoChooser.getSelected());
+        return autoChooser.getSelected();
     }
 
     public ChassisSpeeds getCurrentRobotChassisSpeeds() {

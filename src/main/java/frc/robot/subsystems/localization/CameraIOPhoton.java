@@ -66,6 +66,8 @@ public class CameraIOPhoton implements CameraIO {
     public void updateInputs(CameraIOInputs inputs) {
         inputs.connected = camera.isConnected();
 
+        inputs.name = this.name;
+
         PhotonPipelineResult result = camera.getLatestResult();
         if (result.getTimestampSeconds() == latestTimestampSeconds) {
             inputs.isNew = false;
