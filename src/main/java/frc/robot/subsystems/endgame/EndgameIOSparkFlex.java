@@ -68,6 +68,16 @@ public class EndgameIOSparkFlex implements EndgameIO {
     }
 
     @Override
+    public void setClimbing(boolean climbing) {
+        rightEndgameMotor
+                .getPIDController()
+                .setFF(
+                        climbing
+                                ? EndgameConstants.climberkFFRobot
+                                : EndgameConstants.climberkFFClimber);
+    }
+
+    @Override
     public void setPosition(double position) {
         if (targetPosition != position) {
             profileTimer.reset();
@@ -137,7 +147,7 @@ public class EndgameIOSparkFlex implements EndgameIO {
 
         inputs.targetPosition = profileSetpoint;
 
-        inputs.position = leftEndgameMotor.getEncoder().getPosition();
+        inputs.position = rightEndgameMotor.getEncoder().getPosition();
         inputs.velocity = leftEndgameMotor.getEncoder().getVelocity();
     }
 

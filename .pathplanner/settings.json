@@ -2,7 +2,9 @@
   "robotWidth": 0.8382,
   "robotLength": 0.9525,
   "holonomicMode": true,
-  "pathFolders": [],
+  "pathFolders": [
+    "Endgame"
+  ],
   "autoFolders": [],
   "defaultMaxVel": 4.5,
   "defaultMaxAccel": 2.75,

@@ -4,9 +4,11 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.Utils;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -22,6 +24,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
+    private double lastTime = Utils.getCurrentTimeSeconds();
 
     private int cycle = 0;
 
@@ -72,9 +75,16 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotPeriodic() {
+        double startTime = Utils.getCurrentTimeSeconds() * 1000;
         CommandScheduler.getInstance().run();
 
         robotContainer.robotPeriodic();
+
+        double currentTime = Utils.getCurrentTimeSeconds() * 1000;
+        double diffTime = currentTime - startTime;
+        // lastTime = currentTime;
+
+        SmartDashboard.putNumber("Loop Time", diffTime);
 
         if (cycle % 20 == 0) {
             Logger.recordOutput("JVM/total memory", Runtime.getRuntime().totalMemory());
