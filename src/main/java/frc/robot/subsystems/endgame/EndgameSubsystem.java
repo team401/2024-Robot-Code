@@ -68,8 +68,15 @@ public class EndgameSubsystem extends SubsystemBase implements Tunable {
         Logger.recordOutput("endgame/Action", action);
     }
 
+    public void flipDirection() {
+        setAction(
+                setpointPosition == EndgameConstants.climberTargetDownMeters
+                        ? EndgameAction.GO_UP
+                        : EndgameAction.GO_DOWN);
+    }
+
     public boolean atPosition() {
-        return Math.abs(setpointPosition - endgameInputs.position) < 0.05;
+        return Math.abs(setpointPosition - endgameInputs.position) < 0.07;
     }
 
     public void setBrakeMode(boolean brake) {

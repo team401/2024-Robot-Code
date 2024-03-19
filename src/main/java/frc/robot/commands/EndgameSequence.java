@@ -73,6 +73,7 @@ public class EndgameSequence extends Command {
 
                     // drivetrain.stopDriveToPose();
                     // drivetrain.setAlignState(AlignState.POSE_TARGET);
+                    scoringSubsystem.setAimerStatorCurrentLimit(20.0); // TODO: Find this
                     endgameSubsystem.setClimbing(false);
                     endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_UP);
                 }
@@ -111,6 +112,7 @@ public class EndgameSequence extends Command {
 
                     // drivetrain.setAlignState(AlignState.MANUAL);
                     // drivetrain.stopDriveToPose();
+                    scoringSubsystem.setAimerStatorCurrentLimit(60.0);
                     endgameSubsystem.setClimbing(true);
                     endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_DOWN);
                     scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.ENDGAME);
@@ -133,6 +135,7 @@ public class EndgameSequence extends Command {
     public void end(boolean interrupted) {
         // drivetrain.stopDriveToPose();
         // drivetrain.setAlignState(AlignState.MANUAL);
+        scoringSubsystem.setAimerStatorCurrentLimit(60.0);
         scoringSubsystem.forceHood(false);
     }
 
