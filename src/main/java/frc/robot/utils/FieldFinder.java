@@ -239,10 +239,10 @@ public class FieldFinder {
             double y4) {
         double area = areaOfQuad(x1, y1, x2, y2, x3, y3, x4, y4);
 
-        double a1 = areaOfQuad(x, y, x2, y2, x3, y3, x4, y4);
-        double a2 = areaOfQuad(x1, y1, x, y, x3, y3, x4, y4);
-        double a3 = areaOfQuad(x1, y1, x2, y2, x, y, x4, y4);
-        double a4 = areaOfQuad(x1, y1, x2, y2, x3, y3, x, y);
+        double a1 = areaOfTriangle(x1, y1, x2, y2, x, y);
+        double a2 = areaOfTriangle(x2, y2, x3, y3, x, y);
+        double a3 = areaOfTriangle(x3, y3, x4, y4, x, y);
+        double a4 = areaOfTriangle(x4, y4, x1, y1, x, y);
 
         return MathUtil.isNear(area, a1 + a2 + a3 + a4, 0.05);
     }
