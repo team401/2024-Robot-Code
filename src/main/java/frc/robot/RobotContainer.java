@@ -752,10 +752,9 @@ public class RobotContainer {
 
     public void autoInit() {
         if (drivetrain.getAutoCommand() != null) {
-            drivetrain.setAlignState(AlignState.ALIGNING);
-            drivetrain.setAlignTarget(AlignTarget.SPEAKER);
             drivetrain.getAutoCommand().schedule();
             drivetrain.setAlignState(AlignState.ALIGNING);
+            drivetrain.setAlignTarget(AlignTarget.SPEAKER);
             if (FeatureFlags.runScoring) {
                 scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT);
             }

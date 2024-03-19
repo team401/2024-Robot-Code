@@ -9,8 +9,6 @@ import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.endgame.EndgameSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.telemetry.Telemetry;
-import frc.robot.utils.GeomUtil;
-
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -88,7 +86,24 @@ public class EndgameSequence extends Command {
                                 / (EndgameConstants.climberTargetUpMeters
                                         - EndgameConstants.climberTargetDownMeters);
 
-                targetPose = drivetrain.getEndgamePose().plus(new Transform2d(result * Math.cos(drivetrain.getEndgamePose().getRotation().getRadians()), result * Math.sin(drivetrain.getEndgamePose().getRotation().getRadians()), new Rotation2d()));
+                targetPose =
+                        drivetrain
+                                .getEndgamePose()
+                                .plus(
+                                        new Transform2d(
+                                                result
+                                                        * Math.cos(
+                                                                drivetrain
+                                                                        .getEndgamePose()
+                                                                        .getRotation()
+                                                                        .getRadians()),
+                                                result
+                                                        * Math.sin(
+                                                                drivetrain
+                                                                        .getEndgamePose()
+                                                                        .getRotation()
+                                                                        .getRadians()),
+                                                new Rotation2d()));
                 // drivetrain.setPoseTarget(targetPose);
 
                 if (endgameSubsystem.atPosition() && confirmBooleanSupplier.getAsBoolean()) {
