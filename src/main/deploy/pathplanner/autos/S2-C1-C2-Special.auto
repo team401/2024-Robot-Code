@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7071301441350655,
-      "y": 4.376333332273105
+      "x": 1.441414260288271,
+      "y": 5.463073824179848
     },
-    "rotation": 120.0
+    "rotation": 180.0
   },
   "command": {
     "type": "sequential",
@@ -14,43 +14,13 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.8
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "S3-W3"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.3
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "W3-W2"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.3
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "W2-W1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "W1-C1"
+            "pathName": "S2-C1"
           }
         },
         {
@@ -60,9 +30,21 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.2
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "E1-C2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C2-E1"
           }
         }
       ]

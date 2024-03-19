@@ -33,6 +33,8 @@ public class DriveWithJoysticks extends Command {
 
     private ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
 
+    ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
+
     public DriveWithJoysticks(
             CommandSwerveDrivetrain drivetrain,
             DoubleSupplier x,

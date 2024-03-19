@@ -2,49 +2,37 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.765872873427322,
-      "y": 6.726042503963363
+      "x": 1.441414260288271,
+      "y": 5.463073824179848
     },
-    "rotation": -120.0
+    "rotation": 180.0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "Shoot Scoring"
-          }
-        },
-        {
           "type": "wait",
           "data": {
-            "waitTime": 0.8
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "S1-W1"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.2
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "W1-C1"
+            "waitTime": 0.4
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Aim Scoring"
+            "name": "Disable Auto-Align"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "S2-C1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Enable Auto-Align"
           }
         },
         {
@@ -56,13 +44,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot Scoring"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.3
+            "name": "Disable Auto-Align"
           }
         },
         {
@@ -74,19 +56,13 @@
         {
           "type": "named",
           "data": {
-            "name": "Aim Scoring"
+            "name": "Enable Auto-Align"
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "C2-E1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot Scoring"
           }
         }
       ]

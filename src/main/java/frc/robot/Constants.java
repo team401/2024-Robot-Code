@@ -91,7 +91,7 @@ public final class Constants {
 
         public static final double alignmentkPMax = 7.0;
         public static final double alignmentkPMin = 5.0;
-        public static final double alignmentkI = 2.5;
+        public static final double alignmentkI = 4.5;
         public static final double alignmentkD = 0.0;
     }
 
@@ -131,6 +131,18 @@ public final class Constants {
         public static final Pose2d robotAgainstRedSpeaker =
                 new Pose2d(15.19, 5.56, Rotation2d.fromDegrees(0));
 
+        public static final Pose2d robotAgainstBlueSpeakerRight =
+                new Pose2d(0.7, 4.38, Rotation2d.fromDegrees(120));
+
+        public static final Pose2d robotAgainstRedSpeakerRight =
+                new Pose2d(15.83, 6.73, Rotation2d.fromDegrees(-60));
+
+        public static final Pose2d robotAgainstBlueSpeakerLeft =
+                new Pose2d(0.7, 6.73, Rotation2d.fromDegrees(-120));
+
+        public static final Pose2d robotAgainstRedSpeakerLeft =
+                new Pose2d(15.83, 4.38, Rotation2d.fromDegrees(60));
+
         public static final Pose2d robotAgainstBluePodium =
                 new Pose2d(2.57, 4.09, Rotation2d.fromDegrees(180));
 
@@ -145,16 +157,18 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
-        public static final String tagLayoutName = "vabla";
+        public static final String tagLayoutName = "2024-WPI";
         public static final AprilTagFieldLayout fieldLayout = initLayout(tagLayoutName);
 
-        public static final double singleTagAmbiguityCutoff = 0.05;
+        public static final double lowUncertaintyCutoffDistance = 6.5;
+
+        public static final double skewCutoffDistance = 4.5;
+        public static final double skewCutoffRotation = Units.degreesToRadians(30);
 
         // 0.45 from 2023
-        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(0.8, 0.8, 2);
+        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(4.0, 6.0, 6);
         // 1.2 from 2023
-        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(2.2, 2.2, 10);
-        public static final Matrix<N3, N1> singleTagUncertainty = VecBuilder.fill(25.0, 25.0, 10);
+        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(32.0, 40.0, 40);
 
         public static final Matrix<N3, N1> driveUncertainty = VecBuilder.fill(0.1, 0.1, 0.1);
 
@@ -168,7 +182,7 @@ public final class Constants {
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(0.323, 0.262, 0.216),
-                                        new Rotation3d(0, -0.398, 0.109))),
+                                        new Rotation3d(0, -0.382, 0.209))),
                         new CameraParams(
                                 "Front-Right",
                                 640,
@@ -214,7 +228,8 @@ public final class Constants {
                 layout =
                         new AprilTagFieldLayout(
                                 Filesystem.getDeployDirectory().getAbsolutePath()
-                                        + "/taglayout/2024-WPI"
+                                        + "/taglayout/"
+                                        + name
                                         + ".json");
             } catch (IOException ioe) {
                 DriverStation.reportWarning(
@@ -311,7 +326,7 @@ public final class Constants {
 
         private static final double kDriveGearRatio = 6.122448979591837;
         private static final double kSteerGearRatio = 21.428571428571427;
-        private static final double kWheelRadiusInches = 2;
+        private static final double kWheelRadiusInches = 1.939;
 
         private static final boolean kSteerMotorReversed = true;
         private static final boolean kInvertLeftSide = false;
@@ -387,6 +402,9 @@ public final class Constants {
         private static final double kFrontLeftXPosInches = -10.375;
         private static final double kFrontLeftYPosInches = -10.375;
 
+        public static final double kModuleRadiusMeters =
+                Units.inchesToMeters(Math.hypot(kFrontLeftXPosInches, kFrontLeftYPosInches));
+
         private static final SwerveModuleConstants FrontLeft =
                 ConstantCreator.createModuleConstants(
                         kFrontLeftSteerMotorId,
@@ -437,8 +455,8 @@ public final class Constants {
     }
 
     public static final class ScoringConstants {
-        public static final double aimerkP = 15.0;
-        public static final double aimerkI = 15.0;
+        public static final double aimerkP = 17.0;
+        public static final double aimerkI = 5.0;
         public static final double aimerkD = 0.0;
 
         public static final double aimerkS = 0.265;
@@ -481,11 +499,12 @@ public final class Constants {
 
         public static final double aimPositionTolerance = 0.015;
 
-        public static final double aimAcceleration = 5.0; // TODO: 15.0
+        public static final double aimAcceleration = 4.5; // TODO: 15.0
         public static final double aimCruiseVelocity = 7.0; // TODO: 15.0
 
         public static final double shooterVelocityMarginRPM = 50;
         public static final double aimAngleMarginRadians = Units.degreesToRadians(1);
+        public static final double aimAngleVelocityMargin = 2.0; // Units.degreesToRadians(5);
         public static final double hoodAngleMarginRadians = Units.degreesToRadians(5);
 
         public static final double intakeAngleToleranceRadians = 0.1;
@@ -497,6 +516,7 @@ public final class Constants {
         public static final double hoodHomeAngleRad = Math.PI - 0.23;
 
         public static final double aimMaxAngleRadians = 1.65; // Math.PI / 2
+        public static final double aimMinAngleRadians = -0.03;
 
         public static final double maxAimIntake = 0.0;
         public static final double minAimIntake = 0.0;
@@ -512,30 +532,33 @@ public final class Constants {
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters
         // Value - Aimer angle in radians
-        public static HashMap<Double, Double> getAimerMap() { // TODO: Find this
+        public static HashMap<Double, Double> getAimerMap() {
             HashMap<Double, Double> map = new HashMap<Double, Double>();
             map.put(0.0, 0.8);
-            map.put(1.45, 0.8); // 0.7
+            map.put(1.45, 0.8);
             map.put(1.98, 0.62);
             map.put(2.41, 0.53);
-            map.put(3.02, 0.48); // 0.45
+            map.put(3.02, 0.45);
             map.put(3.22, 0.45);
             map.put(3.9, 0.36);
-            map.put(4.55, 0.34);
-            map.put(4.95, 0.33);
-            map.put(5.64, 0.32);
+            map.put(4.55, 0.31);
+            map.put(4.95, 0.28);
+            map.put(5.15, 0.265);
+            map.put(5.35, 0.265);
+            map.put(5.5, 0.265);
+            map.put(5.64, 0.24);
             // map.put(5.82, 0.275);
-            map.put(6.0, 0.31);
+            map.put(6.0, 0.28);
 
             return map;
         }
 
-        public static final double aimerStaticOffset = 0.02;
+        public static final double aimerStaticOffset = 0.01;
 
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters
         // Value - Shooter RPM
-        public static HashMap<Double, Double> getShooterMap() { // TODO: Find this
+        public static HashMap<Double, Double> getShooterMap() {
             HashMap<Double, Double> map = new HashMap<Double, Double>();
             map.put(0.0, 2700.0);
             map.put(1.45, 2700.0);
@@ -546,6 +569,8 @@ public final class Constants {
             map.put(3.9, 3300.0);
             map.put(4.55, 3500.0);
             map.put(4.95, 4000.0);
+            map.put(5.15, 4000.0);
+            map.put(5.35, 4000.0);
             map.put(5.64, 4200.0);
             map.put(5.82, 4300.0);
 
@@ -555,7 +580,7 @@ public final class Constants {
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters
         // Value - Time in seconds
-        public static HashMap<Double, Double> timeToGoalMap() { // TODO: Find this
+        public static HashMap<Double, Double> timeToGoalMap() {
             HashMap<Double, Double> map = new HashMap<Double, Double>();
             map.put(0.0, 0.15);
             map.put(1.3, 0.15);

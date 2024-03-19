@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.765872873427322,
-      "y": 6.726042503963363
+      "x": 1.441414260288271,
+      "y": 5.463073824179848
     },
-    "rotation": -120.0
+    "rotation": 180.0
   },
   "command": {
     "type": "sequential",
@@ -20,19 +20,37 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.8
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "S1-W1"
+            "pathName": "S2-W3"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.2
+            "waitTime": 0.3
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "W3-W2"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.3
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "W2-W1"
           }
         },
         {
@@ -51,36 +69,6 @@
           "type": "path",
           "data": {
             "pathName": "C1-E1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot Scoring"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.3
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "E1-C2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Aim Scoring"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "C2-E1"
           }
         },
         {

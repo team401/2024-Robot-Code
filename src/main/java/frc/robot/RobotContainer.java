@@ -3,27 +3,25 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.ConversionConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.EndgameConstants;
 import frc.robot.Constants.FeatureFlags;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.IOConstants;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.commands.ShootWithGamepad;
+import frc.robot.commands.WheelRadiusCharacterization;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignState;
@@ -57,6 +55,7 @@ import frc.robot.telemetry.Telemetry;
 import frc.robot.telemetry.TelemetryIO;
 import frc.robot.telemetry.TelemetryIOLive;
 import frc.robot.telemetry.TelemetryIOSim;
+import frc.robot.utils.AllianceUtil;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.feedforward.TuneG;
 import frc.robot.utils.feedforward.TuneS;
@@ -183,16 +182,13 @@ public class RobotContainer {
             drivetrain.registerTelemetry(driveTelemetry::telemeterize);
             drivetrain.setPoseSupplier(driveTelemetry::getFieldToRobot);
             drivetrain.setVelocitySupplier(driveTelemetry::getVelocity);
-            drivetrain.setSpeakerSupplier(this::getFieldToSpeaker);
-            drivetrain.setAmpSupplier(this::getFieldToAmpHeading);
-            drivetrain.setSourceSupplier(this::getFieldToSourceHeading);
 
             if (FeatureFlags.runVision) {
                 tagVision.setCameraConsumer(
                         (m) ->
                                 drivetrain.addVisionMeasurement(
                                         m.pose(), m.timestamp(), m.variance()));
-                tagVision.setFieldToRobotSupplier(driveTelemetry::getFieldToRobot);
+                tagVision.setFieldToRobotSupplier(() -> driveTelemetry.getFieldToRobot());
             }
         }
 
@@ -205,8 +201,6 @@ public class RobotContainer {
                                 VecBuilder.fill(
                                         driveTelemetry.getVelocityX(),
                                         driveTelemetry.getVelocityY()));
-
-                scoringSubsystem.setSpeakerSupplier(this::getFieldToSpeaker);
 
                 scoringSubsystem.setDriveAllignedSupplier(() -> drivetrain.isAligned());
             }
@@ -235,17 +229,21 @@ public class RobotContainer {
                 .onFalse(new InstantCommand(
                     () -> drivetrain.setAlignState(AlignState.MANUAL)));
 
-          leftJoystick.top()
+            leftJoystick.top()
                 .onTrue(new InstantCommand(
-                    () -> drivetrain.seedFieldRelative(getPoseAgainstSpeaker())));
-            
+                    () -> drivetrain.seedFieldRelative(AllianceUtil.getPoseAgainstSpeaker())));
+
             leftJoystick.button(3)
                 .onTrue(new InstantCommand(
-                    () -> drivetrain.seedFieldRelative(getPoseAgainstPodium())));
+                    () -> drivetrain.seedFieldRelative(AllianceUtil.getPoseAgainstSpeakerLeft())));
 
             leftJoystick.button(4)
                 .onTrue(new InstantCommand(
-                    () -> drivetrain.seedFieldRelative(getPoseAgainstAmpZone())));
+                    () -> drivetrain.seedFieldRelative(AllianceUtil.getPoseAgainstSpeakerRight())));
+            
+            leftJoystick.povDown()
+                .onTrue(new InstantCommand(
+                    () -> drivetrain.seedFieldRelative(AllianceUtil.getPoseAgainstPodium())));
 
             controller.povUp()
                 .onTrue(new InstantCommand(
@@ -308,8 +306,6 @@ public class RobotContainer {
 
         if (FeatureFlags.runScoring) {
             scoringSubsystem.setDefaultCommand(new ShootWithGamepad(
-                // rightJoystick.getHID()::getTrigger,
-                () -> false,
                 () -> rightJoystick.getHID().getRawButton(4),
                 controller.getHID()::getRightBumper,
                 controller.getHID()::getYButton,
@@ -330,6 +326,7 @@ public class RobotContainer {
         testModeChooser.addOption("Hood Tuning", "tuning-hood");
         testModeChooser.addOption("Shooter Tuning", "tuning-shooter");
         testModeChooser.addOption("Endgame Tuning", "tuning-endgame");
+        testModeChooser.addOption("Wheel Characterization", "characterization-wheel");
 
         SmartDashboard.putData("Test Mode Chooser", testModeChooser);
     }
@@ -648,83 +645,20 @@ public class RobotContainer {
                                             endgameSubsystem.setVolts(0, 0);
                                             endgameSubsystem.setAction(EndgameAction.OVERRIDE);
                                         }));
-               break;
+                    break;
+            case "characterization-wheel":
+                controller.a()
+                        .whileTrue(
+                                new WheelRadiusCharacterization(
+                                        drivetrain,
+                                        () -> drivetrain.getPigeon2().getYaw().getValueAsDouble()
+                                                * ConversionConstants.kDegreesToRadians));
+                break;
+            }
         }
         // spotless:on
-    }
 
     public void testPeriodic() {}
-
-    private Translation2d getFieldToSpeaker() {
-        if (DriverStation.getAlliance().isEmpty()) {
-            return FieldConstants.fieldToBlueSpeaker;
-        } else {
-            switch (DriverStation.getAlliance().get()) {
-                case Blue:
-                    Logger.recordOutput("Field/speaker", FieldConstants.fieldToBlueSpeaker);
-                    return FieldConstants.fieldToBlueSpeaker;
-                case Red:
-                    Logger.recordOutput("Field/speaker", FieldConstants.fieldToRedSpeaker);
-                    return FieldConstants.fieldToRedSpeaker;
-            }
-        }
-        throw new RuntimeException("Unreachable branch of switch expression");
-    }
-
-    private Rotation2d getFieldToAmpHeading() {
-        Logger.recordOutput("Field/amp", FieldConstants.ampHeading);
-        return FieldConstants.ampHeading;
-    }
-
-    private Pose2d getPoseAgainstSpeaker() {
-        if (!DriverStation.getAlliance().isEmpty()) {
-            switch (DriverStation.getAlliance().get()) {
-                case Blue:
-                    return FieldConstants.robotAgainstBlueSpeaker;
-                case Red:
-                    return FieldConstants.robotAgainstRedSpeaker;
-            }
-        }
-        return FieldConstants.robotAgainstRedSpeaker;
-    }
-
-    private Pose2d getPoseAgainstPodium() {
-        if (!DriverStation.getAlliance().isEmpty()) {
-            switch (DriverStation.getAlliance().get()) {
-                case Blue:
-                    return FieldConstants.robotAgainstBluePodium;
-                case Red:
-                    return FieldConstants.robotAgainstRedPodium;
-            }
-        }
-        return FieldConstants.robotAgainstRedPodium;
-    }
-
-    private Pose2d getPoseAgainstAmpZone() {
-        if (!DriverStation.getAlliance().isEmpty()) {
-            switch (DriverStation.getAlliance().get()) {
-                case Blue:
-                    return FieldConstants.robotAgainstRedAmpZone;
-                case Red:
-                    return FieldConstants.robotAgainstBlueAmpZone;
-            }
-        }
-        return FieldConstants.robotAgainstRedAmpZone;
-    }
-
-    private Rotation2d getFieldToSourceHeading() {
-        if (!DriverStation.getAlliance().isEmpty()) {
-            switch (DriverStation.getAlliance().get()) {
-                case Blue:
-                    Logger.recordOutput("Field/source", FieldConstants.blueSourceHeading);
-                    return FieldConstants.blueSourceHeading;
-                case Red:
-                    Logger.recordOutput("Field/source", FieldConstants.redSourceHeading);
-                    return FieldConstants.redSourceHeading;
-            }
-        }
-        return FieldConstants.redSourceHeading;
-    }
 
     private void setUpDriveWithJoysticks() {
         if (FeatureFlags.runDrive) {
@@ -789,6 +723,13 @@ public class RobotContainer {
     public void autoInit() {
         if (drivetrain.getAutoCommand() != null) {
             drivetrain.getAutoCommand().schedule();
+            drivetrain.setAlignState(AlignState.ALIGNING);
+            if (FeatureFlags.runScoring) {
+                scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT);
+            }
+            if (FeatureFlags.runIntake) {
+                intakeSubsystem.run(IntakeAction.INTAKE);
+            }
         }
     }
 
@@ -816,15 +757,10 @@ public class RobotContainer {
                             () ->
                                     scoringSubsystem.setAction(
                                             ScoringSubsystem.ScoringAction.INTAKE)));
-            NamedCommands.registerCommand(
-                    "Wait Scoring",
-                    new InstantCommand(
-                            () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
         } else {
             NamedCommands.registerCommand("Shoot Scoring", Commands.none());
             NamedCommands.registerCommand("Aim Scoring", Commands.none());
             NamedCommands.registerCommand("Intake Scoring", Commands.none());
-            NamedCommands.registerCommand("Wait Scoring", Commands.none());
         }
         if (FeatureFlags.runIntake) {
             NamedCommands.registerCommand("Intake Note", Commands.none());
@@ -835,8 +771,12 @@ public class RobotContainer {
             NamedCommands.registerCommand(
                     "Disable Auto-Align",
                     new InstantCommand(() -> drivetrain.setAlignState(AlignState.MANUAL)));
+            NamedCommands.registerCommand(
+                    "Enable Auto-Align",
+                    new InstantCommand(() -> drivetrain.setAlignState(AlignState.ALIGNING)));
         } else {
-            NamedCommands.registerCommand("Disable Auto-ALign", Commands.none());
+            NamedCommands.registerCommand("Disable Auto-Align", Commands.none());
+            NamedCommands.registerCommand("Enable Auto-Align", Commands.none());
         }
         if (FeatureFlags.runScoring) {
             NamedCommands.registerCommand(

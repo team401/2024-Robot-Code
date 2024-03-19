@@ -32,6 +32,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
+import frc.robot.utils.AllianceUtil;
 import frc.robot.utils.GeomUtil;
 import frc.robot.utils.InterpolateDouble;
 import java.util.function.Supplier;
@@ -73,14 +74,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             new InterpolateDouble(ScoringConstants.timeToGoalMap(), 0.0, 2.0);
 
     private Supplier<Pose2d> getFieldToRobot = () -> new Pose2d();
-    private Supplier<Translation2d> getFieldToSpeaker = () -> new Translation2d();
-
-    private Supplier<Rotation2d> getFieldToAmp = () -> new Rotation2d();
-    private Supplier<Rotation2d> getFieldToSource = () -> new Rotation2d();
 
     private Supplier<Translation2d> getRobotVelocity = () -> new Translation2d();
 
-    private SendableChooser<String> autoChooser = new SendableChooser<String>();
+    private SendableChooser<Command> autoChooser = new SendableChooser<Command>();
 
     private PIDController thetaController =
             new PIDController(
@@ -140,18 +137,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         this.getFieldToRobot = getFieldToRobot;
     }
 
-    public void setSpeakerSupplier(Supplier<Translation2d> getFieldToSpeaker) {
-        this.getFieldToSpeaker = getFieldToSpeaker;
-    }
-
-    public void setAmpSupplier(Supplier<Rotation2d> getFieldToAmp) {
-        this.getFieldToAmp = getFieldToAmp;
-    }
-
-    public void setSourceSupplier(Supplier<Rotation2d> getFieldToSource) {
-        this.getFieldToSource = getFieldToSource;
-    }
-
     public void setAlignTarget(AlignTarget alignTarget) {
         this.alignTarget = alignTarget;
     }
@@ -185,13 +170,16 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 this::seedFieldRelative, // Consumer for seeding pose against auto
                 this::getCurrentRobotChassisSpeeds,
                 (speeds) -> {
+                    speeds.omegaRadiansPerSecond *= -1;
                     this.setGoalChassisSpeeds(speeds, false);
-                    this.setAlignState(AlignState.ALIGNING);
                     this.setAlignTarget(AlignTarget.SPEAKER);
                 }, // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
-                        new PIDConstants(1, 0, 0),
-                        new PIDConstants(0, 0, 0),
+                        new PIDConstants(2, 0, 0),
+                        new PIDConstants(
+                                DriveConstants.alignmentkPMax,
+                                DriveConstants.alignmentkI,
+                                DriveConstants.alignmentkD),
                         TunerConstants.kSpeedAt12VoltsMps,
                         driveBaseRadius,
                         new ReplanningConfig()),
@@ -212,22 +200,30 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         // PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
 
         // autoChooser = AutoBuilder.buildAutoChooser();
-        autoChooser.setDefaultOption("Default", "None"); // S1-W1-W2-W3
-        autoChooser.addOption("Amp Side - 4 note (2 from center)", "S1-W1-C1-C2");
-        autoChooser.addOption("Amp Side - 5 note (3 from center)", "S1-W1-C1-C2-C3");
-        autoChooser.addOption("Amp Side - 3 note", "S1-W1-W2");
-        autoChooser.addOption("Amp Side - 4 note (wing)", "S1-W1-W2-W3");
-        autoChooser.addOption("Amp Side - 5 note", "S1-W1-W2-W3-C5");
-        autoChooser.addOption("Center - 3 note", "S2-W2-W3");
-        autoChooser.addOption("Center - 4 note (source side to center)", "S2-W2-W3-C5");
-        autoChooser.addOption("Source Side - 2 note", "S3-W3");
-        autoChooser.addOption("Source Side - 3 note", "S3-W3-C5");
-        autoChooser.addOption("Source Side - 5 note (across)", "S3-W3-W2-W1-C1");
+        autoChooser.setDefaultOption("Default", new PathPlannerAuto("None")); // S1-W1-W2-W3
+        autoChooser.addOption(
+                "Amp Side - 4 note (2 from center)", new PathPlannerAuto("S1-W1-C1-C2"));
+        autoChooser.addOption(
+                "Amp Side - 5 note (3 from center)", new PathPlannerAuto("S1-W1-C1-C2-C3"));
+        autoChooser.addOption("Amp Side - 3 note", new PathPlannerAuto("S1-W1-W2"));
+        autoChooser.addOption("Amp Side - 4 note (wing)", new PathPlannerAuto("S1-W1-W2-W3"));
+        autoChooser.addOption("Amp Side - 5 note", new PathPlannerAuto("S1-W1-W2-W3-C5"));
+        autoChooser.addOption("Center - 3 note", new PathPlannerAuto("S2-W2-W3"));
+        autoChooser.addOption(
+                "Center - 3 note (2 from center - avoids wing notes)",
+                new PathPlannerAuto("S2-C1-C2"));
+        autoChooser.addOption(
+                "Center - 4 note (source side to center)", new PathPlannerAuto("S2-W2-W3-C5"));
+        autoChooser.addOption("Center - 3 note - special", new PathPlannerAuto("S2-C1-C2-Special"));
+        autoChooser.addOption("Source Side - 2 note", new PathPlannerAuto("S3-W3"));
+        autoChooser.addOption("Source Side - 3 note", new PathPlannerAuto("S3-W3-C5"));
+        autoChooser.addOption(
+                "Source Side - 5 note (across)", new PathPlannerAuto("S3-W3-W2-W1-C1"));
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     public Command getAutoCommand() {
-        return new PathPlannerAuto(autoChooser.getSelected());
+        return autoChooser.getSelected();
     }
 
     public ChassisSpeeds getCurrentRobotChassisSpeeds() {
@@ -289,15 +285,16 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         if (alignState == AlignState.ALIGNING) {
             switch (alignTarget) {
                 case AMP:
-                    desiredHeading = getFieldToAmp.get();
+                    desiredHeading = AllianceUtil.getAmpHeading();
                     break;
                 case SPEAKER:
                     desiredHeading =
                             calculateDesiredHeading(
-                                    pose, new Pose2d(getFieldToSpeaker.get(), new Rotation2d()));
+                                    pose,
+                                    new Pose2d(AllianceUtil.getFieldToSpeaker(), new Rotation2d()));
                     break;
                 case SOURCE:
-                    desiredHeading = getFieldToSource.get();
+                    desiredHeading = AllianceUtil.getSourceHeading();
                     break;
                     // case SPECIFIC_DIRECTION:
                     //     desiredHeading = Rotation2d.fromRadians(alignDirection);
@@ -391,7 +388,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         Logger.recordOutput("Drive/alignState", alignState);
         Logger.recordOutput("Drive/alignTarget", alignTarget);
         Logger.recordOutput("Drive/desiredHeading", desiredHeading);
-        Logger.recordOutput("Drive/fieldToSpeaker", getFieldToSpeaker.get());
         Logger.recordOutput("Drive/goalChassisSpeeds", new ChassisSpeeds(vx, vy, omega));
 
         // if (vx == 0 && vy == 0 && omega == 0) {
@@ -470,6 +466,19 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public boolean isAligned() {
         return Math.abs(alignError) < DriveConstants.alignToleranceRadians;
+    }
+
+    public void runWheelRadiusCharacterization(double speed) {
+        setGoalChassisSpeeds(new ChassisSpeeds(0, 0, speed));
+    }
+
+    public double[] getWheelRadiusCharacterizationPosition() {
+        return new double[] {
+            this.getModule(0).getDriveMotor().getPosition().getValueAsDouble(),
+            this.getModule(1).getDriveMotor().getPosition().getValueAsDouble(),
+            this.getModule(2).getDriveMotor().getPosition().getValueAsDouble(),
+            this.getModule(3).getDriveMotor().getPosition().getValueAsDouble()
+        };
     }
 
     @Override
