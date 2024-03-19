@@ -6,6 +6,8 @@ import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.google.flatbuffers.Constants;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
@@ -57,6 +59,10 @@ public class AimerIORoboRio implements AimerIO {
     double lastError = 0.0;
     double lastPosition = 0.0;
     double lastTime = Utils.getCurrentTimeSeconds();
+
+    double encoderDiff = 0.0;
+
+    int greatestExpectedAngle = 0;
 
     public AimerIORoboRio() {
         aimerLeft.setControl(new Follower(ScoringConstants.aimRightMotorId, true));
@@ -161,8 +167,11 @@ public class AimerIORoboRio implements AimerIO {
     }
 
     private double getEncoderPosition() {
+        double position = encoder.getAbsolutePosition();
+        if (position < ScoringConstants.aimerLowerLimit)
+        position = 0.0;
         // return aimerRight.getPosition().getValueAsDouble() * 2.0 * Math.PI * (1.0 / 80.0);
-        return encoder.getAbsolutePosition() * 2.0 * Math.PI - ScoringConstants.aimerEncoderOffset;
+        return position * 2.0 * Math.PI - ScoringConstants.aimerEncoderOffset;
     }
 
     @Override
@@ -187,6 +196,18 @@ public class AimerIORoboRio implements AimerIO {
                     feedforward.calculate(controlSetpoint, velocitySetpoint) + controllerVolts;
         }
 
+        /*encoderDiff = getEncoderPosition() - lastPosition;
+        if (Math.abs(encoderDiff) > (ScoringConstants.aimerEncoderMaxValue)/2){ //checks if difference is ridiculous -> indicates wrapping
+            if (encoderDiff < 0.0)
+                encoderDiff = encoderDiff + ScoringConstants.aimerEncoderMaxValue;
+            if (encoderDiff > 0.0)
+                encoderDiff = encoderDiff - ScoringConstants.aimerEncoderMaxValue;
+        }*/
+
+        if (getEncoderPosition() > greatestExpectedAngle){
+            controller.SetContinuous();
+        }
+
         appliedVolts = MathUtil.clamp(appliedVolts, -12.0, 12.0);
         aimerRight.setVoltage(appliedVolts);
 
@@ -198,8 +219,8 @@ public class AimerIORoboRio implements AimerIO {
         double diffTime = currentTime - lastTime;
         lastTime = currentTime;
 
-        inputs.aimVelocityRadPerSec = (getEncoderPosition() - lastPosition) / diffTime;
-        velocity = (getEncoderPosition() - lastPosition) / diffTime;
+        inputs.aimVelocityRadPerSec = encoderDiff / diffTime;
+        velocity = encoderDiff / diffTime;
         lastPosition = getEncoderPosition();
 
         inputs.aimVelocityErrorRadPerSec =

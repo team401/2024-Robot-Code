@@ -495,6 +495,8 @@ public final class Constants {
 
         public static final int aimEncoderPort = 0;
         public static final double aimerEncoderOffset = 1.78;
+        public static final int aimerEncoderMaxValue = 2048;
+        public static final int aimerLowerLimit = -1;
 
         public static final double aimPositionTolerance = 0.015;
 
