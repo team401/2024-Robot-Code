@@ -27,6 +27,8 @@ public interface EndgameIO {
 
     public default void setFF(double ff) {}
 
+    public default void setClimbing(boolean climbing) {}
+
     public default void setOverrideMode(boolean override) {}
 
     public default void setOverrideVolts(double volts) {}

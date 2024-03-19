@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -20,6 +21,7 @@ import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveWithJoysticks;
+import frc.robot.commands.EndgameSequence;
 import frc.robot.commands.ShootWithGamepad;
 import frc.robot.commands.WheelRadiusCharacterization;
 import frc.robot.subsystems.LED;
@@ -82,6 +84,8 @@ public class RobotContainer {
     DigitalOutput timeDigitalOutput = null; // new DigitalOutput(IOConstants.timeOutputPort);
 
     LED leds;
+
+    Command endgameCommand = Commands.print("Endgame command not constructed");
 
     public RobotContainer() {
         configureSubsystems();
@@ -206,6 +210,16 @@ public class RobotContainer {
             }
             if (FeatureFlags.runEndgame) {
                 scoringSubsystem.setElevatorPositionSupplier(endgameSubsystem::getPosition);
+
+                if (FeatureFlags.runDrive) {
+                    endgameCommand =
+                            new EndgameSequence(
+                                    scoringSubsystem,
+                                    endgameSubsystem,
+                                    drivetrain,
+                                    driveTelemetry,
+                                    () -> controller.getHID().getLeftBumper());
+                }
             }
             if (FeatureFlags.runIntake) {
                 intakeSubsystem.setScoringSupplier(scoringSubsystem::canIntake);
@@ -276,18 +290,35 @@ public class RobotContainer {
             rightJoystick.povRight()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.RIGHT)));
+
+            controller.x()
+                .onTrue(new InstantCommand(() -> drivetrain.driveToEndgame()))
+                .onFalse(new InstantCommand(() -> drivetrain.stopDriveToPose()));
         }
 
         if (FeatureFlags.runEndgame) {
-            endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.OVERRIDE);
+            // endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.OVERRIDE);
+            endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.CANCEL);
 
-            controller.leftBumper()
-                .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(4.0, 0)))
-                .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
+            // controller.leftBumper()
+            //     .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(4.0, 0)))
+            //     .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
+
+            // controller.leftTrigger()
+            //     .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(-4.0, 0)))
+            //     .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
+
+            // controller.leftBumper()
+            //     .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_UP)));
+
+            // controller.leftTrigger()
+            //     .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_DOWN)));
+
+            // controller.x()
+            //     .onTrue(/*!endgameCommand.isScheduled() ?*/ endgameCommand);
 
             controller.leftTrigger()
-                .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(-4.0, 0)))
-                .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
+                .onTrue(new InstantCommand(() -> endgameCommand.cancel()));
         }
 
         if (FeatureFlags.runIntake) {
@@ -724,6 +755,7 @@ public class RobotContainer {
         if (drivetrain.getAutoCommand() != null) {
             drivetrain.getAutoCommand().schedule();
             drivetrain.setAlignState(AlignState.ALIGNING);
+            drivetrain.setAlignTarget(AlignTarget.SPEAKER);
             if (FeatureFlags.runScoring) {
                 scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT);
             }

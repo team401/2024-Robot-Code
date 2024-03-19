@@ -87,12 +87,23 @@ public final class Constants {
         public static final double anticipationTime = 0.01;
         public static final double minimumAnticipationVelocity = 0.0;
 
+        public static final double pathfindTransformToleranceMeters = 0.1;
+        public static final double pathfindRotationToleranceRadians = 0.1;
+
         public static final double alignToleranceRadians = 0.1;
 
         public static final double alignmentkPMax = 7.0;
         public static final double alignmentkPMin = 5.0;
         public static final double alignmentkI = 4.5;
         public static final double alignmentkD = 0.0;
+
+        public static final double vXkP = 5.0;
+        public static final double vXkI = 2.5;
+        public static final double vXkD = 0.0;
+
+        public static final double vYkP = 5.0;
+        public static final double vYkI = 2.5;
+        public static final double vYkD = 0.0;
     }
 
     public static final class FieldConstants {
@@ -495,7 +506,7 @@ public final class Constants {
         public static final int hoodId = 17;
 
         public static final int aimEncoderPort = 0;
-        public static final double aimerEncoderOffset = 1.78;
+        public static final double aimerEncoderOffset = 1.75;
 
         public static final double aimPositionTolerance = 0.015;
 
