@@ -115,16 +115,23 @@ public final class Constants {
         public static final Rotation2d redLeftHeading = Rotation2d.fromRadians(-Math.PI / 2.0);
         public static final Rotation2d redRightHeading = Rotation2d.fromRadians(Math.PI / 2.0);
 
-        public static final Rotation2d redSourceHeading = !FeatureFlags.shopMode ? 
-                new Rotation2d(Math.PI * 4 / 3) : // 60 degrees 
-                new Rotation2d(Math.toRadians(180-114.3));
-        public static final Rotation2d blueSourceHeading = !FeatureFlags.shopMode ?
-                new Rotation2d(Math.PI * 5 / 3) : // 120 degrees
-                new Rotation2d(Math.toRadians(114.3));
+        public static final Rotation2d redSourceHeading =
+                !FeatureFlags.shopMode
+                        ? new Rotation2d(Math.PI * 4 / 3)
+                        : // 60 degrees
+                        new Rotation2d(Math.toRadians(180 - 114.3));
+        public static final Rotation2d blueSourceHeading =
+                !FeatureFlags.shopMode
+                        ? new Rotation2d(Math.PI * 5 / 3)
+                        : // 120 degrees
+                        new Rotation2d(Math.toRadians(114.3));
 
-        public static final Translation2d fieldToRedSpeaker = !FeatureFlags.shopMode ?
-                new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42)) :
-                new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42));
+        public static final Translation2d fieldToRedSpeaker =
+                !FeatureFlags.shopMode
+                        ? new Translation2d(
+                                Units.inchesToMeters(652.73), Units.inchesToMeters(218.42))
+                        : new Translation2d(
+                                Units.inchesToMeters(652.73), Units.inchesToMeters(218.42));
 
         public static final Translation2d fieldToBlueSpeaker =
                 new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42));
@@ -132,23 +139,26 @@ public final class Constants {
         public static final Pose2d robotAgainstBlueSpeaker =
                 new Pose2d(1.39, 5.56, Rotation2d.fromDegrees(180));
 
-        public static final Pose2d robotAgainstRedSpeaker = !FeatureFlags.shopMode ?
-                new Pose2d(15.19, 5.56, Rotation2d.fromDegrees(0)) : 
-                new Pose2d(15.19, 5.56, Rotation2d.fromDegrees(0));
+        public static final Pose2d robotAgainstRedSpeaker =
+                !FeatureFlags.shopMode
+                        ? new Pose2d(15.19, 5.56, Rotation2d.fromDegrees(0))
+                        : new Pose2d(15.19, 5.56, Rotation2d.fromDegrees(0));
 
         public static final Pose2d robotAgainstBluePodium =
                 new Pose2d(2.57, 4.09, Rotation2d.fromDegrees(180));
 
-        public static final Pose2d robotAgainstRedPodium = !FeatureFlags.shopMode ?
-                new Pose2d(13.93, 4.09, Rotation2d.fromDegrees(0)) : 
-                new Pose2d(13.93, 4.09, Rotation2d.fromDegrees(0));
+        public static final Pose2d robotAgainstRedPodium =
+                !FeatureFlags.shopMode
+                        ? new Pose2d(13.93, 4.09, Rotation2d.fromDegrees(0))
+                        : new Pose2d(13.93, 4.09, Rotation2d.fromDegrees(0));
 
         public static final Pose2d robotAgainstBlueAmpZone =
                 new Pose2d(2.85, 7.68, Rotation2d.fromDegrees(-90));
 
-        public static final Pose2d robotAgainstRedAmpZone = !FeatureFlags.shopMode ?
-                new Pose2d(13.74, 7.68, Rotation2d.fromDegrees(-90)) : 
-                new Pose2d(13.74, 7.68, Rotation2d.fromDegrees(-90));
+        public static final Pose2d robotAgainstRedAmpZone =
+                !FeatureFlags.shopMode
+                        ? new Pose2d(13.74, 7.68, Rotation2d.fromDegrees(-90))
+                        : new Pose2d(13.74, 7.68, Rotation2d.fromDegrees(-90));
     }
 
     public static final class VisionConstants {
@@ -501,8 +511,10 @@ public final class Constants {
         public static final double intakeAngleToleranceRadians = 0.1;
         // Math.PI / 2 - Units.degreesToRadians(40);
 
-        public static final double sourceIntakeAngleRad = !FeatureFlags.shopMode ?
-            0.35 : 0.35; // FIELD ANGLE: 50 DEGREES, SHOP ANGLE: 38.9 DEGREES
+        public static final double sourceIntakeAngleRad =
+                !FeatureFlags.shopMode
+                        ? 0.35
+                        : 0.35; // FIELD ANGLE: 50 DEGREES, SHOP ANGLE: 38.9 DEGREES
 
         public static final double shooterAmpVelocityRPM = 2000;
 

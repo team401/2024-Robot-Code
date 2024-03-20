@@ -1,6 +1,7 @@
 package frc.robot.utils;
 
 import edu.wpi.first.math.MathUtil;
+import frc.robot.Constants.FeatureFlags;
 import java.awt.geom.Line2D;
 
 public class FieldFinder {
@@ -97,22 +98,23 @@ public class FieldFinder {
                         FieldLocations2024.STAGE_RED_RIGHT_SIDE_Y);
             case BLUE_STAGE:
                 return willIHitTriangle(
-                        x,
-                        y,
-                        dx,
-                        dy,
-                        FieldLocations2024.STAGE_BLUE_NEAR_SIDE_X,
-                        FieldLocations2024.STAGE_BLUE_NEAR_SIDE_Y,
-                        FieldLocations2024.STAGE_BLUE_LEFT_SIDE_X,
-                        FieldLocations2024.STAGE_BLUE_LEFT_SIDE_Y,
-                        FieldLocations2024.STAGE_BLUE_RIGHT_SIDE_X,
-                        FieldLocations2024.STAGE_BLUE_RIGHT_SIDE_Y);
+                                x,
+                                y,
+                                dx,
+                                dy,
+                                FieldLocations2024.STAGE_BLUE_NEAR_SIDE_X,
+                                FieldLocations2024.STAGE_BLUE_NEAR_SIDE_Y,
+                                FieldLocations2024.STAGE_BLUE_LEFT_SIDE_X,
+                                FieldLocations2024.STAGE_BLUE_LEFT_SIDE_Y,
+                                FieldLocations2024.STAGE_BLUE_RIGHT_SIDE_X,
+                                FieldLocations2024.STAGE_BLUE_RIGHT_SIDE_Y)
+                        && !FeatureFlags.shopMode;
             case RED_WING:
                 return x > FieldLocations2024.WING_RED_END_X
                         || x + dx > FieldLocations2024.WING_RED_END_X;
             case BLUE_WING:
                 return x < FieldLocations2024.WING_BLUE_END_X
-                        || x + dx < FieldLocations2024.WING_BLUE_END_X;
+                        || x + dx < FieldLocations2024.WING_BLUE_END_X && !FeatureFlags.shopMode;
             case MIDDLE:
                 return (x < FieldLocations2024.WING_RED_END_X
                                 || x + dx < FieldLocations2024.WING_RED_END_X)
