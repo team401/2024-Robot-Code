@@ -12,15 +12,15 @@ public class FieldFinder {
         public static final double STAGE_RED_RIGHT_SIDE_X = 10.8;
         public static final double STAGE_RED_RIGHT_SIDE_Y = 5.8;
 
-        // TODO: Measure actual podium rectangle dimensions
-        public static final double PODIUM_RED_NEAR_SIDE_LEFT_X = STAGE_RED_NEAR_SIDE_X + 0.1;
-        public static final double PODIUM_RED_NEAR_SIDE_LEFT_Y = STAGE_RED_NEAR_SIDE_Y - 0.1;
-        public static final double PODIUM_RED_NEAR_SIDE_RIGHT_X = STAGE_RED_NEAR_SIDE_X + 0.1;
-        public static final double PODIUM_RED_NEAR_SIDE_RIGHT_Y = STAGE_RED_NEAR_SIDE_Y + 0.1;
+        // TODO: Verify podium rectangle dimensions
+        public static final double PODIUM_RED_NEAR_SIDE_LEFT_X = STAGE_RED_NEAR_SIDE_X + 0.15;
+        public static final double PODIUM_RED_NEAR_SIDE_LEFT_Y = STAGE_RED_NEAR_SIDE_Y - 0.15;
+        public static final double PODIUM_RED_NEAR_SIDE_RIGHT_X = STAGE_RED_NEAR_SIDE_X + 0.15;
+        public static final double PODIUM_RED_NEAR_SIDE_RIGHT_Y = STAGE_RED_NEAR_SIDE_Y + 0.15;
         public static final double PODIUM_RED_FAR_SIDE_RIGHT_X = STAGE_RED_NEAR_SIDE_X;
-        public static final double PODIUM_RED_FAR_SIDE_RIGHT_Y = STAGE_RED_NEAR_SIDE_Y + 0.1;
+        public static final double PODIUM_RED_FAR_SIDE_RIGHT_Y = STAGE_RED_NEAR_SIDE_Y + 0.15;
         public static final double PODIUM_RED_FAR_SIDE_LEFT_X = STAGE_RED_NEAR_SIDE_X;
-        public static final double PODIUM_RED_FAR_SIDE_LEFT_Y = STAGE_RED_NEAR_SIDE_Y - 0.1;
+        public static final double PODIUM_RED_FAR_SIDE_LEFT_Y = STAGE_RED_NEAR_SIDE_Y - 0.15;
 
         public static final double STAGE_BLUE_NEAR_SIDE_X = 3.0;
         public static final double STAGE_BLUE_NEAR_SIDE_Y = 4.0;
@@ -29,15 +29,15 @@ public class FieldFinder {
         public static final double STAGE_BLUE_RIGHT_SIDE_X = 5.6;
         public static final double STAGE_BLUE_RIGHT_SIDE_Y = 2.2;
 
-        // TODO: Measure actual podium rectangle dimensions
-        public static final double PODIUM_BLUE_NEAR_SIDE_LEFT_X = STAGE_BLUE_NEAR_SIDE_X - 0.1;
-        public static final double PODIUM_BLUE_NEAR_SIDE_LEFT_Y = STAGE_BLUE_NEAR_SIDE_Y + 0.1;
-        public static final double PODIUM_BLUE_NEAR_SIDE_RIGHT_X = STAGE_BLUE_NEAR_SIDE_X - 0.1;
-        public static final double PODIUM_BLUE_NEAR_SIDE_RIGHT_Y = STAGE_BLUE_NEAR_SIDE_Y - 0.1;
+        // TODO: Verify podium rectangle dimensions
+        public static final double PODIUM_BLUE_NEAR_SIDE_LEFT_X = STAGE_BLUE_NEAR_SIDE_X - 0.15;
+        public static final double PODIUM_BLUE_NEAR_SIDE_LEFT_Y = STAGE_BLUE_NEAR_SIDE_Y + 0.15;
+        public static final double PODIUM_BLUE_NEAR_SIDE_RIGHT_X = STAGE_BLUE_NEAR_SIDE_X - 0.15;
+        public static final double PODIUM_BLUE_NEAR_SIDE_RIGHT_Y = STAGE_BLUE_NEAR_SIDE_Y - 0.15;
         public static final double PODIUM_BLUE_FAR_SIDE_RIGHT_X = STAGE_BLUE_NEAR_SIDE_X;
-        public static final double PODIUM_BLUE_FAR_SIDE_RIGHT_Y = STAGE_BLUE_NEAR_SIDE_Y - 0.1;
+        public static final double PODIUM_BLUE_FAR_SIDE_RIGHT_Y = STAGE_BLUE_NEAR_SIDE_Y - 0.15;
         public static final double PODIUM_BLUE_FAR_SIDE_LEFT_X = STAGE_BLUE_NEAR_SIDE_X;
-        public static final double PODIUM_BLUE_FAR_SIDE_LEFT_Y = STAGE_BLUE_NEAR_SIDE_Y + 0.1;
+        public static final double PODIUM_BLUE_FAR_SIDE_LEFT_Y = STAGE_BLUE_NEAR_SIDE_Y + 0.15;
 
         public static final double WING_RED_END_X = 10.8;
 
