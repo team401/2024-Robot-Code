@@ -73,7 +73,7 @@ public class EndgameSequence extends Command {
 
                     // drivetrain.stopDriveToPose();
                     // drivetrain.setAlignState(AlignState.POSE_TARGET);
-                    scoringSubsystem.setAimerStatorCurrentLimit(20.0); // TODO: Find this
+                    scoringSubsystem.setAimerStatorCurrentLimit(15.0); // TODO: Find this
                     endgameSubsystem.setClimbing(false);
                     endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_UP);
                 }

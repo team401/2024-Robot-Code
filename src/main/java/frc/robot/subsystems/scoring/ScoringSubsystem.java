@@ -190,7 +190,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         if (!aimerAtIntakePosition()) {
             aimerIo.setAimAngleRad(ScoringConstants.intakeAngleToleranceRadians, true);
         }
-        shooterIo.setKickerVolts(2.0);
+        shooterIo.setKickerVolts(3.0);
 
         if ((hasNote()) || action != ScoringAction.INTAKE) {
             state = ScoringState.IDLE;
@@ -253,10 +253,18 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         } else {
             switch (DriverStation.getAlliance().get()) {
                 case Blue:
-                    fieldLocationReady = FieldFinder.whereAmI(poseSupplier.get()) == FieldLocations.BLUE_WING || (FieldFinder.whereAmI(poseSupplier.get()) == FieldLocations.MIDDLE && DriverStation.isTeleop());
+                    fieldLocationReady =
+                            FieldFinder.whereAmI(poseSupplier.get()) == FieldLocations.BLUE_WING
+                                    || (FieldFinder.whereAmI(poseSupplier.get())
+                                                    == FieldLocations.MIDDLE
+                                            && DriverStation.isTeleop());
                     break;
                 case Red:
-                    fieldLocationReady = FieldFinder.whereAmI(poseSupplier.get()) == FieldLocations.RED_WING || (FieldFinder.whereAmI(poseSupplier.get()) == FieldLocations.MIDDLE && DriverStation.isTeleop());
+                    fieldLocationReady =
+                            FieldFinder.whereAmI(poseSupplier.get()) == FieldLocations.RED_WING
+                                    || (FieldFinder.whereAmI(poseSupplier.get())
+                                                    == FieldLocations.MIDDLE
+                                            && DriverStation.isTeleop());
                     break;
             }
         }

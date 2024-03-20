@@ -79,7 +79,7 @@ public final class Constants {
         public static final double MaxAngularRateRadiansPerSec = Math.PI * 2; // 2 PI is one full
         // rotation per second
         public static final double deadbandPercent = 0.16;
-        public static final double maxAccelerationMetersPerSecSquared = 2.0;
+        public static final double maxAccelerationMetersPerSecSquared = 7.0;
 
         public static final Pose2d initialPose =
                 new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90));
@@ -176,9 +176,10 @@ public final class Constants {
         public static final double skewCutoffDistance = 4.5;
         public static final double skewCutoffRotation = Units.degreesToRadians(30);
 
-        // 0.45 from 2023
+        public static final Matrix<N3, N1> veryLowCameraUncertainty = VecBuilder.fill(3.5, 4.0, 6);
+
         public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(4.0, 6.0, 6);
-        // 1.2 from 2023
+
         public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(32.0, 40.0, 40);
 
         public static final Matrix<N3, N1> driveUncertainty = VecBuilder.fill(0.1, 0.1, 0.1);
@@ -256,7 +257,7 @@ public final class Constants {
         public static final int rightIntakeMotorID = 10;
         public static final int indexTwoMotorID = 14;
 
-        public static final double intakePower = 10.0;
+        public static final double intakePower = 8.0;
         public static final double beltPower = 8.0;
     }
 
@@ -518,7 +519,7 @@ public final class Constants {
         public static final double aimAngleVelocityMargin = 2.0; // Units.degreesToRadians(5);
         public static final double hoodAngleMarginRadians = Units.degreesToRadians(5);
 
-        public static final double intakeAngleToleranceRadians = 0.0;
+        public static final double intakeAngleToleranceRadians = 0.2;
         // Math.PI / 2 - Units.degreesToRadians(40);
 
         public static final double shooterAmpVelocityRPM = 2000;

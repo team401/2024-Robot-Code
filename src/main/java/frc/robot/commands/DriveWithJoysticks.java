@@ -26,6 +26,9 @@ public class DriveWithJoysticks extends Command {
     double commandedYMpS;
     double commandedRotRadpS;
 
+    double lastCommandedXMpS;
+    double lastCommandedYMpS;
+
     double currentXMpS;
     double currentYMpS;
 
@@ -103,18 +106,20 @@ public class DriveWithJoysticks extends Command {
         if (Math.hypot(currentXMpS, currentYMpS) < Math.hypot(commandedXMpS, commandedYMpS)) {
             double velocityVectorTheta = Math.atan2(commandedYMpS, commandedXMpS);
             commandedXMpS =
-                    currentXMpS
-                            + Math.signum(commandedXMpS)
-                                    * (DriveConstants.maxAccelerationMetersPerSecSquared
-                                            * Math.cos(velocityVectorTheta)
-                                            * diffTime);
+                    lastCommandedXMpS
+                            + (DriveConstants.maxAccelerationMetersPerSecSquared
+                                    * Math.cos(velocityVectorTheta)
+                                    * diffTime);
             commandedYMpS =
-                    currentYMpS
-                            + Math.signum(commandedYMpS)
-                                    * (DriveConstants.maxAccelerationMetersPerSecSquared
-                                            * Math.sin(velocityVectorTheta)
-                                            * diffTime);
+                    lastCommandedYMpS
+                            + (DriveConstants.maxAccelerationMetersPerSecSquared
+                                    * Math.sin(velocityVectorTheta)
+                                    * diffTime);
         }
+
+        lastCommandedXMpS = commandedXMpS;
+        lastCommandedYMpS = commandedYMpS;
+
         chassisSpeeds = new ChassisSpeeds(commandedXMpS, commandedYMpS, commandedRotRadpS);
         drivetrain.setGoalChassisSpeeds(chassisSpeeds, fieldCentric.getAsBoolean());
     }

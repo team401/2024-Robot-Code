@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FieldConstants;
@@ -56,18 +57,24 @@ public class VisionLocalizer extends SubsystemBase {
 
     private Matrix<N3, N1> cameraUncertainty(
             double averageTagDistanceM, Rotation2d averageTagYaw, String cameraName) {
-        if (getFieldToRobot.get().getY() > FieldConstants.fieldToBlueSpeaker.getY() - 2
-                && cameraName == "Front-Left") {
-            return VisionConstants.highCameraUncertainty;
-        }
+        if (!DriverStation.isTeleop()) {
+            if (getFieldToRobot.get().getY() > FieldConstants.fieldToBlueSpeaker.getY() - 2
+                    && cameraName == "Front-Left") {
+                return VisionConstants.highCameraUncertainty;
+            }
 
-        if (getFieldToRobot.get().getY() < FieldConstants.fieldToBlueSpeaker.getY() + 2
-                && cameraName == "Front-Right") {
-            return VisionConstants.highCameraUncertainty;
+            if (getFieldToRobot.get().getY() < FieldConstants.fieldToBlueSpeaker.getY() + 2
+                    && cameraName == "Front-Right") {
+                return VisionConstants.highCameraUncertainty;
+            }
         }
 
         if (averageTagDistanceM < VisionConstants.skewCutoffDistance) {
-            return VisionConstants.lowCameraUncertainty;
+            if (!DriverStation.isTeleop()) {
+                return VisionConstants.lowCameraUncertainty;
+            } else {
+                return VisionConstants.veryLowCameraUncertainty;
+            }
         } else if (averageTagDistanceM < VisionConstants.lowUncertaintyCutoffDistance
                 && Math.abs(averageTagYaw.getDegrees()) < VisionConstants.skewCutoffRotation) {
             return VisionConstants.lowCameraUncertainty;

@@ -222,7 +222,7 @@ public class RobotContainer {
                 }
             }
             if (FeatureFlags.runIntake) {
-                intakeSubsystem.setScoringSupplier(scoringSubsystem::canIntake);
+                intakeSubsystem.setScoringSupplier(() -> !scoringSubsystem.hasNote());
             }
         }
 
