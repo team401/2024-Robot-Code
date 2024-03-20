@@ -49,6 +49,8 @@ public class HoodIOSparkFlex implements HoodIO {
         hoodMotor.getEncoder().setVelocityConversionFactor(ScoringConstants.hoodEncoderToRad);
 
         hoodMotor.setIdleMode(CANSparkFlex.IdleMode.kBrake);
+
+        hoodMotor.setSmartCurrentLimit(120);
     }
 
     @Override

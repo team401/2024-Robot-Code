@@ -222,7 +222,7 @@ public class RobotContainer {
                 }
             }
             if (FeatureFlags.runIntake) {
-                intakeSubsystem.setScoringSupplier(scoringSubsystem::canIntake);
+                intakeSubsystem.setScoringSupplier(() -> !scoringSubsystem.hasNote());
             }
         }
 
@@ -291,9 +291,9 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.RIGHT)));
 
-            controller.x()
-                .onTrue(new InstantCommand(() -> drivetrain.driveToEndgame()))
-                .onFalse(new InstantCommand(() -> drivetrain.stopDriveToPose()));
+            // controller.x()
+            //     .onTrue(new InstantCommand(() -> drivetrain.driveToEndgame()))
+            //     .onFalse(new InstantCommand(() -> drivetrain.stopDriveToPose()));
         }
 
         if (FeatureFlags.runEndgame) {
@@ -311,14 +311,11 @@ public class RobotContainer {
             // controller.leftBumper()
             //     .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_UP)));
 
-            // controller.leftTrigger()
-            //     .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_DOWN)));
-
-            // controller.x()
-            //     .onTrue(/*!endgameCommand.isScheduled() ?*/ endgameCommand);
-
             controller.leftTrigger()
-                .onTrue(new InstantCommand(() -> endgameCommand.cancel()));
+                .onTrue(new InstantCommand(() -> endgameSubsystem.flipDirection()));
+
+            controller.x()
+                .onTrue(!endgameCommand.isScheduled() ? endgameCommand : new InstantCommand(() -> endgameCommand.cancel()));
         }
 
         if (FeatureFlags.runIntake) {
@@ -699,11 +696,12 @@ public class RobotContainer {
                             () -> leftJoystick.getY(),
                             () -> leftJoystick.getX(),
                             () -> rightJoystick.getX(),
-                            // () -> controller.getLeftY(),
-                            // () -> controller.getLeftX(),
-                            // () -> controller.getRightX(),
-                            () -> !rightJoystick.getHID().getTrigger(),
-                            () -> rightJoystick.top().getAsBoolean()));
+                            () -> !rightJoystick.trigger().getAsBoolean(),
+                            () -> rightJoystick.top().getAsBoolean(),
+                            () ->
+                                    VecBuilder.fill(
+                                            driveTelemetry.getVelocityX(),
+                                            driveTelemetry.getVelocityY())));
         }
     }
 

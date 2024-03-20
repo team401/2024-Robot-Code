@@ -190,7 +190,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         if (!aimerAtIntakePosition()) {
             aimerIo.setAimAngleRad(ScoringConstants.intakeAngleToleranceRadians, true);
         }
-        shooterIo.setKickerVolts(2.0);
+        shooterIo.setKickerVolts(3.0);
 
         if ((hasNote()) || action != ScoringAction.INTAKE) {
             state = ScoringState.IDLE;
@@ -247,15 +247,39 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                         && Math.abs(aimerInputs.aimVelocityErrorRadPerSec)
                                 < ScoringConstants.aimAngleVelocityMargin;
         boolean driveReady = driveAllignedSupplier.get();
+        boolean fieldLocationReady = true;
+        if (!DriverStation.getAlliance().isPresent()) {
+            fieldLocationReady = true;
+        } else {
+            switch (DriverStation.getAlliance().get()) {
+                case Blue:
+                    fieldLocationReady =
+                            FieldFinder.whereAmI(poseSupplier.get()) == FieldLocations.BLUE_WING
+                                    || (FieldFinder.whereAmI(poseSupplier.get())
+                                                    == FieldLocations.MIDDLE
+                                            && DriverStation.isTeleop());
+                    break;
+                case Red:
+                    fieldLocationReady =
+                            FieldFinder.whereAmI(poseSupplier.get()) == FieldLocations.RED_WING
+                                    || (FieldFinder.whereAmI(poseSupplier.get())
+                                                    == FieldLocations.MIDDLE
+                                            && DriverStation.isTeleop());
+                    break;
+            }
+        }
         boolean notePresent = hasNote();
 
-        boolean primeReady = shooterReady && aimReady && driveReady;
+        boolean primeReady = shooterReady && aimReady && driveReady && fieldLocationReady;
         readyToShoot = primeReady && notePresent;
 
         Logger.recordOutput("scoring/shooterReady", shooterReady);
         Logger.recordOutput("scoring/aimReady", aimReady);
         Logger.recordOutput("scoring/driverReady", driveReady);
+        Logger.recordOutput("scoring/fieldLocationReady", fieldLocationReady);
         Logger.recordOutput("scoring/notePresent", notePresent);
+        Logger.recordOutput("scoring/primeReady", primeReady);
+        Logger.recordOutput("scoring/readyToShoot", readyToShoot);
 
         if (action != ScoringAction.SHOOT && action != ScoringAction.AIM) {
             state = ScoringState.IDLE;
@@ -730,5 +754,9 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     public void setbrakeMode(boolean brake) {
         aimerIo.setBrakeMode(brake);
         hoodIo.setBrakeMode(brake);
+    }
+
+    public void setAimerStatorCurrentLimit(double limit) {
+        aimerIo.setStatorCurrentLimit(limit);
     }
 }

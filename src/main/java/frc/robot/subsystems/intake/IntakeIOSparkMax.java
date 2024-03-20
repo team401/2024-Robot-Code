@@ -20,8 +20,8 @@ public class IntakeIOSparkMax implements IntakeIO {
     private TalonFX belt = new TalonFX(IntakeConstants.indexTwoMotorID);
 
     public IntakeIOSparkMax() {
-        leftIntake.setSmartCurrentLimit(50, 50);
-        rightIntake.setSmartCurrentLimit(50, 50);
+        leftIntake.setSmartCurrentLimit(50);
+        rightIntake.setSmartCurrentLimit(50);
 
         leftIntake.setInverted(true);
         rightIntake.setInverted(true);
