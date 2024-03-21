@@ -232,10 +232,14 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         autoChooser.addOption(
                 "Center - 4 note (source side to center)", new PathPlannerAuto("S2-W2-W3-C5"));
         autoChooser.addOption("Center - 3 note - special", new PathPlannerAuto("S2-C1-C2-Special"));
+        autoChooser.addOption(
+                "Center - 4 note - avoids wing notes", new PathPlannerAuto("S2-C1-C2-C3"));
         autoChooser.addOption("Source Side - 2 note", new PathPlannerAuto("S3-W3"));
         autoChooser.addOption("Source Side - 3 note", new PathPlannerAuto("S3-W3-C5"));
         autoChooser.addOption(
                 "Source Side - 5 note (across)", new PathPlannerAuto("S3-W3-W2-W1-C1"));
+        autoChooser.addOption(
+                "Source Side - 6 note (across)", new PathPlannerAuto("S3-W3-W2-W1-C1-C2"));
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 

@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 8.343684952128402,
-        "y": 5.771473152964195
+        "x": 8.358370634451466,
+        "y": 5.7567874706411315
       },
       "prevControl": {
-        "x": 7.0486477259161555,
-        "y": 5.8141925125011085
+        "x": 7.110087636991016,
+        "y": 6.226729304979184
       },
       "nextControl": null,
       "isLocked": false,
@@ -53,17 +53,34 @@
           ]
         }
       }
+    },
+    {
+      "name": "Disable Auto-Align",
+      "waypointRelativePos": 0.15,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Disable Auto-Align"
+              }
+            }
+          ]
+        }
+      }
     }
   ],
   "globalConstraints": {
     "maxVelocity": 4.5,
-    "maxAcceleration": 2.75,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 167.79953127261922,
+    "rotation": 147.26477372789245,
     "rotateFast": false
   },
   "reversed": false,

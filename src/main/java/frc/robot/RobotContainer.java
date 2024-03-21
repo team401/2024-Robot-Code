@@ -80,6 +80,7 @@ public class RobotContainer {
     SendableChooser<String> testModeChooser = new SendableChooser<String>();
 
     DigitalInput brakeSwitch = new DigitalInput(IOConstants.brakeSwitchPort);
+    DigitalInput ledSwitch = new DigitalInput(IOConstants.ledSwitchPort);
 
     DigitalOutput timeDigitalOutput = null; // new DigitalOutput(IOConstants.timeOutputPort);
 
@@ -376,6 +377,10 @@ public class RobotContainer {
         if (FeatureFlags.runEndgame) {
             endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.CANCEL);
             endgameSubsystem.setBrakeMode(true);
+        }
+
+        if (FeatureFlags.enableLEDS) {
+            leds.setEnabled(true);
         }
     }
 
@@ -746,6 +751,9 @@ public class RobotContainer {
                 endgameSubsystem.setBrakeMode(true);
             }
         }
+        if (ledSwitch != null) {
+            leds.setEnabled(!ledSwitch.get());
+        }
     }
 
     public void autoInit() {
@@ -786,9 +794,14 @@ public class RobotContainer {
                             () ->
                                     scoringSubsystem.setAction(
                                             ScoringSubsystem.ScoringAction.INTAKE)));
+            NamedCommands.registerCommand(
+                    "Wait Scoring",
+                    new InstantCommand(
+                            () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
         } else {
             NamedCommands.registerCommand("Shoot Scoring", Commands.none());
             NamedCommands.registerCommand("Aim Scoring", Commands.none());
+            NamedCommands.registerCommand("Wait Scoring", Commands.none());
             NamedCommands.registerCommand("Intake Scoring", Commands.none());
         }
         if (FeatureFlags.runIntake) {

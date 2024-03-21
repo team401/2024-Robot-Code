@@ -12,9 +12,27 @@
     "data": {
       "commands": [
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "Shoot Scoring"
+            "name": "Override Shoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.2
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Un-Override Shoot"
           }
         },
         {
@@ -24,21 +42,15 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Aim Scoring"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "C1-E1"
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "Shoot Scoring"
+            "waitTime": 0.2
           }
         },
         {
@@ -48,39 +60,15 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Aim Scoring"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "C2-E1"
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Shoot Scoring"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Disable Auto-Align"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "E1-C3"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Enable Auto-Align"
           }
         },
         {

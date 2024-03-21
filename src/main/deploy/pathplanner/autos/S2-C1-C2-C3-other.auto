@@ -2,73 +2,31 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7071301441350655,
-      "y": 4.376333332273105
+      "x": 1.441414260288271,
+      "y": 5.463073824179848
     },
-    "rotation": 120.0
+    "rotation": 180.0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 0.5
+            "name": "Shoot Scoring"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "S2-C1"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Override Shoot"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.2
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Un-Override Shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "S3-W3"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.2
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "W3-W2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "W2-W1"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "W1-C1"
+            "name": "Aim Scoring"
           }
         },
         {
@@ -78,9 +36,21 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Shoot Scoring"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "E1-C2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Aim Scoring"
           }
         },
         {
@@ -90,9 +60,33 @@
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 0
+            "name": "Shoot Scoring"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Disable Auto-Align"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "E1-C3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Enable Auto-Align"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C3-E1"
           }
         }
       ]
