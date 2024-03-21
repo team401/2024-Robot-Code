@@ -11,6 +11,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.ScoringConstants;
 
 public class AimerIOTalon implements AimerIO {
@@ -33,6 +34,12 @@ public class AimerIOTalon implements AimerIO {
 
     double lastPosition = 0.0;
     double lastTime = Utils.getCurrentTimeSeconds();
+
+    boolean motorLeftFailure = false, motorRightFailure = false;
+    boolean motorCheckOverriden = false;
+
+    private Timer errorTimeLeft = new Timer();
+    private Timer errorTimeRight = new Timer();
 
     public AimerIOTalon() {
         aimerRight.setControl(new Follower(ScoringConstants.aimLeftMotorId, true));
@@ -75,6 +82,11 @@ public class AimerIOTalon implements AimerIO {
 
         encoder.setDistancePerRotation(2 * Math.PI);
         encoder.setPositionOffset(ScoringConstants.aimerEncoderOffset);
+
+        errorTimeLeft.reset();
+        errorTimeLeft.start();
+        errorTimeRight.reset();
+        errorTimeRight.start();
     }
 
     @Override
@@ -126,12 +138,93 @@ public class AimerIOTalon implements AimerIO {
         aimerRight.getConfigurator().apply(slot0);
     }
 
+    private boolean checkForAimMotorFailure() {
+
+        // LEFT MOTOR
+        if (!motorFailureCheckPair(aimerLeft, aimerRight)) {
+            errorTimeLeft.reset();
+            errorTimeLeft.start();
+        } else {
+            if (errorTimeLeft.get() > ScoringConstants.allotedArmMotorErrorTime) {
+                motorLeftFailure = true;
+            }
+        }
+
+        // RIGHT MOTOR
+        if (!motorFailureCheckPair(aimerRight, aimerLeft)) {
+            errorTimeRight.reset();
+            errorTimeRight.start();
+        } else {
+            if (errorTimeRight.get() > ScoringConstants.allotedArmMotorErrorTime) {
+                motorRightFailure = true;
+            }
+        }
+
+        if (!motorCheckOverriden) {
+            shutOffFaultyAimMotors();
+        }
+
+        return motorLeftFailure || motorRightFailure;
+    }
+
+    private boolean motorFailureCheckPair(TalonFX check, TalonFX compare) {
+        if (!check.isAlive()) {
+            // motor no longer communicating with robot
+            return true;
+        }
+
+        if (Math.abs(compare.getStatorCurrent().getValueAsDouble())
+                                - Math.abs(check.getStatorCurrent().getValueAsDouble())
+                        > ScoringConstants.allottedArmMotorCurrentDifference
+                && Math.abs(check.getMotorVoltage().getValueAsDouble())
+                        > ScoringConstants.voltageErrorCheckingThreshold) {
+            // motor voltage is really small when it shouldn't be
+            return true;
+        }
+
+        if (Math.abs(check.getStatorCurrent().getValueAsDouble())
+                                - Math.abs(compare.getStatorCurrent().getValueAsDouble())
+                        > ScoringConstants.allottedArmMotorCurrentDifference
+                && Math.abs(check.getMotorVoltage().getValueAsDouble())
+                        < ScoringConstants.voltageErrorCheckingThreshold) {
+            // motor voltage is really large when it shouldn't be
+            return true;
+        }
+        return false;
+    }
+
+    private void shutOffFaultyAimMotors() {
+        if (motorLeftFailure) {
+            aimerLeft.setVoltage(0);
+        }
+        if (motorRightFailure) {
+            aimerRight.setVoltage(0);
+        }
+        if (motorLeftFailure || motorRightFailure) {
+            setFF(
+                    ScoringConstants.aimerFaultkS,
+                    ScoringConstants.aimerFaultkV,
+                    ScoringConstants.aimerFaultkA,
+                    ScoringConstants.aimerFaultkG);
+        }
+    }
+
     @Override
     public void updateInputs(AimerIOInputs inputs) {
+        checkForAimMotorFailure();
+
         if (override) {
-            aimerLeft.setVoltage(overrideVolts);
+            if (!motorLeftFailure || motorCheckOverriden) {
+                aimerLeft.setVoltage(overrideVolts);
+            } else {
+                aimerRight.setVoltage(overrideVolts);
+            }
         } else {
-            aimerLeft.setControl(controller.withPosition(goalAngleRad));
+            if (!motorLeftFailure || motorCheckOverriden) {
+                aimerLeft.setControl(controller.withPosition(goalAngleRad));
+            } else {
+                aimerRight.setControl(controller.withPosition(goalAngleRad));
+            }
         }
 
         inputs.aimGoalAngleRad = goalAngleRad;
@@ -146,8 +239,14 @@ public class AimerIOTalon implements AimerIO {
         lastPosition = encoder.getAbsolutePosition();
         inputs.aimVelocityRadPerSec = 0.0;
 
-        inputs.aimAppliedVolts = aimerLeft.getMotorVoltage().getValueAsDouble();
-        inputs.aimStatorCurrentAmps = aimerLeft.getStatorCurrent().getValueAsDouble();
-        inputs.aimSupplyCurrentAmps = aimerLeft.getSupplyCurrent().getValueAsDouble();
+        if (!motorLeftFailure || motorCheckOverriden) {
+            inputs.aimAppliedVolts = aimerLeft.getMotorVoltage().getValueAsDouble();
+            inputs.aimStatorCurrentAmps = aimerLeft.getStatorCurrent().getValueAsDouble();
+            inputs.aimSupplyCurrentAmps = aimerLeft.getSupplyCurrent().getValueAsDouble();
+        } else {
+            inputs.aimAppliedVolts = aimerRight.getMotorVoltage().getValueAsDouble();
+            inputs.aimStatorCurrentAmps = aimerLeft.getStatorCurrent().getValueAsDouble();
+            inputs.aimSupplyCurrentAmps = aimerLeft.getSupplyCurrent().getValueAsDouble();
+        }
     }
 }

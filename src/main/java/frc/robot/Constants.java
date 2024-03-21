@@ -476,6 +476,12 @@ public final class Constants {
         public static final double aimerkV = 1.51;
         public static final double aimerkA = 0.01;
 
+        // TODO: find real values
+        public static final double aimerFaultkS = 0.4;
+        public static final double aimerFaultkG = 0.2;
+        public static final double aimerFaultkV = 3;
+        public static final double aimerFaultkA = 0.02;
+
         public static final double shooterkP = 0.05;
         public static final double shooterkI = 0.2;
         public static final double shooterkD = 0.0;
@@ -630,6 +636,11 @@ public final class Constants {
 
             return map;
         }
+
+        // TODO: tune
+        public static final double allotedArmMotorErrorTime = 3.0;
+        public static final double allottedArmMotorCurrentDifference = 10;
+        public static final double voltageErrorCheckingThreshold = 2;
     }
 
     public static final class LEDConstants {
