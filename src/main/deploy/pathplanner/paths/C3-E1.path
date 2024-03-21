@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.023347145084273,
-        "y": 4.200105144396336
+        "x": 5.90586168649976,
+        "y": 4.067934003488759
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.8939232082399773,
-        "y": 5.609930647410491
+        "x": 3.629580926424823,
+        "y": 5.742101788318067
       },
       "prevControl": {
-        "x": 5.1128348410542985,
-        "y": 3.8035917216736044
+        "x": 4.936606653177528,
+        "y": 3.304278522689425
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,7 +32,7 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "New Event Marker",
+      "name": "Shoot",
       "waypointRelativePos": 0.9,
       "command": {
         "type": "parallel",
@@ -47,11 +47,34 @@
           ]
         }
       }
+    },
+    {
+      "name": "Wait",
+      "waypointRelativePos": 0.05,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Wait Scoring"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Enable Auto-Align"
+              }
+            }
+          ]
+        }
+      }
     }
   ],
   "globalConstraints": {
     "maxVelocity": 4.5,
-    "maxAcceleration": 2.75,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },

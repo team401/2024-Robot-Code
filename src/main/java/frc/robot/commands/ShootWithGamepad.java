@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignTarget;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
@@ -47,6 +48,10 @@ public class ShootWithGamepad extends Command {
 
     @Override
     public void execute() {
+        if (DriverStation.isAutonomous() || DriverStation.isTest()) {
+            return;
+        }
+
         if (warmup.getAsBoolean()) {
             switch (getDriveMode.get()) {
                 case NONE:

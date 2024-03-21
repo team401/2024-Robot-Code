@@ -54,7 +54,7 @@ public final class Constants {
         public static final boolean runEndgame = true;
         public static final boolean runDrive = true;
 
-        public static final boolean enableLEDS = false;
+        public static final boolean enableLEDS = true;
     }
 
     public static final class ConversionConstants {
@@ -173,14 +173,14 @@ public final class Constants {
 
         public static final double lowUncertaintyCutoffDistance = 6.5;
 
-        public static final double skewCutoffDistance = 4.5;
+        public static final double skewCutoffDistance = 4.7;
         public static final double skewCutoffRotation = Units.degreesToRadians(30);
 
         public static final Matrix<N3, N1> veryLowCameraUncertainty = VecBuilder.fill(3.5, 4.0, 6);
 
-        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(4.0, 6.0, 6);
+        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(2.0, 5.0, 6);
 
-        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(32.0, 40.0, 40);
+        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(25.0, 40.0, 40);
 
         public static final Matrix<N3, N1> driveUncertainty = VecBuilder.fill(0.1, 0.1, 0.1);
 
@@ -468,7 +468,7 @@ public final class Constants {
 
     public static final class ScoringConstants {
         public static final double aimerkP = 17.0;
-        public static final double aimerkI = 5.0;
+        public static final double aimerkI = 10.0; // 5.0
         public static final double aimerkD = 0.0;
 
         public static final double aimerkS = 0.265;
@@ -553,12 +553,12 @@ public final class Constants {
             map.put(3.02, 0.45);
             map.put(3.22, 0.45);
             map.put(3.9, 0.36);
-            map.put(4.55, 0.31);
-            map.put(4.95, 0.28);
-            map.put(5.15, 0.265);
-            map.put(5.35, 0.265);
-            map.put(5.5, 0.265);
-            map.put(5.64, 0.24);
+            map.put(4.55, 0.34);
+            map.put(4.95, 0.31);
+            map.put(5.15, 0.285);
+            map.put(5.35, 0.285);
+            map.put(5.5, 0.285);
+            map.put(5.64, 0.28);
             // map.put(5.82, 0.275);
             map.put(6.0, 0.28);
 
@@ -583,8 +583,8 @@ public final class Constants {
             map.put(4.95, 4000.0);
             map.put(5.15, 4000.0);
             map.put(5.35, 4000.0);
-            map.put(5.64, 4200.0);
-            map.put(5.82, 4300.0);
+            map.put(5.64, 4000.0);
+            map.put(5.82, 4000.0);
 
             return map;
         }
@@ -607,10 +607,10 @@ public final class Constants {
         // Value - Time in seconds
         public static HashMap<Double, Double> timeToPutAimDownMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
-            map.put(0.0, 0.2);
-            map.put(Math.PI / 6, 0.5);
-            map.put(Math.PI / 4, 0.6);
-            map.put(Math.PI / 3, 0.7);
+            map.put(0.0, 0.5);
+            map.put(Math.PI / 6, 0.6);
+            map.put(Math.PI / 4, 0.7);
+            map.put(Math.PI / 3, 0.8);
             map.put(Math.PI / 2, 1.0);
 
             return map;
@@ -634,11 +634,13 @@ public final class Constants {
 
     public static final class LEDConstants {
         public static final int ledPort = 0;
-        public static final int ledLength = 5;
+
+        public static final int ledLength = 17;
     }
 
     public static final class IOConstants {
         public static final int brakeSwitchPort = 2;
+        public static final int ledSwitchPort = 3;
         public static final int timeOutputPort = 4;
     }
 }
