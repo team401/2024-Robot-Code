@@ -178,9 +178,9 @@ public final class Constants {
 
         public static final Matrix<N3, N1> veryLowCameraUncertainty = VecBuilder.fill(3.5, 4.0, 6);
 
-        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(2.0, 5.0, 6);
+        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(2.0, 3.5, 6);
 
-        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(25.0, 40.0, 40);
+        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(25.0, 25.0, 40);
 
         public static final Matrix<N3, N1> driveUncertainty = VecBuilder.fill(0.1, 0.1, 0.1);
 
@@ -553,14 +553,14 @@ public final class Constants {
             map.put(3.02, 0.45);
             map.put(3.22, 0.45);
             map.put(3.9, 0.36);
-            map.put(4.55, 0.34);
-            map.put(4.95, 0.31);
-            map.put(5.15, 0.285);
-            map.put(5.35, 0.285);
-            map.put(5.5, 0.285);
-            map.put(5.64, 0.28);
+            map.put(4.55, 0.35);
+            map.put(4.95, 0.32);
+            map.put(5.15, 0.295);
+            map.put(5.35, 0.295);
+            map.put(5.5, 0.295);
+            map.put(5.64, 0.29);
             // map.put(5.82, 0.275);
-            map.put(6.0, 0.28);
+            map.put(6.0, 0.29);
 
             return map;
         }
@@ -580,11 +580,11 @@ public final class Constants {
             map.put(3.22, 3300.0);
             map.put(3.9, 3300.0);
             map.put(4.55, 3500.0);
-            map.put(4.95, 4000.0);
-            map.put(5.15, 4000.0);
-            map.put(5.35, 4000.0);
-            map.put(5.64, 4000.0);
-            map.put(5.82, 4000.0);
+            map.put(4.95, 3500.0); // 4000.0
+            map.put(5.15, 3500.0);
+            map.put(5.35, 3500.0);
+            map.put(5.64, 3500.0);
+            map.put(5.82, 3500.0);
 
             return map;
         }

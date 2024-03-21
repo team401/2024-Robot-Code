@@ -76,6 +76,12 @@
           "data": {
             "pathName": "C3-E1"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Override Shoot"
+          }
         }
       ]
     }

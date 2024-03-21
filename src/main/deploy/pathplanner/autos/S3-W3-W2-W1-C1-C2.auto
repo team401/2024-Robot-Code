@@ -24,6 +24,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "OverrideStageAvoidance"
+          }
+        },
+        {
           "type": "wait",
           "data": {
             "waitTime": 0.2
@@ -62,7 +68,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0
+            "waitTime": 0.1
           }
         },
         {
@@ -90,9 +96,9 @@
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 0
+            "name": "Un-OverrideStageAvoidance"
           }
         }
       ]

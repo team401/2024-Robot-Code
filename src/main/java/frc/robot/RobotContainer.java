@@ -798,11 +798,19 @@ public class RobotContainer {
                     "Wait Scoring",
                     new InstantCommand(
                             () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+            NamedCommands.registerCommand(
+                    "OverrideStageAvoidance",
+                    new InstantCommand(() -> scoringSubsystem.setOverrideStageAvoidance(true)));
+            NamedCommands.registerCommand(
+                    "Un-OverrideStageAvoidance",
+                    new InstantCommand(() -> scoringSubsystem.setOverrideStageAvoidance(false)));
         } else {
             NamedCommands.registerCommand("Shoot Scoring", Commands.none());
             NamedCommands.registerCommand("Aim Scoring", Commands.none());
             NamedCommands.registerCommand("Wait Scoring", Commands.none());
             NamedCommands.registerCommand("Intake Scoring", Commands.none());
+            NamedCommands.registerCommand("OverrideStageAvoidance", Commands.none());
+            NamedCommands.registerCommand("Un-OverrideStageAvoidance", Commands.none());
         }
         if (FeatureFlags.runIntake) {
             NamedCommands.registerCommand("Intake Note", Commands.none());
