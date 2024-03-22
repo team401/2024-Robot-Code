@@ -298,25 +298,13 @@ public class RobotContainer {
         }
 
         if (FeatureFlags.runEndgame) {
-            // endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.OVERRIDE);
             endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.CANCEL);
 
-            // controller.leftBumper()
-            //     .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(4.0, 0)))
-            //     .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
-
-            // controller.leftTrigger()
-            //     .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(-4.0, 0)))
-            //     .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
-
-            // controller.leftBumper()
-            //     .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_UP)));
+            controller.leftBumper()
+                .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_UP)));
 
             controller.leftTrigger()
-                .onTrue(new InstantCommand(() -> endgameSubsystem.flipDirection()));
-
-            controller.x()
-                .onTrue(!endgameCommand.isScheduled() ? endgameCommand : new InstantCommand(() -> endgameCommand.cancel()));
+                .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_DOWN)));
         }
 
         if (FeatureFlags.runIntake) {
