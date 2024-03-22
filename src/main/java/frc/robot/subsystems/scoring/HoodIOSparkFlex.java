@@ -50,7 +50,7 @@ public class HoodIOSparkFlex implements HoodIO {
 
         hoodMotor.setIdleMode(CANSparkFlex.IdleMode.kBrake);
 
-        hoodMotor.setSmartCurrentLimit(120);
+        hoodMotor.setSmartCurrentLimit(140);
     }
 
     @Override
