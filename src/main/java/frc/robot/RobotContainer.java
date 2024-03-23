@@ -61,9 +61,6 @@ import frc.robot.utils.AllianceUtil;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.feedforward.TuneG;
 import frc.robot.utils.feedforward.TuneS;
-
-import java.time.Instant;
-
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -315,7 +312,7 @@ public class RobotContainer {
             }))
             .onFalse(new InstantCommand(() -> {
                 endgameSubsystem.setVolts(0, 0);
-                endgameSubsystem.setAction(EndgameAction.CANCEL);
+                endgameSubsystem.setAction(EndgameAction.WAIT);
             }));
         }
 
