@@ -11,7 +11,7 @@ import frc.robot.Constants.EndgameConstants;
 
 public class EndgameIOSim implements EndgameIO {
     private ElevatorSim elevatorSim =
-            new ElevatorSim(DCMotor.getNeoVortex(2), 20, 1.814, 0.02231009, 0.0, 0.45, true, 0.0);
+            new ElevatorSim(DCMotor.getNeoVortex(2), 20, 1.814, 0.02231009, 0.0, 0.6, true, 0.0);
 
     private TrapezoidProfile profile =
             new TrapezoidProfile(EndgameConstants.climberProfileConstraints);
