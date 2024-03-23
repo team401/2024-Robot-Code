@@ -308,7 +308,7 @@ public class RobotContainer {
             
             controller.x().onTrue(new InstantCommand(() -> {
                 endgameSubsystem.setAction(EndgameAction.OVERRIDE);
-                endgameSubsystem.setVolts(3, 0);
+                endgameSubsystem.setVolts(-3, 0);
             }))
             .onFalse(new InstantCommand(() -> {
                 endgameSubsystem.setVolts(0, 0);

@@ -292,7 +292,7 @@ public final class Constants {
         public static final double climberkFFClimber = 0.125;
         // Feedforward value for lowering elevator, assuming we are now lifting entire
         // weight of the robot
-        public static final double climberkFFRobot = 0.5;
+        public static final double climberkFFRobot = -0.5;
 
         public static final double encoderToMeters = Math.PI * Units.inchesToMeters(1.7567) / 20.0;
     }
