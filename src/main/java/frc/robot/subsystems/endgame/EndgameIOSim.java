@@ -91,7 +91,7 @@ public class EndgameIOSim implements EndgameIO {
                             profileTimer.get(),
                             new State(initialPosition, initialVelocity),
                             new State(targetPosition, 0.0));
-            inputs.targetPosition = trapezoidSetpoint.position;
+            inputs.profileTargetPosition = trapezoidSetpoint.position;
             appliedVolts =
                     ff
                             + climberController.calculate(
@@ -107,6 +107,8 @@ public class EndgameIOSim implements EndgameIO {
 
         inputs.position = elevatorSim.getPositionMeters();
         inputs.velocity = elevatorSim.getVelocityMetersPerSecond();
+
+        inputs.finalTargetPosition = targetPosition;
     }
 
     @Override

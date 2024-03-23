@@ -306,13 +306,13 @@ public class RobotContainer {
             controller.leftTrigger()
                 .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_DOWN)));
             
-            controller.x().onTrue(new InstantCommand(() -> {
-                endgameSubsystem.setAction(EndgameAction.OVERRIDE);
-                endgameSubsystem.setVolts(-3, 0);
-            }))
-            .onFalse(new InstantCommand(() -> {
-                endgameSubsystem.setVolts(0, 0);
-            }));
+            controller.x()
+                .onTrue(new InstantCommand(() -> {
+                    endgameSubsystem.setAction(EndgameAction.OVERRIDE);
+                    endgameSubsystem.setVolts(-3, 0);
+                })).onFalse(new InstantCommand(() -> {
+                    endgameSubsystem.setVolts(0, 0);
+                }));
         }
 
         if (FeatureFlags.runIntake) {
