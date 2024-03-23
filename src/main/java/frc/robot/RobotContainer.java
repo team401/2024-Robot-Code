@@ -330,6 +330,12 @@ public class RobotContainer {
                 controller.getHID()::getAButton,
                 controller.getHID()::getBButton, scoringSubsystem,
                 FeatureFlags.runDrive ? drivetrain::getAlignTarget : () -> AlignTarget.NONE));
+
+            controller.start()
+                .onTrue(new InstantCommand(() -> scoringSubsystem.setOverrideBeamBrake(true)));
+                
+            controller.back()
+                .onTrue(new InstantCommand(() -> scoringSubsystem.setOverrideBeamBrake(false)));
         }
     } // spotless:on
 

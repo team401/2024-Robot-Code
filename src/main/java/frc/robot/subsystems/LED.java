@@ -62,6 +62,12 @@ public class LED extends SubsystemBase {
                 }
             }
 
+            if (DriverStation.getMatchTime() < 20 && DriverStation.getMatchTime() > 17) {
+                for (int i = 0; i < ledcount; i++) {
+                    ledBuffer.setRGB(i, 255 / 3, 0, 0);
+                }
+            }
+
             // // idle
             // if (scoringSubsystem.getCurrentState() == ScoringState.IDLE) {
             //     if (Constants.currentMode == Mode.REAL)

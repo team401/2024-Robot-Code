@@ -60,6 +60,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     private boolean overrideIntake = false;
     private boolean overrideShoot = false;
     private boolean overrideStageAvoidance = false;
+    private boolean overrideBeamBreak = false;
 
     private boolean hoodForced = false;
 
@@ -234,7 +235,9 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         Logger.recordOutput("scoring/aimGoal", getAimerAngle(distancetoGoal));
         shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
         aimerIo.setAimAngleRad(getAimerAngle(distancetoGoal), false);
-        shooterIo.setKickerVolts(hasNote() ? 0.0 : 1.5);
+        if (!overrideBeamBreak) {
+            shooterIo.setKickerVolts(hasNote() ? 0.0 : 1.5);
+        }
 
         boolean shooterReady =
                 Math.abs(
@@ -268,7 +271,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                     break;
             }
         }
-        boolean notePresent = hasNote();
+        boolean notePresent = overrideBeamBreak ? true : hasNote();
 
         boolean primeReady = shooterReady && aimReady && driveReady && fieldLocationReady;
         readyToShoot = primeReady && notePresent;
@@ -586,6 +589,10 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     public void setOverrideStageAvoidance(boolean overrideStageAvoidance) {
         this.overrideStageAvoidance = overrideStageAvoidance;
+    }
+
+    public void setOverrideBeamBrake(boolean overrideBeamBrake) {
+        this.overrideBeamBreak = overrideBeamBrake;
     }
 
     public void forceHood(boolean hoodForced) {
