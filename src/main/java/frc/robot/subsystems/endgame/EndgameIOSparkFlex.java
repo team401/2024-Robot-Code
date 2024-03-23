@@ -134,7 +134,9 @@ public class EndgameIOSparkFlex implements EndgameIO {
 
             profileSetpoint = clampedPosition;
 
-            rightEndgameMotor.getPIDController().setReference(goalPosition, ControlType.kPosition);
+            rightEndgameMotor
+                    .getPIDController()
+                    .setReference(clampedPosition, ControlType.kPosition);
         }
 
         inputs.endgameLeftAppliedVolts = leftEndgameMotor.getAppliedOutput();

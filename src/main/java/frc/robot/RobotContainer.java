@@ -61,6 +61,9 @@ import frc.robot.utils.AllianceUtil;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.feedforward.TuneG;
 import frc.robot.utils.feedforward.TuneS;
+
+import java.time.Instant;
+
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -305,6 +308,15 @@ public class RobotContainer {
 
             controller.leftTrigger()
                 .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_DOWN)));
+            
+            controller.x().onTrue(new InstantCommand(() -> {
+                endgameSubsystem.setAction(EndgameAction.OVERRIDE);
+                endgameSubsystem.setVolts(3, 0);
+            }))
+            .onFalse(new InstantCommand(() -> {
+                endgameSubsystem.setVolts(0, 0);
+                endgameSubsystem.setAction(EndgameAction.CANCEL);
+            }));
         }
 
         if (FeatureFlags.runIntake) {
