@@ -298,7 +298,7 @@ public class RobotContainer {
         }
 
         if (FeatureFlags.runEndgame) {
-            endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.CANCEL);
+            endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.WAIT);
 
             controller.leftBumper()
                 .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_UP)));
@@ -369,7 +369,7 @@ public class RobotContainer {
         }
 
         if (FeatureFlags.runEndgame) {
-            endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.CANCEL);
+            endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.WAIT);
             endgameSubsystem.setBrakeMode(true);
         }
 

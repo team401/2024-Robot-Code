@@ -24,7 +24,7 @@ public class EndgameIOSparkFlex implements EndgameIO {
 
     boolean override = false;
     double overrideVolts = 0.0;
-    double targetPosition = 0.0;
+    double goalPosition = 0.0;
 
     double profileSetpoint = 0.0;
 
@@ -79,14 +79,14 @@ public class EndgameIOSparkFlex implements EndgameIO {
 
     @Override
     public void setPosition(double position) {
-        if (targetPosition != position) {
+        if (goalPosition != position) {
             profileTimer.reset();
             profileTimer.start();
 
             initialPosition = rightEndgameMotor.getEncoder().getPosition();
             initialVelocity = rightEndgameMotor.getEncoder().getVelocity();
 
-            if (position < targetPosition) {
+            if (position < goalPosition) {
                 // Moving down, assume weight of robot is on the climber now
                 setFF(EndgameConstants.climberkFFRobot);
             } else {
@@ -94,7 +94,7 @@ public class EndgameIOSparkFlex implements EndgameIO {
                 setFF(EndgameConstants.climberkFFClimber);
             }
         }
-        targetPosition = position;
+        goalPosition = position;
     }
 
     @Override
@@ -105,14 +105,14 @@ public class EndgameIOSparkFlex implements EndgameIO {
     }
 
     public void setPositionTuning(double position) {
-        if (targetPosition != position) {
+        if (goalPosition != position) {
             profileTimer.reset();
             profileTimer.start();
 
             initialPosition = rightEndgameMotor.getEncoder().getPosition();
             initialVelocity = rightEndgameMotor.getEncoder().getVelocity();
         }
-        targetPosition = position;
+        goalPosition = position;
     }
 
     @Override
@@ -125,7 +125,7 @@ public class EndgameIOSparkFlex implements EndgameIO {
                     profile.calculate(
                             profileTimer.get(),
                             new State(initialPosition, initialVelocity),
-                            new State(targetPosition, 0.0));
+                            new State(goalPosition, 0.0));
             double clampedPosition =
                     MathUtil.clamp(
                             trapezoidSetpoint.position,
