@@ -191,7 +191,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         if (!aimerAtIntakePosition()) {
             aimerIo.setAimAngleRad(ScoringConstants.intakeAngleToleranceRadians, true);
         }
-        shooterIo.setKickerVolts(1.5);
+        shooterIo.setKickerVolts(1.75);
 
         if ((hasNote()) || action != ScoringAction.INTAKE) {
             state = ScoringState.IDLE;
@@ -236,7 +236,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
         aimerIo.setAimAngleRad(getAimerAngle(distancetoGoal), false);
         if (!overrideBeamBreak) {
-            shooterIo.setKickerVolts(hasNote() ? 0.0 : 1.5);
+            shooterIo.setKickerVolts(hasNote() ? 0.0 : 1.75);
         }
 
         boolean shooterReady =
