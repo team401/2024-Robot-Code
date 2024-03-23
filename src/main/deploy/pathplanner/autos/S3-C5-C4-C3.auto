@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.5234556947987139,
-      "y": 2.0523241046482106
+      "x": 0.6679855613232356,
+      "y": 4.350348982388106
     },
-    "rotation": 180.0
+    "rotation": 121.12182293312829
   },
   "command": {
     "type": "sequential",
@@ -18,39 +18,63 @@
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "S4-C5_fast"
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Override Shoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.2
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Un-Override Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C5-E2_fast"
+            "pathName": "S3-C5"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "E2-C4_fast"
+            "pathName": "C5-E2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C4-E2_fast"
+            "pathName": "E2-C4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "E2-C3_fast"
+            "pathName": "C4-E1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C3-E1_fast"
+            "pathName": "E1-C3-Stage"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C3-E1"
           }
         }
       ]
