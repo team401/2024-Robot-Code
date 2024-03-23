@@ -312,7 +312,6 @@ public class RobotContainer {
             }))
             .onFalse(new InstantCommand(() -> {
                 endgameSubsystem.setVolts(0, 0);
-                endgameSubsystem.setAction(EndgameAction.WAIT);
             }));
         }
 
