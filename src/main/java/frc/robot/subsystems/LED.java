@@ -71,6 +71,12 @@ public class LED extends SubsystemBase {
                 }
             }
 
+            if (!visionWorkingSupplier.get()) {
+                for (int i = 0; i < ledcount - 10; i++) {
+                    ledBuffer.setRGB(i, 0, 0, 255 / 3);
+                }
+            }
+
             // // idle
             // if (scoringSubsystem.getCurrentState() == ScoringState.IDLE) {
             //     if (Constants.currentMode == Mode.REAL)
@@ -141,12 +147,6 @@ public class LED extends SubsystemBase {
         }
 
         if (Constants.currentMode == Mode.REAL) {
-            if (!visionWorkingSupplier.get()) {
-                for (int i = 0; i < ledcount - 10; i++) {
-                    ledBuffer.setRGB(i, 0, 0, 255 / 3);
-                }
-            }
-
             led.setData(ledBuffer);
         }
     }
