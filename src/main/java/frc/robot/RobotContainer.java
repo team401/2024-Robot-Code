@@ -301,15 +301,22 @@ public class RobotContainer {
             endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.WAIT);
 
             controller.leftBumper()
-                .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_UP)));
+                .onTrue(new InstantCommand(() -> {
+                    endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_UP);
+                    scoringSubsystem.forceHood(true);
+                }));
 
             controller.leftTrigger()
-                .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_DOWN)));
+                .onTrue(new InstantCommand(() -> {
+                    endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_DOWN);
+                    scoringSubsystem.forceHood(false);
+                }));
             
             controller.x()
                 .onTrue(new InstantCommand(() -> {
                     endgameSubsystem.setAction(EndgameAction.OVERRIDE);
                     endgameSubsystem.setVolts(-3, 0);
+                    scoringSubsystem.forceHood(false);
                 })).onFalse(new InstantCommand(() -> {
                     endgameSubsystem.setVolts(0, 0);
                 }));
