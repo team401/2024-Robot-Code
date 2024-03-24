@@ -607,7 +607,7 @@ public final class Constants {
         // Value - Time in seconds
         public static HashMap<Double, Double> timeToPutAimDownMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
-            map.put(0.0, 0.5);
+            map.put(0.0, 0.6);
             map.put(Math.PI / 6, 0.6);
             map.put(Math.PI / 4, 0.7);
             map.put(Math.PI / 3, 0.8);

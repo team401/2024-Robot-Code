@@ -50,7 +50,7 @@ public class HoodIOSparkFlex implements HoodIO {
 
         hoodMotor.setIdleMode(CANSparkFlex.IdleMode.kBrake);
 
-        hoodMotor.setSmartCurrentLimit(140);
+        // hoodMotor.setSmartCurrentLimit(140);
     }
 
     @Override
@@ -127,7 +127,11 @@ public class HoodIOSparkFlex implements HoodIO {
         //             .setReference(trapezoidSetpoint.position, ControlType.kPosition);
         // }
 
-        hoodMotor.setVoltage(overrideVolts);
+        if (hoodMotor.getOutputCurrent() > 70) {
+            hoodMotor.setVoltage(0.0);
+        } else {
+            hoodMotor.setVoltage(overrideVolts);
+        }
 
         inputs.hoodAngleRad = hoodMotor.getEncoder().getPosition();
         inputs.hoodGoalAngleRad = trapezoidSetpoint.position;
