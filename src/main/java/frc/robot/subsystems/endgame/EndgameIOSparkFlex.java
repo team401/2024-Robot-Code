@@ -131,6 +131,10 @@ public class EndgameIOSparkFlex implements EndgameIO {
                             profileTimer.get(),
                             new State(initialPosition, initialVelocity),
                             new State(goalPosition, 0.0));
+            Logger.recordOutput("endgame/initialPosition", initialPosition);
+            Logger.recordOutput("endgame/initialVelocity", initialVelocity);
+            Logger.recordOutput("endgame/trapezoidSetpoint", trapezoidSetpoint.position);
+
             double clampedPosition =
                     MathUtil.clamp(
                             trapezoidSetpoint.position,
