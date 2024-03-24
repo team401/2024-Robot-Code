@@ -227,7 +227,13 @@ public class RobotContainer {
             }
         }
 
-        if (FeatureFlags.enableLEDS) leds = new LED(scoringSubsystem);
+        if (FeatureFlags.enableLEDS) {
+            leds = new LED(scoringSubsystem);
+
+            if (FeatureFlags.runVision) {
+                leds.setVisionWorkingSupplier(() -> tagVision.getVisionWorking());
+            }
+        }
     }
 
     // spotless:off

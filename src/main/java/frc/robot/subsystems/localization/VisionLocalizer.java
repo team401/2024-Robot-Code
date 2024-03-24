@@ -89,4 +89,8 @@ public class VisionLocalizer extends SubsystemBase {
      */
     public static record CameraMeasurement(
             Pose2d pose, double timestamp, Matrix<N3, N1> variance) {}
+
+    public boolean getVisionWorking() {
+        return io.getInputs().get(0).connected;
+    }
 }
