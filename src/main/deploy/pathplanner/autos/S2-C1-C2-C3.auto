@@ -38,13 +38,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "S2-C1"
+            "pathName": "S2-C2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C1-E1"
+            "pathName": "C2-E1"
           }
         },
         {
@@ -56,13 +56,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "E1-C2"
+            "pathName": "E1-C1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C2-E1"
+            "pathName": "C1-E1"
           }
         },
         {
