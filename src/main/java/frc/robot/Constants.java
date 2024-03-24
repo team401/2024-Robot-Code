@@ -265,7 +265,7 @@ public final class Constants {
         public static final int leftMotorID = 18;
         public static final int rightMotorID = 19;
 
-        public static final int smartCurrentLimit = 50;
+        public static final int smartCurrentLimit = 200;
 
         public static final TrapezoidProfile.Constraints climberProfileConstraints =
                 new TrapezoidProfile.Constraints(0.5, 0.3); // TODO: Find safe values for this

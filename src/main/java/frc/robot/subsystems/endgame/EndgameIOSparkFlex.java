@@ -34,6 +34,8 @@ public class EndgameIOSparkFlex implements EndgameIO {
     double initialVelocity = 0.0;
 
     public EndgameIOSparkFlex() {
+        leftEndgameMotor.setSmartCurrentLimit(EndgameConstants.smartCurrentLimit);
+        rightEndgameMotor.setSmartCurrentLimit(EndgameConstants.smartCurrentLimit);
 
         rightEndgameMotor.setIdleMode(IdleMode.kBrake);
         leftEndgameMotor.setIdleMode(IdleMode.kBrake);
