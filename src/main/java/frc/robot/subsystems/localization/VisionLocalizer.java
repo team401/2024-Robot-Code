@@ -73,7 +73,7 @@ public class VisionLocalizer extends SubsystemBase {
             if (!DriverStation.isTeleop()) {
                 return VisionConstants.lowCameraUncertainty;
             } else {
-                return VisionConstants.veryLowCameraUncertainty;
+                return VisionConstants.teleopCameraUncertainty;
             }
         } else if (averageTagDistanceM < VisionConstants.lowUncertaintyCutoffDistance
                 && Math.abs(averageTagYaw.getDegrees()) < VisionConstants.skewCutoffRotation) {

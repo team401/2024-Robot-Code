@@ -47,7 +47,7 @@ public final class Constants {
     }
 
     public static final class FeatureFlags {
-        public static final boolean runVision = false;
+        public static final boolean runVision = true;
 
         public static final boolean runIntake = true;
         public static final boolean runScoring = true;
@@ -176,7 +176,7 @@ public final class Constants {
         public static final double skewCutoffDistance = 4.7;
         public static final double skewCutoffRotation = Units.degreesToRadians(30);
 
-        public static final Matrix<N3, N1> veryLowCameraUncertainty = VecBuilder.fill(3.5, 4.0, 6);
+        public static final Matrix<N3, N1> teleopCameraUncertainty = VecBuilder.fill(2.0, 3.5, 6);
 
         public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(2.0, 3.5, 6);
 

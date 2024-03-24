@@ -145,6 +145,8 @@ public class EndgameIOSparkFlex implements EndgameIO {
         inputs.endgameRightAppliedVolts = rightEndgameMotor.getAppliedOutput();
         inputs.endgameRightStatorCurrentAmps = rightEndgameMotor.getOutputCurrent();
 
+        inputs.overrideVolts = this.overrideVolts;
+
         inputs.finalTargetPosition = goalPosition;
         inputs.profileTargetPosition = profileSetpoint;
 
