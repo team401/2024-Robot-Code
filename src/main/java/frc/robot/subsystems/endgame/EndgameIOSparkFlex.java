@@ -152,6 +152,8 @@ public class EndgameIOSparkFlex implements EndgameIO {
 
         inputs.position = rightEndgameMotor.getEncoder().getPosition();
         inputs.velocity = leftEndgameMotor.getEncoder().getVelocity();
+
+        inputs.profileTimerTime = profileTimer.get();
     }
 
     @Override

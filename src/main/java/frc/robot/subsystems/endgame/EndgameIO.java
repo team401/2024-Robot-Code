@@ -22,6 +22,8 @@ public interface EndgameIO {
 
         public double profileTargetPosition = 0.0;
         public double finalTargetPosition = 0.0;
+
+        public double profileTimerTime = 0.0;
     }
 
     public default void updateInputs(EndgameIOInputs inputs) {}
