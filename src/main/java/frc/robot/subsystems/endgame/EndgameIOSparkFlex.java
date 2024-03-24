@@ -129,7 +129,9 @@ public class EndgameIOSparkFlex implements EndgameIO {
             State trapezoidSetpoint =
                     profile.calculate(
                             profileTimer.get(),
-                            new State(initialPosition, initialVelocity),
+                            // HACK: our velocity calculation is too noisy to be used, so we assume
+                            // it's zero
+                            new State(initialPosition, 0),
                             new State(goalPosition, 0.0));
             Logger.recordOutput("endgame/initialPosition", initialPosition);
             Logger.recordOutput("endgame/initialVelocity", initialVelocity);
