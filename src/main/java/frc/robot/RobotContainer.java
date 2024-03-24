@@ -256,7 +256,7 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                     () -> drivetrain.seedFieldRelative(AllianceUtil.getPoseAgainstSpeakerRight())));
             
-            leftJoystick.povDown()
+            leftJoystick.povUp()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.seedFieldRelative(AllianceUtil.getPoseAgainstPodium())));
 
