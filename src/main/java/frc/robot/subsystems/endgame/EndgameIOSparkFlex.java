@@ -4,12 +4,14 @@ import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.REVLibError;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.EndgameConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class EndgameIOSparkFlex implements EndgameIO {
     private final CANSparkFlex leftEndgameMotor =
@@ -117,9 +119,12 @@ public class EndgameIOSparkFlex implements EndgameIO {
 
     @Override
     public void updateInputs(EndgameIOInputs inputs) {
+        REVLibError err;
         if (override) {
             SmartDashboard.putNumber("endgame/overrideVolts", overrideVolts);
             rightEndgameMotor.setVoltage(overrideVolts);
+
+            err = REVLibError.kOk;
         } else {
             State trapezoidSetpoint =
                     profile.calculate(
@@ -134,10 +139,14 @@ public class EndgameIOSparkFlex implements EndgameIO {
 
             profileSetpoint = clampedPosition;
 
-            rightEndgameMotor
-                    .getPIDController()
-                    .setReference(clampedPosition, ControlType.kPosition);
+            err =
+                    rightEndgameMotor
+                            .getPIDController()
+                            .setReference(clampedPosition, ControlType.kPosition);
         }
+
+        Logger.recordOutput("endgame/overrideMode", override);
+        Logger.recordOutput("endgame/motorOk", err == REVLibError.kOk);
 
         inputs.endgameLeftAppliedVolts = leftEndgameMotor.getAppliedOutput();
         inputs.endgameLeftStatorCurrentAmps = leftEndgameMotor.getOutputCurrent();
