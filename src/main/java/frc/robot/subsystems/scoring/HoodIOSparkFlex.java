@@ -127,7 +127,11 @@ public class HoodIOSparkFlex implements HoodIO {
         //             .setReference(trapezoidSetpoint.position, ControlType.kPosition);
         // }
 
+        // if (hoodMotor.getOutputCurrent() > 70) {
+        //     hoodMotor.setVoltage(0.0);
+        // } else {
         hoodMotor.setVoltage(overrideVolts);
+        // }
 
         inputs.hoodAngleRad = hoodMotor.getEncoder().getPosition();
         inputs.hoodGoalAngleRad = trapezoidSetpoint.position;

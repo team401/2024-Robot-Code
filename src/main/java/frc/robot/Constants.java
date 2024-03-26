@@ -176,7 +176,7 @@ public final class Constants {
         public static final double skewCutoffDistance = 4.7;
         public static final double skewCutoffRotation = Units.degreesToRadians(30);
 
-        public static final Matrix<N3, N1> veryLowCameraUncertainty = VecBuilder.fill(3.5, 4.0, 6);
+        public static final Matrix<N3, N1> teleopCameraUncertainty = VecBuilder.fill(2.0, 3.5, 6);
 
         public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(2.0, 3.5, 6);
 
@@ -265,7 +265,7 @@ public final class Constants {
         public static final int leftMotorID = 18;
         public static final int rightMotorID = 19;
 
-        public static final int smartCurrentLimit = 50;
+        public static final int smartCurrentLimit = 200;
 
         public static final TrapezoidProfile.Constraints climberProfileConstraints =
                 new TrapezoidProfile.Constraints(0.5, 0.3); // TODO: Find safe values for this
@@ -292,7 +292,7 @@ public final class Constants {
         public static final double climberkFFClimber = 0.125;
         // Feedforward value for lowering elevator, assuming we are now lifting entire
         // weight of the robot
-        public static final double climberkFFRobot = 0.5;
+        public static final double climberkFFRobot = -0.5;
 
         public static final double encoderToMeters = Math.PI * Units.inchesToMeters(1.7567) / 20.0;
     }
@@ -338,7 +338,7 @@ public final class Constants {
 
         private static final double kDriveGearRatio = 6.122448979591837;
         private static final double kSteerGearRatio = 21.428571428571427;
-        private static final double kWheelRadiusInches = 1.939;
+        private static final double kWheelRadiusInches = 1.945;
 
         private static final boolean kSteerMotorReversed = true;
         private static final boolean kInvertLeftSide = false;
@@ -607,7 +607,7 @@ public final class Constants {
         // Value - Time in seconds
         public static HashMap<Double, Double> timeToPutAimDownMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
-            map.put(0.0, 0.5);
+            map.put(0.0, 0.6);
             map.put(Math.PI / 6, 0.6);
             map.put(Math.PI / 4, 0.7);
             map.put(Math.PI / 3, 0.8);

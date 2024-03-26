@@ -15,10 +15,15 @@ public interface EndgameIO {
         public double endgameRightStatorCurrentAmps = 0.0;
         public double endgameRightSupplyCurrentAmps = 0.0;
 
+        public double overrideVolts = 0.0;
+
         public double position = 0.0;
         public double velocity = 0.0;
 
-        public double targetPosition = 0.0;
+        public double profileTargetPosition = 0.0;
+        public double finalTargetPosition = 0.0;
+
+        public double profileTimerTime = 0.0;
     }
 
     public default void updateInputs(EndgameIOInputs inputs) {}

@@ -10,6 +10,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import java.util.function.Supplier;
 
 public class LED extends SubsystemBase {
 
@@ -28,6 +29,8 @@ public class LED extends SubsystemBase {
     private final int rainbowScale = 2;
 
     private ScoringSubsystem scoringSubsystem;
+
+    private Supplier<Boolean> visionWorkingSupplier = () -> true;
 
     public LED(ScoringSubsystem scoringSubsystem) {
         led = new AddressableLED(LEDConstants.ledPort);
@@ -59,6 +62,18 @@ public class LED extends SubsystemBase {
             if (scoringSubsystem.hasNote()) {
                 for (int i = 0; i < ledcount; i++) {
                     ledBuffer.setRGB(i, 245 / 3, 117 / 3, 66 / 3);
+                }
+            }
+
+            if (DriverStation.getMatchTime() < 20 && DriverStation.getMatchTime() > 17) {
+                for (int i = 0; i < ledcount; i++) {
+                    ledBuffer.setRGB(i, 255 / 3, 0, 0);
+                }
+            }
+
+            if (!visionWorkingSupplier.get()) {
+                for (int i = 0; i < ledcount - 10; i++) {
+                    ledBuffer.setRGB(i, 0, 0, 255 / 3);
                 }
             }
 
@@ -131,7 +146,13 @@ public class LED extends SubsystemBase {
             // }
         }
 
-        if (Constants.currentMode == Mode.REAL) led.setData(ledBuffer);
+        if (Constants.currentMode == Mode.REAL) {
+            led.setData(ledBuffer);
+        }
+    }
+
+    public void setVisionWorkingSupplier(Supplier<Boolean> visionWorkingSupplier) {
+        this.visionWorkingSupplier = visionWorkingSupplier;
     }
 
     private void clear() {

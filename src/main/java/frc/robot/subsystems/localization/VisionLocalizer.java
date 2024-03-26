@@ -73,7 +73,7 @@ public class VisionLocalizer extends SubsystemBase {
             if (!DriverStation.isTeleop()) {
                 return VisionConstants.lowCameraUncertainty;
             } else {
-                return VisionConstants.veryLowCameraUncertainty;
+                return VisionConstants.teleopCameraUncertainty;
             }
         } else if (averageTagDistanceM < VisionConstants.lowUncertaintyCutoffDistance
                 && Math.abs(averageTagYaw.getDegrees()) < VisionConstants.skewCutoffRotation) {
@@ -89,4 +89,8 @@ public class VisionLocalizer extends SubsystemBase {
      */
     public static record CameraMeasurement(
             Pose2d pose, double timestamp, Matrix<N3, N1> variance) {}
+
+    public boolean getVisionWorking() {
+        return io.getInputs().get(0).connected;
+    }
 }

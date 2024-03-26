@@ -227,7 +227,13 @@ public class RobotContainer {
             }
         }
 
-        if (FeatureFlags.enableLEDS) leds = new LED(scoringSubsystem);
+        if (FeatureFlags.enableLEDS) {
+            leds = new LED(scoringSubsystem);
+
+            if (FeatureFlags.runVision) {
+                leds.setVisionWorkingSupplier(() -> tagVision.getVisionWorking());
+            }
+        }
     }
 
     // spotless:off
@@ -256,7 +262,7 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                     () -> drivetrain.seedFieldRelative(AllianceUtil.getPoseAgainstSpeakerRight())));
             
-            leftJoystick.povDown()
+            leftJoystick.povUp()
                 .onTrue(new InstantCommand(
                     () -> drivetrain.seedFieldRelative(AllianceUtil.getPoseAgainstPodium())));
 
@@ -298,13 +304,28 @@ public class RobotContainer {
         }
 
         if (FeatureFlags.runEndgame) {
-            endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.CANCEL);
+            endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.WAIT);
 
             controller.leftBumper()
-                .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_UP)));
+                .onTrue(new InstantCommand(() -> {
+                    endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_UP);
+                    scoringSubsystem.forceHood(true);
+                }));
 
             controller.leftTrigger()
-                .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_DOWN)));
+                .onTrue(new InstantCommand(() -> {
+                    endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_DOWN);
+                    scoringSubsystem.forceHood(false);
+                }));
+            
+            controller.x()
+                .onTrue(new InstantCommand(() -> {
+                    endgameSubsystem.setAction(EndgameAction.OVERRIDE);
+                    endgameSubsystem.setVolts(-3, 0);
+                    scoringSubsystem.forceHood(false);
+                })).onFalse(new InstantCommand(() -> {
+                    endgameSubsystem.setVolts(0, 0);
+                }));
         }
 
         if (FeatureFlags.runIntake) {
@@ -330,6 +351,12 @@ public class RobotContainer {
                 controller.getHID()::getAButton,
                 controller.getHID()::getBButton, scoringSubsystem,
                 FeatureFlags.runDrive ? drivetrain::getAlignTarget : () -> AlignTarget.NONE));
+
+            controller.start()
+                .onTrue(new InstantCommand(() -> scoringSubsystem.setOverrideBeamBrake(true)));
+                
+            controller.back()
+                .onTrue(new InstantCommand(() -> scoringSubsystem.setOverrideBeamBrake(false)));
         }
     } // spotless:on
 
@@ -363,7 +390,7 @@ public class RobotContainer {
         }
 
         if (FeatureFlags.runEndgame) {
-            endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.CANCEL);
+            endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.WAIT);
             endgameSubsystem.setBrakeMode(true);
         }
 
