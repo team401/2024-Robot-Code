@@ -175,7 +175,7 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
-        public static final String tagLayoutName = "2024-WPI";
+        public static final String tagLayoutName = "Pairs-Only";
         public static final AprilTagFieldLayout fieldLayout = initLayout(tagLayoutName);
 
         public static final double lowUncertaintyCutoffDistance = 6.5;
