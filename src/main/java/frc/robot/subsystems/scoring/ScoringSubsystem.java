@@ -453,6 +453,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     public void enabledInit() {
         aimerIo.resetPID();
 
+        setOverrideStageAvoidance(false);
+        setOverrideShoot(false);
         aimerIo.setAimAngleRad(aimerInputs.aimAngleRad, true);
     }
 

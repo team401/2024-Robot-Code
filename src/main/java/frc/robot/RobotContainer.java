@@ -298,25 +298,13 @@ public class RobotContainer {
         }
 
         if (FeatureFlags.runEndgame) {
-            // endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.OVERRIDE);
             endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.CANCEL);
 
-            // controller.leftBumper()
-            //     .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(4.0, 0)))
-            //     .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
-
-            // controller.leftTrigger()
-            //     .onTrue(new InstantCommand(() -> endgameSubsystem.setVolts(-4.0, 0)))
-            //     .onFalse(new InstantCommand(() -> endgameSubsystem.setVolts(0.0, 0)));
-
-            // controller.leftBumper()
-            //     .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_UP)));
+            controller.leftBumper()
+                .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_UP)));
 
             controller.leftTrigger()
-                .onTrue(new InstantCommand(() -> endgameSubsystem.flipDirection()));
-
-            controller.x()
-                .onTrue(!endgameCommand.isScheduled() ? endgameCommand : new InstantCommand(() -> endgameCommand.cancel()));
+                .onTrue(new InstantCommand(() -> endgameSubsystem.setAction(EndgameSubsystem.EndgameAction.GO_DOWN)));
         }
 
         if (FeatureFlags.runIntake) {
@@ -798,11 +786,19 @@ public class RobotContainer {
                     "Wait Scoring",
                     new InstantCommand(
                             () -> scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.WAIT)));
+            NamedCommands.registerCommand(
+                    "OverrideStageAvoidance",
+                    new InstantCommand(() -> scoringSubsystem.setOverrideStageAvoidance(true)));
+            NamedCommands.registerCommand(
+                    "Un-OverrideStageAvoidance",
+                    new InstantCommand(() -> scoringSubsystem.setOverrideStageAvoidance(false)));
         } else {
             NamedCommands.registerCommand("Shoot Scoring", Commands.none());
             NamedCommands.registerCommand("Aim Scoring", Commands.none());
             NamedCommands.registerCommand("Wait Scoring", Commands.none());
             NamedCommands.registerCommand("Intake Scoring", Commands.none());
+            NamedCommands.registerCommand("OverrideStageAvoidance", Commands.none());
+            NamedCommands.registerCommand("Un-OverrideStageAvoidance", Commands.none());
         }
         if (FeatureFlags.runIntake) {
             NamedCommands.registerCommand("Intake Note", Commands.none());
