@@ -23,6 +23,12 @@ public class VisionLocalizer extends SubsystemBase {
 
     private Supplier<Pose2d> getFieldToRobot = () -> new Pose2d();
 
+    public enum CameraTrustZone {
+        LEFT,
+        RIGHT,
+        MIDDLE,
+    }
+
     public VisionLocalizer(CameraContainer io) {
         this.io = io;
     }

@@ -23,6 +23,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.localization.VisionLocalizer.CameraTrustZone;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -188,41 +190,34 @@ public final class Constants {
                 List.of(
                         new CameraParams(
                                 "Front-Left",
-                                640,
-                                480,
-                                20,
+                                1280,
+                                800,
+                                16,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(0.323, 0.262, 0.216),
-                                        new Rotation3d(0, -0.382, 0.209))),
+                                        new Rotation3d(0, -0.382, 0.209)),
+                                CameraTrustZone.LEFT),
                         new CameraParams(
                                 "Front-Right",
-                                640,
-                                480,
-                                20,
+                                1280,
+                                800,
+                                16,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(0.323, -0.262, 0.216),
-                                        new Rotation3d(0.0, -0.398, -0.109))),
+                                        new Rotation3d(0.0, -0.398, -0.109)),
+                                CameraTrustZone.RIGHT),
                         new CameraParams(
-                                "Back-Left",
-                                640,
-                                480,
-                                20,
+                                "Middle",
+                                1280,
+                                800,
+                                16,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
-                                        new Translation3d(-0.327, 0.281, 0.333),
-                                        new Rotation3d(0.0, -0.409, 3.14))));
-
-        // new CameraParams(
-        //         "Back-Right",
-        //         640,
-        //         480,
-        //         20,
-        //         Rotation2d.fromDegrees(70),
-        //         new Transform3d(
-        //                 new Translation3d(-0.327, -0.281, 0.333),
-        //                 new Rotation3d(0.0, -0.409, 3.14))));
+                                        new Translation3d(0.0, 0.0, 0.0),
+                                        new Rotation3d(0.0, 0.0, 0.0)),
+                                CameraTrustZone.MIDDLE));
 
         public static record CameraParams(
                 String name,
@@ -230,7 +225,8 @@ public final class Constants {
                 int yResolution,
                 int fps,
                 Rotation2d fov,
-                Transform3d robotToCamera) {}
+                Transform3d robotToCamera,
+                CameraTrustZone zone) {}
 
         private static AprilTagFieldLayout initLayout(String name) {
             AprilTagFieldLayout layout;
