@@ -1,6 +1,5 @@
 package frc.robot.subsystems.scoring;
 
-import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkFlex;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -37,7 +36,7 @@ public class HoodIOSparkFlex implements HoodIO {
     private Timer homeTimer = new Timer();
 
     public HoodIOSparkFlex() {
-        hoodMotor.setSmartCurrentLimit(120);
+        // hoodMotor.setSmartCurrentLimit(150);
 
         hoodMotor.getPIDController().setP(ScoringConstants.hoodkP);
         hoodMotor.getPIDController().setI(ScoringConstants.hoodkI);
@@ -50,6 +49,8 @@ public class HoodIOSparkFlex implements HoodIO {
         hoodMotor.getEncoder().setVelocityConversionFactor(ScoringConstants.hoodEncoderToRad);
 
         hoodMotor.setIdleMode(CANSparkFlex.IdleMode.kBrake);
+
+        hoodMotor.setSmartCurrentLimit(140);
     }
 
     @Override
@@ -79,11 +80,11 @@ public class HoodIOSparkFlex implements HoodIO {
 
     @Override
     public void home() {
-        homing = true;
-        hoodMotor.setVoltage(1.5);
+        // homing = true;
+        // hoodMotor.setVoltage(1.5);
 
-        homeTimer.reset();
-        homeTimer.start();
+        // homeTimer.reset();
+        // homeTimer.start();
     }
 
     @Override
@@ -106,25 +107,31 @@ public class HoodIOSparkFlex implements HoodIO {
                         new State(initialAngle, initialVelocity),
                         new State(goalAngleRad, 0.0));
 
-        if (homing) {
-            if (hoodMotor.getOutputCurrent() > ScoringConstants.hoodHomeAmps
-                    && homeTimer.get() > 0.4) {
-                hoodMotor.setVoltage(0);
-                hoodMotor.getEncoder().setPosition(ScoringConstants.hoodHomeAngleRad);
-                homing = false;
+        // if (homing) {
+        //     if (hoodMotor.getOutputCurrent() > ScoringConstants.hoodHomeAmps
+        //             && homeTimer.get() > 0.4) {
+        //         hoodMotor.setVoltage(0);
+        //         hoodMotor.getEncoder().setPosition(ScoringConstants.hoodHomeAngleRad);
+        //         homing = false;
 
-                homeTimer.stop();
-            }
-        } else if (override) {
-            hoodMotor.setVoltage(overrideVolts);
-        } else {
-            hoodMotor
-                    .getPIDController()
-                    .setFF(feedforward.calculate(trapezoidSetpoint.position, 0.0));
-            hoodMotor
-                    .getPIDController()
-                    .setReference(trapezoidSetpoint.position, ControlType.kPosition);
-        }
+        //         homeTimer.stop();
+        //     }
+        // } else if (override) {
+        //     hoodMotor.setVoltage(overrideVolts);
+        // } else {
+        //     hoodMotor
+        //             .getPIDController()
+        //             .setFF(feedforward.calculate(trapezoidSetpoint.position, 0.0));
+        //     hoodMotor
+        //             .getPIDController()
+        //             .setReference(trapezoidSetpoint.position, ControlType.kPosition);
+        // }
+
+        // if (hoodMotor.getOutputCurrent() > 70) {
+        //     hoodMotor.setVoltage(0.0);
+        // } else {
+        hoodMotor.setVoltage(overrideVolts);
+        // }
 
         inputs.hoodAngleRad = hoodMotor.getEncoder().getPosition();
         inputs.hoodGoalAngleRad = trapezoidSetpoint.position;

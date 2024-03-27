@@ -1,0 +1,73 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.441414260288271,
+      "y": 5.463073824179848
+    },
+    "rotation": 180.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.4
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Disable Auto-Align"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "S2-C1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Enable Auto-Align"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C1-E1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Disable Auto-Align"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "E1-C2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Enable Auto-Align"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C2-E1"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

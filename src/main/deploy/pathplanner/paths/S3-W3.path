@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 2.8169382053049823,
-        "y": 4.133967125077108
+        "x": 2.8,
+        "y": 4.16
       },
       "prevControl": {
-        "x": 1.877054536628879,
-        "y": 4.266138265984686
+        "x": 2.023048731811749,
+        "y": 4.555805363039298
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,16 +30,51 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "OverrideShoot",
+      "waypointRelativePos": 0.6,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Override Shoot"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "UnOverrideShoot",
+      "waypointRelativePos": 0.9,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Un-Override Shoot"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 4.5,
-    "maxAcceleration": 2.75,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0,
+    "rotation": 161.5291041528196,
     "rotateFast": false
   },
   "reversed": false,

@@ -1,0 +1,85 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.6679855613232356,
+      "y": 4.350348982388106
+    },
+    "rotation": 121.12182293312829
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot Scoring"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Override Shoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.2
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Un-Override Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "S3-C5"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C5-E2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "E2-C4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C4-E1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "E1-C3-Stage"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C3-E1"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

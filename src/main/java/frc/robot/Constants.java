@@ -56,7 +56,7 @@ public final class Constants {
         public static final boolean runEndgame = true;
         public static final boolean runDrive = true;
 
-        public static final boolean enableLEDS = false;
+        public static final boolean enableLEDS = true;
     }
 
     public static final class ConversionConstants {
@@ -81,6 +81,7 @@ public final class Constants {
         public static final double MaxAngularRateRadiansPerSec = Math.PI * 2; // 2 PI is one full
         // rotation per second
         public static final double deadbandPercent = 0.16;
+        public static final double maxAccelerationMetersPerSecSquared = 7.0;
 
         public static final Pose2d initialPose =
                 new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90));
@@ -88,12 +89,23 @@ public final class Constants {
         public static final double anticipationTime = 0.01;
         public static final double minimumAnticipationVelocity = 0.0;
 
+        public static final double pathfindTransformToleranceMeters = 0.1;
+        public static final double pathfindRotationToleranceRadians = 0.1;
+
         public static final double alignToleranceRadians = 0.1;
 
         public static final double alignmentkPMax = 7.0;
         public static final double alignmentkPMin = 5.0;
-        public static final double alignmentkI = 2.5;
+        public static final double alignmentkI = 5.5;
         public static final double alignmentkD = 0.0;
+
+        public static final double vXkP = 5.0;
+        public static final double vXkI = 2.5;
+        public static final double vXkD = 0.0;
+
+        public static final double vYkP = 5.0;
+        public static final double vYkI = 2.5;
+        public static final double vYkD = 0.0;
     }
 
     public static final class FieldConstants {
@@ -132,6 +144,18 @@ public final class Constants {
         public static final Pose2d robotAgainstRedSpeaker =
                 new Pose2d(15.19, 5.56, Rotation2d.fromDegrees(0));
 
+        public static final Pose2d robotAgainstBlueSpeakerRight =
+                new Pose2d(0.7, 4.38, Rotation2d.fromDegrees(120));
+
+        public static final Pose2d robotAgainstRedSpeakerRight =
+                new Pose2d(15.83, 6.73, Rotation2d.fromDegrees(-60));
+
+        public static final Pose2d robotAgainstBlueSpeakerLeft =
+                new Pose2d(0.7, 6.73, Rotation2d.fromDegrees(-120));
+
+        public static final Pose2d robotAgainstRedSpeakerLeft =
+                new Pose2d(15.83, 4.38, Rotation2d.fromDegrees(60));
+
         public static final Pose2d robotAgainstBluePodium =
                 new Pose2d(2.57, 4.09, Rotation2d.fromDegrees(180));
 
@@ -146,16 +170,19 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
-        public static final String tagLayoutName = "vabla";
+        public static final String tagLayoutName = "2024-WPI";
         public static final AprilTagFieldLayout fieldLayout = initLayout(tagLayoutName);
 
-        public static final double singleTagAmbiguityCutoff = 0.05;
+        public static final double lowUncertaintyCutoffDistance = 6.5;
 
-        // 0.45 from 2023
-        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(0.8, 0.8, 2);
-        // 1.2 from 2023
-        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(2.2, 2.2, 10);
-        public static final Matrix<N3, N1> singleTagUncertainty = VecBuilder.fill(25.0, 25.0, 10);
+        public static final double skewCutoffDistance = 4.7;
+        public static final double skewCutoffRotation = Units.degreesToRadians(30);
+
+        public static final Matrix<N3, N1> teleopCameraUncertainty = VecBuilder.fill(2.0, 3.5, 6);
+
+        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(2.0, 3.5, 6);
+
+        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(25.0, 25.0, 40);
 
         public static final Matrix<N3, N1> driveUncertainty = VecBuilder.fill(0.1, 0.1, 0.1);
 
@@ -169,7 +196,7 @@ public final class Constants {
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(0.323, 0.262, 0.216),
-                                        new Rotation3d(0, -0.398, 0.109))),
+                                        new Rotation3d(0, -0.382, 0.209))),
                         new CameraParams(
                                 "Front-Right",
                                 640,
@@ -215,7 +242,8 @@ public final class Constants {
                 layout =
                         new AprilTagFieldLayout(
                                 Filesystem.getDeployDirectory().getAbsolutePath()
-                                        + "/taglayout/2024-WPI"
+                                        + "/taglayout/"
+                                        + name
                                         + ".json");
             } catch (IOException ioe) {
                 DriverStation.reportWarning(
@@ -231,7 +259,7 @@ public final class Constants {
         public static final int rightIntakeMotorID = 10;
         public static final int indexTwoMotorID = 14;
 
-        public static final double intakePower = 10.0;
+        public static final double intakePower = 8.0;
         public static final double beltPower = 8.0;
     }
 
@@ -239,7 +267,7 @@ public final class Constants {
         public static final int leftMotorID = 18;
         public static final int rightMotorID = 19;
 
-        public static final int smartCurrentLimit = 50;
+        public static final int smartCurrentLimit = 200;
 
         public static final TrapezoidProfile.Constraints climberProfileConstraints =
                 new TrapezoidProfile.Constraints(0.5, 0.3); // TODO: Find safe values for this
@@ -266,7 +294,7 @@ public final class Constants {
         public static final double climberkFFClimber = 0.125;
         // Feedforward value for lowering elevator, assuming we are now lifting entire
         // weight of the robot
-        public static final double climberkFFRobot = 0.5;
+        public static final double climberkFFRobot = -0.5;
 
         public static final double encoderToMeters = Math.PI * Units.inchesToMeters(1.7567) / 20.0;
     }
@@ -312,7 +340,7 @@ public final class Constants {
 
         private static final double kDriveGearRatio = 6.122448979591837;
         private static final double kSteerGearRatio = 21.428571428571427;
-        private static final double kWheelRadiusInches = 1.925;
+        private static final double kWheelRadiusInches = 1.945;
 
         private static final boolean kSteerMotorReversed = true;
         private static final boolean kInvertLeftSide = false;
@@ -441,8 +469,8 @@ public final class Constants {
     }
 
     public static final class ScoringConstants {
-        public static final double aimerkP = 15.0;
-        public static final double aimerkI = 15.0;
+        public static final double aimerkP = 17.0;
+        public static final double aimerkI = 10.0; // 5.0
         public static final double aimerkD = 0.0;
 
         public static final double aimerkS = 0.265;
@@ -481,18 +509,19 @@ public final class Constants {
         public static final int hoodId = 17;
 
         public static final int aimEncoderPort = 0;
-        public static final double aimerEncoderOffset = 1.78;
+        public static final double aimerEncoderOffset = 1.75;
 
         public static final double aimPositionTolerance = 0.015;
 
-        public static final double aimAcceleration = 5.0; // TODO: 15.0
+        public static final double aimAcceleration = 4.5; // TODO: 15.0
         public static final double aimCruiseVelocity = 7.0; // TODO: 15.0
 
         public static final double shooterVelocityMarginRPM = 50;
         public static final double aimAngleMarginRadians = Units.degreesToRadians(1);
+        public static final double aimAngleVelocityMargin = 2.0; // Units.degreesToRadians(5);
         public static final double hoodAngleMarginRadians = Units.degreesToRadians(5);
 
-        public static final double intakeAngleToleranceRadians = 0.1;
+        public static final double intakeAngleToleranceRadians = 0.2;
         // Math.PI / 2 - Units.degreesToRadians(40);
 
         public static final double shooterAmpVelocityRPM = 2000;
@@ -501,6 +530,7 @@ public final class Constants {
         public static final double hoodHomeAngleRad = Math.PI - 0.23;
 
         public static final double aimMaxAngleRadians = 1.65; // Math.PI / 2
+        public static final double aimMinAngleRadians = -0.03;
 
         public static final double maxAimIntake = 0.0;
         public static final double minAimIntake = 0.0;
@@ -516,30 +546,33 @@ public final class Constants {
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters
         // Value - Aimer angle in radians
-        public static HashMap<Double, Double> getAimerMap() { // TODO: Find this
+        public static HashMap<Double, Double> getAimerMap() {
             HashMap<Double, Double> map = new HashMap<Double, Double>();
             map.put(0.0, 0.8);
-            map.put(1.45, 0.8); // 0.7
+            map.put(1.45, 0.8);
             map.put(1.98, 0.62);
             map.put(2.41, 0.53);
-            map.put(3.02, 0.48); // 0.45
+            map.put(3.02, 0.45);
             map.put(3.22, 0.45);
             map.put(3.9, 0.36);
-            map.put(4.55, 0.34);
-            map.put(4.95, 0.33);
-            map.put(5.64, 0.32);
+            map.put(4.55, 0.35);
+            map.put(4.95, 0.32);
+            map.put(5.15, 0.295);
+            map.put(5.35, 0.295);
+            map.put(5.5, 0.295);
+            map.put(5.64, 0.29);
             // map.put(5.82, 0.275);
-            map.put(6.0, 0.31);
+            map.put(6.0, 0.29);
 
             return map;
         }
 
-        public static final double aimerStaticOffset = 0.02;
+        public static final double aimerStaticOffset = 0.01;
 
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters
         // Value - Shooter RPM
-        public static HashMap<Double, Double> getShooterMap() { // TODO: Find this
+        public static HashMap<Double, Double> getShooterMap() {
             HashMap<Double, Double> map = new HashMap<Double, Double>();
             map.put(0.0, 2700.0);
             map.put(1.45, 2700.0);
@@ -549,9 +582,11 @@ public final class Constants {
             map.put(3.22, 3300.0);
             map.put(3.9, 3300.0);
             map.put(4.55, 3500.0);
-            map.put(4.95, 4000.0);
-            map.put(5.64, 4200.0);
-            map.put(5.82, 4300.0);
+            map.put(4.95, 3500.0); // 4000.0
+            map.put(5.15, 3500.0);
+            map.put(5.35, 3500.0);
+            map.put(5.64, 3500.0);
+            map.put(5.82, 3500.0);
 
             return map;
         }
@@ -559,7 +594,7 @@ public final class Constants {
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters
         // Value - Time in seconds
-        public static HashMap<Double, Double> timeToGoalMap() { // TODO: Find this
+        public static HashMap<Double, Double> timeToGoalMap() {
             HashMap<Double, Double> map = new HashMap<Double, Double>();
             map.put(0.0, 0.15);
             map.put(1.3, 0.15);
@@ -574,10 +609,10 @@ public final class Constants {
         // Value - Time in seconds
         public static HashMap<Double, Double> timeToPutAimDownMap() { // TODO: Find this
             HashMap<Double, Double> map = new HashMap<Double, Double>();
-            map.put(0.0, 0.2);
-            map.put(Math.PI / 6, 0.5);
-            map.put(Math.PI / 4, 0.6);
-            map.put(Math.PI / 3, 0.7);
+            map.put(0.0, 0.6);
+            map.put(Math.PI / 6, 0.6);
+            map.put(Math.PI / 4, 0.7);
+            map.put(Math.PI / 3, 0.8);
             map.put(Math.PI / 2, 1.0);
 
             return map;
@@ -601,11 +636,13 @@ public final class Constants {
 
     public static final class LEDConstants {
         public static final int ledPort = 0;
-        public static final int ledLength = 5;
+
+        public static final int ledLength = 17;
     }
 
     public static final class IOConstants {
         public static final int brakeSwitchPort = 2;
+        public static final int ledSwitchPort = 3;
         public static final int timeOutputPort = 4;
     }
 }

@@ -13,6 +13,7 @@ public interface AimerIO {
         public double aimSupplyCurrentAmps = 0.0;
 
         public double aimVelocityRadPerSec = 0.0;
+        public double aimVelocityErrorRadPerSec = 0.0;
     }
 
     public default void updateInputs(AimerIOInputs inputs) {}
@@ -36,4 +37,6 @@ public interface AimerIO {
     public default void setFF(double kS, double kV, double kA, double kG) {}
 
     public default void setBrakeMode(boolean brake) {}
+
+    public default void setStatorCurrentLimit(double limit) {}
 }

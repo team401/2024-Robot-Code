@@ -54,6 +54,7 @@ public class AimerIORoboRio implements AimerIO {
 
     double velocity = 0.0;
 
+    double lastError = 0.0;
     double lastPosition = 0.0;
     double lastTime = Utils.getCurrentTimeSeconds();
 
@@ -62,6 +63,8 @@ public class AimerIORoboRio implements AimerIO {
 
         aimerLeft.setNeutralMode(NeutralModeValue.Brake);
         aimerRight.setNeutralMode(NeutralModeValue.Brake);
+
+        aimerRight.setInverted(false);
 
         TalonFXConfigurator aimerLeftConfig = aimerLeft.getConfigurator();
         aimerLeftConfig.apply(
@@ -111,9 +114,15 @@ public class AimerIORoboRio implements AimerIO {
             return;
         }
         this.minAngleClamp =
-                MathUtil.clamp(minAngleClamp, 0.0, ScoringConstants.aimMaxAngleRadians);
+                MathUtil.clamp(
+                        minAngleClamp,
+                        ScoringConstants.aimMinAngleRadians,
+                        ScoringConstants.aimMaxAngleRadians);
         this.maxAngleClamp =
-                MathUtil.clamp(maxAngleClamp, 0.0, ScoringConstants.aimMaxAngleRadians);
+                MathUtil.clamp(
+                        maxAngleClamp,
+                        ScoringConstants.aimMinAngleRadians,
+                        ScoringConstants.aimMaxAngleRadians);
     }
 
     @Override
@@ -156,6 +165,20 @@ public class AimerIORoboRio implements AimerIO {
         return encoder.getAbsolutePosition() * 2.0 * Math.PI - ScoringConstants.aimerEncoderOffset;
     }
 
+    public void setStatorCurrentLimit(double limit) {
+        TalonFXConfigurator aimerLeftConfig = aimerLeft.getConfigurator();
+        aimerLeftConfig.apply(
+                new CurrentLimitsConfigs()
+                        .withStatorCurrentLimit(limit)
+                        .withStatorCurrentLimitEnable(true));
+
+        TalonFXConfigurator aimerRightConfig = aimerRight.getConfigurator();
+        aimerRightConfig.apply(
+                new CurrentLimitsConfigs()
+                        .withStatorCurrentLimit(limit)
+                        .withStatorCurrentLimitEnable(true));
+    }
+
     @Override
     public void updateInputs(AimerIOInputs inputs) {
         appliedVolts = 0.0;
@@ -192,6 +215,10 @@ public class AimerIORoboRio implements AimerIO {
         inputs.aimVelocityRadPerSec = (getEncoderPosition() - lastPosition) / diffTime;
         velocity = (getEncoderPosition() - lastPosition) / diffTime;
         lastPosition = getEncoderPosition();
+
+        inputs.aimVelocityErrorRadPerSec =
+                ((getEncoderPosition() - controlSetpoint) - lastError) / diffTime;
+        lastError = getEncoderPosition() - controlSetpoint;
 
         inputs.aimAppliedVolts = appliedVolts;
         inputs.aimStatorCurrentAmps = aimerRight.getStatorCurrent().getValueAsDouble();

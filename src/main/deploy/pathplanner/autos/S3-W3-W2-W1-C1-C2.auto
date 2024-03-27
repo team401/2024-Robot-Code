@@ -1,0 +1,109 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7071301441350655,
+      "y": 4.376333332273105
+    },
+    "rotation": 120.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.4
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Override Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "OverrideStageAvoidance"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.2
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Un-Override Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "S3-W3"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.2
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "W3-W2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "W2-W1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.1
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "W1-C1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C1-E1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "E1-C2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C2-E1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Un-OverrideStageAvoidance"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

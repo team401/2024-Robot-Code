@@ -12,12 +12,6 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "Shoot Scoring"
-          }
-        },
-        {
           "type": "wait",
           "data": {
             "waitTime": 1.0
@@ -60,21 +54,15 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Aim Scoring"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "C1-E1"
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Shoot Scoring"
+            "pathName": "E1-C2"
           }
         }
       ]

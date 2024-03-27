@@ -3,37 +3,43 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.007287860729568,
-        "y": 6.035815434779349
+        "x": 4.05,
+        "y": 6.6
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.624086518298261,
-        "y": 5.698044741348875
+        "x": 5.453411669766119,
+        "y": 6.989097356941308
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.797997024565479,
-        "y": 5.790485866686019
+        "x": 8.358370634451466,
+        "y": 5.7567874706411315
       },
       "prevControl": {
-        "x": 7.801153888022062,
-        "y": 5.790485866686019
+        "x": 7.060891142672386,
+        "y": 6.1778460341661825
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0,
+      "rotationDegrees": -168.36636600105948,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [
     {
       "name": "Prime",
-      "waypointRelativePos": 0.0,
+      "waypointRelativePos": 0.15,
       "command": {
         "type": "parallel",
         "data": {
@@ -47,21 +53,38 @@
           ]
         }
       }
+    },
+    {
+      "name": "Disable Auto-Align",
+      "waypointRelativePos": 0.15,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Disable Auto-Align"
+              }
+            }
+          ]
+        }
+      }
     }
   ],
   "globalConstraints": {
     "maxVelocity": 4.5,
-    "maxAcceleration": 2.75,
+    "maxAcceleration": 4.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0,
+    "rotation": 179.5231067005846,
     "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": null,
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

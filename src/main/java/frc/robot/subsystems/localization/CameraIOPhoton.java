@@ -1,6 +1,7 @@
 package frc.robot.subsystems.localization;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.Constants.VisionConstants;
@@ -65,6 +66,8 @@ public class CameraIOPhoton implements CameraIO {
     public void updateInputs(CameraIOInputs inputs) {
         inputs.connected = camera.isConnected();
 
+        inputs.name = this.name;
+
         PhotonPipelineResult result = camera.getLatestResult();
         if (result.getTimestampSeconds() == latestTimestampSeconds) {
             inputs.isNew = false;
@@ -83,16 +86,13 @@ public class CameraIOPhoton implements CameraIO {
 
                     inputs.latestTimestampSeconds = this.latestTimestampSeconds;
                     inputs.averageTagDistanceM = calculateAverageTagDistance(pose);
+                    inputs.averageTagYaw = calculateAverageTagYaw(pose);
                 });
     }
 
     private static boolean filterPhotonPose(EstimatedRobotPose photonPose) {
-        if (photonPose.targetsUsed.size() == 1) {
-            // if we only see one tag, filter strictly
-            double ambiguity = photonPose.targetsUsed.get(0).getPoseAmbiguity();
-            if (ambiguity > VisionConstants.singleTagAmbiguityCutoff || ambiguity == -1) {
-                return false;
-            }
+        if (photonPose.targetsUsed.size() < 2) {
+            return false;
         }
 
         Pose3d pose = photonPose.estimatedPose;
@@ -115,5 +115,16 @@ public class CameraIOPhoton implements CameraIO {
         distance /= pose.targetsUsed.size();
 
         return distance;
+    }
+
+    private static Rotation2d calculateAverageTagYaw(EstimatedRobotPose pose) {
+        double yawRad = 0.0;
+        for (PhotonTrackedTarget target : pose.targetsUsed) {
+            yawRad += target.getBestCameraToTarget().getRotation().getZ();
+        }
+        yawRad /= pose.targetsUsed.size();
+        yawRad -= Math.PI * Math.signum(yawRad);
+
+        return Rotation2d.fromRadians(yawRad);
     }
 }

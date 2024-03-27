@@ -8,6 +8,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -16,6 +17,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -32,6 +34,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
+import frc.robot.utils.AllianceUtil;
 import frc.robot.utils.GeomUtil;
 import frc.robot.utils.InterpolateDouble;
 import java.util.function.Supplier;
@@ -62,6 +65,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     public enum AlignState {
         MANUAL,
         ALIGNING,
+        POSE_TARGET
     }
 
     private AlignTarget alignTarget = AlignTarget.NONE;
@@ -69,18 +73,22 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private double alignDirection = 0.0;
 
+    private Pose2d targetTightPose;
+
     private static InterpolateDouble noteTimeToGoal =
             new InterpolateDouble(ScoringConstants.timeToGoalMap(), 0.0, 2.0);
 
     private Supplier<Pose2d> getFieldToRobot = () -> new Pose2d();
-    private Supplier<Translation2d> getFieldToSpeaker = () -> new Translation2d();
-
-    private Supplier<Rotation2d> getFieldToAmp = () -> new Rotation2d();
-    private Supplier<Rotation2d> getFieldToSource = () -> new Rotation2d();
 
     private Supplier<Translation2d> getRobotVelocity = () -> new Translation2d();
 
-    private SendableChooser<String> autoChooser = new SendableChooser<String>();
+    private SendableChooser<Command> autoChooser = new SendableChooser<Command>();
+
+    private PIDController vXController =
+            new PIDController(DriveConstants.vXkP, DriveConstants.vXkI, DriveConstants.vXkD);
+
+    private PIDController vYController =
+            new PIDController(DriveConstants.vYkP, DriveConstants.vYkI, DriveConstants.vYkD);
 
     private PIDController thetaController =
             new PIDController(
@@ -95,6 +103,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private static final double kSimLoopPeriod = 0.02; // Original: 5 ms
     private Notifier simNotifier = null;
     private double lastSimTime;
+
+    private Command pathfindCommand = null;
+
+    private Pose2d pathfindPose = new Pose2d();
+
+    private ChassisSpeeds stopSpeeds = new ChassisSpeeds(0, 0, 0);
 
     public CommandSwerveDrivetrain(
             SwerveDrivetrainConstants driveTrainConstants,
@@ -140,18 +154,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         this.getFieldToRobot = getFieldToRobot;
     }
 
-    public void setSpeakerSupplier(Supplier<Translation2d> getFieldToSpeaker) {
-        this.getFieldToSpeaker = getFieldToSpeaker;
-    }
-
-    public void setAmpSupplier(Supplier<Rotation2d> getFieldToAmp) {
-        this.getFieldToAmp = getFieldToAmp;
-    }
-
-    public void setSourceSupplier(Supplier<Rotation2d> getFieldToSource) {
-        this.getFieldToSource = getFieldToSource;
-    }
-
     public void setAlignTarget(AlignTarget alignTarget) {
         this.alignTarget = alignTarget;
     }
@@ -185,13 +187,16 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 this::seedFieldRelative, // Consumer for seeding pose against auto
                 this::getCurrentRobotChassisSpeeds,
                 (speeds) -> {
+                    speeds.omegaRadiansPerSecond *= -1;
                     this.setGoalChassisSpeeds(speeds, false);
-                    this.setAlignState(AlignState.ALIGNING);
                     this.setAlignTarget(AlignTarget.SPEAKER);
                 }, // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
                         new PIDConstants(1, 0, 0),
-                        new PIDConstants(0, 0, 0),
+                        new PIDConstants(
+                                DriveConstants.alignmentkPMax,
+                                DriveConstants.alignmentkI,
+                                DriveConstants.alignmentkD),
                         TunerConstants.kSpeedAt12VoltsMps,
                         driveBaseRadius,
                         new ReplanningConfig()),
@@ -212,22 +217,36 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         // PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
 
         // autoChooser = AutoBuilder.buildAutoChooser();
-        autoChooser.setDefaultOption("Default", "None"); // S1-W1-W2-W3
-        autoChooser.addOption("Amp Side - 4 note (2 from center)", "S1-W1-C1-C2");
-        autoChooser.addOption("Amp Side - 5 note (3 from center)", "S1-W1-C1-C2-C3");
-        autoChooser.addOption("Amp Side - 3 note", "S1-W1-W2");
-        autoChooser.addOption("Amp Side - 4 note (wing)", "S1-W1-W2-W3");
-        autoChooser.addOption("Amp Side - 5 note", "S1-W1-W2-W3-C5");
-        autoChooser.addOption("Center - 3 note", "S2-W2-W3");
-        autoChooser.addOption("Center - 4 note (source side to center)", "S2-W2-W3-C5");
-        autoChooser.addOption("Source Side - 2 note", "S3-W3");
-        autoChooser.addOption("Source Side - 3 note", "S3-W3-C5");
-        autoChooser.addOption("Source Side - 5 note (across)", "S3-W3-W2-W1-C1");
+        autoChooser.setDefaultOption("Default", new PathPlannerAuto("None")); // S1-W1-W2-W3
+        autoChooser.addOption(
+                "Amp Side - 4 note (2 from center)", new PathPlannerAuto("S1-W1-C1-C2"));
+        autoChooser.addOption(
+                "Amp Side - 5 note (3 from center)", new PathPlannerAuto("S1-W1-C1-C2-C3"));
+        autoChooser.addOption("Amp Side - 3 note", new PathPlannerAuto("S1-W1-W2"));
+        autoChooser.addOption("Amp Side - 4 note (wing)", new PathPlannerAuto("S1-W1-W2-W3"));
+        autoChooser.addOption("Amp Side - 5 note", new PathPlannerAuto("S1-W1-W2-W3-C5"));
+        autoChooser.addOption("Center - 3 note", new PathPlannerAuto("S2-W2-W3"));
+        autoChooser.addOption(
+                "Center - 3 note (2 from center - avoids wing notes)",
+                new PathPlannerAuto("S2-C1-C2"));
+        autoChooser.addOption(
+                "Center - 4 note (source side to center)", new PathPlannerAuto("S2-W2-W3-C5"));
+        autoChooser.addOption("Center - 3 note - special", new PathPlannerAuto("S2-C1-C2-Special"));
+        autoChooser.addOption(
+                "Center - 4 note - avoids wing notes", new PathPlannerAuto("S2-C1-C2-C3"));
+        autoChooser.addOption("Source Side - 2 note", new PathPlannerAuto("S3-W3"));
+        autoChooser.addOption("Source Side - 3 note", new PathPlannerAuto("S3-W3-C5"));
+        autoChooser.addOption(
+                "Source Side - 4 note - 3 from center", new PathPlannerAuto("S3-C5-C4-C3"));
+        autoChooser.addOption(
+                "Source Side - 5 note (across)", new PathPlannerAuto("S3-W3-W2-W1-C1"));
+        autoChooser.addOption(
+                "Source Side - 6 note (across)", new PathPlannerAuto("S3-W3-W2-W1-C1-C2"));
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     public Command getAutoCommand() {
-        return new PathPlannerAuto(autoChooser.getSelected());
+        return autoChooser.getSelected();
     }
 
     public ChassisSpeeds getCurrentRobotChassisSpeeds() {
@@ -274,7 +293,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                         alignDirection = direction;
                         break;
                     case Red:
-                        alignDirection = direction + 3.14;
+                        alignDirection = direction + Math.PI;
                         break;
                 }
             }
@@ -289,15 +308,16 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         if (alignState == AlignState.ALIGNING) {
             switch (alignTarget) {
                 case AMP:
-                    desiredHeading = getFieldToAmp.get();
+                    desiredHeading = AllianceUtil.getAmpHeading();
                     break;
                 case SPEAKER:
                     desiredHeading =
                             calculateDesiredHeading(
-                                    pose, new Pose2d(getFieldToSpeaker.get(), new Rotation2d()));
+                                    pose,
+                                    new Pose2d(AllianceUtil.getFieldToSpeaker(), new Rotation2d()));
                     break;
                 case SOURCE:
-                    desiredHeading = getFieldToSource.get();
+                    desiredHeading = AllianceUtil.getSourceHeading();
                     break;
                     // case SPECIFIC_DIRECTION:
                     //     desiredHeading = Rotation2d.fromRadians(alignDirection);
@@ -386,12 +406,18 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             Logger.recordOutput("Drive/omegaCommand", omega);
             Logger.recordOutput("Drive/desiredHeading", desiredHeading.getRadians());
             Logger.recordOutput("Drive/rotationError", thetaController.getPositionError());
+        } else if (alignState == AlignState.POSE_TARGET) {
+            vx = vXController.calculate(pose.getX(), targetTightPose.getX());
+            vy = vYController.calculate(pose.getY(), targetTightPose.getY());
+            omega =
+                    -thetaController.calculate(
+                            pose.getRotation().getRadians(),
+                            targetTightPose.getRotation().getRadians());
         }
 
         Logger.recordOutput("Drive/alignState", alignState);
         Logger.recordOutput("Drive/alignTarget", alignTarget);
         Logger.recordOutput("Drive/desiredHeading", desiredHeading);
-        Logger.recordOutput("Drive/fieldToSpeaker", getFieldToSpeaker.get());
         Logger.recordOutput("Drive/goalChassisSpeeds", new ChassisSpeeds(vx, vy, omega));
 
         // if (vx == 0 && vy == 0 && omega == 0) {
@@ -458,14 +484,140 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     //                     new Pose2d(getFieldToSpeaker.get(), new Rotation2d())));
     // }
 
-    public Command getDriveToPointCommand() {
-        Pose2d targetPose = new Pose2d(11.74, 4.13, Rotation2d.fromDegrees(180));
+    private Command getPathfindCommand(Pose2d targetPose) {
+        pathfindPose = targetPose;
 
         PathConstraints constraints =
                 new PathConstraints(
                         3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
 
         return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0, 0.0);
+    }
+
+    public boolean atPathfindPose() {
+        Transform2d translationError = getFieldToRobot.get().minus(pathfindPose);
+        double rotationError =
+                Math.abs(
+                        getFieldToRobot.get().getRotation().getRadians()
+                                - pathfindPose.getRotation().getRadians());
+
+        return translationError.getTranslation().getNorm()
+                        < DriveConstants.pathfindTransformToleranceMeters
+                && rotationError < DriveConstants.pathfindRotationToleranceRadians;
+    }
+
+    public void driveToPose(Pose2d targetPose) {
+        this.setAlignState(AlignState.MANUAL);
+
+        pathfindCommand = getPathfindCommand(targetPose);
+        pathfindCommand.schedule();
+    }
+
+    public void stopDriveToPose() {
+        if (pathfindCommand != null) {
+            pathfindCommand.cancel();
+        }
+
+        setGoalChassisSpeeds(stopSpeeds, true);
+    }
+
+    public void setPoseTarget(Pose2d pose) {
+        targetTightPose = pose;
+    }
+
+    public Pose2d getEndgamePose() {
+        // Blue Alliance Poses
+        Pose2d leftClimbPose2d = new Pose2d(4.61, 4.48, Rotation2d.fromDegrees(-60));
+        Pose2d rightClimbPose2d = new Pose2d(4.66, 3.67, Rotation2d.fromDegrees(60));
+        Pose2d farClimbPose2d = new Pose2d(5.38, 4.11, Rotation2d.fromDegrees(180));
+
+        if (DriverStation.getAlliance().isPresent()
+                && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+            // Red Alliance Poses
+            leftClimbPose2d = new Pose2d(11.882, 3.67, Rotation2d.fromDegrees(120));
+            rightClimbPose2d = new Pose2d(11.932, 4.48, Rotation2d.fromDegrees(-120));
+            farClimbPose2d = new Pose2d(11.162, 4.11, Rotation2d.fromDegrees(0));
+        }
+
+        double distanceToTargetLeft =
+                Math.hypot(
+                        getFieldToRobot.get().getX() - leftClimbPose2d.getX(),
+                        getFieldToRobot.get().getY() - leftClimbPose2d.getY());
+        double distanceToTargetRight =
+                Math.hypot(
+                        getFieldToRobot.get().getX() - rightClimbPose2d.getX(),
+                        getFieldToRobot.get().getY() - rightClimbPose2d.getY());
+        double distanceToTargetFar =
+                Math.hypot(
+                        getFieldToRobot.get().getX() - farClimbPose2d.getX(),
+                        getFieldToRobot.get().getY() - farClimbPose2d.getY());
+
+        Pose2d targetPose = new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180));
+
+        if (distanceToTargetLeft < distanceToTargetRight
+                && distanceToTargetLeft < distanceToTargetFar) {
+            targetPose = leftClimbPose2d;
+        } else if (distanceToTargetRight < distanceToTargetLeft
+                && distanceToTargetRight < distanceToTargetFar) {
+            targetPose = rightClimbPose2d;
+        } else {
+            targetPose = farClimbPose2d;
+        }
+
+        return targetPose;
+    }
+
+    public void driveToSpeaker() {
+        driveToPose(new Pose2d(AllianceUtil.getFieldToSpeaker(), new Rotation2d()));
+    }
+
+    public void driveToEndgame() {
+        // Blue Alliance Poses
+        Pose2d leftClimbPose2d = new Pose2d(4.64, 4.46, Rotation2d.fromDegrees(-60));
+        Pose2d rightClimbPose2d = new Pose2d(4.67, 3.72, Rotation2d.fromDegrees(60));
+        Pose2d farClimbPose2d = new Pose2d(5.35, 4.11, Rotation2d.fromDegrees(180));
+
+        if (DriverStation.getAlliance().isPresent()
+                && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+            // Red Alliance Poses
+            leftClimbPose2d = new Pose2d(11.9, 4.49, Rotation2d.fromDegrees(-120));
+            rightClimbPose2d = new Pose2d(11.93, 3.72, Rotation2d.fromDegrees(120));
+            farClimbPose2d = new Pose2d(11.22, 4.08, Rotation2d.fromDegrees(0));
+        }
+
+        double distanceToTargetLeft =
+                Math.hypot(
+                        getFieldToRobot.get().getX() - leftClimbPose2d.getX(),
+                        getFieldToRobot.get().getY() - leftClimbPose2d.getY());
+        double distanceToTargetRight =
+                Math.hypot(
+                        getFieldToRobot.get().getX() - rightClimbPose2d.getX(),
+                        getFieldToRobot.get().getY() - rightClimbPose2d.getY());
+        double distanceToTargetFar =
+                Math.hypot(
+                        getFieldToRobot.get().getX() - farClimbPose2d.getX(),
+                        getFieldToRobot.get().getY() - farClimbPose2d.getY());
+
+        PathPlannerPath path = null;
+
+        if (distanceToTargetLeft < distanceToTargetRight
+                && distanceToTargetLeft < distanceToTargetFar) {
+            path = PathPlannerPath.fromPathFile("LeftEndgame");
+        } else if (distanceToTargetRight < distanceToTargetLeft
+                && distanceToTargetRight < distanceToTargetFar) {
+            path = PathPlannerPath.fromPathFile("RightEndgame");
+        } else {
+            path = PathPlannerPath.fromPathFile("FarEndgame");
+        }
+
+        this.setAlignState(AlignState.MANUAL);
+
+        PathConstraints constraints =
+                new PathConstraints(
+                        3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+
+        pathfindCommand = AutoBuilder.pathfindThenFollowPath(path, constraints, 0.0);
+        pathfindCommand.schedule();
     }
 
     public boolean isAligned() {

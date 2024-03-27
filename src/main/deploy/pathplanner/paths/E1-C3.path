@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.5667173910376455,
-        "y": 5.9623870231640295
+        "x": 4.05,
+        "y": 6.6
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.139459001637146,
-        "y": 4.71410402570358
+        "x": 6.956290548095115,
+        "y": 7.591381496366316
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.461170410712915,
-        "y": 4.111991050457951
+        "x": 8.294090132848853,
+        "y": 4.1046482092964185
       },
       "prevControl": {
-        "x": 7.05134490769876,
-        "y": 3.979819909550374
+        "x": 7.1452268345865875,
+        "y": 5.2382659282452515
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,17 +47,34 @@
           ]
         }
       }
+    },
+    {
+      "name": "Auto-Align off",
+      "waypointRelativePos": 0.1,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Disable Auto-Align"
+              }
+            }
+          ]
+        }
+      }
     }
   ],
   "globalConstraints": {
     "maxVelocity": 4.5,
-    "maxAcceleration": 2.75,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0,
+    "rotation": 169.69515353123393,
     "rotateFast": false
   },
   "reversed": false,
