@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.90586168649976,
-        "y": 4.067934003488759
+        "x": 5.200948934992683,
+        "y": 4.126676732781015
       },
       "isLocked": false,
       "linkedName": null
@@ -20,8 +20,8 @@
         "y": 5.742101788318067
       },
       "prevControl": {
-        "x": 4.936606653177528,
-        "y": 3.304278522689425
+        "x": 5.039406429438977,
+        "y": 2.9811935115820147
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,35 +32,12 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Shoot",
-      "waypointRelativePos": 0.9,
+      "name": "Enable auto align",
+      "waypointRelativePos": 0.2,
       "command": {
         "type": "parallel",
         "data": {
           "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Shoot Scoring"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Wait",
-      "waypointRelativePos": 0.05,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Wait Scoring"
-              }
-            },
             {
               "type": "named",
               "data": {

@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
@@ -115,7 +116,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             double OdometryUpdateFrequency,
             SwerveModuleConstants... modules) {
         super(driveTrainConstants, OdometryUpdateFrequency, modules);
-        configurePathPlanner();
         if (Constants.currentMode == Constants.Mode.SIM) {
             startSimThread();
         }
@@ -134,7 +134,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     public CommandSwerveDrivetrain(
             SwerveDrivetrainConstants driveTrainConstants, SwerveModuleConstants... modules) {
         super(driveTrainConstants, modules);
-        configurePathPlanner();
         if (Constants.currentMode == Constants.Mode.SIM) {
             startSimThread();
         }
@@ -174,7 +173,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         this.getRobotVelocity = getRobotVelocity;
     }
 
-    private void configurePathPlanner() {
+    public void configurePathPlanner() {
         double driveBaseRadius = 0;
         for (var moduleLocation : m_moduleLocations) {
             driveBaseRadius = Math.max(driveBaseRadius, moduleLocation.getNorm());
@@ -192,7 +191,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     this.setAlignTarget(AlignTarget.SPEAKER);
                 }, // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
-                        new PIDConstants(1, 0, 0),
+                        new PIDConstants(3, 0, 0),
                         new PIDConstants(
                                 DriveConstants.alignmentkPMax,
                                 DriveConstants.alignmentkI,
@@ -217,7 +216,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         // PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
 
         // autoChooser = AutoBuilder.buildAutoChooser();
-        autoChooser.setDefaultOption("Default", new PathPlannerAuto("None")); // S1-W1-W2-W3
+        autoChooser.setDefaultOption("Default (nothing)", Commands.none()); // S1-W1-W2-W3
         autoChooser.addOption(
                 "Amp Side - 4 note (2 from center)", new PathPlannerAuto("S1-W1-C1-C2"));
         autoChooser.addOption(
@@ -635,6 +634,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             this.getModule(2).getDriveMotor().getPosition().getValueAsDouble(),
             this.getModule(3).getDriveMotor().getPosition().getValueAsDouble()
         };
+    }
+
+    public void setBrakeMode(boolean brake) {
+        // this.getModule(0).getDriveMotor()
     }
 
     @Override

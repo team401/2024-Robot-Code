@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.453411669766119,
-        "y": 6.989097356941308
+        "x": 6.302375109222491,
+        "y": 6.990384785778517
       },
       "isLocked": false,
       "linkedName": null
@@ -20,8 +20,8 @@
         "y": 5.7567874706411315
       },
       "prevControl": {
-        "x": 7.060891142672386,
-        "y": 6.1778460341661825
+        "x": 7.036659225375696,
+        "y": 6.417643175179016
       },
       "nextControl": null,
       "isLocked": false,
@@ -37,23 +37,6 @@
   ],
   "constraintZones": [],
   "eventMarkers": [
-    {
-      "name": "Prime",
-      "waypointRelativePos": 0.15,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Aim Scoring"
-              }
-            }
-          ]
-        }
-      }
-    },
     {
       "name": "Disable Auto-Align",
       "waypointRelativePos": 0.15,
@@ -80,7 +63,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 179.5231067005846,
+    "rotation": 153.4349488229221,
     "rotateFast": false
   },
   "reversed": false,

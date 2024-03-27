@@ -20,8 +20,8 @@
         "y": 4.1046482092964185
       },
       "prevControl": {
-        "x": 7.1452268345865875,
-        "y": 5.2382659282452515
+        "x": 7.462544012744556,
+        "y": 5.330902683272273
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,23 +31,6 @@
   "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
-    {
-      "name": "Prime",
-      "waypointRelativePos": 0.0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Aim Scoring"
-              }
-            }
-          ]
-        }
-      }
-    },
     {
       "name": "Auto-Align off",
       "waypointRelativePos": 0.1,
@@ -74,7 +57,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 169.69515353123393,
+    "rotation": 124.9566974651101,
     "rotateFast": false
   },
   "reversed": false,

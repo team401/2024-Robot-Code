@@ -19,6 +19,14 @@ public interface TelemetryIO {
                     new SwerveModuleState(),
                     new SwerveModuleState()
                 };
+        public SwerveModuleState[] moduleGoalStates =
+                new SwerveModuleState[] {
+                    new SwerveModuleState(),
+                    new SwerveModuleState(),
+                    new SwerveModuleState(),
+                    new SwerveModuleState()
+                };
+
         public double accelerationX = 0.0;
         public double accelerationY = 0.0;
 
@@ -33,6 +41,8 @@ public interface TelemetryIO {
     public default void setRobotPose(Pose2d pose) {}
 
     public default void setSwerveModuleStates(SwerveModuleState[] moduleStates) {}
+
+    public default void setSwerveModuleGoalStates(SwerveModuleState[] moduleGoalStates) {}
 
     public default void setRobotRotation(double rotation) {}
 

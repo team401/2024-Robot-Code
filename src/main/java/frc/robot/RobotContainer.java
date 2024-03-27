@@ -92,6 +92,9 @@ public class RobotContainer {
         configureSubsystems();
         configureModes();
         configureAutonomous();
+        if (FeatureFlags.runDrive) {
+            drivetrain.configurePathPlanner();
+        }
     }
 
     public void configureSubsystems() {
@@ -758,12 +761,18 @@ public class RobotContainer {
             if (FeatureFlags.runEndgame) {
                 endgameSubsystem.setBrakeMode(false);
             }
+            if (FeatureFlags.runDrive) {
+                drivetrain.setBrakeMode(false);
+            }
         } else {
             if (FeatureFlags.runScoring) {
                 scoringSubsystem.setBrakeMode(true);
             }
             if (FeatureFlags.runEndgame) {
                 endgameSubsystem.setBrakeMode(true);
+            }
+            if (FeatureFlags.runDrive) {
+                drivetrain.setBrakeMode(true);
             }
         }
         if (ledSwitch != null) {

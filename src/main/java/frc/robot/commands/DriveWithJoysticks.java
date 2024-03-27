@@ -103,19 +103,19 @@ public class DriveWithJoysticks extends Command {
         double diffTime = currentTime - lastTime;
         lastTime = currentTime;
 
-        if (Math.hypot(currentXMpS, currentYMpS) < Math.hypot(commandedXMpS, commandedYMpS)) {
-            double velocityVectorTheta = Math.atan2(commandedYMpS, commandedXMpS);
-            commandedXMpS =
-                    lastCommandedXMpS
-                            + (DriveConstants.maxAccelerationMetersPerSecSquared
-                                    * Math.cos(velocityVectorTheta)
-                                    * diffTime);
-            commandedYMpS =
-                    lastCommandedYMpS
-                            + (DriveConstants.maxAccelerationMetersPerSecSquared
-                                    * Math.sin(velocityVectorTheta)
-                                    * diffTime);
-        }
+        // if (Math.hypot(currentXMpS, currentYMpS) < Math.hypot(commandedXMpS, commandedYMpS)) {
+        //     double velocityVectorTheta = Math.atan2(commandedYMpS, commandedXMpS);
+        //     commandedXMpS =
+        //             lastCommandedXMpS
+        //                     + (DriveConstants.maxAccelerationMetersPerSecSquared
+        //                             * Math.cos(velocityVectorTheta)
+        //                             * diffTime);
+        //     commandedYMpS =
+        //             lastCommandedYMpS
+        //                     + (DriveConstants.maxAccelerationMetersPerSecSquared
+        //                             * Math.sin(velocityVectorTheta)
+        //                             * diffTime);
+        // }
 
         lastCommandedXMpS = commandedXMpS;
         lastCommandedYMpS = commandedYMpS;
