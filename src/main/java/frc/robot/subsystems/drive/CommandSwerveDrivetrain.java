@@ -5,6 +5,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathConstraints;
@@ -637,7 +638,31 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     public void setBrakeMode(boolean brake) {
-        // this.getModule(0).getDriveMotor()
+        this.getModule(0)
+                .getDriveMotor()
+                .setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+        this.getModule(1)
+                .getDriveMotor()
+                .setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+        this.getModule(2)
+                .getDriveMotor()
+                .setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+        this.getModule(3)
+                .getDriveMotor()
+                .setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+
+        this.getModule(0)
+                .getSteerMotor()
+                .setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+        this.getModule(1)
+                .getSteerMotor()
+                .setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+        this.getModule(2)
+                .getSteerMotor()
+                .setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+        this.getModule(3)
+                .getSteerMotor()
+                .setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
     }
 
     @Override
