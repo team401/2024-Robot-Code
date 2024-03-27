@@ -15,9 +15,13 @@ public interface CameraIO {
 
         public double latestTimestampSeconds = 0.0;
         public boolean connected = false;
-        public boolean isNew = false;
+        public boolean isNewMeasurement = false;
 
-        public String name = "";
+        /**
+         * Whether the new camera measurement was accepted by the initial filters. Always false if
+         * `isNewMeasurement` is false.
+         */
+        public boolean wasAccepted = false;
     }
 
     public default void updateInputs(CameraIOInputs inputs) {}

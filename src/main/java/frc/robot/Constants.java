@@ -23,8 +23,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
-import frc.robot.subsystems.localization.VisionLocalizer.CameraTrustZone;
-
+import frc.robot.subsystems.localization.Camera.CameraTrustZone;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
