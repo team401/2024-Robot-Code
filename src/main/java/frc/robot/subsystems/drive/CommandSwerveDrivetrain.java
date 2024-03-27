@@ -15,7 +15,6 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -30,10 +29,8 @@ import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
-import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.utils.GeomUtil;
 import frc.robot.utils.InterpolateDouble;
-
 import java.util.List;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -259,12 +256,14 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         String stringcorner = corner.toString();
         stringcorner = stringcorner.substring(1, stringcorner.length());
         String[] stringResult = stringcorner.split(",");
-        return new double[] {Double.parseDouble(stringResult[0]), Double.parseDouble(stringResult[1])};
+        return new double[] {
+            Double.parseDouble(stringResult[0]), Double.parseDouble(stringResult[1])
+        };
     }
 
     private Pose2d getNotePoseFromTarget(PhotonTrackedTarget target) {
-        double transformWidth = 1*1; // = distance at setpoint / width at setpoint
-        //TODO: GET PROPER D0 and H0 VALUES
+        double transformWidth = 1 * 1; // = distance at setpoint / width at setpoint
+        // TODO: GET PROPER D0 and H0 VALUES
 
         List<TargetCorner> corners = target.getDetectedCorners();
 
@@ -274,50 +273,63 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         }
 
         double width = cornersCoordinates[3][0] - cornersCoordinates[2][0];
-        double distanceForward = transformWidth * width; 
-        //alternatively: instead of using magnification maybe try using just y instead?
+        double distanceForward = transformWidth * width;
+        // alternatively: instead of using magnification maybe try using just y instead?
 
-        double distanceSide = (cornersCoordinates[3][0] + cornersCoordinates[2][0])/2 / transformWidth;
+        double distanceSide =
+                (cornersCoordinates[3][0] + cornersCoordinates[2][0]) / 2 / transformWidth;
 
-        double distance = Math.sqrt(distanceForward*distanceForward + distanceSide*distanceSide);
-        double angle = Math.tanh(distanceSide/distanceForward);
+        double distance =
+                Math.sqrt(distanceForward * distanceForward + distanceSide * distanceSide);
+        double angle = Math.tanh(distanceSide / distanceForward);
 
         Rotation2d fromForward = this.getState().Pose.getRotation().plus(new Rotation2d(angle));
-        
-        return new Pose2d(this.getState().Pose.getX() + Math.cos(fromForward.getRadians())*distance, this.getState().Pose.getY() + Math.sin(fromForward.getRadians())*distance, fromForward);
-        
+
+        return new Pose2d(
+                this.getState().Pose.getX() + Math.cos(fromForward.getRadians()) * distance,
+                this.getState().Pose.getY() + Math.sin(fromForward.getRadians()) * distance,
+                fromForward);
     }
 
     private void controlDrivetrain() {
         Pose2d pose = getFieldToRobot.get();
         Rotation2d desiredHeading = pose.getRotation();
         if (alignState != AlignState.ALIGNING || alignTarget != AlignTarget.NOTE) {
-                drivingToNote = false;
-                elapsedDriveToNote.stop();
-                elapsedDriveToNote.reset();
+            drivingToNote = false;
+            elapsedDriveToNote.stop();
+            elapsedDriveToNote.reset();
         }
         if (alignState == AlignState.ALIGNING) {
             switch (alignTarget) {
                 case NOTE:
-                var cameraResult = colorCamera.getLatestResult();
+                    var cameraResult = colorCamera.getLatestResult();
                     if (cameraResult.hasTargets()) {
                         Pose2d notePose = getNotePoseFromTarget(cameraResult.getBestTarget());
 
                         if (!drivingToNote) {
-            
-                            double distance = Math.sqrt(Math.pow(notePose.getX(),2) + Math.pow(notePose.getY(),2));
-                            
+
+                            double distance =
+                                    Math.sqrt(
+                                            Math.pow(notePose.getX(), 2)
+                                                    + Math.pow(notePose.getY(), 2));
+
                             drivingToNote = true;
-                            estimatedTimeToNote = distance / DriveConstants.MaxSpeedMetPerSec + allotedErrorTime;
+                            estimatedTimeToNote =
+                                    distance / DriveConstants.MaxSpeedMetPerSec + allotedErrorTime;
                             elapsedDriveToNote.reset();
                             elapsedDriveToNote.start();
 
-                            setGoalChassisSpeeds(new ChassisSpeeds(DriveConstants.MaxSpeedMetPerSec, 0, 0), false);
+                            setGoalChassisSpeeds(
+                                    new ChassisSpeeds(DriveConstants.MaxSpeedMetPerSec, 0, 0),
+                                    false);
                             desiredHeading = notePose.getRotation();
-                        } else if (elapsedDriveToNote.get() > estimatedTimeToNote || hasNote.get()) {
+                        } else if (elapsedDriveToNote.get() > estimatedTimeToNote
+                                || hasNote.get()) {
                             setGoalChassisSpeeds(new ChassisSpeeds());
                         } else {
-                            setGoalChassisSpeeds(new ChassisSpeeds(DriveConstants.MaxSpeedMetPerSec, 0, 0), false);
+                            setGoalChassisSpeeds(
+                                    new ChassisSpeeds(DriveConstants.MaxSpeedMetPerSec, 0, 0),
+                                    false);
                             desiredHeading = notePose.getRotation();
                         }
                     }
@@ -435,7 +447,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     public void periodic() {
         controlDrivetrain();
 
-        List<TargetCorner> corners = colorCamera.getLatestResult().getBestTarget().getDetectedCorners();
+        List<TargetCorner> corners =
+                colorCamera.getLatestResult().getBestTarget().getDetectedCorners();
         double[][] cornersCoordinates = new double[4][2];
         for (int i = 0; i < 4; i++) {
             cornersCoordinates[i] = getCoordinateOfTargetCorner(corners.get(i));
