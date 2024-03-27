@@ -15,6 +15,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -29,9 +30,13 @@ import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.utils.GeomUtil;
 import frc.robot.utils.InterpolateDouble;
+
+import java.util.List;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonTrackedTarget;
+import org.photonvision.targeting.TargetCorner;
 
 /**
  * Class that extends the Phoenix SwerveDrivetrain class and implements subsystem so it can be used
@@ -234,6 +239,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         setGoalChassisSpeeds(chassisSpeeds, true);
     }
 
+    private double[] getCoordinateOfTargetCorner(TargetCorner corner) {
+        String stringcorner = corner.toString();
+        stringcorner = stringcorner.substring(1, stringcorner.length());
+        String[] stringResult = stringcorner.split(",");
+        return new double[] {Double.parseDouble(stringResult[0]), Double.parseDouble(stringResult[1])};
+    }
+
     private void controlDrivetrain() {
         Pose2d pose = getFieldToRobot.get();
         Rotation2d desiredHeading = pose.getRotation();
@@ -242,6 +254,38 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 case NOTE:
                     var cameraResult = colorCamera.getLatestResult();
                     if (cameraResult.hasTargets()) {
+
+                        PhotonTrackedTarget target = cameraResult.getBestTarget();
+
+                        List<TargetCorner> corners = target.getDetectedCorners();
+
+                        double[][] cornersCoordinates = new double[4][2];
+                        for (int i = 0; i < 4; i++) {
+                            cornersCoordinates[i] = getCoordinateOfTargetCorner(corners.get(i));
+                        }
+
+                        double width = cornersCoordinates[3][0] - cornersCoordinates[2][0];
+                        double distanceForward = 1/1 * width; //TODO: GET PROPER D0 and H0 VALUES
+                        //alternatively: instead of using magnification maybe try using just y instead?
+
+                        double distanceSide = (cornersCoordinates[3][0] + cornersCoordinates[2][0])/2;
+
+                        Transform2d noteTransform = new Transform2d(distanceForward, distanceSide, desiredHeading);
+                        //TODO: remember how to actually get the robot heading
+
+                        Pose2d notePose; // transform robot pose?
+
+                        //next steps:
+                        /*
+                         * calculate trajectory for robot to reach note + face note
+                         * check to make sure that note is still there + note has not moved + set a timer in case something goes wrong
+                         * intake?
+                         * actually fix all of this unhinged brainstorming stuff
+                         */
+
+
+
+                        /* previous code from honzik and charlie
                         double yaw = cameraResult.getBestTarget().getYaw();
 
                         double lowerArea = 0.5;
@@ -253,7 +297,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                         double distance = lowerDistance * (1.0 - t) + t * upperDistance;
 
                         double notePosX = distance * Math.cos(yaw);
-                        Logger.recordOutput("NOOOOOTE/notePosX", notePosX);
+                        Logger.recordOutput("NOOOOOTE/notePosX", notePosX);*/
+
                     }
                     break;
                 case AMP:
