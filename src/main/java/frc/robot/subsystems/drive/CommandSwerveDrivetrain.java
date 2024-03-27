@@ -21,6 +21,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -28,6 +29,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
+import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.utils.GeomUtil;
 import frc.robot.utils.InterpolateDouble;
 
@@ -47,6 +49,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private boolean fieldCentric = true;
 
     private double alignError = 0.0;
+
+    private Timer elapsedDriveToNote = new Timer();
+    private double estimatedTimeToNote = 0;
+    private boolean drivingToNote = false;
+    private double allotedErrorTime = 2;
 
     public enum AlignTarget {
         NONE,
@@ -76,6 +83,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private Supplier<Rotation2d> getFieldToSource = () -> new Rotation2d();
 
     private Supplier<Translation2d> getRobotVelocity = () -> new Translation2d();
+
+    private Supplier<Boolean> hasNote = () -> false;
 
     private PIDController thetaController =
             new PIDController(
@@ -110,6 +119,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
          * In short, never trust the Command Scheduler.
          */
         CommandScheduler.getInstance().registerSubsystem(this);
+        elapsedDriveToNote.reset();
+        elapsedDriveToNote.stop();
     }
 
     public CommandSwerveDrivetrain(
@@ -145,6 +156,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public void setSourceSupplier(Supplier<Rotation2d> getFieldToSource) {
         this.getFieldToSource = getFieldToSource;
+    }
+
+    public void setNoteAcquiredSupplier(Supplier<Boolean> hasNote) {
+        this.hasNote = hasNote;
     }
 
     public void setAlignTarget(AlignTarget alignTarget) {
@@ -246,59 +261,64 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         return new double[] {Double.parseDouble(stringResult[0]), Double.parseDouble(stringResult[1])};
     }
 
+    private Pose2d getNotePoseFromTarget(PhotonTrackedTarget target) {
+        double transformWidth = 1*1; // = distance at setpoint / width at setpoint
+        //TODO: GET PROPER D0 and H0 VALUES
+
+        List<TargetCorner> corners = target.getDetectedCorners();
+
+        double[][] cornersCoordinates = new double[4][2];
+        for (int i = 0; i < 4; i++) {
+            cornersCoordinates[i] = getCoordinateOfTargetCorner(corners.get(i));
+        }
+
+        double width = cornersCoordinates[3][0] - cornersCoordinates[2][0];
+        double distanceForward = transformWidth * width; 
+        //alternatively: instead of using magnification maybe try using just y instead?
+
+        double distanceSide = (cornersCoordinates[3][0] + cornersCoordinates[2][0])/2 / transformWidth;
+
+        double distance = Math.sqrt(distanceForward*distanceForward + distanceSide*distanceSide);
+        double angle = Math.tanh(distanceSide/distanceForward);
+
+        Rotation2d fromForward = this.getState().Pose.getRotation().plus(new Rotation2d(angle));
+        
+        return new Pose2d(this.getState().Pose.getX() + Math.cos(fromForward.getRadians())*distance, this.getState().Pose.getY() + Math.sin(fromForward.getRadians())*distance, fromForward);
+        
+    }
+
     private void controlDrivetrain() {
         Pose2d pose = getFieldToRobot.get();
         Rotation2d desiredHeading = pose.getRotation();
+        if (alignState != AlignState.ALIGNING || alignTarget != AlignTarget.NOTE) {
+                drivingToNote = false;
+                elapsedDriveToNote.stop();
+                elapsedDriveToNote.reset();
+        }
         if (alignState == AlignState.ALIGNING) {
             switch (alignTarget) {
                 case NOTE:
-                    var cameraResult = colorCamera.getLatestResult();
+                var cameraResult = colorCamera.getLatestResult();
                     if (cameraResult.hasTargets()) {
+                        Pose2d notePose = getNotePoseFromTarget(cameraResult.getBestTarget());
 
-                        PhotonTrackedTarget target = cameraResult.getBestTarget();
+                        if (!drivingToNote) {
+            
+                            double distance = Math.sqrt(Math.pow(notePose.getX(),2) + Math.pow(notePose.getY(),2));
+                            
+                            drivingToNote = true;
+                            estimatedTimeToNote = distance / DriveConstants.MaxSpeedMetPerSec + allotedErrorTime;
+                            elapsedDriveToNote.reset();
+                            elapsedDriveToNote.start();
 
-                        List<TargetCorner> corners = target.getDetectedCorners();
-
-                        double[][] cornersCoordinates = new double[4][2];
-                        for (int i = 0; i < 4; i++) {
-                            cornersCoordinates[i] = getCoordinateOfTargetCorner(corners.get(i));
+                            setGoalChassisSpeeds(new ChassisSpeeds(DriveConstants.MaxSpeedMetPerSec, 0, 0), false);
+                            desiredHeading = notePose.getRotation();
+                        } else if (elapsedDriveToNote.get() > estimatedTimeToNote || hasNote.get()) {
+                            setGoalChassisSpeeds(new ChassisSpeeds());
+                        } else {
+                            setGoalChassisSpeeds(new ChassisSpeeds(DriveConstants.MaxSpeedMetPerSec, 0, 0), false);
+                            desiredHeading = notePose.getRotation();
                         }
-
-                        double width = cornersCoordinates[3][0] - cornersCoordinates[2][0];
-                        double distanceForward = 1/1 * width; //TODO: GET PROPER D0 and H0 VALUES
-                        //alternatively: instead of using magnification maybe try using just y instead?
-
-                        double distanceSide = (cornersCoordinates[3][0] + cornersCoordinates[2][0])/2;
-
-                        Transform2d noteTransform = new Transform2d(distanceForward, distanceSide, desiredHeading);
-                        //TODO: remember how to actually get the robot heading
-
-                        Pose2d notePose; // transform robot pose?
-
-                        //next steps:
-                        /*
-                         * calculate trajectory for robot to reach note + face note
-                         * check to make sure that note is still there + note has not moved + set a timer in case something goes wrong
-                         * intake?
-                         * actually fix all of this unhinged brainstorming stuff
-                         */
-
-
-
-                        /* previous code from honzik and charlie
-                        double yaw = cameraResult.getBestTarget().getYaw();
-
-                        double lowerArea = 0.5;
-                        double upperArea = 1.0;
-                        double lowerDistance = 0.1;
-                        double upperDistance = 1.0;
-                        double area = cameraResult.getBestTarget().getArea();
-                        double t = (area - lowerArea) / (upperArea - lowerArea);
-                        double distance = lowerDistance * (1.0 - t) + t * upperDistance;
-
-                        double notePosX = distance * Math.cos(yaw);
-                        Logger.recordOutput("NOOOOOTE/notePosX", notePosX);*/
-
                     }
                     break;
                 case AMP:
