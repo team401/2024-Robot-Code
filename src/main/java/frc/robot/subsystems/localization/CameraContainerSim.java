@@ -21,8 +21,7 @@ public class CameraContainerSim implements CameraContainer {
 
     private VisionSystemSim visionSim = new VisionSystemSim("main");
 
-    private List<CameraIO> cameras = new ArrayList<>();
-    private List<CameraIOInputsAutoLogged> inputs = new ArrayList<>();
+    private List<Camera> cameras = new ArrayList<>();
 
     private Supplier<SwerveModuleState[]> getModuleStates;
     private Pose2d latestOdometryPose;
@@ -49,23 +48,23 @@ public class CameraContainerSim implements CameraContainer {
                         Rotation2d.fromRadians(pose.getRotation().getRadians()));
 
         for (CameraParams param : params) {
-            cameras.add(CameraIOPhoton.fromSimCameraParams(param, visionSim, true));
-            inputs.add(new CameraIOInputsAutoLogged());
+            cameras.add(
+                    new Camera(param, CameraIOPhoton.fromSimCameraParams(param, visionSim, true)));
         }
     }
 
-    public List<CameraIOInputsAutoLogged> getInputs() {
+    public List<Camera> getCameras() {
+        return cameras;
+    }
+
+    public void update() {
         updateOdometry();
         visionSim.update(latestOdometryPose);
         SmartDashboard.putData("PhotonSimField", visionSim.getDebugField());
 
-        for (int i = 0; i < cameras.size(); i++) {
-            cameras.get(i).updateInputs(inputs.get(i));
-
-            Logger.processInputs("Vision/Camera" + i, inputs.get(i));
+        for (Camera camera : cameras) {
+            camera.update();
         }
-
-        return inputs;
     }
 
     private void updateOdometry() {

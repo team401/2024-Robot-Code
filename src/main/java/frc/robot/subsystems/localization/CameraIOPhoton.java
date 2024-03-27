@@ -23,8 +23,6 @@ public class CameraIOPhoton implements CameraIO {
 
     private double latestTimestampSeconds = 0.0;
 
-    private String name;
-
     public CameraIOPhoton(String name, Transform3d robotToCamera) {
         this(new PhotonCamera(name), robotToCamera);
     }
@@ -32,7 +30,6 @@ public class CameraIOPhoton implements CameraIO {
     public CameraIOPhoton(PhotonCamera camera, Transform3d robotToCamera) {
         this.camera = camera;
 
-        name = camera.getName();
         poseEstimator =
                 new PhotonPoseEstimator(
                         VisionConstants.fieldLayout,
@@ -66,20 +63,19 @@ public class CameraIOPhoton implements CameraIO {
     public void updateInputs(CameraIOInputs inputs) {
         inputs.connected = camera.isConnected();
 
-        inputs.name = this.name;
-
         PhotonPipelineResult result = camera.getLatestResult();
         if (result.getTimestampSeconds() == latestTimestampSeconds) {
-            inputs.isNew = false;
+            inputs.isNewMeasurement = false;
+            inputs.wasAccepted = false;
             return;
         }
-        inputs.isNew = true;
+        inputs.isNewMeasurement = true;
         latestTimestampSeconds = result.getTimestampSeconds();
         Optional<EstimatedRobotPose> photonPose = poseEstimator.update(result);
 
         photonPose.filter(CameraIOPhoton::filterPhotonPose);
 
-        photonPose.ifPresent(
+        photonPose.ifPresentOrElse(
                 (pose) -> {
                     inputs.latestFieldToRobot = pose.estimatedPose.toPose2d();
                     inputs.nTags = pose.targetsUsed.size();
@@ -87,6 +83,11 @@ public class CameraIOPhoton implements CameraIO {
                     inputs.latestTimestampSeconds = this.latestTimestampSeconds;
                     inputs.averageTagDistanceM = calculateAverageTagDistance(pose);
                     inputs.averageTagYaw = calculateAverageTagYaw(pose);
+
+                    inputs.wasAccepted = true;
+                },
+                () -> {
+                    inputs.wasAccepted = false;
                 });
     }
 
