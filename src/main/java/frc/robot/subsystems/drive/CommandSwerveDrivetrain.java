@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -433,5 +434,15 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     @Override
     public void periodic() {
         controlDrivetrain();
+
+        List<TargetCorner> corners = colorCamera.getLatestResult().getBestTarget().getDetectedCorners();
+        double[][] cornersCoordinates = new double[4][2];
+        for (int i = 0; i < 4; i++) {
+            cornersCoordinates[i] = getCoordinateOfTargetCorner(corners.get(i));
+        }
+        SmartDashboard.putNumberArray("coordinates 0", cornersCoordinates[0]);
+        SmartDashboard.putNumberArray("coordinates 1", cornersCoordinates[1]);
+        SmartDashboard.putNumberArray("coordinates 2", cornersCoordinates[2]);
+        SmartDashboard.putNumberArray("coordinates 3", cornersCoordinates[3]);
     }
 }
