@@ -32,12 +32,12 @@
     },
     {
       "anchor": {
-        "x": 8.431799046066786,
-        "y": 7.4309552554704394
+        "x": 8.446484728389851,
+        "y": 7.401583890824312
       },
       "prevControl": {
-        "x": 5.773690545592183,
-        "y": 6.740728186286426
+        "x": 5.788376227915249,
+        "y": 6.711356821640298
       },
       "nextControl": null,
       "isLocked": false,
@@ -49,7 +49,7 @@
   "eventMarkers": [
     {
       "name": "Override Shoot",
-      "waypointRelativePos": 0.45,
+      "waypointRelativePos": 0.1,
       "command": {
         "type": "parallel",
         "data": {
@@ -66,7 +66,7 @@
     },
     {
       "name": "Un-Override Shoot",
-      "waypointRelativePos": 1.0,
+      "waypointRelativePos": 0.35,
       "command": {
         "type": "parallel",
         "data": {
@@ -90,7 +90,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -166.23921488820875,
+    "rotation": -167.5675236059489,
     "rotateFast": false
   },
   "reversed": false,

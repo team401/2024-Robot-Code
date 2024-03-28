@@ -21,7 +21,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
@@ -52,6 +52,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private double alignError = 0.0;
 
+    private double tuningVolts = 0.0;
+
     public enum AlignTarget {
         NONE,
         AMP,
@@ -67,7 +69,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     public enum AlignState {
         MANUAL,
         ALIGNING,
-        POSE_TARGET
+        POSE_TARGET,
+        SYS_ID
     }
 
     private AlignTarget alignTarget = AlignTarget.NONE;
@@ -98,8 +101,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     DriveConstants.alignmentkI,
                     DriveConstants.alignmentkD);
 
+    private double alignkPMax = DriveConstants.alignmentkPMax;
+    private double alignkPMin = DriveConstants.alignmentkPMin;
+
     private SwerveRequest.FieldCentric driveFieldCentric = new SwerveRequest.FieldCentric();
     private SwerveRequest.RobotCentric driveRobotCentric = new SwerveRequest.RobotCentric();
+    private SwerveRequest.SysIdSwerveTranslation driveSysId =
+            new SwerveRequest.SysIdSwerveTranslation();
     // private SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
     private static final double kSimLoopPeriod = 0.02; // Original: 5 ms
@@ -150,6 +158,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         CommandScheduler.getInstance().registerSubsystem(this);
     }
 
+    public void setAlignGains(double kPMax, double kPMin, double kI, double kD) {
+        alignkPMax = kPMax;
+        alignkPMin = kPMin;
+        thetaController.setI(kI);
+        thetaController.setD(kD);
+    }
+
     public void setPoseSupplier(Supplier<Pose2d> getFieldToRobot) {
         this.getFieldToRobot = getFieldToRobot;
     }
@@ -192,9 +207,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     this.setAlignTarget(AlignTarget.SPEAKER);
                 }, // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
-                        new PIDConstants(3, 0, 0),
+                        new PIDConstants(1, 0, 0),
                         new PIDConstants(
-                                DriveConstants.alignmentkPMax,
+                                DriveConstants.alignmentkPMin,
                                 DriveConstants.alignmentkI,
                                 DriveConstants.alignmentkD),
                         TunerConstants.kSpeedAt12VoltsMps,
@@ -302,6 +317,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         }
     }
 
+    public void setTuningVolts(double tuningVolts) {
+        this.tuningVolts = tuningVolts;
+    }
+
     private void controlDrivetrain() {
         Pose2d pose = getFieldToRobot.get();
         Rotation2d desiredHeading = pose.getRotation();
@@ -386,8 +405,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             alignError = thetaController.getPositionError();
 
             double t = Math.abs(alignError) / (Math.PI / 4);
-            double minkP = DriveConstants.alignmentkPMin;
-            double maxkP = DriveConstants.alignmentkPMax;
+            double minkP = alignkPMin;
+            double maxkP = alignkPMax;
             double rotationkP = minkP * (1.0 - t) + t * maxkP;
 
             // double rotationkP1 = (maxkP-minkP)/(Math.PI/4) * (alignError) + 0.1;
@@ -405,6 +424,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
             Logger.recordOutput("Drive/omegaCommand", omega);
             Logger.recordOutput("Drive/desiredHeading", desiredHeading.getRadians());
+            Logger.recordOutput("Drive/currentHeading", pose.getRotation().getRadians());
             Logger.recordOutput("Drive/rotationError", thetaController.getPositionError());
         } else if (alignState == AlignState.POSE_TARGET) {
             vx = vXController.calculate(pose.getX(), targetTightPose.getX());
@@ -422,7 +442,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
         // if (vx == 0 && vy == 0 && omega == 0) {
         //     setControl(brake);
-        if (!fieldCentric) {
+        if (alignState == AlignState.SYS_ID) {
+            setControl(driveSysId.withVolts(Units.Volts.of(tuningVolts)));
+        } else if (!fieldCentric) {
             setControl(
                     driveRobotCentric
                             .withVelocityX(vx)
@@ -489,7 +511,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
         PathConstraints constraints =
                 new PathConstraints(
-                        3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+                        3.0,
+                        4.0,
+                        Constants.ConversionConstants.kDegreesToRadians * 540,
+                        Constants.ConversionConstants.kDegreesToRadians * 720);
 
         return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0, 0.0);
     }
@@ -614,7 +639,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
         PathConstraints constraints =
                 new PathConstraints(
-                        3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+                        3.0,
+                        4.0,
+                        Constants.ConversionConstants.kDegreesToRadians * 540,
+                        Constants.ConversionConstants.kDegreesToRadians * 720);
 
         pathfindCommand = AutoBuilder.pathfindThenFollowPath(path, constraints, 0.0);
         pathfindCommand.schedule();

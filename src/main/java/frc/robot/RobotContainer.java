@@ -374,6 +374,8 @@ public class RobotContainer {
         testModeChooser.addOption("Shooter Tuning", "tuning-shooter");
         testModeChooser.addOption("Endgame Tuning", "tuning-endgame");
         testModeChooser.addOption("Wheel Characterization", "characterization-wheel");
+        testModeChooser.addOption("Translation Drive Tuning", "drive-translation-tuning");
+        testModeChooser.addOption("Drive Align Tuning", "drive-align");
 
         SmartDashboard.putData("Test Mode Chooser", testModeChooser);
     }
@@ -417,18 +419,31 @@ public class RobotContainer {
             case "tuning":
                 break;
             case "drive-align":
-                drivetrain.seedFieldRelative();
+                SmartDashboard.putNumber("Test-Mode/drive/alignPMax", Constants.DriveConstants.alignmentkPMax);
+                SmartDashboard.putNumber("Test-Mode/drive/alignPMin", Constants.DriveConstants.alignmentkPMin);
+                SmartDashboard.putNumber("Test-Mode/drive/alignI", Constants.DriveConstants.alignmentkI);
+                SmartDashboard.putNumber("Test-Mode/drive/alignD", Constants.DriveConstants.alignmentkD);
+            
                 setUpDriveWithJoysticks();
 
-                rightJoystick.trigger()
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignState(AlignState.ALIGNING)))
-                .onFalse(new InstantCommand(
-                    () -> drivetrain.setAlignState(AlignState.MANUAL)));
-
                 controller.a()
+                    .onTrue(new InstantCommand(
+                        () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
+
+                controller.b()
+                    .onTrue(new InstantCommand(
+                        () -> drivetrain.setAlignState(AlignState.ALIGNING)))
+                    .onFalse(new InstantCommand(
+                        () -> drivetrain.setAlignState(AlignState.MANUAL)));
+
+                controller.b()
                 .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
+                    () -> drivetrain.setAlignGains(
+                        SmartDashboard.getNumber("Test-Mode/drive/alignPMax", Constants.DriveConstants.alignmentkPMax),
+                        SmartDashboard.getNumber("Test-Mode/drive/alignPMin", Constants.DriveConstants.alignmentkPMin),
+                        SmartDashboard.getNumber("Test-Mode/drive/alignI", Constants.DriveConstants.alignmentkI),
+                        SmartDashboard.getNumber("Test-Mode/drive/alignD", Constants.DriveConstants.alignmentkD)
+                    )));
                 break;
             case "calculate-speaker":
                 drivetrain.seedFieldRelative();
@@ -704,6 +719,17 @@ public class RobotContainer {
                                         drivetrain,
                                         () -> drivetrain.getPigeon2().getYaw().getValueAsDouble()
                                                 * ConversionConstants.kDegreesToRadians));
+                break;
+            case "drive-translation-tuning":
+                SmartDashboard.putNumber("Test-Mode/drive/translationVolts", 0.0);
+
+                drivetrain.setAlignState(AlignState.SYS_ID);
+
+                controller.a()
+                        .onTrue(new InstantCommand(() ->
+                            drivetrain.setTuningVolts(SmartDashboard.getNumber("Test-Mode/drive/translationVolts", 0.0))))
+                        .onFalse(new InstantCommand(() ->
+                            drivetrain.setTuningVolts(0.0)));
                 break;
             }
         }

@@ -92,10 +92,10 @@ public final class Constants {
 
         public static final double alignToleranceRadians = 0.1;
 
-        public static final double alignmentkPMax = 7.0;
-        public static final double alignmentkPMin = 5.0;
-        public static final double alignmentkI = 5.5;
-        public static final double alignmentkD = 0.0;
+        public static final double alignmentkPMax = 15.0;
+        public static final double alignmentkPMin = 8.0;
+        public static final double alignmentkI = 25.0;
+        public static final double alignmentkD = 0.4;
 
         public static final double vXkP = 5.0;
         public static final double vXkI = 2.5;
@@ -313,7 +313,13 @@ public final class Constants {
         // When using closed-loop control, the drive motor uses the control
         // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
         private static final Slot0Configs driveGains =
-                new Slot0Configs().withKP(5).withKI(8).withKD(0).withKS(0).withKV(0).withKA(0);
+                new Slot0Configs()
+                        .withKP(5)
+                        .withKI(8)
+                        .withKD(0)
+                        .withKS(0.26)
+                        .withKV(2.369)
+                        .withKA(0);
 
         // The closed-loop output type to use for the steer motors;
         // This affects the PID/FF gains for the steer motors
