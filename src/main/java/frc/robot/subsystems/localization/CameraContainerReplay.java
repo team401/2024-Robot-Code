@@ -1,27 +1,25 @@
 package frc.robot.subsystems.localization;
 
+import frc.robot.Constants.VisionConstants.CameraParams;
 import java.util.ArrayList;
 import java.util.List;
-import org.littletonrobotics.junction.Logger;
 
 public class CameraContainerReplay implements CameraContainer {
-    private List<CameraIO> cameras = new ArrayList<>();
-    private List<CameraIOInputsAutoLogged> inputs;
+    private List<Camera> cameras = new ArrayList<>();
 
-    public CameraContainerReplay(int nCameras) {
-        for (int i = 0; i < nCameras; i++) {
-            cameras.add(new CameraIO() {});
-            inputs.add(new CameraIOInputsAutoLogged());
+    public CameraContainerReplay(List<CameraParams> params) {
+        for (CameraParams param : params) {
+            cameras.add(new Camera(param, new CameraIO() {}));
         }
     }
 
-    public List<CameraIOInputsAutoLogged> getInputs() {
-        for (int i = 0; i < cameras.size(); i++) {
-            cameras.get(i).updateInputs(inputs.get(i));
+    public List<Camera> getCameras() {
+        return cameras;
+    }
 
-            Logger.processInputs("Vision/Camera" + i, inputs.get(i));
+    public void update() {
+        for (Camera camera : cameras) {
+            camera.update();
         }
-
-        return inputs;
     }
 }
