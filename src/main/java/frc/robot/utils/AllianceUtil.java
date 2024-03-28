@@ -101,4 +101,30 @@ public class AllianceUtil {
         }
         return FieldConstants.redSourceHeading;
     }
+
+    /** Returns whether the speaker is significantly to the robot's left */
+    public static boolean isLeftOfSpeaker(double robotY, double tolerance) {
+        if (!DriverStation.getAlliance().isEmpty()) {
+            switch (DriverStation.getAlliance().get()) {
+                case Blue:
+                    return robotY > FieldConstants.fieldToBlueSpeaker.getY() + tolerance;
+                case Red:
+                    return robotY < FieldConstants.fieldToRedSpeaker.getY() - tolerance;
+            }
+        }
+        return robotY < FieldConstants.fieldToRedSpeaker.getY() - tolerance;
+    }
+
+    /** Returns whether the speaker is significantly to the robot's right */
+    public static boolean isRightOfSpeaker(double robotY, double tolerance) {
+        if (!DriverStation.getAlliance().isEmpty()) {
+            switch (DriverStation.getAlliance().get()) {
+                case Blue:
+                    return robotY < FieldConstants.fieldToBlueSpeaker.getY() - tolerance;
+                case Red:
+                    return robotY > FieldConstants.fieldToRedSpeaker.getY() + tolerance;
+            }
+        }
+        return robotY > FieldConstants.fieldToRedSpeaker.getY() + tolerance;
+    }
 }
