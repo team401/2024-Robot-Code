@@ -14,6 +14,13 @@ public class TelemetryIOSim implements TelemetryIO {
                 new SwerveModuleState(),
                 new SwerveModuleState()
             };
+    private SwerveModuleState[] moduleGoalStates =
+            new SwerveModuleState[] {
+                new SwerveModuleState(),
+                new SwerveModuleState(),
+                new SwerveModuleState(),
+                new SwerveModuleState()
+            };
 
     // private Pigeon2 pigeon = new Pigeon2(0);
     // private Pigeon2SimState pigeonSim = pigeon.getSimState();
@@ -38,10 +45,16 @@ public class TelemetryIOSim implements TelemetryIO {
     }
 
     @Override
+    public void setSwerveModuleGoalStates(SwerveModuleState[] moduleGoalStates) {
+        this.moduleGoalStates = moduleGoalStates;
+    }
+
+    @Override
     public void updateInputs(TelemetryIOInputs inputs) {
         inputs.pose3d = pose3d;
         inputs.pose2d = pose2d;
         inputs.moduleStates = moduleStates;
+        inputs.moduleGoalStates = moduleGoalStates;
         // inputs.accelerationX = pigeon.getAccelerationX().getValueAsDouble();
         // inputs.accelerationY = pigeon.getAccelerationY().getValueAsDouble();
     }

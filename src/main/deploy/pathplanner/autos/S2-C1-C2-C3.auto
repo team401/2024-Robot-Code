@@ -14,25 +14,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Override Shoot"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.2
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Un-Override Shoot"
+            "waitTime": 0.4
           }
         },
         {
@@ -48,12 +30,6 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.2
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "E1-C2"
@@ -63,6 +39,12 @@
           "type": "path",
           "data": {
             "pathName": "C2-E1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Disable Auto-Align"
           }
         },
         {
@@ -80,7 +62,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Override Shoot"
+            "name": "Enable Auto-Align"
           }
         }
       ]

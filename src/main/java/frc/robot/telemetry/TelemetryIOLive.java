@@ -14,6 +14,13 @@ public class TelemetryIOLive implements TelemetryIO {
                 new SwerveModuleState(),
                 new SwerveModuleState()
             };
+    private SwerveModuleState[] moduleGoalStates =
+            new SwerveModuleState[] {
+                new SwerveModuleState(),
+                new SwerveModuleState(),
+                new SwerveModuleState(),
+                new SwerveModuleState()
+            };
 
     private double rotation;
     private double rotationVelocity;
@@ -38,6 +45,11 @@ public class TelemetryIOLive implements TelemetryIO {
     }
 
     @Override
+    public void setSwerveModuleGoalStates(SwerveModuleState[] moduleGoalStates) {
+        this.moduleGoalStates = moduleGoalStates;
+    }
+
+    @Override
     public void setRobotRotation(double rotation) {
         this.rotation = rotation;
     }
@@ -52,6 +64,7 @@ public class TelemetryIOLive implements TelemetryIO {
         inputs.pose3d = pose3d;
         inputs.pose2d = pose2d;
         inputs.moduleStates = moduleStates;
+        inputs.moduleGoalStates = moduleGoalStates;
 
         inputs.robotRotation = rotation;
         inputs.robotRotationVelocity = rotationVelocity;

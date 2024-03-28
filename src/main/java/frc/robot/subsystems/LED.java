@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.LEDConstants;
@@ -55,8 +54,15 @@ public class LED extends SubsystemBase {
         if (!enabled) {
             // LEDs left cleared if not enabled
         } else if (DriverStation.isDisabled()) {
-            if (Constants.currentMode == Mode.REAL) rainbow();
-            else SmartDashboard.putString("current task", "rainbow!");
+            if (Constants.currentMode == Mode.REAL) {
+                rainbow();
+
+                if (!visionWorkingSupplier.get()) {
+                    for (int i = 0; i < ledcount - 10; i++) {
+                        ledBuffer.setRGB(i, 0, 0, 255 / 3);
+                    }
+                }
+            }
 
         } else {
             if (scoringSubsystem.hasNote()) {

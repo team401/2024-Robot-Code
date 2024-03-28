@@ -510,6 +510,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                         new Rotation3d(0, -hoodInputs.hoodAngleRad - aimerInputs.aimAngleRad, 0)));
 
         Logger.recordOutput("scoring/readyToShoot", readyToShoot);
+        Logger.recordOutput("scoring/overrideShoot", overrideShoot);
 
         Logger.recordOutput("aimer/willIHitStage", willHitStage());
 

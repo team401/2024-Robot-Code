@@ -28,13 +28,7 @@
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0,
-      "rotationDegrees": -168.36636600105948,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
@@ -48,23 +42,6 @@
               "type": "named",
               "data": {
                 "name": "Aim Scoring"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Disable Auto-Align",
-      "waypointRelativePos": 0.15,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Disable Auto-Align"
               }
             }
           ]
