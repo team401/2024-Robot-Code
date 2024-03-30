@@ -3,6 +3,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -378,6 +379,7 @@ public class RobotContainer {
         testModeChooser.addOption("Wheel Characterization", "characterization-wheel");
         testModeChooser.addOption("Translation Drive Tuning", "drive-translation-tuning");
         testModeChooser.addOption("Drive Align Tuning", "drive-align");
+        testModeChooser.addOption("Drive Velocity Tuning", "drive-velocity");
 
         SmartDashboard.putData("Test Mode Chooser", testModeChooser);
     }
@@ -732,6 +734,48 @@ public class RobotContainer {
                             drivetrain.setTuningVolts(SmartDashboard.getNumber("Test-Mode/drive/translationVolts", 0.0))))
                         .onFalse(new InstantCommand(() ->
                             drivetrain.setTuningVolts(0.0)));
+                break;
+            case "drive-velocity":
+                SmartDashboard.putNumber("Test-Mode/drive/velocity", 1.0);
+
+                SmartDashboard.putNumber("Test-Mode/drive/velKP", TunerConstants.driveGains.kP);
+                SmartDashboard.putNumber("Test-Mode/drive/velKI", TunerConstants.driveGains.kI);
+                SmartDashboard.putNumber("Test-Mode/drive/velKD", TunerConstants.driveGains.kD);
+
+                drivetrain.setAlignState(AlignState.MANUAL);
+
+                controller.rightBumper()
+                        .onTrue(new InstantCommand(() ->
+                            drivetrain.setDrivePID(
+                                SmartDashboard.getNumber("Test-Mode/drive/velKP", TunerConstants.driveGains.kP),
+                                SmartDashboard.getNumber("Test-Mode/drive/velKI", TunerConstants.driveGains.kI),
+                                SmartDashboard.getNumber("Test-Mode/drive/velKD", TunerConstants.driveGains.kD)
+                            )));
+
+                controller.a()
+                        .onTrue(new InstantCommand(() -> 
+                            drivetrain.setGoalChassisSpeeds(
+                                new ChassisSpeeds(
+                                    SmartDashboard.getNumber("Test-Mode/drive/velocity", 1.0),
+                                    0.0,
+                                    0.0), 
+                                false)))
+                        .onFalse(new InstantCommand(() -> 
+                            drivetrain.setGoalChassisSpeeds(
+                                new ChassisSpeeds(0.0, 0.0, 0.0), 
+                                false)));
+                controller.b()
+                        .onTrue(new InstantCommand(() -> 
+                            drivetrain.setGoalChassisSpeeds(
+                                new ChassisSpeeds(
+                                    -SmartDashboard.getNumber("Test-Mode/drive/velocity", 1.0),
+                                    0.0,
+                                    0.0), 
+                                false)))
+                        .onFalse(new InstantCommand(() -> 
+                            drivetrain.setGoalChassisSpeeds(
+                                new ChassisSpeeds(0.0, 0.0, 0.0), 
+                                false)));
                 break;
             }
         }

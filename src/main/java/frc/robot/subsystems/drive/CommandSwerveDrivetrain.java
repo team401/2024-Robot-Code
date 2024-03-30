@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
@@ -665,6 +666,70 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             this.getModule(2).getDriveMotor().getPosition().getValueAsDouble(),
             this.getModule(3).getDriveMotor().getPosition().getValueAsDouble()
         };
+    }
+
+    public void setDrivePID(double kP, double kI, double kD) {
+        for (int i = 0; i < 4; i++) {
+            getModule(i)
+                    .getDriveMotor()
+                    .getConfigurator()
+                    .apply(
+                            new Slot0Configs()
+                                    .withKP(kP)
+                                    .withKI(kI)
+                                    .withKD(kD)
+                                    .withKS(TunerConstants.driveGains.kS)
+                                    .withKV(TunerConstants.driveGains.kV)
+                                    .withKA(TunerConstants.driveGains.kA));
+        }
+    }
+
+    public void setDriveP(double kP) {
+        for (int i = 0; i < 4; i++) {
+            getModule(i)
+                    .getDriveMotor()
+                    .getConfigurator()
+                    .apply(
+                            new Slot0Configs()
+                                    .withKP(kP)
+                                    .withKI(TunerConstants.driveGains.kI)
+                                    .withKD(TunerConstants.driveGains.kD)
+                                    .withKS(TunerConstants.driveGains.kS)
+                                    .withKV(TunerConstants.driveGains.kV)
+                                    .withKA(TunerConstants.driveGains.kA));
+        }
+    }
+
+    public void setDriveI(double kI) {
+        for (int i = 0; i < 4; i++) {
+            getModule(i)
+                    .getDriveMotor()
+                    .getConfigurator()
+                    .apply(
+                            new Slot0Configs()
+                                    .withKP(TunerConstants.driveGains.kP)
+                                    .withKI(kI)
+                                    .withKD(TunerConstants.driveGains.kD)
+                                    .withKS(TunerConstants.driveGains.kS)
+                                    .withKV(TunerConstants.driveGains.kV)
+                                    .withKA(TunerConstants.driveGains.kA));
+        }
+    }
+
+    public void setDriveD(double kD) {
+        for (int i = 0; i < 4; i++) {
+            getModule(i)
+                    .getDriveMotor()
+                    .getConfigurator()
+                    .apply(
+                            new Slot0Configs()
+                                    .withKP(TunerConstants.driveGains.kP)
+                                    .withKI(TunerConstants.driveGains.kI)
+                                    .withKD(kD)
+                                    .withKS(TunerConstants.driveGains.kS)
+                                    .withKV(TunerConstants.driveGains.kV)
+                                    .withKA(TunerConstants.driveGains.kA));
+        }
     }
 
     public void setBrakeMode(boolean brake) {

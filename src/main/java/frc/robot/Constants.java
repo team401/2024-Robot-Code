@@ -307,7 +307,7 @@ public final class Constants {
 
         // The steer motor uses any SwerveModule.SteerRequestType control request with the
         // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
-        private static final Slot0Configs steerGains =
+        public static final Slot0Configs steerGains =
                 new Slot0Configs()
                         .withKP(150)
                         .withKI(50)
@@ -317,7 +317,7 @@ public final class Constants {
                         .withKA(0);
         // When using closed-loop control, the drive motor uses the control
         // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
-        private static final Slot0Configs driveGains =
+        public static final Slot0Configs driveGains =
                 new Slot0Configs()
                         .withKP(5)
                         .withKI(8)
