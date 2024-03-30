@@ -224,6 +224,11 @@ public class RobotContainer {
             }
         }
 
+        if (FeatureFlags.runVision) {
+            tagVision.setCameraConsumer(
+                    (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
+        }
+
         if (FeatureFlags.enableLEDS) {
             leds = new LED(scoringSubsystem, intakeSubsystem);
 

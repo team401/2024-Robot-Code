@@ -20,6 +20,7 @@ public class VisionLocalizer extends SubsystemBase {
 
     @Override
     public void periodic() {
+        container.update();
         for (Camera camera : container.getCameras()) {
             if (camera.hasNewMeasurement()) {
                 cameraConsumer.accept(camera.getLatestMeasurement());

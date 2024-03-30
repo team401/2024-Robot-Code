@@ -212,7 +212,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     this.setAlignTarget(AlignTarget.SPEAKER);
                 }, // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
-                        new PIDConstants(1),
+                        new PIDConstants(2),
                         new PIDConstants(
                                 DriveConstants.autoAlignmentkP,
                                 DriveConstants.autoAlignmentkI,
