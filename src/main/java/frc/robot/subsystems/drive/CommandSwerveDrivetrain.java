@@ -4,6 +4,7 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -71,7 +72,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         MANUAL,
         ALIGNING,
         POSE_TARGET,
-        SYS_ID
+        SYS_ID_DRIVE,
+        SYS_ID_ROTATION
     }
 
     private AlignTarget alignTarget = AlignTarget.NONE;
@@ -109,6 +111,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private SwerveRequest.RobotCentric driveRobotCentric = new SwerveRequest.RobotCentric();
     private SwerveRequest.SysIdSwerveTranslation driveSysId =
             new SwerveRequest.SysIdSwerveTranslation();
+    private SwerveRequest.SysIdSwerveSteerGains rotationSysId =
+            new SwerveRequest.SysIdSwerveSteerGains();
     // private SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
     private static final double kSimLoopPeriod = 0.02; // Original: 5 ms
@@ -208,7 +212,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     this.setAlignTarget(AlignTarget.SPEAKER);
                 }, // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
-                        new PIDConstants(3, 0, 0),
+                        new PIDConstants(1),
                         new PIDConstants(
                                 DriveConstants.autoAlignmentkP,
                                 DriveConstants.autoAlignmentkI,
@@ -445,8 +449,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
         // if (vx == 0 && vy == 0 && omega == 0) {
         //     setControl(brake);
-        if (alignState == AlignState.SYS_ID) {
+        if (alignState == AlignState.SYS_ID_DRIVE) {
             setControl(driveSysId.withVolts(Units.Volts.of(tuningVolts)));
+        } else if (alignState == AlignState.SYS_ID_ROTATION) {
+            setControl(rotationSysId.withVolts(Units.Volts.of(tuningVolts)));
         } else if (!fieldCentric) {
             setControl(
                     driveRobotCentric
@@ -454,7 +460,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                             .withVelocityY(vy)
                             .withRotationalRate(omega)
                             .withDeadband(0.0)
-                            .withRotationalDeadband(0.0));
+                            .withRotationalDeadband(0.0)
+                            .withDriveRequestType(DriveRequestType.Velocity));
         } else {
             setControl(
                     driveFieldCentric
@@ -462,7 +469,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                             .withVelocityY(vy)
                             .withRotationalRate(omega)
                             .withDeadband(0.0)
-                            .withRotationalDeadband(0.0));
+                            .withRotationalDeadband(0.0)
+                            .withDriveRequestType(DriveRequestType.Velocity));
         }
     }
 
@@ -673,7 +681,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             getModule(i)
                     .getDriveMotor()
                     .getConfigurator()
-                    .apply(
+                    .refresh(
                             new Slot0Configs()
                                     .withKP(kP)
                                     .withKI(kI)

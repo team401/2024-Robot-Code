@@ -30,8 +30,10 @@ public interface TelemetryIO {
         public double accelerationX = 0.0;
         public double accelerationY = 0.0;
 
-        public double robotRotation;
-        public double robotRotationVelocity;
+        public double robotRotation = 0.0;
+        public double robotRotationVelocity = 0.0;
+
+        public double driveAppliedVolts = 0.0;
     }
 
     public default void updateInputs(TelemetryIOInputs inputs) {}
@@ -47,4 +49,6 @@ public interface TelemetryIO {
     public default void setRobotRotation(double rotation) {}
 
     public default void setRobotRotationVelocity(double rotationVelocity) {}
+
+    public default void setDriveAppliedVolts(double driveAppliedVolts) {}
 }

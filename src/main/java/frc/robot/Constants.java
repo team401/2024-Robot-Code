@@ -93,10 +93,10 @@ public final class Constants {
 
         public static final double alignToleranceRadians = 0.1;
 
-        public static final double alignmentkPMax = 15.0;
-        public static final double alignmentkPMin = 8.0;
-        public static final double alignmentkI = 25.0;
-        public static final double alignmentkD = 0.4;
+        public static final double alignmentkPMax = 7.0; // 15
+        public static final double alignmentkPMin = 5.0; // 8
+        public static final double alignmentkI = 5.5; // 25
+        public static final double alignmentkD = 0.0; // 0.4
 
         public static final double autoAlignmentkP = 5.0;
         public static final double autoAlignmentkI = 5.5;
@@ -312,19 +312,19 @@ public final class Constants {
                         .withKP(150)
                         .withKI(50)
                         .withKD(0.2)
-                        .withKS(0.32)
+                        .withKS(0.25)
                         .withKV(1.5)
                         .withKA(0);
         // When using closed-loop control, the drive motor uses the control
         // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
         public static final Slot0Configs driveGains =
                 new Slot0Configs()
-                        .withKP(5)
-                        .withKI(8)
+                        .withKP(0)
+                        .withKI(0.02)
                         .withKD(0)
                         .withKS(0.26)
-                        .withKV(2.369)
-                        .withKA(0);
+                        .withKV(0.12)
+                        .withKA(0.01);
 
         // The closed-loop output type to use for the steer motors;
         // This affects the PID/FF gains for the steer motors
@@ -341,7 +341,7 @@ public final class Constants {
 
         // Theoretical free speed (m/s) at 12v applied output;
         // This needs to be tuned to your individual robot
-        public static final double kSpeedAt12VoltsMps = 5.02; // 5.21
+        public static final double kSpeedAt12VoltsMps = 5.02; // 5.21 OR 5.02
 
         // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
         // This may need to be tuned to your individual robot
@@ -520,7 +520,7 @@ public final class Constants {
         public static final int aimEncoderPort = 0;
         public static final double aimerEncoderOffset = 1.75;
 
-        public static final double aimPositionTolerance = 0.015;
+        public static final double aimPositionTolerance = 0.017;
 
         public static final double aimAcceleration = 4.5; // TODO: 15.0
         public static final double aimCruiseVelocity = 7.0; // TODO: 15.0
@@ -638,6 +638,18 @@ public final class Constants {
             map.put(0.1, Math.PI / 4);
             map.put(0.2, Math.PI / 3);
             map.put(0.4, 1.37);
+
+            return map;
+        }
+
+        // NOTE - This should be monotonically increasing
+        // Key - Distance to goal in meters
+        // Value - Aimer angle tolerance in radians
+        public static HashMap<Double, Double> aimerToleranceTable() {
+            HashMap<Double, Double> map = new HashMap<Double, Double>();
+            map.put(0.0, 0.1);
+            map.put(2.0, 0.1);
+            map.put(10.0, 0.015);
 
             return map;
         }

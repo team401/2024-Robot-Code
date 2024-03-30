@@ -52,6 +52,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     private final InterpolateDouble aimerInterpolated;
     private final InterpolateDouble timeToPutAimDown;
     private final InterpolateDouble aimerAvoidElevator;
+    private final InterpolateDouble aimerAngleTolerance;
 
     private double shooterGoalVelocityRPMTuning = 0.0;
     private double aimerGoalAngleRadTuning = 0.0;
@@ -125,6 +126,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         aimerAvoidElevator =
                 new InterpolateDouble(
                         ScoringConstants.aimerAvoidElevatorTable(), 0.0, Math.PI / 2.0);
+
+        aimerAngleTolerance = new InterpolateDouble(ScoringConstants.aimerToleranceTable());
 
         if (Constants.currentMode == Mode.SIM) {
             mechanism = new Mechanism2d(2.2, 2.0);
@@ -235,10 +238,10 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private void prime() {
-        double distancetoGoal = findDistanceToGoal();
-        Logger.recordOutput("scoring/aimGoal", getAimerAngle(distancetoGoal));
-        shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
-        aimerIo.setAimAngleRad(getAimerAngle(distancetoGoal), false);
+        double distanceToGoal = findDistanceToGoal();
+        Logger.recordOutput("scoring/aimGoal", getAimerAngle(distanceToGoal));
+        shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distanceToGoal));
+        aimerIo.setAimAngleRad(getAimerAngle(distanceToGoal), false);
         if (!overrideBeamBreak) {
             shooterIo.setKickerVolts(hasNote() ? 0.0 : 1.75);
         }
@@ -250,7 +253,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                         < ScoringConstants.shooterVelocityMarginRPM;
         boolean aimReady =
                 Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad)
-                                < ScoringConstants.aimAngleMarginRadians
+                                < aimerAngleTolerance.getValue(distanceToGoal)
                         && Math.abs(aimerInputs.aimVelocityErrorRadPerSec)
                                 < ScoringConstants.aimAngleVelocityMargin;
         boolean driveReady = driveAllignedSupplier.get();

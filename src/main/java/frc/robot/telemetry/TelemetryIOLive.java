@@ -22,8 +22,10 @@ public class TelemetryIOLive implements TelemetryIO {
                 new SwerveModuleState()
             };
 
-    private double rotation;
-    private double rotationVelocity;
+    private double rotation = 0.0;
+    private double rotationVelocity = 0.0;
+
+    private double driveAppliedVolts = 0.0;
 
     // private Pigeon2 pigeon = new Pigeon2(0);
 
@@ -60,6 +62,11 @@ public class TelemetryIOLive implements TelemetryIO {
     }
 
     @Override
+    public void setDriveAppliedVolts(double driveAppliedVolts) {
+        this.driveAppliedVolts = driveAppliedVolts;
+    }
+
+    @Override
     public void updateInputs(TelemetryIOInputs inputs) {
         inputs.pose3d = pose3d;
         inputs.pose2d = pose2d;
@@ -68,6 +75,8 @@ public class TelemetryIOLive implements TelemetryIO {
 
         inputs.robotRotation = rotation;
         inputs.robotRotationVelocity = rotationVelocity;
+
+        inputs.driveAppliedVolts = driveAppliedVolts;
 
         // inputs.accelerationX = pigeon.getAccelerationX().getValueAsDouble();
         // inputs.accelerationY = pigeon.getAccelerationY().getValueAsDouble();
