@@ -71,7 +71,8 @@ public final class Constants {
     public static final class CANDevices {}
 
     public static final class SensorConstants {
-        public static final int bannerSensorPort = 1;
+        public static final int indexerSensorPort = 1;
+        public static final int uptakeSensorPort = 4;
     }
 
     public static final class DriveConstants {
@@ -96,6 +97,10 @@ public final class Constants {
         public static final double alignmentkPMin = 8.0;
         public static final double alignmentkI = 25.0;
         public static final double alignmentkD = 0.4;
+
+        public static final double autoAlignmentkP = 5.0;
+        public static final double autoAlignmentkI = 5.5;
+        public static final double autoAlignmentkD = 0.0;
 
         public static final double vXkP = 5.0;
         public static final double vXkI = 2.5;
@@ -194,7 +199,7 @@ public final class Constants {
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(0.323, 0.262, 0.216),
-                                        new Rotation3d(0, -0.382, 0.209))),
+                                        new Rotation3d(0, -0.349, 0.209))),
                         new CameraParams(
                                 "Front-Right",
                                 640,
@@ -203,7 +208,7 @@ public final class Constants {
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
                                         new Translation3d(0.323, -0.262, 0.216),
-                                        new Rotation3d(0.0, -0.398, -0.109))),
+                                        new Rotation3d(0.0, -0.349, -0.109))),
                         new CameraParams(
                                 "Back-Left",
                                 640,

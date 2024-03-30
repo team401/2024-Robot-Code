@@ -207,11 +207,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     this.setAlignTarget(AlignTarget.SPEAKER);
                 }, // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
-                        new PIDConstants(1, 0, 0),
+                        new PIDConstants(3, 0, 0),
                         new PIDConstants(
-                                DriveConstants.alignmentkPMin,
-                                DriveConstants.alignmentkI,
-                                DriveConstants.alignmentkD),
+                                DriveConstants.autoAlignmentkP,
+                                DriveConstants.autoAlignmentkI,
+                                DriveConstants.autoAlignmentkD),
                         TunerConstants.kSpeedAt12VoltsMps,
                         driveBaseRadius,
                         new ReplanningConfig()),
@@ -416,7 +416,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             }
 
             Logger.recordOutput("thetaController/rotationkP", rotationkP);
-            thetaController.setP(rotationkP);
+            if (!DriverStation.isAutonomous()) {
+                thetaController.setP(rotationkP);
+            }
 
             omega =
                     -thetaController.calculate(
@@ -691,6 +693,27 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         this.getModule(3)
                 .getSteerMotor()
                 .setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+    }
+
+    public void autoInit() {
+        thetaController.setP(DriveConstants.autoAlignmentkP);
+        thetaController.setI(DriveConstants.autoAlignmentkI);
+        thetaController.setD(DriveConstants.autoAlignmentkD);
+
+        setAlignState(AlignState.ALIGNING);
+        setAlignTarget(AlignTarget.SPEAKER);
+    }
+
+    public void teleopInit() {
+        thetaController.setP(DriveConstants.alignmentkPMax);
+        thetaController.setI(DriveConstants.alignmentkI);
+        thetaController.setD(DriveConstants.alignmentkD);
+
+        setAlignState(AlignState.MANUAL);
+
+        vx = 0.0;
+        vy = 0.0;
+        omega = 0.0;
     }
 
     @Override

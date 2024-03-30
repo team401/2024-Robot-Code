@@ -95,6 +95,8 @@ public class RobotContainer {
         if (FeatureFlags.runDrive) {
             drivetrain.configurePathPlanner();
         }
+
+        SmartDashboard.putNumber("Debug/currentTimeMillis", System.currentTimeMillis());
     }
 
     public void configureSubsystems() {
@@ -231,7 +233,7 @@ public class RobotContainer {
         }
 
         if (FeatureFlags.enableLEDS) {
-            leds = new LED(scoringSubsystem);
+            leds = new LED(scoringSubsystem, intakeSubsystem);
 
             if (FeatureFlags.runVision) {
                 leds.setVisionWorkingSupplier(() -> tagVision.getVisionWorking());
@@ -808,9 +810,10 @@ public class RobotContainer {
 
     public void autoInit() {
         if (drivetrain.getAutoCommand() != null) {
+            drivetrain.autoInit();
+
             drivetrain.getAutoCommand().schedule();
-            drivetrain.setAlignState(AlignState.ALIGNING);
-            drivetrain.setAlignTarget(AlignTarget.SPEAKER);
+
             if (FeatureFlags.runScoring) {
                 scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT);
             }
@@ -903,7 +906,9 @@ public class RobotContainer {
         }
 
         if (FeatureFlags.runDrive) {
-            drivetrain.setAlignState(AlignState.MANUAL);
+            drivetrain.teleopInit();
         }
+
+        SmartDashboard.putNumber("Debug/currentTimeMillis", System.currentTimeMillis());
     }
 }

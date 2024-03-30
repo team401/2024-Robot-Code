@@ -53,6 +53,10 @@ public class IntakeSubsystem extends SubsystemBase {
         this.scorerWantsNote = scorerWantsNote;
     }
 
+    public boolean hasNote() {
+        return inputs.noteSensed;
+    }
+
     public void run(IntakeAction action) {
         this.action = action;
     }

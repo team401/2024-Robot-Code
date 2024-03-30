@@ -32,12 +32,12 @@
     },
     {
       "anchor": {
-        "x": 8.446484728389851,
-        "y": 7.401583890824312
+        "x": 8.68,
+        "y": 7.43
       },
       "prevControl": {
-        "x": 5.788376227915249,
-        "y": 6.711356821640298
+        "x": 6.021891499525397,
+        "y": 6.739772930815986
       },
       "nextControl": null,
       "isLocked": false,
@@ -49,7 +49,7 @@
   "eventMarkers": [
     {
       "name": "Override Shoot",
-      "waypointRelativePos": 0.1,
+      "waypointRelativePos": 0.25,
       "command": {
         "type": "parallel",
         "data": {

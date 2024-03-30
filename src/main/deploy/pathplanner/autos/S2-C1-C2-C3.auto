@@ -14,7 +14,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.4
+            "waitTime": 0.1
           }
         },
         {
@@ -30,6 +30,12 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.1
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "E1-C2"
@@ -39,6 +45,12 @@
           "type": "path",
           "data": {
             "pathName": "C2-E1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.2
           }
         },
         {
@@ -57,12 +69,6 @@
           "type": "path",
           "data": {
             "pathName": "C3-E1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Enable Auto-Align"
           }
         }
       ]

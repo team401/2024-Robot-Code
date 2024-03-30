@@ -14,13 +14,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.4
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Override Shoot"
+            "waitTime": 0.1
           }
         },
         {
@@ -30,27 +24,9 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.2
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Un-Override Shoot"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "S3-W3"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.2
           }
         },
         {
@@ -63,12 +39,6 @@
           "type": "path",
           "data": {
             "pathName": "W2-W1"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.1
           }
         },
         {

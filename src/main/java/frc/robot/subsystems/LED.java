@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.Mode;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import java.util.function.Supplier;
 
@@ -28,15 +29,17 @@ public class LED extends SubsystemBase {
     private final int rainbowScale = 2;
 
     private ScoringSubsystem scoringSubsystem;
+    private IntakeSubsystem intakeSubsystem;
 
     private Supplier<Boolean> visionWorkingSupplier = () -> true;
 
-    public LED(ScoringSubsystem scoringSubsystem) {
+    public LED(ScoringSubsystem scoringSubsystem, IntakeSubsystem intakeSubsystem) {
         led = new AddressableLED(LEDConstants.ledPort);
         ledBuffer = new AddressableLEDBuffer(ledcount);
         led.setLength(ledBuffer.getLength());
         timer = new Timer();
         this.scoringSubsystem = scoringSubsystem;
+        this.intakeSubsystem = intakeSubsystem;
 
         led.setData(ledBuffer);
         led.start();
@@ -65,7 +68,7 @@ public class LED extends SubsystemBase {
             }
 
         } else {
-            if (scoringSubsystem.hasNote()) {
+            if (scoringSubsystem.hasNote() || intakeSubsystem.hasNote()) {
                 for (int i = 0; i < ledcount; i++) {
                     ledBuffer.setRGB(i, 245 / 3, 117 / 3, 66 / 3);
                 }
