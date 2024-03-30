@@ -199,8 +199,8 @@ public final class Constants {
                                 16,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
-                                        new Translation3d(0.323, 0.262, 0.216),
-                                        new Rotation3d(0, -0.382, 0.209)),
+                                        new Translation3d(0.306, 0.259, 0.211),
+                                        new Rotation3d(0, -0.349, 0.785)),
                                 CameraTrustZone.LEFT),
                         new CameraParams(
                                 "Front-Right",
@@ -209,18 +209,18 @@ public final class Constants {
                                 16,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
-                                        new Translation3d(0.323, -0.262, 0.216),
-                                        new Rotation3d(0.0, -0.398, -0.109)),
+                                        new Translation3d(0.312, -0.304, 0.217),
+                                        new Rotation3d(0.0, -0.349, -0.785)),
                                 CameraTrustZone.RIGHT),
                         new CameraParams(
-                                "Middle",
+                                "Front-Center",
                                 1280,
                                 800,
                                 16,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
-                                        new Translation3d(0.0, 0.0, 0.0),
-                                        new Rotation3d(0.0, 0.0, 0.0)),
+                                        new Translation3d(0.312, -0.237, 0.233),
+                                        new Rotation3d(0.0, -0.349, 0.524)),
                                 CameraTrustZone.MIDDLE));
 
         public static record CameraParams(
