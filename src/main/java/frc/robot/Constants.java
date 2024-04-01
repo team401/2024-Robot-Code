@@ -23,6 +23,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.localization.Camera.CameraTrustZone;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -173,7 +174,7 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
-        public static final String tagLayoutName = "2024-WPI";
+        public static final String tagLayoutName = "Pairs-Only";
         public static final AprilTagFieldLayout fieldLayout = initLayout(tagLayoutName);
 
         public static final double lowUncertaintyCutoffDistance = 6.5;
@@ -181,9 +182,9 @@ public final class Constants {
         public static final double skewCutoffDistance = 4.7;
         public static final double skewCutoffRotation = Units.degreesToRadians(30);
 
-        public static final Matrix<N3, N1> teleopCameraUncertainty = VecBuilder.fill(2.0, 3.5, 6);
+        public static final Matrix<N3, N1> teleopCameraUncertainty = VecBuilder.fill(1.0, 1.0, 6);
 
-        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(2.0, 3.5, 6);
+        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(1.5, 2.5, 6);
 
         public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(25.0, 25.0, 40);
 
@@ -193,41 +194,34 @@ public final class Constants {
                 List.of(
                         new CameraParams(
                                 "Front-Left",
-                                640,
-                                480,
-                                20,
+                                1280,
+                                800,
+                                16,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
-                                        new Translation3d(0.323, 0.262, 0.216),
-                                        new Rotation3d(0, -0.349, 0.209))),
+                                        new Translation3d(0.306, 0.259, 0.211),
+                                        new Rotation3d(0, -0.349, 0.785)),
+                                CameraTrustZone.LEFT),
                         new CameraParams(
                                 "Front-Right",
-                                640,
-                                480,
-                                20,
+                                1280,
+                                800,
+                                16,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
-                                        new Translation3d(0.323, -0.262, 0.216),
-                                        new Rotation3d(0.0, -0.349, -0.109))),
+                                        new Translation3d(0.312, -0.304, 0.217),
+                                        new Rotation3d(0.0, -0.349, -0.785)),
+                                CameraTrustZone.RIGHT),
                         new CameraParams(
-                                "Back-Left",
-                                640,
-                                480,
-                                20,
+                                "Front-Center",
+                                1280,
+                                800,
+                                16,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
-                                        new Translation3d(-0.327, 0.281, 0.333),
-                                        new Rotation3d(0.0, -0.409, 3.14))));
-
-        // new CameraParams(
-        //         "Back-Right",
-        //         640,
-        //         480,
-        //         20,
-        //         Rotation2d.fromDegrees(70),
-        //         new Transform3d(
-        //                 new Translation3d(-0.327, -0.281, 0.333),
-        //                 new Rotation3d(0.0, -0.409, 3.14))));
+                                        new Translation3d(0.312, -0.237, 0.233),
+                                        new Rotation3d(0.0, -0.349, 0.524)),
+                                CameraTrustZone.MIDDLE));
 
         public static record CameraParams(
                 String name,
@@ -235,7 +229,8 @@ public final class Constants {
                 int yResolution,
                 int fps,
                 Rotation2d fov,
-                Transform3d robotToCamera) {}
+                Transform3d robotToCamera,
+                CameraTrustZone zone) {}
 
         private static AprilTagFieldLayout initLayout(String name) {
             AprilTagFieldLayout layout;

@@ -183,8 +183,7 @@ public class RobotContainer {
 
                 if (FeatureFlags.runVision) {
                     tagVision =
-                            new VisionLocalizer(
-                                    new CameraContainerReplay(VisionConstants.cameras.size()));
+                            new VisionLocalizer(new CameraContainerReplay(VisionConstants.cameras));
                 }
                 break;
         }
@@ -193,14 +192,6 @@ public class RobotContainer {
             drivetrain.registerTelemetry(driveTelemetry::telemeterize);
             drivetrain.setPoseSupplier(driveTelemetry::getFieldToRobot);
             drivetrain.setVelocitySupplier(driveTelemetry::getVelocity);
-
-            if (FeatureFlags.runVision) {
-                tagVision.setCameraConsumer(
-                        (m) ->
-                                drivetrain.addVisionMeasurement(
-                                        m.pose(), m.timestamp(), m.variance()));
-                tagVision.setFieldToRobotSupplier(() -> driveTelemetry.getFieldToRobot());
-            }
         }
 
         if (FeatureFlags.runScoring) {
@@ -233,11 +224,16 @@ public class RobotContainer {
             }
         }
 
+        if (FeatureFlags.runVision) {
+            tagVision.setCameraConsumer(
+                    (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
+        }
+
         if (FeatureFlags.enableLEDS) {
             leds = new LED(scoringSubsystem, intakeSubsystem);
 
             if (FeatureFlags.runVision) {
-                leds.setVisionWorkingSupplier(() -> tagVision.getVisionWorking());
+                leds.setVisionWorkingSupplier(() -> tagVision.coprocessorConnected());
             }
         }
     }
