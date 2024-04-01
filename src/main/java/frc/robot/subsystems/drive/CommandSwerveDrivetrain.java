@@ -219,7 +219,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                                 DriveConstants.autoAlignmentkD),
                         TunerConstants.kSpeedAt12VoltsMps,
                         driveBaseRadius,
-                        new ReplanningConfig()),
+                        new ReplanningConfig(false, false)),
                 () -> {
                     // Boolean supplier that controls when the path will be mirrored for the red
                     // alliance
