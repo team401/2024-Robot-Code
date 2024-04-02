@@ -787,6 +787,15 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         vx = 0.0;
         vy = 0.0;
         omega = 0.0;
+
+        setControl(
+                driveRobotCentric
+                        .withVelocityX(vx)
+                        .withVelocityY(vy)
+                        .withRotationalRate(omega)
+                        .withDeadband(0.0)
+                        .withRotationalDeadband(0.0)
+                        .withDriveRequestType(DriveRequestType.Velocity));
     }
 
     @Override

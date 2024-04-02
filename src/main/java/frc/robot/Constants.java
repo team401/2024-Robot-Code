@@ -257,8 +257,8 @@ public final class Constants {
         public static final int rightIntakeMotorID = 10;
         public static final int indexTwoMotorID = 14;
 
-        public static final double intakePower = 8.0;
-        public static final double beltPower = 8.0;
+        public static final double intakePower = 12.0;
+        public static final double beltPower = 12.0;
     }
 
     public static final class EndgameConstants {
@@ -515,12 +515,15 @@ public final class Constants {
         public static final int aimEncoderPort = 0;
         public static final double aimerEncoderOffset = 1.75;
 
+        public static final double kickerIntakeVolts = 2.0;
+
         public static final double aimPositionTolerance = 0.017;
 
         public static final double aimAcceleration = 4.5; // TODO: 15.0
         public static final double aimCruiseVelocity = 7.0; // TODO: 15.0
 
-        public static final double shooterVelocityMarginRPM = 50;
+        public static final double shooterLowerVelocityMarginRPM = 50;
+        public static final double shooterUpperVelocityMarginRPM = 150;
         public static final double aimAngleMarginRadians = Units.degreesToRadians(1);
         public static final double aimAngleVelocityMargin = 2.0; // Units.degreesToRadians(5);
         public static final double hoodAngleMarginRadians = Units.degreesToRadians(5);

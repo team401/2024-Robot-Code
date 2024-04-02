@@ -74,6 +74,12 @@
         {
           "type": "named",
           "data": {
+            "name": "Enable Auto-Align"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Aim Scoring"
           }
         },

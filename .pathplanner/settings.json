@@ -6,9 +6,9 @@
     "Endgame"
   ],
   "autoFolders": [],
-  "defaultMaxVel": 4.5,
-  "defaultMaxAccel": 4.75,
+  "defaultMaxVel": 4.0,
+  "defaultMaxAccel": 12.0,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,
-  "maxModuleSpeed": 4.5
+  "maxModuleSpeed": 4.0
 }

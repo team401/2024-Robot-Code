@@ -14,13 +14,31 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.1
+            "waitTime": 0.4
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Override Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "S2-C1"
+            "pathName": "S2-W2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "W2-C1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Un-Override Shoot"
           }
         },
         {
@@ -32,13 +50,37 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.1
+            "waitTime": 0.3
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Override Shoot"
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "E1-C2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Enable Auto-Align"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Un-Override Shoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.3
           }
         },
         {
@@ -50,7 +92,13 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.1
+            "waitTime": 0.3
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Override Shoot"
           }
         },
         {
@@ -63,6 +111,18 @@
           "type": "path",
           "data": {
             "pathName": "E1-C3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Un-Override Shoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.3
           }
         },
         {

@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.498207776918125,
-        "y": 1.13641093395541
+        "x": 4.451979136516414,
+        "y": 0.9545693509991673
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.261138286338007,
-        "y": 0.9314957549412599
+        "x": 8.608027233943556,
+        "y": 0.7930268454454622
       },
       "prevControl": {
-        "x": 5.762736641243646,
-        "y": 1.4056449722584377
+        "x": 6.1096255888491955,
+        "y": 1.26717606276264
       },
       "nextControl": null,
       "isLocked": false,
@@ -36,25 +36,7 @@
     }
   ],
   "constraintZones": [],
-  "eventMarkers": [
-    {
-      "name": "Prime",
-      "waypointRelativePos": 0.65,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Aim Scoring"
-              }
-            }
-          ]
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 5.0,
     "maxAcceleration": 4.5,
@@ -63,7 +45,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 151.11718773359448,
+    "rotation": 150.74517849977155,
     "rotateFast": false
   },
   "reversed": false,
