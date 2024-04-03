@@ -43,6 +43,12 @@
               "data": {
                 "name": "Disable Auto-Align"
               }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Un-Override Shoot"
+              }
             }
           ]
         }

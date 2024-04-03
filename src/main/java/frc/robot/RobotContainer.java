@@ -409,6 +409,10 @@ public class RobotContainer {
         if (timeDigitalOutput != null) {
             timeDigitalOutput.set(false);
         }
+
+        if (FeatureFlags.runEndgame) {
+            endgameSubsystem.setAction(EndgameAction.WAIT);
+        }
     }
 
     public void testInit() {

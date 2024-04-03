@@ -30,6 +30,12 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.4
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "W2-C1"
@@ -44,7 +50,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "C1-E1"
+            "pathName": "C1-E1-Slow"
           }
         },
         {
@@ -86,7 +92,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "C2-E1"
+            "pathName": "C2-E1-Slow"
           }
         },
         {

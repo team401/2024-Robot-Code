@@ -68,7 +68,8 @@ public class LED extends SubsystemBase {
             }
 
         } else {
-            if (scoringSubsystem.hasNote() || intakeSubsystem.hasNote()) {
+            if ((scoringSubsystem != null && scoringSubsystem.hasNote())
+                    || (intakeSubsystem != null && intakeSubsystem.hasNote())) {
                 for (int i = 0; i < ledcount; i++) {
                     ledBuffer.setRGB(i, 245 / 3, 117 / 3, 66 / 3);
                 }
