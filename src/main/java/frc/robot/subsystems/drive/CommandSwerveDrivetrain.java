@@ -1,10 +1,13 @@
 package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathConstraints;
@@ -20,7 +23,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
@@ -28,6 +31,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
@@ -50,6 +54,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private double alignError = 0.0;
 
+    private double tuningVolts = 0.0;
+
     public enum AlignTarget {
         NONE,
         AMP,
@@ -65,7 +71,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     public enum AlignState {
         MANUAL,
         ALIGNING,
-        POSE_TARGET
+        POSE_TARGET,
+        SYS_ID_DRIVE,
+        SYS_ID_ROTATION
     }
 
     private AlignTarget alignTarget = AlignTarget.NONE;
@@ -96,8 +104,15 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     DriveConstants.alignmentkI,
                     DriveConstants.alignmentkD);
 
+    private double alignkPMax = DriveConstants.alignmentkPMax;
+    private double alignkPMin = DriveConstants.alignmentkPMin;
+
     private SwerveRequest.FieldCentric driveFieldCentric = new SwerveRequest.FieldCentric();
     private SwerveRequest.RobotCentric driveRobotCentric = new SwerveRequest.RobotCentric();
+    private SwerveRequest.SysIdSwerveTranslation driveSysId =
+            new SwerveRequest.SysIdSwerveTranslation();
+    private SwerveRequest.SysIdSwerveSteerGains rotationSysId =
+            new SwerveRequest.SysIdSwerveSteerGains();
     // private SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
     private static final double kSimLoopPeriod = 0.02; // Original: 5 ms
@@ -115,7 +130,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             double OdometryUpdateFrequency,
             SwerveModuleConstants... modules) {
         super(driveTrainConstants, OdometryUpdateFrequency, modules);
-        configurePathPlanner();
         if (Constants.currentMode == Constants.Mode.SIM) {
             startSimThread();
         }
@@ -134,7 +148,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     public CommandSwerveDrivetrain(
             SwerveDrivetrainConstants driveTrainConstants, SwerveModuleConstants... modules) {
         super(driveTrainConstants, modules);
-        configurePathPlanner();
         if (Constants.currentMode == Constants.Mode.SIM) {
             startSimThread();
         }
@@ -148,6 +161,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
          * In short, never trust the Command Scheduler.
          */
         CommandScheduler.getInstance().registerSubsystem(this);
+    }
+
+    public void setAlignGains(double kPMax, double kPMin, double kI, double kD) {
+        alignkPMax = kPMax;
+        alignkPMin = kPMin;
+        thetaController.setI(kI);
+        thetaController.setD(kD);
     }
 
     public void setPoseSupplier(Supplier<Pose2d> getFieldToRobot) {
@@ -174,7 +194,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         this.getRobotVelocity = getRobotVelocity;
     }
 
-    private void configurePathPlanner() {
+    public void configurePathPlanner() {
         double driveBaseRadius = 0;
         for (var moduleLocation : m_moduleLocations) {
             driveBaseRadius = Math.max(driveBaseRadius, moduleLocation.getNorm());
@@ -192,14 +212,14 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     this.setAlignTarget(AlignTarget.SPEAKER);
                 }, // Consumer of ChassisSpeeds to drive the robot
                 new HolonomicPathFollowerConfig(
-                        new PIDConstants(1, 0, 0),
+                        new PIDConstants(2),
                         new PIDConstants(
-                                DriveConstants.alignmentkPMax,
-                                DriveConstants.alignmentkI,
-                                DriveConstants.alignmentkD),
+                                DriveConstants.autoAlignmentkP,
+                                DriveConstants.autoAlignmentkI,
+                                DriveConstants.autoAlignmentkD),
                         TunerConstants.kSpeedAt12VoltsMps,
                         driveBaseRadius,
-                        new ReplanningConfig()),
+                        new ReplanningConfig(false, false)),
                 () -> {
                     // Boolean supplier that controls when the path will be mirrored for the red
                     // alliance
@@ -217,7 +237,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         // PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
 
         // autoChooser = AutoBuilder.buildAutoChooser();
-        autoChooser.setDefaultOption("Default", new PathPlannerAuto("None")); // S1-W1-W2-W3
+        autoChooser.setDefaultOption("Default (nothing)", Commands.none()); // S1-W1-W2-W3
         autoChooser.addOption(
                 "Amp Side - 4 note (2 from center)", new PathPlannerAuto("S1-W1-C1-C2"));
         autoChooser.addOption(
@@ -233,7 +253,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 "Center - 4 note (source side to center)", new PathPlannerAuto("S2-W2-W3-C5"));
         autoChooser.addOption("Center - 3 note - special", new PathPlannerAuto("S2-C1-C2-Special"));
         autoChooser.addOption(
-                "Center - 4 note - avoids wing notes", new PathPlannerAuto("S2-C1-C2-C3"));
+                "Center - 5 note - 3 from center", new PathPlannerAuto("S2-C1-C2-C3"));
         autoChooser.addOption("Source Side - 2 note", new PathPlannerAuto("S3-W3"));
         autoChooser.addOption("Source Side - 3 note", new PathPlannerAuto("S3-W3-C5"));
         autoChooser.addOption(
@@ -300,6 +320,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         } else {
             alignDirection = direction;
         }
+    }
+
+    public void setTuningVolts(double tuningVolts) {
+        this.tuningVolts = tuningVolts;
     }
 
     private void controlDrivetrain() {
@@ -386,8 +410,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             alignError = thetaController.getPositionError();
 
             double t = Math.abs(alignError) / (Math.PI / 4);
-            double minkP = DriveConstants.alignmentkPMin;
-            double maxkP = DriveConstants.alignmentkPMax;
+            double minkP = alignkPMin;
+            double maxkP = alignkPMax;
             double rotationkP = minkP * (1.0 - t) + t * maxkP;
 
             // double rotationkP1 = (maxkP-minkP)/(Math.PI/4) * (alignError) + 0.1;
@@ -397,7 +421,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             }
 
             Logger.recordOutput("thetaController/rotationkP", rotationkP);
-            thetaController.setP(rotationkP);
+            if (!DriverStation.isAutonomous()) {
+                thetaController.setP(rotationkP);
+            }
 
             omega =
                     -thetaController.calculate(
@@ -405,6 +431,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
             Logger.recordOutput("Drive/omegaCommand", omega);
             Logger.recordOutput("Drive/desiredHeading", desiredHeading.getRadians());
+            Logger.recordOutput("Drive/currentHeading", pose.getRotation().getRadians());
             Logger.recordOutput("Drive/rotationError", thetaController.getPositionError());
         } else if (alignState == AlignState.POSE_TARGET) {
             vx = vXController.calculate(pose.getX(), targetTightPose.getX());
@@ -422,14 +449,19 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
         // if (vx == 0 && vy == 0 && omega == 0) {
         //     setControl(brake);
-        if (!fieldCentric) {
+        if (alignState == AlignState.SYS_ID_DRIVE) {
+            setControl(driveSysId.withVolts(Units.Volts.of(tuningVolts)));
+        } else if (alignState == AlignState.SYS_ID_ROTATION) {
+            setControl(rotationSysId.withVolts(Units.Volts.of(tuningVolts)));
+        } else if (!fieldCentric) {
             setControl(
                     driveRobotCentric
                             .withVelocityX(vx)
                             .withVelocityY(vy)
                             .withRotationalRate(omega)
                             .withDeadband(0.0)
-                            .withRotationalDeadband(0.0));
+                            .withRotationalDeadband(0.0)
+                            .withDriveRequestType(DriveRequestType.Velocity));
         } else {
             setControl(
                     driveFieldCentric
@@ -437,7 +469,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                             .withVelocityY(vy)
                             .withRotationalRate(omega)
                             .withDeadband(0.0)
-                            .withRotationalDeadband(0.0));
+                            .withRotationalDeadband(0.0)
+                            .withDriveRequestType(DriveRequestType.Velocity));
         }
     }
 
@@ -489,7 +522,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
         PathConstraints constraints =
                 new PathConstraints(
-                        3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+                        3.0,
+                        4.0,
+                        Constants.ConversionConstants.kDegreesToRadians * 540,
+                        Constants.ConversionConstants.kDegreesToRadians * 720);
 
         return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0, 0.0);
     }
@@ -614,7 +650,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
         PathConstraints constraints =
                 new PathConstraints(
-                        3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+                        3.0,
+                        4.0,
+                        Constants.ConversionConstants.kDegreesToRadians * 540,
+                        Constants.ConversionConstants.kDegreesToRadians * 720);
 
         pathfindCommand = AutoBuilder.pathfindThenFollowPath(path, constraints, 0.0);
         pathfindCommand.schedule();
@@ -635,6 +674,128 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             this.getModule(2).getDriveMotor().getPosition().getValueAsDouble(),
             this.getModule(3).getDriveMotor().getPosition().getValueAsDouble()
         };
+    }
+
+    public void setDrivePID(double kP, double kI, double kD) {
+        for (int i = 0; i < 4; i++) {
+            getModule(i)
+                    .getDriveMotor()
+                    .getConfigurator()
+                    .refresh(
+                            new Slot0Configs()
+                                    .withKP(kP)
+                                    .withKI(kI)
+                                    .withKD(kD)
+                                    .withKS(TunerConstants.driveGains.kS)
+                                    .withKV(TunerConstants.driveGains.kV)
+                                    .withKA(TunerConstants.driveGains.kA));
+        }
+    }
+
+    public void setDriveP(double kP) {
+        for (int i = 0; i < 4; i++) {
+            getModule(i)
+                    .getDriveMotor()
+                    .getConfigurator()
+                    .apply(
+                            new Slot0Configs()
+                                    .withKP(kP)
+                                    .withKI(TunerConstants.driveGains.kI)
+                                    .withKD(TunerConstants.driveGains.kD)
+                                    .withKS(TunerConstants.driveGains.kS)
+                                    .withKV(TunerConstants.driveGains.kV)
+                                    .withKA(TunerConstants.driveGains.kA));
+        }
+    }
+
+    public void setDriveI(double kI) {
+        for (int i = 0; i < 4; i++) {
+            getModule(i)
+                    .getDriveMotor()
+                    .getConfigurator()
+                    .apply(
+                            new Slot0Configs()
+                                    .withKP(TunerConstants.driveGains.kP)
+                                    .withKI(kI)
+                                    .withKD(TunerConstants.driveGains.kD)
+                                    .withKS(TunerConstants.driveGains.kS)
+                                    .withKV(TunerConstants.driveGains.kV)
+                                    .withKA(TunerConstants.driveGains.kA));
+        }
+    }
+
+    public void setDriveD(double kD) {
+        for (int i = 0; i < 4; i++) {
+            getModule(i)
+                    .getDriveMotor()
+                    .getConfigurator()
+                    .apply(
+                            new Slot0Configs()
+                                    .withKP(TunerConstants.driveGains.kP)
+                                    .withKI(TunerConstants.driveGains.kI)
+                                    .withKD(kD)
+                                    .withKS(TunerConstants.driveGains.kS)
+                                    .withKV(TunerConstants.driveGains.kV)
+                                    .withKA(TunerConstants.driveGains.kA));
+        }
+    }
+
+    public void setBrakeMode(boolean brake) {
+        this.getModule(0)
+                .getDriveMotor()
+                .setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+        this.getModule(1)
+                .getDriveMotor()
+                .setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+        this.getModule(2)
+                .getDriveMotor()
+                .setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+        this.getModule(3)
+                .getDriveMotor()
+                .setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+
+        this.getModule(0)
+                .getSteerMotor()
+                .setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+        this.getModule(1)
+                .getSteerMotor()
+                .setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+        this.getModule(2)
+                .getSteerMotor()
+                .setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+        this.getModule(3)
+                .getSteerMotor()
+                .setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+    }
+
+    public void autoInit() {
+        thetaController.setP(DriveConstants.autoAlignmentkP);
+        thetaController.setI(DriveConstants.autoAlignmentkI);
+        thetaController.setD(DriveConstants.autoAlignmentkD);
+
+        setAlignState(AlignState.ALIGNING);
+        setAlignTarget(AlignTarget.SPEAKER);
+    }
+
+    public void teleopInit() {
+        thetaController.setP(DriveConstants.alignmentkPMax);
+        thetaController.setI(DriveConstants.alignmentkI);
+        thetaController.setD(DriveConstants.alignmentkD);
+
+        setAlignState(AlignState.MANUAL);
+
+        vx = 0.0;
+        vy = 0.0;
+        omega = 0.0;
+
+        setControl(
+                driveRobotCentric
+                        .withVelocityX(vx)
+                        .withVelocityY(vy)
+                        .withRotationalRate(omega)
+                        .withDeadband(0.0)
+                        .withRotationalDeadband(0.0)
+                        .withDriveRequestType(DriveRequestType.Velocity));
     }
 
     @Override

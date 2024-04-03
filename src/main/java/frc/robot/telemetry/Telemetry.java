@@ -34,6 +34,14 @@ public class Telemetry {
                 new SwerveModuleState()
             };
 
+    SwerveModuleState[] moduleGoalStates =
+            new SwerveModuleState[] {
+                new SwerveModuleState(),
+                new SwerveModuleState(),
+                new SwerveModuleState(),
+                new SwerveModuleState()
+            };
+
     double robotRotation = 0;
     double robotRotationVelocity = 0;
     double robotRotationLast = 0;
@@ -87,6 +95,8 @@ public class Telemetry {
         accelYFiltered = accelYFilter.calculate(telemetryInputs.accelerationY);
 
         latestModuleStates = state.ModuleStates;
+
+        moduleGoalStates = state.ModuleTargets;
     }
 
     /**
@@ -98,10 +108,13 @@ public class Telemetry {
 
         telemetryIo.setRobotPose(getFieldToRobot3d());
         telemetryIo.setRobotPose(pose);
-        telemetryIo.setSwerveModuleStates(moduleStates);
+        telemetryIo.setSwerveModuleStates(getModuleStates());
+        telemetryIo.setSwerveModuleGoalStates(getModuleGoalStates());
 
         telemetryIo.setRobotRotation(robotRotation);
         telemetryIo.setRobotRotationVelocity(robotRotationVelocity);
+
+        // telemetryIo.setDriveAppliedVolts();
 
         telemetryIo.updateInputs(telemetryInputs);
         Logger.processInputs("telemetry", telemetryInputs);
@@ -133,6 +146,18 @@ public class Telemetry {
         SwerveModuleState[] states = new SwerveModuleState[4];
         for (int i = 0; i < 4; i++) {
             var state = latestModuleStates[i];
+            states[i] =
+                    new SwerveModuleState(
+                            state.speedMetersPerSecond,
+                            Rotation2d.fromRadians(state.angle.getRadians()));
+        }
+        return states;
+    }
+
+    public SwerveModuleState[] getModuleGoalStates() {
+        SwerveModuleState[] states = new SwerveModuleState[4];
+        for (int i = 0; i < 4; i++) {
+            var state = moduleGoalStates[i];
             states[i] =
                     new SwerveModuleState(
                             state.speedMetersPerSecond,

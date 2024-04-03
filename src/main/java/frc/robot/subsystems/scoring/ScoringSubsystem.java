@@ -52,6 +52,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     private final InterpolateDouble aimerInterpolated;
     private final InterpolateDouble timeToPutAimDown;
     private final InterpolateDouble aimerAvoidElevator;
+    private final InterpolateDouble aimerAngleTolerance;
 
     private double shooterGoalVelocityRPMTuning = 0.0;
     private double aimerGoalAngleRadTuning = 0.0;
@@ -126,6 +127,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                 new InterpolateDouble(
                         ScoringConstants.aimerAvoidElevatorTable(), 0.0, Math.PI / 2.0);
 
+        aimerAngleTolerance = new InterpolateDouble(ScoringConstants.aimerToleranceTable());
+
         if (Constants.currentMode == Mode.SIM) {
             mechanism = new Mechanism2d(2.2, 2.0);
             rootMechanism = mechanism.getRoot("scoring", 0.6, 0.3);
@@ -144,6 +147,10 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     public void setBrakeMode(boolean brake) {
         aimerIo.setBrakeMode(brake);
         hoodIo.setBrakeMode(brake);
+    }
+
+    public boolean atAimerGoalPosition() {
+        return Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad) < 0.2;
     }
 
     private void idle() {
@@ -191,7 +198,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         if (!aimerAtIntakePosition()) {
             aimerIo.setAimAngleRad(ScoringConstants.intakeAngleToleranceRadians, true);
         }
-        shooterIo.setKickerVolts(1.75);
+        shooterIo.setKickerVolts(ScoringConstants.kickerIntakeVolts);
 
         if ((hasNote()) || action != ScoringAction.INTAKE) {
             state = ScoringState.IDLE;
@@ -231,22 +238,24 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private void prime() {
-        double distancetoGoal = findDistanceToGoal();
-        Logger.recordOutput("scoring/aimGoal", getAimerAngle(distancetoGoal));
-        shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
-        aimerIo.setAimAngleRad(getAimerAngle(distancetoGoal), false);
+        double distanceToGoal = findDistanceToGoal();
+        Logger.recordOutput("scoring/aimGoal", getAimerAngle(distanceToGoal));
+        shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distanceToGoal));
+        aimerIo.setAimAngleRad(getAimerAngle(distanceToGoal), false);
         if (!overrideBeamBreak) {
-            shooterIo.setKickerVolts(hasNote() ? 0.0 : 1.75);
+            shooterIo.setKickerVolts(hasNote() ? 0.0 : ScoringConstants.kickerIntakeVolts);
         }
 
         boolean shooterReady =
-                Math.abs(
-                                shooterInputs.shooterLeftVelocityRPM
-                                        - shooterInputs.shooterLeftGoalVelocityRPM)
-                        < ScoringConstants.shooterVelocityMarginRPM;
+                shooterInputs.shooterLeftVelocityRPM
+                                < (shooterInputs.shooterLeftGoalVelocityRPM
+                                        + ScoringConstants.shooterUpperVelocityMarginRPM)
+                        && shooterInputs.shooterLeftVelocityRPM
+                                > (shooterInputs.shooterLeftGoalVelocityRPM
+                                        - ScoringConstants.shooterLowerVelocityMarginRPM);
         boolean aimReady =
                 Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad)
-                                < ScoringConstants.aimAngleMarginRadians
+                                < aimerAngleTolerance.getValue(distanceToGoal)
                         && Math.abs(aimerInputs.aimVelocityErrorRadPerSec)
                                 < ScoringConstants.aimAngleVelocityMargin;
         boolean driveReady = driveAllignedSupplier.get();
@@ -510,6 +519,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                         new Rotation3d(0, -hoodInputs.hoodAngleRad - aimerInputs.aimAngleRad, 0)));
 
         Logger.recordOutput("scoring/readyToShoot", readyToShoot);
+        Logger.recordOutput("scoring/overrideShoot", overrideShoot);
 
         Logger.recordOutput("aimer/willIHitStage", willHitStage());
 

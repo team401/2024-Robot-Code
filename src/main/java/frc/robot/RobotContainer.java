@@ -3,6 +3,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -92,6 +93,11 @@ public class RobotContainer {
         configureSubsystems();
         configureModes();
         configureAutonomous();
+        if (FeatureFlags.runDrive) {
+            drivetrain.configurePathPlanner();
+        }
+
+        SmartDashboard.putNumber("Debug/currentTimeMillis", System.currentTimeMillis());
     }
 
     public void configureSubsystems() {
@@ -177,8 +183,7 @@ public class RobotContainer {
 
                 if (FeatureFlags.runVision) {
                     tagVision =
-                            new VisionLocalizer(
-                                    new CameraContainerReplay(VisionConstants.cameras.size()));
+                            new VisionLocalizer(new CameraContainerReplay(VisionConstants.cameras));
                 }
                 break;
         }
@@ -187,14 +192,6 @@ public class RobotContainer {
             drivetrain.registerTelemetry(driveTelemetry::telemeterize);
             drivetrain.setPoseSupplier(driveTelemetry::getFieldToRobot);
             drivetrain.setVelocitySupplier(driveTelemetry::getVelocity);
-
-            if (FeatureFlags.runVision) {
-                tagVision.setCameraConsumer(
-                        (m) ->
-                                drivetrain.addVisionMeasurement(
-                                        m.pose(), m.timestamp(), m.variance()));
-                tagVision.setFieldToRobotSupplier(() -> driveTelemetry.getFieldToRobot());
-            }
         }
 
         if (FeatureFlags.runScoring) {
@@ -227,11 +224,16 @@ public class RobotContainer {
             }
         }
 
+        if (FeatureFlags.runVision) {
+            tagVision.setCameraConsumer(
+                    (m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
+        }
+
         if (FeatureFlags.enableLEDS) {
-            leds = new LED(scoringSubsystem);
+            leds = new LED(scoringSubsystem, intakeSubsystem);
 
             if (FeatureFlags.runVision) {
-                leds.setVisionWorkingSupplier(() -> tagVision.getVisionWorking());
+                leds.setVisionWorkingSupplier(() -> tagVision.coprocessorConnected());
             }
         }
     }
@@ -371,6 +373,10 @@ public class RobotContainer {
         testModeChooser.addOption("Shooter Tuning", "tuning-shooter");
         testModeChooser.addOption("Endgame Tuning", "tuning-endgame");
         testModeChooser.addOption("Wheel Characterization", "characterization-wheel");
+        testModeChooser.addOption("Translation Drive Tuning", "drive-translation-tuning");
+        testModeChooser.addOption("Rotation Drive Tuning", "drive-rotation-tuning");
+        testModeChooser.addOption("Drive Align Tuning", "drive-align");
+        testModeChooser.addOption("Drive Velocity Tuning", "drive-velocity");
 
         SmartDashboard.putData("Test Mode Chooser", testModeChooser);
     }
@@ -403,6 +409,10 @@ public class RobotContainer {
         if (timeDigitalOutput != null) {
             timeDigitalOutput.set(false);
         }
+
+        if (FeatureFlags.runEndgame) {
+            endgameSubsystem.setAction(EndgameAction.WAIT);
+        }
     }
 
     public void testInit() {
@@ -414,18 +424,31 @@ public class RobotContainer {
             case "tuning":
                 break;
             case "drive-align":
-                drivetrain.seedFieldRelative();
+                SmartDashboard.putNumber("Test-Mode/drive/alignPMax", Constants.DriveConstants.alignmentkPMax);
+                SmartDashboard.putNumber("Test-Mode/drive/alignPMin", Constants.DriveConstants.alignmentkPMin);
+                SmartDashboard.putNumber("Test-Mode/drive/alignI", Constants.DriveConstants.alignmentkI);
+                SmartDashboard.putNumber("Test-Mode/drive/alignD", Constants.DriveConstants.alignmentkD);
+            
                 setUpDriveWithJoysticks();
 
-                rightJoystick.trigger()
-                .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignState(AlignState.ALIGNING)))
-                .onFalse(new InstantCommand(
-                    () -> drivetrain.setAlignState(AlignState.MANUAL)));
-
                 controller.a()
+                    .onTrue(new InstantCommand(
+                        () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
+
+                controller.b()
+                    .onTrue(new InstantCommand(
+                        () -> drivetrain.setAlignState(AlignState.ALIGNING)))
+                    .onFalse(new InstantCommand(
+                        () -> drivetrain.setAlignState(AlignState.MANUAL)));
+
+                controller.b()
                 .onTrue(new InstantCommand(
-                    () -> drivetrain.setAlignTarget(AlignTarget.SPEAKER)));
+                    () -> drivetrain.setAlignGains(
+                        SmartDashboard.getNumber("Test-Mode/drive/alignPMax", Constants.DriveConstants.alignmentkPMax),
+                        SmartDashboard.getNumber("Test-Mode/drive/alignPMin", Constants.DriveConstants.alignmentkPMin),
+                        SmartDashboard.getNumber("Test-Mode/drive/alignI", Constants.DriveConstants.alignmentkI),
+                        SmartDashboard.getNumber("Test-Mode/drive/alignD", Constants.DriveConstants.alignmentkD)
+                    )));
                 break;
             case "calculate-speaker":
                 drivetrain.seedFieldRelative();
@@ -702,6 +725,84 @@ public class RobotContainer {
                                         () -> drivetrain.getPigeon2().getYaw().getValueAsDouble()
                                                 * ConversionConstants.kDegreesToRadians));
                 break;
+            case "drive-translation-tuning":
+                SmartDashboard.putNumber("Test-Mode/drive/translationVolts", 0.0);
+
+                drivetrain.setAlignState(AlignState.SYS_ID_DRIVE);
+
+                controller.a()
+                        .onTrue(new InstantCommand(() ->
+                            drivetrain.setTuningVolts(SmartDashboard.getNumber("Test-Mode/drive/translationVolts", 0.0))))
+                        .onFalse(new InstantCommand(() ->
+                            drivetrain.setTuningVolts(0.0)));
+                break;
+            case "drive-rotation-tuning":
+                SmartDashboard.putNumber("Test-Mode/drive/rotationVolts", 0.0);
+
+                drivetrain.setAlignState(AlignState.SYS_ID_ROTATION);
+
+                controller.a()
+                        .onTrue(new InstantCommand(() ->
+                            drivetrain.setTuningVolts(SmartDashboard.getNumber("Test-Mode/drive/rotationVolts", 0.0))))
+                        .onFalse(new InstantCommand(() ->
+                            drivetrain.setTuningVolts(0.0)));
+                break;
+            case "drive-velocity":
+                SmartDashboard.putNumber("Test-Mode/drive/velocity", 1.0);
+
+                SmartDashboard.putNumber("Test-Mode/drive/velKP", TunerConstants.driveGains.kP);
+                SmartDashboard.putNumber("Test-Mode/drive/velKI", TunerConstants.driveGains.kI);
+                SmartDashboard.putNumber("Test-Mode/drive/velKD", TunerConstants.driveGains.kD);
+
+                drivetrain.setAlignState(AlignState.MANUAL);
+
+                controller.rightBumper()
+                        .onTrue(new InstantCommand(() ->
+                            drivetrain.setDrivePID(
+                                SmartDashboard.getNumber("Test-Mode/drive/velKP", TunerConstants.driveGains.kP),
+                                SmartDashboard.getNumber("Test-Mode/drive/velKI", TunerConstants.driveGains.kI),
+                                SmartDashboard.getNumber("Test-Mode/drive/velKD", TunerConstants.driveGains.kD)
+                            )));
+
+                controller.a()
+                        .onTrue(new InstantCommand(() -> {
+                                drivetrain.setDrivePID(
+                                        SmartDashboard.getNumber("Test-Mode/drive/velKP", TunerConstants.driveGains.kP),
+                                        SmartDashboard.getNumber("Test-Mode/drive/velKI", TunerConstants.driveGains.kI),
+                                        SmartDashboard.getNumber("Test-Mode/drive/velKD", TunerConstants.driveGains.kD)
+                                );
+                                drivetrain.setGoalChassisSpeeds(
+                                    new ChassisSpeeds(
+                                        SmartDashboard.getNumber("Test-Mode/drive/velocity", 1.0),
+                                        0.0,
+                                        0.0), 
+                                    false);
+                                
+                            }))
+                        .onFalse(new InstantCommand(() -> 
+                            drivetrain.setGoalChassisSpeeds(
+                                new ChassisSpeeds(0.0, 0.0, 0.0), 
+                                false)));
+                controller.b()
+                        .onTrue(new InstantCommand(() -> {
+                                drivetrain.setDrivePID(
+                                        SmartDashboard.getNumber("Test-Mode/drive/velKP", TunerConstants.driveGains.kP),
+                                        SmartDashboard.getNumber("Test-Mode/drive/velKI", TunerConstants.driveGains.kI),
+                                        SmartDashboard.getNumber("Test-Mode/drive/velKD", TunerConstants.driveGains.kD)
+                                );
+                                drivetrain.setGoalChassisSpeeds(
+                                    new ChassisSpeeds(
+                                        -SmartDashboard.getNumber("Test-Mode/drive/velocity", 1.0),
+                                        0.0,
+                                        0.0), 
+                                    false);
+                                
+                            }))
+                        .onFalse(new InstantCommand(() -> 
+                            drivetrain.setGoalChassisSpeeds(
+                                new ChassisSpeeds(0.0, 0.0, 0.0), 
+                                false)));
+                break;
             }
         }
         // spotless:on
@@ -758,12 +859,18 @@ public class RobotContainer {
             if (FeatureFlags.runEndgame) {
                 endgameSubsystem.setBrakeMode(false);
             }
+            if (FeatureFlags.runDrive) {
+                drivetrain.setBrakeMode(false);
+            }
         } else {
             if (FeatureFlags.runScoring) {
                 scoringSubsystem.setBrakeMode(true);
             }
             if (FeatureFlags.runEndgame) {
                 endgameSubsystem.setBrakeMode(true);
+            }
+            if (FeatureFlags.runDrive) {
+                drivetrain.setBrakeMode(true);
             }
         }
         if (ledSwitch != null) {
@@ -773,9 +880,10 @@ public class RobotContainer {
 
     public void autoInit() {
         if (drivetrain.getAutoCommand() != null) {
+            drivetrain.autoInit();
+
             drivetrain.getAutoCommand().schedule();
-            drivetrain.setAlignState(AlignState.ALIGNING);
-            drivetrain.setAlignTarget(AlignTarget.SPEAKER);
+
             if (FeatureFlags.runScoring) {
                 scoringSubsystem.setAction(ScoringSubsystem.ScoringAction.SHOOT);
             }
@@ -868,7 +976,9 @@ public class RobotContainer {
         }
 
         if (FeatureFlags.runDrive) {
-            drivetrain.setAlignState(AlignState.MANUAL);
+            drivetrain.teleopInit();
         }
+
+        SmartDashboard.putNumber("Debug/currentTimeMillis", System.currentTimeMillis());
     }
 }

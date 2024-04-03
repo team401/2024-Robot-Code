@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.9379802552091694,
-        "y": 2.0413098429059118
+        "x": 3.2,
+        "y": 5.58
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.569464595100926,
-        "y": 4.596618567119067
+        "x": 4.672264371362375,
+        "y": 6.123929528717735
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.279995578509675,
-        "y": 4.093483946227152
+        "x": 8.68,
+        "y": 7.43
       },
       "prevControl": {
-        "x": 7.506601059713748,
-        "y": 4.126676732781015
+        "x": 4.716321418331567,
+        "y": 6.93164205648626
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,8 +32,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Prime",
-      "waypointRelativePos": 0.2,
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.5,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Aim Scoring"
+                "name": "Un-Override Shoot"
               }
             }
           ]
@@ -51,17 +51,20 @@
   ],
   "globalConstraints": {
     "maxVelocity": 4.0,
-    "maxAcceleration": 12.0,
+    "maxAcceleration": 6.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0,
+    "rotation": -167.95279739073942,
     "rotateFast": false
   },
   "reversed": false,
   "folder": null,
-  "previewStartingState": null,
-  "useDefaultConstraints": true
+  "previewStartingState": {
+    "rotation": 179.98962167166312,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
 }

@@ -14,7 +14,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 0.4
           }
         },
         {
@@ -24,9 +24,21 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "S2-W2"
+          }
+        },
+        {
           "type": "wait",
           "data": {
-            "waitTime": 0.2
+            "waitTime": 0.4
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "W2-C1"
           }
         },
         {
@@ -38,19 +50,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "S2-C1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "C1-E1"
+            "pathName": "C1-E1-Slow"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.2
+            "waitTime": 0.3
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Override Shoot"
           }
         },
         {
@@ -60,9 +72,45 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Enable Auto-Align"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Un-Override Shoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.3
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "C2-E1"
+            "pathName": "C2-E1-Slow"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.3
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Override Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Disable Auto-Align"
           }
         },
         {
@@ -72,15 +120,21 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "C3-E1"
+            "name": "Un-Override Shoot"
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "Override Shoot"
+            "waitTime": 0.3
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C3-E1"
           }
         }
       ]

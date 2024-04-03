@@ -20,7 +20,7 @@ public class FieldFinder {
         public static final double STAGE_BLUE_RIGHT_SIDE_X = 5.6;
         public static final double STAGE_BLUE_RIGHT_SIDE_Y = 2.2;
 
-        public static final double WING_RED_END_X = 12.0; // Actual 10.8
+        public static final double WING_RED_END_X = 12; // Actual 10.8
 
         public static final double WING_BLUE_END_X = 4.6; // Actual 5.8
     }
