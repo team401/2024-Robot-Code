@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ConversionConstants;
@@ -320,14 +321,14 @@ public class RobotContainer {
                     scoringSubsystem.forceHood(false);
                 }));
             
-            controller.x()
-                .onTrue(new InstantCommand(() -> {
-                    endgameSubsystem.setAction(EndgameAction.OVERRIDE);
-                    endgameSubsystem.setVolts(-3, 0);
-                    scoringSubsystem.forceHood(false);
-                })).onFalse(new InstantCommand(() -> {
-                    endgameSubsystem.setVolts(0, 0);
-                }));
+            // controller.x()
+            //     .onTrue(new InstantCommand(() -> {
+            //         endgameSubsystem.setAction(EndgameAction.OVERRIDE);
+            //         endgameSubsystem.setVolts(-3, 0);
+            //         scoringSubsystem.forceHood(false);
+            //     })).onFalse(new InstantCommand(() -> {
+            //         endgameSubsystem.setVolts(0, 0);
+            //     }));
         }
 
         if (FeatureFlags.runIntake) {
@@ -340,6 +341,18 @@ public class RobotContainer {
             controller.a()
                 .onTrue(new InstantCommand(
                     () -> intakeSubsystem.run(IntakeAction.REVERSE)))
+                .onFalse(new InstantCommand(
+                    () -> intakeSubsystem.run(IntakeAction.NONE)));
+
+            controller.x()
+                .onTrue(new SequentialCommandGroup(new InstantCommand(
+                        () -> intakeSubsystem.run(IntakeAction.REVERSE)),
+                    Commands.waitSeconds(0.1),
+                    new InstantCommand(
+                        () -> intakeSubsystem.run(IntakeAction.INTAKE)),
+                    Commands.waitSeconds(0.5),
+                    new InstantCommand(
+                        () -> intakeSubsystem.run(IntakeAction.NONE))))
                 .onFalse(new InstantCommand(
                     () -> intakeSubsystem.run(IntakeAction.NONE)));
         }
