@@ -179,12 +179,12 @@ public final class Constants {
 
         public static final double lowUncertaintyCutoffDistance = 6.5;
 
-        public static final double skewCutoffDistance = 5.5;
+        public static final double skewCutoffDistance = 5.8;
         public static final double skewCutoffRotation = Units.degreesToRadians(50);
 
-        public static final Matrix<N3, N1> teleopCameraUncertainty = VecBuilder.fill(1.0, 1.0, 4);
+        public static final Matrix<N3, N1> teleopCameraUncertainty = VecBuilder.fill(0.6, 0.6, 4);
 
-        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(1.0, 2.0, 4);
+        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(0.8, 1.6, 4);
 
         public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(16.0, 20.0, 40);
 
@@ -344,7 +344,7 @@ public final class Constants {
 
         private static final double kDriveGearRatio = 6.122448979591837;
         private static final double kSteerGearRatio = 21.428571428571427;
-        private static final double kWheelRadiusInches = 1.947;
+        private static final double kWheelRadiusInches = 1.931;
 
         private static final boolean kSteerMotorReversed = true;
         private static final boolean kInvertLeftSide = false;
