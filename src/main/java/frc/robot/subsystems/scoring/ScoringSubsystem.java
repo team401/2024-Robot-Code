@@ -520,6 +520,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
         Logger.recordOutput("scoring/readyToShoot", readyToShoot);
         Logger.recordOutput("scoring/overrideShoot", overrideShoot);
+        Logger.recordOutput("scoring/overrideStageAvoidance", overrideStageAvoidance);
 
         Logger.recordOutput("aimer/willIHitStage", willHitStage());
 
