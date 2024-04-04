@@ -24,6 +24,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "OverrideStageAvoidance"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "S2-W2"
@@ -39,6 +45,12 @@
           "type": "path",
           "data": {
             "pathName": "W2-C1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Un-OverrideStageAvoidance"
           }
         },
         {
