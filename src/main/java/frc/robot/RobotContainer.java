@@ -372,6 +372,21 @@ public class RobotContainer {
                 
             controller.back()
                 .onTrue(new InstantCommand(() -> scoringSubsystem.setOverrideBeamBrake(false)));
+
+            rightJoystick.button(11).onTrue(new InstantCommand(() -> scoringSubsystem.setArmDisabled(true)));
+            rightJoystick.button(16).onTrue(new InstantCommand(() -> scoringSubsystem.setArmDisabled(false)));
+
+            rightJoystick.button(12).onTrue(new InstantCommand(
+                () -> {
+                    scoringSubsystem.setAction(ScoringAction.OVERRIDE);
+                    scoringSubsystem.setVolts(3, 0);
+                }, scoringSubsystem));
+
+            rightJoystick.button(15).onTrue(new InstantCommand(
+                () -> {
+                    scoringSubsystem.setAction(ScoringAction.OVERRIDE);
+                    scoringSubsystem.setVolts(-3, 0);
+                }, scoringSubsystem));
         }
     } // spotless:on
 

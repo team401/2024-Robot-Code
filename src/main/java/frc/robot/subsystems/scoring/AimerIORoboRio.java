@@ -58,6 +58,8 @@ public class AimerIORoboRio implements AimerIO {
     double lastPosition = 0.0;
     double lastTime = Utils.getCurrentTimeSeconds();
 
+    boolean motorDisabled = false;
+
     public AimerIORoboRio() {
         aimerLeft.setControl(new Follower(ScoringConstants.aimRightMotorId, true));
 
@@ -180,6 +182,11 @@ public class AimerIORoboRio implements AimerIO {
     }
 
     @Override
+    public void setMotorDisabled(boolean disabled) {
+        motorDisabled = disabled;
+    }
+
+    @Override
     public void updateInputs(AimerIOInputs inputs) {
         appliedVolts = 0.0;
 
@@ -193,6 +200,10 @@ public class AimerIORoboRio implements AimerIO {
                 MathUtil.clamp(trapezoidSetpoint.position, minAngleClamp, maxAngleClamp);
         double velocitySetpoint = trapezoidSetpoint.velocity;
 
+        if (getEncoderPosition() == -1.75) {
+            motorDisabled = true;
+        }
+
         if (override) {
             appliedVolts = overrideVolts;
         } else {
@@ -202,7 +213,11 @@ public class AimerIORoboRio implements AimerIO {
         }
 
         appliedVolts = MathUtil.clamp(appliedVolts, -12.0, 12.0);
-        aimerRight.setVoltage(appliedVolts);
+        if (!motorDisabled || override) {
+            aimerRight.setVoltage(appliedVolts);
+        } else {
+            aimerRight.setVoltage(0.0);
+        }
 
         inputs.aimGoalAngleRad = goalAngleRad;
         inputs.aimProfileGoalAngleRad = controlSetpoint;

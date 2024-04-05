@@ -39,4 +39,6 @@ public interface AimerIO {
     public default void setBrakeMode(boolean brake) {}
 
     public default void setStatorCurrentLimit(double limit) {}
+
+    public default void setMotorDisabled(boolean disabled) {}
 }

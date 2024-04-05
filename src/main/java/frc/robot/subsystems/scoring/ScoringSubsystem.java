@@ -606,6 +606,10 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         this.overrideBeamBreak = overrideBeamBrake;
     }
 
+    public void setArmDisabled(boolean disabled) {
+        aimerIo.setMotorDisabled(disabled);
+    }
+
     public void forceHood(boolean hoodForced) {
         this.hoodForced = hoodForced;
     }
