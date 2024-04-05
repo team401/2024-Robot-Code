@@ -182,7 +182,8 @@ public final class Constants {
         public static final double skewCutoffDistance = 5.8;
         public static final double skewCutoffRotation = Units.degreesToRadians(50);
 
-        public static final Matrix<N3, N1> teleopCameraUncertainty = VecBuilder.fill(0.4, 0.4, 4);
+        public static final Matrix<N3, N1> teleopCameraUncertainty =
+                VecBuilder.fill(0.35, 0.35, 3.5);
 
         public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(0.6, 1.0, 4);
 

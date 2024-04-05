@@ -44,7 +44,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.3
+            "waitTime": 0.4
           }
         },
         {
@@ -98,7 +98,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "C3-E1"
+            "pathName": "C3-E1-From-Stage"
           }
         }
       ]
