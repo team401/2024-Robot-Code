@@ -514,7 +514,7 @@ public final class Constants {
         public static final int hoodId = 17;
 
         public static final int aimEncoderPort = 0;
-        public static final double aimerEncoderOffset = 1.75 - 0.007; // 0.027
+        public static final double aimerEncoderOffset = 1.75 - 0.012; // 0.027
 
         public static final double kickerIntakeVolts = 2.0;
 
