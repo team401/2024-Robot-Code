@@ -426,6 +426,10 @@ public class RobotContainer {
         if (FeatureFlags.runEndgame) {
             endgameSubsystem.setAction(EndgameAction.WAIT);
         }
+
+        if (FeatureFlags.runDrive) {
+            drivetrain.teleopInit();
+        }
     }
 
     public void testInit() {
