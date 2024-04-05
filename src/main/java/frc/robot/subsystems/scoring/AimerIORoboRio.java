@@ -14,6 +14,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.ScoringConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class AimerIORoboRio implements AimerIO {
     private final TalonFX aimerLeft = new TalonFX(ScoringConstants.aimLeftMotorId);
@@ -218,6 +219,8 @@ public class AimerIORoboRio implements AimerIO {
         } else {
             aimerRight.setVoltage(0.0);
         }
+
+        Logger.recordOutput("Scoring/motorDisabled", motorDisabled);
 
         inputs.aimGoalAngleRad = goalAngleRad;
         inputs.aimProfileGoalAngleRad = controlSetpoint;
