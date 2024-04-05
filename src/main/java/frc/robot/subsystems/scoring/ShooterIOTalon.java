@@ -28,7 +28,7 @@ public class ShooterIOTalon implements ShooterIO {
     double goalRightVelocityRPM = 0.0;
 
     public ShooterIOTalon() {
-        kicker.setInverted(true);
+        kicker.setInverted(false);
 
         shooterLeft.setInverted(true);
         shooterRight.setInverted(false);
