@@ -344,6 +344,7 @@ public class RobotContainer {
                 .onFalse(new InstantCommand(
                     () -> intakeSubsystem.run(IntakeAction.NONE)));
 
+            // HACK: This button was added during DCMP to un-jam the intake. Ideally, this functionality should be implemented through a state machine.
             controller.x()
                 .onTrue(new SequentialCommandGroup(new InstantCommand(
                         () -> intakeSubsystem.run(IntakeAction.REVERSE)),
@@ -437,6 +438,9 @@ public class RobotContainer {
         }
 
         if (FeatureFlags.runDrive) {
+            // HACK: this method is called here to stop the drive from briefly moving when the robot
+            // is enabled. Either the method should be renamed, or the underlying issue (unreasonable 
+            // disabledPeriodic() loop times) should be rectified and this call moved.
             drivetrain.teleopInit();
         }
     }
