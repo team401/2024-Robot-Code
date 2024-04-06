@@ -367,12 +367,6 @@ public class RobotContainer {
                 controller.getHID()::getBButton, scoringSubsystem,
                 FeatureFlags.runDrive ? drivetrain::getAlignTarget : () -> AlignTarget.NONE));
 
-            controller.start()
-                .onTrue(new InstantCommand(() -> scoringSubsystem.setOverrideBeamBrake(true)));
-                
-            controller.back()
-                .onTrue(new InstantCommand(() -> scoringSubsystem.setOverrideBeamBrake(false)));
-
             rightJoystick.button(11).onTrue(new InstantCommand(() -> scoringSubsystem.setArmDisabled(true)));
             rightJoystick.button(16).onTrue(new InstantCommand(() -> scoringSubsystem.setArmDisabled(false)));
 

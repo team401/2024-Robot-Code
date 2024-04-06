@@ -476,6 +476,12 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
             SmartDashboard.putNumber("Aimer Offset", ScoringConstants.aimerStaticOffset);
         }
 
+        if (!SmartDashboard.containsKey("Beam Break Overridden")) {
+            SmartDashboard.putBoolean("Beam Break Overridden", overrideBeamBreak);
+        }
+
+        overrideBeamBreak = SmartDashboard.getBoolean("Beam Break Overridden", overrideBeamBreak);
+
         if (state == ScoringState.TEMPORARY_SETPOINT) {
             aimerIo.setAngleClampsRad(
                     ScoringConstants.aimMinAngleRadians, ScoringConstants.aimMaxAngleRadians);
