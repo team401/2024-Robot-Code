@@ -33,7 +33,7 @@ public class VisionLocalizer extends SubsystemBase {
     }
 
     public boolean coprocessorConnected() {
-        return container.getCameras().get(1).isConnected();
+        return container.getCameras().get(0).isConnected();
     }
 
     /**
