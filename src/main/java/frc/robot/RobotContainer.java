@@ -439,7 +439,8 @@ public class RobotContainer {
 
         if (FeatureFlags.runDrive) {
             // HACK: this method is called here to stop the drive from briefly moving when the robot
-            // is enabled. Either the method should be renamed, or the underlying issue (unreasonable 
+            // is enabled. Either the method should be renamed, or the underlying issue
+            // (unreasonable
             // disabledPeriodic() loop times) should be rectified and this call moved.
             drivetrain.teleopInit();
         }
