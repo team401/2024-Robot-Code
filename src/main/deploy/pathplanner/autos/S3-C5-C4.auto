@@ -5,16 +5,22 @@
       "x": 0.6679855613232356,
       "y": 4.350348982388106
     },
-    "rotation": 120.0
+    "rotation": 121.12182293312829
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.4
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "Shoot Scoring"
+            "name": "Override Shoot"
           }
         },
         {
@@ -24,21 +30,45 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Un-Override Shoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "C5-E2"
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "E2-C4_fast"
+            "waitTime": 0.8
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Override Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C4-E2_fast"
+            "pathName": "E2-C4-No-Stage"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Un-Override Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C4-E2"
           }
         }
       ]

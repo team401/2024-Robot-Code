@@ -12,9 +12,27 @@
     "data": {
       "commands": [
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Override Shoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "S3-C5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Un-Override Shoot"
           }
         },
         {
@@ -24,9 +42,27 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.6
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Override Shoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "E2-C4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Un-Override Shoot"
           }
         },
         {
@@ -36,15 +72,33 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.6
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Override Shoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "E1-C3-Stage"
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Un-Override Shoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "C3-E1"
+            "pathName": "C3-E2"
           }
         }
       ]

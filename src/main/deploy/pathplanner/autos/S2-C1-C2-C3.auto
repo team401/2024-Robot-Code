@@ -14,13 +14,19 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.4
+            "waitTime": 0.5
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Override Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "OverrideStageAvoidance"
           }
         },
         {
@@ -32,13 +38,19 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.4
+            "waitTime": 0.5
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "W2-C1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Un-OverrideStageAvoidance"
           }
         },
         {

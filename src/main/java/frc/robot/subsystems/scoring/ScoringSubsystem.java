@@ -476,6 +476,12 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
             SmartDashboard.putNumber("Aimer Offset", ScoringConstants.aimerStaticOffset);
         }
 
+        if (!SmartDashboard.containsKey("Beam Break Overridden")) {
+            SmartDashboard.putBoolean("Beam Break Overridden", overrideBeamBreak);
+        }
+
+        overrideBeamBreak = SmartDashboard.getBoolean("Beam Break Overridden", overrideBeamBreak);
+
         if (state == ScoringState.TEMPORARY_SETPOINT) {
             aimerIo.setAngleClampsRad(
                     ScoringConstants.aimMinAngleRadians, ScoringConstants.aimMaxAngleRadians);
@@ -520,6 +526,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
         Logger.recordOutput("scoring/readyToShoot", readyToShoot);
         Logger.recordOutput("scoring/overrideShoot", overrideShoot);
+        Logger.recordOutput("scoring/overrideStageAvoidance", overrideStageAvoidance);
 
         Logger.recordOutput("aimer/willIHitStage", willHitStage());
 
@@ -603,6 +610,10 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     public void setOverrideBeamBrake(boolean overrideBeamBrake) {
         this.overrideBeamBreak = overrideBeamBrake;
+    }
+
+    public void setArmDisabled(boolean disabled) {
+        aimerIo.setMotorDisabled(disabled);
     }
 
     public void forceHood(boolean hoodForced) {

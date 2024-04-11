@@ -8,24 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.506992323337165,
-        "y": 4.030275398680295
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 5.488713423470013,
-        "y": 4.208770144158994
-      },
-      "prevControl": {
-        "x": 4.63846486583004,
-        "y": 4.282067433610717
-      },
-      "nextControl": {
-        "x": 5.912266769865396,
-        "y": 4.172256924642151
+        "x": 5.889736047462169,
+        "y": 1.2110845065362585
       },
       "isLocked": false,
       "linkedName": null
@@ -36,8 +20,8 @@
         "y": 2.43
       },
       "prevControl": {
-        "x": 7.130654261308522,
-        "y": 3.53484706969414
+        "x": 6.863479012814106,
+        "y": 1.3868235188083289
       },
       "nextControl": null,
       "isLocked": false,
@@ -49,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.5,
+      "waypointRelativePos": 0.25,
       "command": {
         "type": "parallel",
         "data": {
@@ -58,6 +42,12 @@
               "type": "named",
               "data": {
                 "name": "Un-Override Shoot"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Disable Auto-Align"
               }
             }
           ]
@@ -73,7 +63,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 158.71136721217746,
+    "rotation": -143.7320219277392,
     "rotateFast": false
   },
   "reversed": false,

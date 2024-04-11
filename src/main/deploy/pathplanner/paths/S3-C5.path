@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 8.608027233943556,
-        "y": 0.7930268454454622
+        "x": 8.29957545629377,
+        "y": 0.8062701839689397
       },
       "prevControl": {
-        "x": 6.1096255888491955,
-        "y": 1.26717606276264
+        "x": 5.801173811199409,
+        "y": 1.2804194012861174
       },
       "nextControl": null,
       "isLocked": false,
@@ -36,16 +36,34 @@
     }
   ],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.25,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Un-Override Shoot"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
-    "maxVelocity": 5.0,
-    "maxAcceleration": 4.5,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 6.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 150.74517849977155,
+    "rotation": 150.671742867078,
     "rotateFast": false
   },
   "reversed": false,

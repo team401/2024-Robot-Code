@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ConversionConstants;
@@ -320,14 +321,14 @@ public class RobotContainer {
                     scoringSubsystem.forceHood(false);
                 }));
             
-            controller.x()
-                .onTrue(new InstantCommand(() -> {
-                    endgameSubsystem.setAction(EndgameAction.OVERRIDE);
-                    endgameSubsystem.setVolts(-3, 0);
-                    scoringSubsystem.forceHood(false);
-                })).onFalse(new InstantCommand(() -> {
-                    endgameSubsystem.setVolts(0, 0);
-                }));
+            // controller.x()
+            //     .onTrue(new InstantCommand(() -> {
+            //         endgameSubsystem.setAction(EndgameAction.OVERRIDE);
+            //         endgameSubsystem.setVolts(-3, 0);
+            //         scoringSubsystem.forceHood(false);
+            //     })).onFalse(new InstantCommand(() -> {
+            //         endgameSubsystem.setVolts(0, 0);
+            //     }));
         }
 
         if (FeatureFlags.runIntake) {
@@ -342,6 +343,19 @@ public class RobotContainer {
                     () -> intakeSubsystem.run(IntakeAction.REVERSE)))
                 .onFalse(new InstantCommand(
                     () -> intakeSubsystem.run(IntakeAction.NONE)));
+
+            // HACK: This button was added during DCMP to un-jam the intake. Ideally, this functionality should be implemented through a state machine.
+            controller.x()
+                .onTrue(new SequentialCommandGroup(new InstantCommand(
+                        () -> intakeSubsystem.run(IntakeAction.REVERSE)),
+                    Commands.waitSeconds(0.1),
+                    new InstantCommand(
+                        () -> intakeSubsystem.run(IntakeAction.INTAKE)),
+                    Commands.waitSeconds(0.5),
+                    new InstantCommand(
+                        () -> intakeSubsystem.run(IntakeAction.NONE))))
+                .onFalse(new InstantCommand(
+                    () -> intakeSubsystem.run(IntakeAction.NONE)));
         }
 
         if (FeatureFlags.runScoring) {
@@ -354,11 +368,20 @@ public class RobotContainer {
                 controller.getHID()::getBButton, scoringSubsystem,
                 FeatureFlags.runDrive ? drivetrain::getAlignTarget : () -> AlignTarget.NONE));
 
-            controller.start()
-                .onTrue(new InstantCommand(() -> scoringSubsystem.setOverrideBeamBrake(true)));
-                
-            controller.back()
-                .onTrue(new InstantCommand(() -> scoringSubsystem.setOverrideBeamBrake(false)));
+            rightJoystick.button(11).onTrue(new InstantCommand(() -> scoringSubsystem.setArmDisabled(true)));
+            rightJoystick.button(16).onTrue(new InstantCommand(() -> scoringSubsystem.setArmDisabled(false)));
+
+            rightJoystick.button(12).onTrue(new InstantCommand(
+                () -> {
+                    scoringSubsystem.setAction(ScoringAction.OVERRIDE);
+                    scoringSubsystem.setVolts(3, 0);
+                }, scoringSubsystem));
+
+            rightJoystick.button(15).onTrue(new InstantCommand(
+                () -> {
+                    scoringSubsystem.setAction(ScoringAction.OVERRIDE);
+                    scoringSubsystem.setVolts(-3, 0);
+                }, scoringSubsystem));
         }
     } // spotless:on
 
@@ -412,6 +435,14 @@ public class RobotContainer {
 
         if (FeatureFlags.runEndgame) {
             endgameSubsystem.setAction(EndgameAction.WAIT);
+        }
+
+        if (FeatureFlags.runDrive) {
+            // HACK: this method is called here to stop the drive from briefly moving when the robot
+            // is enabled. Either the method should be renamed, or the underlying issue
+            // (unreasonable
+            // disabledPeriodic() loop times) should be rectified and this call moved.
+            drivetrain.teleopInit();
         }
     }
 

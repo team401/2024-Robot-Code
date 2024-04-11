@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.26,
-        "y": 2.35
+        "x": 8.3,
+        "y": 2.43
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.063146028827267,
-        "y": 1.4394618408955124
+        "x": 6.17351739714632,
+        "y": 1.1563200708557553
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.9379802552091694,
-        "y": 2.0413098429059118
+        "x": 2.94,
+        "y": 2.213864650777629
       },
       "prevControl": {
-        "x": 5.1773173968883155,
-        "y": 1.532016585159931
+        "x": 4.64631686988281,
+        "y": 0.968714502484767
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "Shoot",
-      "waypointRelativePos": 0.55,
+      "waypointRelativePos": 0.15,
       "command": {
         "type": "parallel",
         "data": {
@@ -42,6 +42,12 @@
               "type": "named",
               "data": {
                 "name": "Shoot Scoring"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Enable Auto-Align"
               }
             }
           ]
@@ -57,7 +63,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0,
+    "rotation": 130.68658788979673,
     "rotateFast": false
   },
   "reversed": false,

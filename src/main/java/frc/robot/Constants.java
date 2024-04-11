@@ -179,14 +179,15 @@ public final class Constants {
 
         public static final double lowUncertaintyCutoffDistance = 6.5;
 
-        public static final double skewCutoffDistance = 5.5;
+        public static final double skewCutoffDistance = 5.8;
         public static final double skewCutoffRotation = Units.degreesToRadians(50);
 
-        public static final Matrix<N3, N1> teleopCameraUncertainty = VecBuilder.fill(1.0, 1.0, 4);
+        public static final Matrix<N3, N1> teleopCameraUncertainty =
+                VecBuilder.fill(0.35, 0.35, 3.5);
 
-        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(1.0, 2.0, 4);
+        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(0.6, 1.0, 4);
 
-        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(16.0, 20.0, 40);
+        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(12.0, 16.0, 40);
 
         public static final Matrix<N3, N1> driveUncertainty = VecBuilder.fill(0.1, 0.1, 0.1);
 
@@ -344,7 +345,7 @@ public final class Constants {
 
         private static final double kDriveGearRatio = 6.122448979591837;
         private static final double kSteerGearRatio = 21.428571428571427;
-        private static final double kWheelRadiusInches = 1.947;
+        private static final double kWheelRadiusInches = 1.965;
 
         private static final boolean kSteerMotorReversed = true;
         private static final boolean kInvertLeftSide = false;
@@ -513,7 +514,7 @@ public final class Constants {
         public static final int hoodId = 17;
 
         public static final int aimEncoderPort = 0;
-        public static final double aimerEncoderOffset = 1.75;
+        public static final double aimerEncoderOffset = 1.75 - 0.01; // 0.027
 
         public static final double kickerIntakeVolts = 2.0;
 
