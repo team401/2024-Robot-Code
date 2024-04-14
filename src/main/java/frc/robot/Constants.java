@@ -114,6 +114,12 @@ public final class Constants {
         public static final double vYkD = 0.0;
     }
 
+    public static final class AutomatedTeleopConstants {
+        // TODO: Find constants for automated teleop command
+        public static final double intakeTimeoutSeconds = 0.5;
+        public static final double retryIntakeWaitSeconds = 0.5;
+    }
+
     public static final class FieldConstants {
         public static final double lengthM = 16.451;
         public static final double widthM = 8.211;
