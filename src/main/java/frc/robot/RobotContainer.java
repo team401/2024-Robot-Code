@@ -3,6 +3,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
@@ -19,6 +20,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.EndgameConstants;
 import frc.robot.Constants.FeatureFlags;
 import frc.robot.Constants.IOConstants;
+import frc.robot.Constants.Mode;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
@@ -63,6 +65,8 @@ import frc.robot.utils.AllianceUtil;
 import frc.robot.utils.FieldFinder;
 import frc.robot.utils.feedforward.TuneG;
 import frc.robot.utils.feedforward.TuneS;
+import frc.robot.utils.notesimulator.Note;
+import frc.robot.utils.notesimulator.NoteManager;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -94,6 +98,30 @@ public class RobotContainer {
         configureSubsystems();
         configureModes();
         configureAutonomous();
+        if (Constants.currentMode == Mode.SIM) {
+            NoteManager.addNote(new Note(driveTelemetry::getFieldToRobot, true, "1"));
+            NoteManager.addNote(
+                    new Note(
+                            driveTelemetry::getFieldToRobot,
+                            new Pose2d(2.69, 4.14, new Rotation2d()),
+                            "2"));
+            NoteManager.addNote(
+                    new Note(
+                            driveTelemetry::getFieldToRobot,
+                            "" + (NoteManager.numberOfExistingNotes() + 1)));
+            NoteManager.addNote(
+                    new Note(
+                            driveTelemetry::getFieldToRobot,
+                            "" + (NoteManager.numberOfExistingNotes() + 1)));
+            NoteManager.addNote(
+                    new Note(
+                            driveTelemetry::getFieldToRobot,
+                            "" + (NoteManager.numberOfExistingNotes() + 1)));
+            NoteManager.addNote(
+                    new Note(
+                            driveTelemetry::getFieldToRobot,
+                            "" + (NoteManager.numberOfExistingNotes() + 1)));
+        }
         if (FeatureFlags.runDrive) {
             drivetrain.configurePathPlanner();
         }
@@ -335,6 +363,8 @@ public class RobotContainer {
             controller.b()
                 .onTrue(new InstantCommand(
                         () -> intakeSubsystem.run(IntakeAction.INTAKE)))
+                .onTrue(
+                    new InstantCommand(() -> NoteManager.intake()))
                 .onFalse(new InstantCommand(
                     () -> intakeSubsystem.run(IntakeAction.NONE)));
 
@@ -383,6 +413,7 @@ public class RobotContainer {
                     scoringSubsystem.setVolts(-3, 0);
                 }, scoringSubsystem));
         }
+
     } // spotless:on
 
     private void configureModes() {

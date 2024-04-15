@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
@@ -24,6 +25,7 @@ import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
 import frc.robot.utils.Tunable;
+import frc.robot.utils.notesimulator.NoteManager;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -321,8 +323,11 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     private void shoot() {
         double distancetoGoal = findDistanceToGoal();
-        shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distancetoGoal));
-        aimerIo.setAimAngleRad(getAimerAngle(distancetoGoal), false);
+
+        double shootRPM = shooterInterpolated.getValue(distancetoGoal);
+        shooterIo.setShooterVelocityRPM(shootRPM);
+        double aimAngleRad = aimerInterpolated.getValue(distancetoGoal);
+        aimerIo.setAimAngleRad(aimAngleRad, false);
 
         shooterIo.setKickerVolts(10);
 
@@ -331,6 +336,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
             shootTimer.stop();
         }
+
+        CommandScheduler.getInstance().schedule(NoteManager.shoot(shootRPM, aimAngleRad));
     }
 
     private void ampShoot() {
