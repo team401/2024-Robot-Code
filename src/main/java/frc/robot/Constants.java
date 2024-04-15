@@ -23,6 +23,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.localization.Camera.CameraTrustZone;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -73,7 +74,8 @@ public final class Constants {
     public static final class CANDevices {}
 
     public static final class SensorConstants {
-        public static final int bannerSensorPort = 1;
+        public static final int indexerSensorPort = 1;
+        public static final int uptakeSensorPort = 4;
     }
 
     public static final class DriveConstants {
@@ -94,10 +96,14 @@ public final class Constants {
 
         public static final double alignToleranceRadians = 0.1;
 
-        public static final double alignmentkPMax = 7.0;
-        public static final double alignmentkPMin = 5.0;
-        public static final double alignmentkI = 5.5;
-        public static final double alignmentkD = 0.0;
+        public static final double alignmentkPMax = 7.0; // 15
+        public static final double alignmentkPMin = 5.0; // 8
+        public static final double alignmentkI = 5.5; // 25
+        public static final double alignmentkD = 0.0; // 0.4
+
+        public static final double autoAlignmentkP = 5.0;
+        public static final double autoAlignmentkI = 5.5;
+        public static final double autoAlignmentkD = 0.0;
 
         public static final double vXkP = 5.0;
         public static final double vXkI = 2.5;
@@ -170,19 +176,20 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
-        public static final String tagLayoutName = "2024-WPI";
+        public static final String tagLayoutName = "Pairs-Only";
         public static final AprilTagFieldLayout fieldLayout = initLayout(tagLayoutName);
 
         public static final double lowUncertaintyCutoffDistance = 6.5;
 
-        public static final double skewCutoffDistance = 4.7;
-        public static final double skewCutoffRotation = Units.degreesToRadians(30);
+        public static final double skewCutoffDistance = 5.8;
+        public static final double skewCutoffRotation = Units.degreesToRadians(50);
 
-        public static final Matrix<N3, N1> teleopCameraUncertainty = VecBuilder.fill(2.0, 3.5, 6);
+        public static final Matrix<N3, N1> teleopCameraUncertainty =
+                VecBuilder.fill(0.35, 0.35, 3.5);
 
-        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(2.0, 3.5, 6);
+        public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(0.6, 1.0, 4);
 
-        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(25.0, 25.0, 40);
+        public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(12.0, 16.0, 40);
 
         public static final Matrix<N3, N1> driveUncertainty = VecBuilder.fill(0.1, 0.1, 0.1);
 
@@ -190,41 +197,34 @@ public final class Constants {
                 List.of(
                         new CameraParams(
                                 "Front-Left",
-                                640,
-                                480,
-                                20,
+                                1280,
+                                800,
+                                16,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
-                                        new Translation3d(0.323, 0.262, 0.216),
-                                        new Rotation3d(0, -0.382, 0.209))),
+                                        new Translation3d(0.306, 0.259, 0.211),
+                                        new Rotation3d(0, -0.349, 0.785)),
+                                CameraTrustZone.LEFT),
                         new CameraParams(
                                 "Front-Right",
-                                640,
-                                480,
-                                20,
+                                1280,
+                                800,
+                                16,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
-                                        new Translation3d(0.323, -0.262, 0.216),
-                                        new Rotation3d(0.0, -0.398, -0.109))),
+                                        new Translation3d(0.312, -0.304, 0.217),
+                                        new Rotation3d(0.0, -0.349, -0.785)),
+                                CameraTrustZone.RIGHT),
                         new CameraParams(
-                                "Back-Left",
-                                640,
-                                480,
-                                20,
+                                "Front-Center",
+                                1280,
+                                800,
+                                16,
                                 Rotation2d.fromDegrees(70),
                                 new Transform3d(
-                                        new Translation3d(-0.327, 0.281, 0.333),
-                                        new Rotation3d(0.0, -0.409, 3.14))));
-
-        // new CameraParams(
-        //         "Back-Right",
-        //         640,
-        //         480,
-        //         20,
-        //         Rotation2d.fromDegrees(70),
-        //         new Transform3d(
-        //                 new Translation3d(-0.327, -0.281, 0.333),
-        //                 new Rotation3d(0.0, -0.409, 3.14))));
+                                        new Translation3d(0.312, -0.237, 0.233),
+                                        new Rotation3d(0.0, -0.349, 0.524)),
+                                CameraTrustZone.MIDDLE));
 
         public static record CameraParams(
                 String name,
@@ -232,7 +232,8 @@ public final class Constants {
                 int yResolution,
                 int fps,
                 Rotation2d fov,
-                Transform3d robotToCamera) {}
+                Transform3d robotToCamera,
+                CameraTrustZone zone) {}
 
         private static AprilTagFieldLayout initLayout(String name) {
             AprilTagFieldLayout layout;
@@ -259,8 +260,8 @@ public final class Constants {
         public static final int rightIntakeMotorID = 10;
         public static final int indexTwoMotorID = 14;
 
-        public static final double intakePower = 8.0;
-        public static final double beltPower = 8.0;
+        public static final double intakePower = 12.0;
+        public static final double beltPower = 12.0;
     }
 
     public static final class EndgameConstants {
@@ -304,18 +305,24 @@ public final class Constants {
 
         // The steer motor uses any SwerveModule.SteerRequestType control request with the
         // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
-        private static final Slot0Configs steerGains =
+        public static final Slot0Configs steerGains =
                 new Slot0Configs()
                         .withKP(150)
-                        .withKI(0)
+                        .withKI(50)
                         .withKD(0.2)
-                        .withKS(0.32)
+                        .withKS(0.25)
                         .withKV(1.5)
                         .withKA(0);
         // When using closed-loop control, the drive motor uses the control
         // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
-        private static final Slot0Configs driveGains =
-                new Slot0Configs().withKP(5).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
+        public static final Slot0Configs driveGains =
+                new Slot0Configs()
+                        .withKP(0)
+                        .withKI(0.02)
+                        .withKD(0)
+                        .withKS(0.26)
+                        .withKV(0.12)
+                        .withKA(0.01);
 
         // The closed-loop output type to use for the steer motors;
         // This affects the PID/FF gains for the steer motors
@@ -332,7 +339,7 @@ public final class Constants {
 
         // Theoretical free speed (m/s) at 12v applied output;
         // This needs to be tuned to your individual robot
-        public static final double kSpeedAt12VoltsMps = 5.21;
+        public static final double kSpeedAt12VoltsMps = 5.02; // 5.21 OR 5.02
 
         // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
         // This may need to be tuned to your individual robot
@@ -340,7 +347,7 @@ public final class Constants {
 
         private static final double kDriveGearRatio = 6.122448979591837;
         private static final double kSteerGearRatio = 21.428571428571427;
-        private static final double kWheelRadiusInches = 1.945;
+        private static final double kWheelRadiusInches = 1.965;
 
         private static final boolean kSteerMotorReversed = true;
         private static final boolean kInvertLeftSide = false;
@@ -509,14 +516,17 @@ public final class Constants {
         public static final int hoodId = 17;
 
         public static final int aimEncoderPort = 0;
-        public static final double aimerEncoderOffset = 1.75;
+        public static final double aimerEncoderOffset = 1.75 - 0.01; // 0.027
 
-        public static final double aimPositionTolerance = 0.015;
+        public static final double kickerIntakeVolts = 2.0;
+
+        public static final double aimPositionTolerance = 0.017;
 
         public static final double aimAcceleration = 4.5; // TODO: 15.0
         public static final double aimCruiseVelocity = 7.0; // TODO: 15.0
 
-        public static final double shooterVelocityMarginRPM = 50;
+        public static final double shooterLowerVelocityMarginRPM = 50;
+        public static final double shooterUpperVelocityMarginRPM = 150;
         public static final double aimAngleMarginRadians = Units.degreesToRadians(1);
         public static final double aimAngleVelocityMargin = 2.0; // Units.degreesToRadians(5);
         public static final double hoodAngleMarginRadians = Units.degreesToRadians(5);
@@ -629,6 +639,18 @@ public final class Constants {
             map.put(0.1, Math.PI / 4);
             map.put(0.2, Math.PI / 3);
             map.put(0.4, 1.37);
+
+            return map;
+        }
+
+        // NOTE - This should be monotonically increasing
+        // Key - Distance to goal in meters
+        // Value - Aimer angle tolerance in radians
+        public static HashMap<Double, Double> aimerToleranceTable() {
+            HashMap<Double, Double> map = new HashMap<Double, Double>();
+            map.put(0.0, 0.1);
+            map.put(2.0, 0.1);
+            map.put(10.0, 0.015);
 
             return map;
         }

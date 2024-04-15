@@ -12,12 +12,6 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "Shoot Scoring"
-          }
-        },
-        {
           "type": "wait",
           "data": {
             "waitTime": 0.5
@@ -30,9 +24,9 @@
           }
         },
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 0.2
+            "pathName": "S3-C5"
           }
         },
         {
@@ -44,13 +38,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "S3-C5"
+            "pathName": "C5-E2"
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "C5-E2"
+            "waitTime": 0.6
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Override Shoot"
           }
         },
         {
@@ -60,9 +60,27 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Un-Override Shoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "C4-E1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.6
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Override Shoot"
           }
         },
         {
@@ -72,9 +90,15 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Un-Override Shoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "C3-E1"
+            "pathName": "C3-E2"
           }
         }
       ]

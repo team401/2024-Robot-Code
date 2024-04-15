@@ -8,55 +8,32 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.453411669766119,
-        "y": 6.989097356941308
+        "x": 6.067404192053465,
+        "y": 6.5938713630557855
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.358370634451466,
-        "y": 5.7567874706411315
+        "x": 8.4,
+        "y": 5.64
       },
       "prevControl": {
-        "x": 7.060891142672386,
-        "y": 6.1778460341661825
+        "x": 5.3747494414487935,
+        "y": 6.902968679783514
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0,
-      "rotationDegrees": -168.36636600105948,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Prime",
-      "waypointRelativePos": 0.15,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Aim Scoring"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Disable Auto-Align",
-      "waypointRelativePos": 0.15,
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.4,
       "command": {
         "type": "parallel",
         "data": {
@@ -66,6 +43,12 @@
               "data": {
                 "name": "Disable Auto-Align"
               }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Un-Override Shoot"
+              }
             }
           ]
         }
@@ -73,18 +56,18 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 4.5,
-    "maxAcceleration": 4.5,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 12.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 179.5231067005846,
+    "rotation": 154.13364320590549,
     "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": null,
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

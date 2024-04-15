@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.956290548095115,
-        "y": 7.591381496366316
+        "x": 6.7870026258836065,
+        "y": 7.6365548079933365
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.294090132848853,
-        "y": 4.1046482092964185
+        "x": 8.240937624732393,
+        "y": 4.2219238724191746
       },
       "prevControl": {
-        "x": 7.1452268345865875,
-        "y": 5.2382659282452515
+        "x": 6.072994413229262,
+        "y": 6.740518390824668
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,8 +32,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Prime",
-      "waypointRelativePos": 0.0,
+      "name": "Un-Override Shoot",
+      "waypointRelativePos": 0.5,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,24 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Aim Scoring"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Auto-Align off",
-      "waypointRelativePos": 0.1,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Disable Auto-Align"
+                "name": "Un-Override Shoot"
               }
             }
           ]
@@ -67,18 +50,18 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 4.5,
-    "maxAcceleration": 4.0,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 8.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 169.69515353123393,
+    "rotation": 138.42874387888028,
     "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": null,
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

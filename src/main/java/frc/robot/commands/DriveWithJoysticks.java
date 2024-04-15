@@ -96,29 +96,29 @@ public class DriveWithJoysticks extends Command {
             commandedRotRadpS *= 0.5;
         }
 
-        currentXMpS = currentVelocitySupplier.get().get(0, 0);
-        currentYMpS = currentVelocitySupplier.get().get(1, 0);
+        // currentXMpS = currentVelocitySupplier.get().get(0, 0);
+        // currentYMpS = currentVelocitySupplier.get().get(1, 0);
 
-        double currentTime = Utils.getCurrentTimeSeconds();
-        double diffTime = currentTime - lastTime;
-        lastTime = currentTime;
+        // double currentTime = Utils.getCurrentTimeSeconds();
+        // double diffTime = currentTime - lastTime;
+        // lastTime = currentTime;
 
-        if (Math.hypot(currentXMpS, currentYMpS) < Math.hypot(commandedXMpS, commandedYMpS)) {
-            double velocityVectorTheta = Math.atan2(commandedYMpS, commandedXMpS);
-            commandedXMpS =
-                    lastCommandedXMpS
-                            + (DriveConstants.maxAccelerationMetersPerSecSquared
-                                    * Math.cos(velocityVectorTheta)
-                                    * diffTime);
-            commandedYMpS =
-                    lastCommandedYMpS
-                            + (DriveConstants.maxAccelerationMetersPerSecSquared
-                                    * Math.sin(velocityVectorTheta)
-                                    * diffTime);
-        }
+        // if (Math.hypot(currentXMpS, currentYMpS) < Math.hypot(commandedXMpS, commandedYMpS)) {
+        //     double velocityVectorTheta = Math.atan2(commandedYMpS, commandedXMpS);
+        //     commandedXMpS =
+        //             lastCommandedXMpS
+        //                     + (DriveConstants.maxAccelerationMetersPerSecSquared
+        //                             * Math.cos(velocityVectorTheta)
+        //                             * diffTime);
+        //     commandedYMpS =
+        //             lastCommandedYMpS
+        //                     + (DriveConstants.maxAccelerationMetersPerSecSquared
+        //                             * Math.sin(velocityVectorTheta)
+        //                             * diffTime);
+        // }
 
-        lastCommandedXMpS = commandedXMpS;
-        lastCommandedYMpS = commandedYMpS;
+        // lastCommandedXMpS = commandedXMpS;
+        // lastCommandedYMpS = commandedYMpS;
 
         chassisSpeeds = new ChassisSpeeds(commandedXMpS, commandedYMpS, commandedRotRadpS);
         drivetrain.setGoalChassisSpeeds(chassisSpeeds, fieldCentric.getAsBoolean());

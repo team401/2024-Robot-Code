@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.863178241562208,
-        "y": 4.111991050457951
+        "x": 8.4,
+        "y": 7.4
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.769143993136157,
-        "y": 4.274863146383425
+        "x": 7.544635146413151,
+        "y": 7.268064878986901
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.613521642070118,
-        "y": 4.479133108534554
+        "x": 4.049466479347272,
+        "y": 6.596627581202432
       },
       "prevControl": {
-        "x": 4.708978577170035,
-        "y": 4.313796847006692
+        "x": 5.0040216723521675,
+        "y": 6.846338307933009
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,20 +33,17 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.0,
-    "maxAcceleration": 12.0,
+    "maxAcceleration": 6.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -60.0,
+    "rotation": -158.1103952440019,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Endgame",
-  "previewStartingState": {
-    "rotation": -55.30484646876609,
-    "velocity": 0
-  },
-  "useDefaultConstraints": true
+  "folder": null,
+  "previewStartingState": null,
+  "useDefaultConstraints": false
 }

@@ -19,7 +19,7 @@ public class ShooterIOTalon implements ShooterIO {
 
     private final Slot0Configs slot0 = new Slot0Configs();
 
-    DigitalInput bannerSensor = new DigitalInput(SensorConstants.bannerSensorPort);
+    DigitalInput bannerSensor = new DigitalInput(SensorConstants.indexerSensorPort);
 
     private boolean override = false;
     private double overrideVolts = 0.0;
