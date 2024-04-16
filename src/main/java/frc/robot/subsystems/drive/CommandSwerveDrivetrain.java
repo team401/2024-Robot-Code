@@ -550,6 +550,22 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         pathfindCommand.schedule();
     }
 
+    public void driveToPath(String pathName) {
+        this.setAlignState(AlignState.MANUAL);
+
+        PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
+
+        PathConstraints constraints =
+                new PathConstraints(
+                        3.0,
+                        4.0,
+                        Constants.ConversionConstants.kDegreesToRadians * 540,
+                        Constants.ConversionConstants.kDegreesToRadians * 720);
+
+        pathfindCommand = AutoBuilder.pathfindThenFollowPath(path, constraints, 0.0);
+        pathfindCommand.schedule();
+    }
+
     public void stopDriveToPose() {
         if (pathfindCommand != null) {
             pathfindCommand.cancel();
@@ -567,19 +583,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     public void driveToSource() {
-        this.setAlignState(AlignState.MANUAL);
-
-        PathPlannerPath path = PathPlannerPath.fromPathFile("rightSource");
-
-        PathConstraints constraints =
-                new PathConstraints(
-                        3.0,
-                        4.0,
-                        Constants.ConversionConstants.kDegreesToRadians * 540,
-                        Constants.ConversionConstants.kDegreesToRadians * 720);
-
-        pathfindCommand = AutoBuilder.pathfindThenFollowPath(path, constraints, 0.0);
-        pathfindCommand.schedule();
+        driveToPath("rightSource");
     }
 
     public void driveToEndgame() {
@@ -609,29 +613,15 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                         getFieldToRobot.get().getX() - farClimbPose2d.getX(),
                         getFieldToRobot.get().getY() - farClimbPose2d.getY());
 
-        PathPlannerPath path = null;
-
         if (distanceToTargetLeft < distanceToTargetRight
                 && distanceToTargetLeft < distanceToTargetFar) {
-            path = PathPlannerPath.fromPathFile("LeftEndgame");
+            driveToPath("leftEndgame");
         } else if (distanceToTargetRight < distanceToTargetLeft
                 && distanceToTargetRight < distanceToTargetFar) {
-            path = PathPlannerPath.fromPathFile("RightEndgame");
+            driveToPath("rightEndgame");
         } else {
-            path = PathPlannerPath.fromPathFile("FarEndgame");
+            driveToPath("farEndgame");
         }
-
-        this.setAlignState(AlignState.MANUAL);
-
-        PathConstraints constraints =
-                new PathConstraints(
-                        3.0,
-                        4.0,
-                        Constants.ConversionConstants.kDegreesToRadians * 540,
-                        Constants.ConversionConstants.kDegreesToRadians * 720);
-
-        pathfindCommand = AutoBuilder.pathfindThenFollowPath(path, constraints, 0.0);
-        pathfindCommand.schedule();
     }
 
     public boolean isAligned() {
