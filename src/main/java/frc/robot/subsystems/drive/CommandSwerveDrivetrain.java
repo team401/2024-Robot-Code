@@ -562,50 +562,24 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         targetTightPose = pose;
     }
 
-    public Pose2d getEndgamePose() {
-        // Blue Alliance Poses
-        Pose2d leftClimbPose2d = new Pose2d(4.61, 4.48, Rotation2d.fromDegrees(-60));
-        Pose2d rightClimbPose2d = new Pose2d(4.66, 3.67, Rotation2d.fromDegrees(60));
-        Pose2d farClimbPose2d = new Pose2d(5.38, 4.11, Rotation2d.fromDegrees(180));
-
-        if (DriverStation.getAlliance().isPresent()
-                && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-            // Red Alliance Poses
-            leftClimbPose2d = new Pose2d(11.882, 3.67, Rotation2d.fromDegrees(120));
-            rightClimbPose2d = new Pose2d(11.932, 4.48, Rotation2d.fromDegrees(-120));
-            farClimbPose2d = new Pose2d(11.162, 4.11, Rotation2d.fromDegrees(0));
-        }
-
-        double distanceToTargetLeft =
-                Math.hypot(
-                        getFieldToRobot.get().getX() - leftClimbPose2d.getX(),
-                        getFieldToRobot.get().getY() - leftClimbPose2d.getY());
-        double distanceToTargetRight =
-                Math.hypot(
-                        getFieldToRobot.get().getX() - rightClimbPose2d.getX(),
-                        getFieldToRobot.get().getY() - rightClimbPose2d.getY());
-        double distanceToTargetFar =
-                Math.hypot(
-                        getFieldToRobot.get().getX() - farClimbPose2d.getX(),
-                        getFieldToRobot.get().getY() - farClimbPose2d.getY());
-
-        Pose2d targetPose = new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180));
-
-        if (distanceToTargetLeft < distanceToTargetRight
-                && distanceToTargetLeft < distanceToTargetFar) {
-            targetPose = leftClimbPose2d;
-        } else if (distanceToTargetRight < distanceToTargetLeft
-                && distanceToTargetRight < distanceToTargetFar) {
-            targetPose = rightClimbPose2d;
-        } else {
-            targetPose = farClimbPose2d;
-        }
-
-        return targetPose;
-    }
-
     public void driveToSpeaker() {
         driveToPose(new Pose2d(AllianceUtil.getFieldToSpeaker(), new Rotation2d()));
+    }
+
+    public void driveToSource() {
+        this.setAlignState(AlignState.MANUAL);
+
+        PathPlannerPath path = PathPlannerPath.fromPathFile("rightSource");
+
+        PathConstraints constraints =
+                new PathConstraints(
+                        3.0,
+                        4.0,
+                        Constants.ConversionConstants.kDegreesToRadians * 540,
+                        Constants.ConversionConstants.kDegreesToRadians * 720);
+
+        pathfindCommand = AutoBuilder.pathfindThenFollowPath(path, constraints, 0.0);
+        pathfindCommand.schedule();
     }
 
     public void driveToEndgame() {
