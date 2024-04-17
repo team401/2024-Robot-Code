@@ -16,6 +16,7 @@ import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -555,12 +556,21 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
         PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
 
+        // if(DriverStation.getAlliance() === Alliance.Blue) {
+        //     path.flipPath();
+        // }
+
         PathConstraints constraints =
                 new PathConstraints(
                         3.0,
                         4.0,
                         Constants.ConversionConstants.kDegreesToRadians * 540,
                         Constants.ConversionConstants.kDegreesToRadians * 720);
+
+        PathPlannerLogging.setLogTargetPoseCallback(
+                (target) -> {
+                    Logger.recordOutput("targetPose", target);
+                });
 
         pathfindCommand = AutoBuilder.pathfindThenFollowPath(path, constraints, 0.0);
         pathfindCommand.schedule();
@@ -579,11 +589,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     public void driveToSpeaker() {
-        driveToPose(new Pose2d(AllianceUtil.getFieldToSpeaker(), new Rotation2d()));
+        driveToPath("speaker");
     }
 
     public void driveToSource() {
-        driveToPath("rightSource");
+        driveToPath("shopSource");
     }
 
     public void driveToEndgame() {
