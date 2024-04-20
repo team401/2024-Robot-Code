@@ -4,6 +4,9 @@ import sys
 import subprocess
 
 def main():
+    print("WARNING: Secretary does not work consistently at the moment.")
+    print("\tBe sure to verify that generated diagrams look correct before committing.")
+
     secretary = os.path.join(os.path.dirname(__file__), "secretary.py");
     if not os.path.isfile(secretary):
         print(f"[ERROR] secretary not found at {secretary}")
