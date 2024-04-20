@@ -120,6 +120,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private Notifier simNotifier = null;
     private double lastSimTime;
 
+    private String lastCommandedPath = "";
     private Command pathfindCommand = null;
 
     private Pose2d pathfindPose = new Pose2d();
@@ -552,6 +553,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     public void driveToPath(String pathName) {
+        if (pathName == lastCommandedPath) {
+            return;
+        } else {
+            lastCommandedPath = pathName;
+        }
         this.setAlignState(AlignState.MANUAL);
 
         PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
@@ -580,6 +586,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         if (pathfindCommand != null) {
             pathfindCommand.cancel();
         }
+
+        lastCommandedPath = "";
 
         setGoalChassisSpeeds(stopSpeeds, true);
     }
