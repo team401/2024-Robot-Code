@@ -43,7 +43,6 @@ import frc.robot.Constants.TunerConstants;
 import frc.robot.utils.AllianceUtil;
 import frc.robot.utils.GeomUtil;
 import frc.robot.utils.InterpolateDouble;
-
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -130,7 +129,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private ChassisSpeeds stopSpeeds = new ChassisSpeeds(0, 0, 0);
 
-    private Rotation2d desiredHeading = new Rotation2d(); 
+    private Rotation2d desiredHeading = new Rotation2d();
 
     public CommandSwerveDrivetrain(
             SwerveDrivetrainConstants driveTrainConstants,
@@ -586,8 +585,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         pathfindCommand = AutoBuilder.pathfindThenFollowPath(path, constraints, 0.0);
         pathfindCommand.schedule();
     }
-    public Optional<Rotation2d> getOverrideRotation () {
-        if(alignState == AlignState.ALIGNING) {
+
+    public Optional<Rotation2d> getOverrideRotation() {
+        if (alignState == AlignState.ALIGNING) {
             return Optional.of(desiredHeading);
         } else {
             return Optional.empty();
