@@ -550,8 +550,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     public void driveToPose(Pose2d targetPose) {
-        this.setAlignState(AlignState.MANUAL);
-
         pathfindCommand = getPathfindCommand(targetPose);
         pathfindCommand.schedule();
     }
@@ -562,13 +560,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         } else {
             lastCommandedPath = pathName;
         }
-        this.setAlignState(AlignState.MANUAL);
 
         PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
-
-        // if(DriverStation.getAlliance() === Alliance.Blue) {
-        //     path.flipPath();
-        // }
 
         PathConstraints constraints =
                 new PathConstraints(
@@ -576,11 +569,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                         4.0,
                         Constants.ConversionConstants.kDegreesToRadians * 540,
                         Constants.ConversionConstants.kDegreesToRadians * 720);
-
-        PathPlannerLogging.setLogTargetPoseCallback(
-                (target) -> {
-                    Logger.recordOutput("targetPose", target);
-                });
 
         pathfindCommand = AutoBuilder.pathfindThenFollowPath(path, constraints, 0.0);
         pathfindCommand.schedule();
