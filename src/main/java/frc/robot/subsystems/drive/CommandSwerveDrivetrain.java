@@ -17,6 +17,7 @@ import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -555,7 +556,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public void driveToPath(String pathName) {
         if (pathName == lastCommandedPath) {
-            return;
+            // return;
         } else {
             lastCommandedPath = pathName;
         }
@@ -568,6 +569,16 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                         4.0,
                         Constants.ConversionConstants.kDegreesToRadians * 540,
                         Constants.ConversionConstants.kDegreesToRadians * 720);
+
+        PathPlannerLogging.setLogTargetPoseCallback(
+                (target) -> {
+                    Logger.recordOutput("targetPose", target);
+                });
+        // Logging callback for the active path, this is sent as a list of poses
+        PathPlannerLogging.setLogActivePathCallback(
+                (poses) -> {
+                    // TODO: Log the actual trajectory
+                });
 
         pathfindCommand = AutoBuilder.pathfindThenFollowPath(path, constraints, 0.0);
         pathfindCommand.schedule();

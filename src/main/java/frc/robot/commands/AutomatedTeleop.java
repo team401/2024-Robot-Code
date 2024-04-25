@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.Constants.AutomatedTeleopConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
@@ -10,7 +11,9 @@ import frc.robot.subsystems.intake.IntakeSubsystem.IntakeAction;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringAction;
 import frc.robot.telemetry.Telemetry;
+import frc.robot.utils.notesimulator.NoteManager;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class AutomatedTeleop extends Command {
     ScoringSubsystem scoringSubsystem;
@@ -44,7 +47,15 @@ public class AutomatedTeleop extends Command {
 
         this.poseSupplier = poseSupplier;
 
-        addRequirements(scoringSubsystem, intakeSubsystem, drivetrain);
+        if (scoringSubsystem != null) {
+            addRequirements(scoringSubsystem);
+        }
+        if (intakeSubsystem != null) {
+            addRequirements(intakeSubsystem);
+        }
+        if (drivetrain != null) {
+            addRequirements(drivetrain);
+        }
     }
 
     @Override
@@ -74,6 +85,7 @@ public class AutomatedTeleop extends Command {
 
     @Override
     public void execute() {
+        Logger.recordOutput("automatedTeleop/State", state.toString());
         switch (state) {
             case START:
                 if (intakeSubsystem.hasNote()) {
@@ -98,7 +110,11 @@ public class AutomatedTeleop extends Command {
                 drivetrain.stopDriveToPose();
                 intakeSubsystem.run(IntakeAction.INTAKE);
 
-                if (intakeSubsystem.hasNote()) {
+                NoteManager.intake();
+
+                if (intakeSubsystem.hasNote()
+                        || (Constants.currentMode == Constants.Mode.SIM
+                                && NoteManager.noteInRobot())) {
                     state = State.DRIVE_TO_SPEAKER;
                 }
                 break;
