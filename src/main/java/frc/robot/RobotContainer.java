@@ -24,7 +24,7 @@ import frc.robot.Constants.Mode;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.commands.DriveWithJoysticks;
+import frc.robot.commands.AutomatedTeleop;
 import frc.robot.commands.EndgameSequence;
 import frc.robot.commands.ShootWithGamepad;
 import frc.robot.commands.WheelRadiusCharacterization;
@@ -878,17 +878,23 @@ public class RobotContainer {
     private void setUpDriveWithJoysticks() {
         if (FeatureFlags.runDrive) {
             drivetrain.setDefaultCommand(
-                    new DriveWithJoysticks(
+                    new AutomatedTeleop(
+                            scoringSubsystem,
+                            intakeSubsystem,
                             drivetrain,
-                            () -> leftJoystick.getY(),
-                            () -> leftJoystick.getX(),
-                            () -> rightJoystick.getX(),
-                            () -> !rightJoystick.trigger().getAsBoolean(),
-                            () -> rightJoystick.top().getAsBoolean(),
-                            () ->
-                                    VecBuilder.fill(
-                                            driveTelemetry.getVelocityX(),
-                                            driveTelemetry.getVelocityY())));
+                            driveTelemetry,
+                            () -> driveTelemetry.getFieldToRobot()));
+            // new DriveWithJoysticks(
+            //         drivetrain,
+            //         () -> leftJoystick.getY(),
+            //         () -> leftJoystick.getX(),
+            //         () -> rightJoystick.getX(),
+            //         () -> !rightJoystick.trigger().getAsBoolean(),
+            //         () -> rightJoystick.top().getAsBoolean(),
+            //         () ->
+            //                 VecBuilder.fill(
+            //                         driveTelemetry.getVelocityX(),
+            //                         driveTelemetry.getVelocityY())));
         }
     }
 

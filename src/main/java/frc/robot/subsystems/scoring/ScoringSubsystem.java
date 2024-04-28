@@ -407,7 +407,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         }
     }
 
-    private double findDistanceToGoal() {
+    public double findDistanceToGoal() {
         Translation2d speakerPose = AllianceUtil.getFieldToSpeaker();
         Pose2d robotPose = poseSupplier.get();
         double distancetoGoal =

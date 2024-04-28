@@ -1,0 +1,6 @@
+↓ Prev | Next → ,START,DRIVE_TO_SOURCE,ACQUIRE_NOTE,DRIVE_TO_SPEAKER,SHOOT_NOTE
+START,default,!hasNote(),Not allowed,hasNote(),Not allowed
+DRIVE_TO_SOURCE,Not allowed,default,Near Source? || Note Detected?,Not allowed,Not allowed
+ACQUIRE_NOTE,Not allowed,Not allowed,default,hasNote(),Not allowed
+DRIVE_TO_SPEAKER,Not allowed,!hasNote(),Not allowed,default,In range?
+SHOOT_NOTE,Not allowed,!hasNote(),Not allowed,Not allowed,default

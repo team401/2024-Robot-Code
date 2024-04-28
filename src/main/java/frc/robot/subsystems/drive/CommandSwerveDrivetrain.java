@@ -10,6 +10,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.pathfinding.LocalADStar;
@@ -42,6 +43,7 @@ import frc.robot.Constants.TunerConstants;
 import frc.robot.utils.AllianceUtil;
 import frc.robot.utils.GeomUtil;
 import frc.robot.utils.InterpolateDouble;
+import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -120,11 +122,14 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private Notifier simNotifier = null;
     private double lastSimTime;
 
+    private String lastCommandedPath = "";
     private Command pathfindCommand = null;
 
     private Pose2d pathfindPose = new Pose2d();
 
     private ChassisSpeeds stopSpeeds = new ChassisSpeeds(0, 0, 0);
+
+    private Rotation2d desiredHeading = new Rotation2d();
 
     public CommandSwerveDrivetrain(
             SwerveDrivetrainConstants driveTrainConstants,
@@ -235,7 +240,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 }, // Change this if the path needs to be flipped on red vs blue
                 this); // Subsystem for requirements
 
-        // PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
+        PPHolonomicDriveController.setRotationTargetOverride(this::getOverrideRotation);
 
         // autoChooser = AutoBuilder.buildAutoChooser();
         autoChooser.setDefaultOption("Default (nothing)", Commands.none()); // S1-W1-W2-W3
@@ -330,7 +335,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private void controlDrivetrain() {
         Pose2d pose = getFieldToRobot.get();
-        Rotation2d desiredHeading = pose.getRotation();
+        desiredHeading = pose.getRotation();
         if (alignState == AlignState.ALIGNING) {
             switch (alignTarget) {
                 case AMP:
@@ -545,20 +550,19 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     public void driveToPose(Pose2d targetPose) {
-        this.setAlignState(AlignState.MANUAL);
-
         pathfindCommand = getPathfindCommand(targetPose);
         pathfindCommand.schedule();
     }
 
     public void driveToPath(String pathName) {
-        this.setAlignState(AlignState.MANUAL);
+        if (pathName == lastCommandedPath) {
+            // TODO: Determine if we need/want this check
+            // return;
+        } else {
+            lastCommandedPath = pathName;
+        }
 
         PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
-
-        // if(DriverStation.getAlliance() === Alliance.Blue) {
-        //     path.flipPath();
-        // }
 
         PathConstraints constraints =
                 new PathConstraints(
@@ -572,14 +576,30 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     Logger.recordOutput("targetPose", target);
                 });
 
+        // Logging callback for the active path, this is sent as a list of poses
+        PathPlannerLogging.setLogActivePathCallback(
+                (poses) -> {
+                    // TODO: Log the actual trajectory
+                });
+
         pathfindCommand = AutoBuilder.pathfindThenFollowPath(path, constraints, 0.0);
         pathfindCommand.schedule();
+    }
+
+    public Optional<Rotation2d> getOverrideRotation() {
+        if (alignState == AlignState.ALIGNING) {
+            return Optional.of(desiredHeading);
+        } else {
+            return Optional.empty();
+        }
     }
 
     public void stopDriveToPose() {
         if (pathfindCommand != null) {
             pathfindCommand.cancel();
         }
+
+        lastCommandedPath = "";
 
         setGoalChassisSpeeds(stopSpeeds, true);
     }
