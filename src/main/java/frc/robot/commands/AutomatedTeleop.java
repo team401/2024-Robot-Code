@@ -6,6 +6,8 @@ import frc.robot.Constants;
 import frc.robot.Constants.AutomatedTeleopConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignState;
+import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignTarget;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem.IntakeAction;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
@@ -127,9 +129,14 @@ public class AutomatedTeleop extends Command {
                 }
 
                 drivetrain.driveToSpeaker();
+
+                // Begin aligning to the speaker so robot is already aimed when it's ready to shoot
+                drivetrain.setAlignTarget(AlignTarget.SPEAKER);
+                drivetrain.setAlignState(AlignState.ALIGNING);
+
                 scoringSubsystem.setAction(ScoringAction.AIM);
 
-                // Once we are in range, shoot
+                // Once robot is in range, shoot
                 if (scoringSubsystem.findDistanceToGoal()
                         < AutomatedTeleopConstants.shootRangeMeters) {
                     state = State.SHOOT_NOTE;
@@ -140,7 +147,10 @@ public class AutomatedTeleop extends Command {
                     state = State.DRIVE_TO_SOURCE;
                 }
 
+                drivetrain.setAlignTarget(AlignTarget.SPEAKER);
+                drivetrain.setAlignState(AlignState.ALIGNING);
                 drivetrain.driveToSpeaker();
+
                 scoringSubsystem.setAction(ScoringAction.SHOOT);
 
                 break;

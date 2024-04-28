@@ -556,6 +556,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public void driveToPath(String pathName) {
         if (pathName == lastCommandedPath) {
+            // TODO: Determine if we need/want this check
             // return;
         } else {
             lastCommandedPath = pathName;
@@ -574,6 +575,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 (target) -> {
                     Logger.recordOutput("targetPose", target);
                 });
+
         // Logging callback for the active path, this is sent as a list of poses
         PathPlannerLogging.setLogActivePathCallback(
                 (poses) -> {
