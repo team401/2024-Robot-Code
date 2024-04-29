@@ -221,7 +221,6 @@ public class RobotContainer {
             drivetrain.registerTelemetry(driveTelemetry::telemeterize);
             drivetrain.setPoseSupplier(driveTelemetry::getFieldToRobot);
             drivetrain.setVelocitySupplier(driveTelemetry::getVelocity);
-            drivetrain
         }
 
         if (FeatureFlags.runScoring) {

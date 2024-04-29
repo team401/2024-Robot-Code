@@ -18,7 +18,6 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -557,12 +556,14 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     public void driveToPose(Pose2d targetPose) {
-        pathfindCommand = getPathfindCommand(targetPose);
-        pathfindCommand.schedule();
+        if (!demo) {
+            pathfindCommand = getPathfindCommand(targetPose);
+            pathfindCommand.schedule();
+        }
     }
 
     public void driveToPath(String pathName) {
-        if (pathName == lastCommandedPath) {
+        if (pathName == lastCommandedPath || demo) {
             return;
         } else {
             lastCommandedPath = pathName;
