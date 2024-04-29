@@ -575,6 +575,9 @@ public final class Constants {
         public static final double hoodMaxVelocity = 0.5;
         public static final double hoodMaxAcceleration = 0.5;
 
+        public static final double demoShooterRPM = 1000;
+        public static final double demoAimAngle = 0.1;
+
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters
         // Value - Aimer angle in radians
