@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.targeting.TargetCorner;
 
 /**
@@ -252,56 +251,19 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         setGoalChassisSpeeds(chassisSpeeds, true);
     }
 
-    private double[] getCoordinateOfTargetCorner(TargetCorner corner) {
-        String stringcorner = corner.toString();
-        stringcorner = stringcorner.substring(1, stringcorner.length());
-        String[] stringResult = stringcorner.split(",");
-        return new double[] {
-            Double.parseDouble(stringResult[0]), Double.parseDouble(stringResult[1])
-        };
-    }
-
-    private Pose2d getNotePoseFromTarget(PhotonTrackedTarget target) {
-        double transformWidth = 1 * 1; // = distance at setpoint / width at setpoint
-        // TODO: GET PROPER D0 and H0 VALUES
-
-        List<TargetCorner> corners = target.getDetectedCorners();
-
-        double[][] cornersCoordinates = new double[4][2];
-        for (int i = 0; i < 4; i++) {
-            cornersCoordinates[i] = getCoordinateOfTargetCorner(corners.get(i));
-        }
-
-        double width = cornersCoordinates[3][0] - cornersCoordinates[2][0];
-        double distanceForward = transformWidth * width;
-        // alternatively: instead of using magnification maybe try using just y instead?
-
-        double distanceSide =
-                (cornersCoordinates[3][0] + cornersCoordinates[2][0]) / 2 / transformWidth;
-
-        double distance =
-                Math.sqrt(distanceForward * distanceForward + distanceSide * distanceSide);
-        double angle = Math.tanh(distanceSide / distanceForward);
-
-        Rotation2d fromForward = this.getState().Pose.getRotation().plus(new Rotation2d(angle));
-
-        return new Pose2d(
-                this.getState().Pose.getX() + Math.cos(fromForward.getRadians()) * distance,
-                this.getState().Pose.getY() + Math.sin(fromForward.getRadians()) * distance,
-                fromForward);
-    }
-
     private void controlDrivetrain() {
         Pose2d pose = getFieldToRobot.get();
         Rotation2d desiredHeading = pose.getRotation();
+
         if (alignState != AlignState.ALIGNING || alignTarget != AlignTarget.NOTE) {
             drivingToNote = false;
             elapsedDriveToNote.stop();
             elapsedDriveToNote.reset();
         }
+
         if (alignState == AlignState.ALIGNING) {
             switch (alignTarget) {
-                case NOTE:
+                    /*case NOTE:
                     var cameraResult = colorCamera.getLatestResult();
                     if (cameraResult.hasTargets()) {
                         Pose2d notePose = getNotePoseFromTarget(cameraResult.getBestTarget());
@@ -333,7 +295,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                             desiredHeading = notePose.getRotation();
                         }
                     }
-                    break;
+                    break;*/
                 case AMP:
                     desiredHeading = getFieldToAmp.get();
                     break;
@@ -450,9 +412,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         List<TargetCorner> corners =
                 colorCamera.getLatestResult().getBestTarget().getDetectedCorners();
         double[][] cornersCoordinates = new double[4][2];
-        for (int i = 0; i < 4; i++) {
+        /*for (int i = 0; i < 4; i++) {
             cornersCoordinates[i] = getCoordinateOfTargetCorner(corners.get(i));
-        }
+        }*/
         SmartDashboard.putNumberArray("coordinates 0", cornersCoordinates[0]);
         SmartDashboard.putNumberArray("coordinates 1", cornersCoordinates[1]);
         SmartDashboard.putNumberArray("coordinates 2", cornersCoordinates[2]);

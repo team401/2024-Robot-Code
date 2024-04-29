@@ -39,6 +39,7 @@ import frc.robot.subsystems.intake.IntakeSubsystem.IntakeAction;
 import frc.robot.subsystems.localization.CameraContainerReal;
 import frc.robot.subsystems.localization.CameraContainerReplay;
 import frc.robot.subsystems.localization.CameraContainerSim;
+import frc.robot.subsystems.localization.NoteDetection;
 import frc.robot.subsystems.localization.VisionLocalizer;
 import frc.robot.subsystems.scoring.AimerIO;
 import frc.robot.subsystems.scoring.AimerIORoboRio;
@@ -83,6 +84,8 @@ public class RobotContainer {
     DigitalOutput timeDigitalOutput = null; // new DigitalOutput(IOConstants.timeOutputPort);
 
     LED leds;
+
+    NoteDetection noteDetection;
 
     public RobotContainer() {
         configureSubsystems();
@@ -219,6 +222,8 @@ public class RobotContainer {
         }
 
         if (FeatureFlags.enableLEDS) leds = new LED(scoringSubsystem);
+
+        noteDetection = new NoteDetection(() -> new Pose2d(0, 0, new Rotation2d()));
     }
 
     // spotless:off
@@ -683,11 +688,11 @@ public class RobotContainer {
     public void disabledPeriodic() {
         /* set to coast mode when circuit open */
         if (brakeSwitch != null && brakeSwitch.get()) {
-            scoringSubsystem.setBrakeMode(false);
-            endgameSubsystem.setBrakeMode(false);
+            if (FeatureFlags.runScoring) scoringSubsystem.setBrakeMode(false);
+            if (FeatureFlags.runEndgame) endgameSubsystem.setBrakeMode(false);
         } else {
-            scoringSubsystem.setBrakeMode(true);
-            endgameSubsystem.setBrakeMode(true);
+            if (FeatureFlags.runScoring) scoringSubsystem.setBrakeMode(true);
+            if (FeatureFlags.runEndgame) endgameSubsystem.setBrakeMode(true);
         }
     }
 
