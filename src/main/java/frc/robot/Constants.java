@@ -56,6 +56,7 @@ public final class Constants {
         public static final boolean runScoring = false;
         public static final boolean runEndgame = false;
         public static final boolean runDrive = true;
+        public static final boolean demoMode = false;
 
         public static final boolean enableLEDS = true;
     }

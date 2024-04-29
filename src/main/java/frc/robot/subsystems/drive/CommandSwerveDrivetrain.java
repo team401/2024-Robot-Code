@@ -18,6 +18,8 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -130,6 +132,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private Rotation2d desiredHeading = new Rotation2d();
 
+    private boolean demo = false;
+
     public CommandSwerveDrivetrain(
             SwerveDrivetrainConstants driveTrainConstants,
             double OdometryUpdateFrequency,
@@ -197,6 +201,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public void setVelocitySupplier(Supplier<Translation2d> getRobotVelocity) {
         this.getRobotVelocity = getRobotVelocity;
+    }
+
+    public void setDemo(boolean demo) {
+        this.demo = demo;
     }
 
     public void configurePathPlanner() {
@@ -335,7 +343,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private void controlDrivetrain() {
         Pose2d pose = getFieldToRobot.get();
         desiredHeading = pose.getRotation();
-        if (alignState == AlignState.ALIGNING) {
+        if (alignState == AlignState.ALIGNING && !demo) {
             switch (alignTarget) {
                 case AMP:
                     desiredHeading = AllianceUtil.getAmpHeading();
@@ -462,18 +470,18 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         } else if (!fieldCentric) {
             setControl(
                     driveRobotCentric
-                            .withVelocityX(vx)
-                            .withVelocityY(vy)
-                            .withRotationalRate(omega)
+                            .withVelocityX(demo ? MathUtil.clamp(vx, 0, 1) : vx)
+                            .withVelocityY(demo ? MathUtil.clamp(vy, 0, 1) : vy)
+                            .withRotationalRate(demo ? omega * 0.50 : omega)
                             .withDeadband(0.0)
                             .withRotationalDeadband(0.0)
                             .withDriveRequestType(DriveRequestType.Velocity));
         } else {
             setControl(
                     driveFieldCentric
-                            .withVelocityX(vx)
-                            .withVelocityY(vy)
-                            .withRotationalRate(omega)
+                            .withVelocityX(demo ? MathUtil.clamp(vx, 0, 1) : vx)
+                            .withVelocityY(demo ? MathUtil.clamp(vy, 0, 1) : vy)
+                            .withRotationalRate(demo ? omega * 0.5 : omega)
                             .withDeadband(0.0)
                             .withRotationalDeadband(0.0)
                             .withDriveRequestType(DriveRequestType.Velocity));
