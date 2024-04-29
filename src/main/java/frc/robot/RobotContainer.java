@@ -135,6 +135,9 @@ public class RobotContainer {
                 if (FeatureFlags.runDrive) {
                     driveTelemetry =
                             new Telemetry(DriveConstants.MaxSpeedMetPerSec, new TelemetryIOLive());
+                    if (FeatureFlags.demoMode) {
+                        drivetrain.setDemo(true);
+                    }
                 }
 
                 if (FeatureFlags.runScoring) {
@@ -143,6 +146,9 @@ public class RobotContainer {
                                     new ShooterIOTalon(),
                                     new AimerIORoboRio(),
                                     new HoodIOSparkFlex());
+                    if (FeatureFlags.demoMode) {
+                        scoringSubsystem.setDemo(true);
+                    }
                 }
 
                 if (FeatureFlags.runEndgame) {

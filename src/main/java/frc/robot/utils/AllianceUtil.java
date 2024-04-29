@@ -88,6 +88,18 @@ public class AllianceUtil {
         return FieldConstants.robotAgainstRedAmpZone;
     }
 
+    public static Pose2d getPoseAgainstSource() {
+        if (!DriverStation.getAlliance().isEmpty()) {
+            switch (DriverStation.getAlliance().get()) {
+                case Blue:
+                    return FieldConstants.robotAgainstRedSource;
+                case Red:
+                    return FieldConstants.robotAgainstBlueSource;
+            }
+        }
+        return FieldConstants.robotAgainstRedSource;
+    }
+
     public static Rotation2d getSourceHeading() {
         if (!DriverStation.getAlliance().isEmpty()) {
             switch (DriverStation.getAlliance().get()) {
