@@ -213,7 +213,7 @@ public class AimerIORoboRio implements AimerIO {
                     feedforward.calculate(controlSetpoint, velocitySetpoint) + controllerVolts;
         }
 
-        appliedVolts = MathUtil.clamp(appliedVolts, -12.0, 12.0);
+        appliedVolts = MathUtil.clamp(appliedVolts, -4.0, 4.0);
         if (!motorDisabled || override) {
             aimerRight.setVoltage(appliedVolts);
         } else {

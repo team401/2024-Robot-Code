@@ -53,7 +53,7 @@ public final class Constants {
         public static final boolean runLocalizer = true;
 
         public static final boolean runIntake = false;
-        public static final boolean runScoring = false;
+        public static final boolean runScoring = true;
         public static final boolean runEndgame = false;
         public static final boolean runDrive = true;
 
@@ -479,6 +479,9 @@ public final class Constants {
         public static final double aimerkP = 17.0;
         public static final double aimerkI = 10.0; // 5.0
         public static final double aimerkD = 0.0;
+
+        public static final double aimerMovementThresholdRadPerSec = 0.05;
+        public static final double maxAimUnresponsiveTimeSeconds = 0.1;
 
         public static final double aimerkS = 0.265;
         public static final double aimerkG = 0.1;

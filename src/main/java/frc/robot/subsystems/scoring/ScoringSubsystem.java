@@ -111,6 +111,12 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     private boolean readyToShoot = false;
 
+    // Keep track of the amount of time the arm has been unresponsive for
+    private Timer armUnresponsiveTime = new Timer();
+
+    // Something has gone wrong: disable the arm until code is restarted
+    private boolean faulted = false;
+
     public ScoringSubsystem(ShooterIO shooterIo, AimerIO aimerIo, HoodIO hoodIo) {
 
         this.shooterIo = shooterIo;
@@ -168,6 +174,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         shooterIo.setOverrideVolts(0);
 
         Logger.recordOutput("scoring/aimGoal", 0.0);
+
+        Logger.recordOutput("scoring/faulted", faulted);
 
         SmartDashboard.putBoolean("Has Note", shooterInputs.bannerSensor);
         SmartDashboard.putNumber("Aimer Location", aimerInputs.aimAngleRad);
@@ -479,6 +487,8 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     @Override
     public void periodic() {
+        Logger.recordOutput("scoring/faulted", faulted);
+
         if (!SmartDashboard.containsKey("Aimer Offset")) {
             SmartDashboard.putNumber("Aimer Offset", ScoringConstants.aimerStaticOffset);
         }
@@ -591,7 +601,27 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         }
 
         shooterIo.updateInputs(shooterInputs);
+
+        if (faulted && DriverStation.isEnabled()) {
+            aimerIo.setOverrideMode(true);
+            aimerIo.setOverrideVolts(0.0);
+        }
         aimerIo.updateInputs(aimerInputs);
+
+        if (DriverStation.isEnabled()
+                && (aimerInputs.aimAppliedVolts > ScoringConstants.aimerkS * 2
+                        && aimerInputs.aimVelocityRadPerSec
+                                < ScoringConstants.aimerMovementThresholdRadPerSec)) {
+            armUnresponsiveTime.start();
+
+            if (armUnresponsiveTime.get() > ScoringConstants.maxAimUnresponsiveTimeSeconds) {
+                faulted = true;
+            }
+        } else {
+            armUnresponsiveTime.reset();
+            armUnresponsiveTime.stop();
+        }
+
         hoodIo.updateInputs(hoodInputs);
 
         Logger.processInputs("scoring/shooter", shooterInputs);
