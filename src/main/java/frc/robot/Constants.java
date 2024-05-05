@@ -480,6 +480,9 @@ public final class Constants {
         public static final double aimerkI = 10.0; // 5.0
         public static final double aimerkD = 0.0;
 
+        public static final double aimerMovementThresholdRadPerSec = 0.05;
+        public static final double maxAimUnresponsiveTimeSeconds = 0.1;
+
         public static final double aimerkS = 0.265;
         public static final double aimerkG = 0.1;
         public static final double aimerkV = 1.51;

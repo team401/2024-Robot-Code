@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.ScoringConstants;
@@ -25,12 +24,14 @@ import frc.robot.utils.FieldFinder;
 import frc.robot.utils.FieldFinder.FieldLocations;
 import frc.robot.utils.InterpolateDouble;
 import frc.robot.utils.Tunable;
+import frc.robot.utils.monitors.Monitor;
+import frc.robot.utils.monitors.MonitoredSubsystem;
 import frc.robot.utils.notesimulator.NoteManager;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
-public class ScoringSubsystem extends SubsystemBase implements Tunable {
+public class ScoringSubsystem extends MonitoredSubsystem implements Tunable {
     private final ShooterIO shooterIo;
     private final ShooterIOInputsAutoLogged shooterInputs = new ShooterIOInputsAutoLogged();
 
@@ -140,6 +141,32 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
                             new MechanismLigament2d(
                                     "hood", 0.2, 0.0, 10.0, new Color8Bit(0, 200, 50)));
         }
+
+        addMonitor(
+                new Monitor(
+                        "armEncoderUnplugged", // Name to log callback under
+                        true, // Sticky fault (remain faulted even after conditions become
+                        // acceptable again
+                        () ->
+                                // isStateValid function to check whether the state is currently
+                                // valid or
+                                // not
+                                !(DriverStation.isEnabled()
+                                        && (aimerInputs.aimAppliedVolts
+                                                        > ScoringConstants.aimerkS * 2
+                                                && aimerInputs.aimVelocityRadPerSec
+                                                        < ScoringConstants
+                                                                .aimerMovementThresholdRadPerSec)),
+                        ScoringConstants
+                                .maxAimUnresponsiveTimeSeconds, // timeToFault (how long can state
+                        // be invalid before a
+                        // fault occurs)
+                        () -> { // faultCallback, the function run every tick when the monitor has
+                            // detected a
+                            // fault.
+                            aimerIo.setOverrideMode(true);
+                            aimerIo.setOverrideVolts(0.0);
+                        }));
     }
 
     public void setAction(ScoringAction action) {
@@ -478,7 +505,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     @Override
-    public void periodic() {
+    public void monitoredPeriodic() {
         if (!SmartDashboard.containsKey("Aimer Offset")) {
             SmartDashboard.putNumber("Aimer Offset", ScoringConstants.aimerStaticOffset);
         }
