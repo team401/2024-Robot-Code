@@ -22,8 +22,10 @@ public class NoteDetection extends SubsystemBase {
     }
 
     private Pose2d getNotePoseFromTarget(PhotonTrackedTarget target) {
-        double transformWidth = .405 * 74; // = distance at setpoint / width at setpoint
-        // TODO: GET PROPER D0 and H0 VALUES
+        double transformWidth = 1 * 78; // = distance at setpoint / width at setpoint
+        double noteWidth = 0.1;
+        // w of real note = 35 cm
+        // .405 * 74 * 35 = d * wd
 
         List<TargetCorner> corners = target.getMinAreaRectCorners();
 
@@ -45,7 +47,10 @@ public class NoteDetection extends SubsystemBase {
 
         double widthShift = 0.180 * 199 / 2;
         double distanceSide =
-                widthShift / ((cornersCoordinates[1][0] + cornersCoordinates[0][0]) / 2 - 160);
+                widthShift
+                        * noteWidth
+                        / ((cornersCoordinates[1][0] + cornersCoordinates[0][0]) / 2 - 160)
+                        / distanceForward;
         SmartDashboard.putNumber("distanceSize", distanceSide);
 
         double distance =
@@ -53,6 +58,12 @@ public class NoteDetection extends SubsystemBase {
         double angle = Math.tanh(distanceSide / distanceForward);
 
         Rotation2d fromForward = robotPose.get().getRotation().plus(new Rotation2d(angle));
+
+        SmartDashboard.putNumber("width", width);
+        SmartDashboard.putNumber(
+                "centerx", (cornersCoordinates[1][0] + cornersCoordinates[0][0]) / 2);
+        SmartDashboard.putNumber(
+                "centery", (cornersCoordinates[1][1] + cornersCoordinates[0][1]) / 2);
 
         return new Pose2d(
                 robotPose.get().getX() + Math.cos(fromForward.getRadians()) * distance,
