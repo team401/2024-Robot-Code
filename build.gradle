@@ -91,6 +91,8 @@ dependencies {
 
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation 'com.github.team401:coppercore:json-controller-incorporation-SNAPSHOT'
 }
 
 test {
@@ -141,6 +143,7 @@ repositories {
 		}
 	}
 	mavenLocal()
+    maven { url 'https://jitpack.io' }
 }
 
 spotless {
