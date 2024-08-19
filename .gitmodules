@@ -1,0 +1,3 @@
+[submodule "lib/coppercore"]
+	path = lib/coppercore
+	url = https://github.com/team401/coppercore
