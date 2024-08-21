@@ -25,6 +25,7 @@ import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.TunerConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveWithJoysticks;
+import frc.robot.commands.EndgameSequence;
 import frc.robot.commands.ShootWithGamepad;
 import frc.robot.commands.WheelRadiusCharacterization;
 import frc.robot.subsystems.LED;
@@ -36,11 +37,13 @@ import frc.robot.subsystems.endgame.EndgameIOSim;
 import frc.robot.subsystems.endgame.EndgameIOSparkFlex;
 import frc.robot.subsystems.endgame.EndgameSubsystem;
 import frc.robot.subsystems.endgame.EndgameSubsystem.EndgameAction;
+import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem.IntakeAction;
 import frc.robot.subsystems.localization.CameraContainerReal;
+import frc.robot.subsystems.localization.CameraContainerReplay;
 import frc.robot.subsystems.localization.CameraContainerSim;
 import frc.robot.subsystems.localization.VisionLocalizer;
 import frc.robot.subsystems.scoring.AimerIO;
@@ -64,15 +67,16 @@ import frc.robot.utils.feedforward.TuneG;
 import frc.robot.utils.feedforward.TuneS;
 import frc.robot.utils.notesimulator.Note;
 import frc.robot.utils.notesimulator.NoteManager;
-import lib.coppercore.wpi_interface.ControllerJSONReader;
+import coppercore.wpilib_interface.ControllerJSONReader;
 import org.littletonrobotics.junction.Logger;
-
 public class RobotContainer {
     ScoringSubsystem scoringSubsystem;
     IntakeSubsystem intakeSubsystem;
     EndgameSubsystem endgameSubsystem;
 
-    ControllerJSONReader controllerJSONReader;
+    subproject_test hatShop = new subproject_test();
+
+    // ControllerJSONReader controllerJSONReader;
 
     CommandJoystick leftJoystick = new CommandJoystick(0);
     CommandJoystick rightJoystick = new CommandJoystick(1);

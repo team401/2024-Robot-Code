@@ -93,11 +93,15 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	implementation project(':lib:coppercore')
+	implementation project(':subproject_test')
 }
 
 subprojects {
 	apply plugin: 'java'
+
 }
+
+
 
 test {
 	useJUnitPlatform()

@@ -28,6 +28,8 @@ pluginManagement {
 
 rootProject.name = '2024-Robot-Code'
 include 'lib:coppercore'
+include 'subproject_test'
+includeBuild ".."
 
 Properties props = System.getProperties();
 props.setProperty("org.gradle.internal.native.headers.unresolved.dependencies.ignore", "true");
