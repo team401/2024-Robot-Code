@@ -651,7 +651,13 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     public void setArmDisabled(boolean disabled) {
-        aimerIo.setMotorDisabled(disabled);
+        aimerIo.setOutput(!disabled);
+    }
+
+    public void setScoringOutput(boolean output) {
+        aimerIo.setOutput(output);
+        hoodIo.setOutput(output);
+        shooterIo.setOutput(output);
     }
 
     public void forceHood(boolean hoodForced) {

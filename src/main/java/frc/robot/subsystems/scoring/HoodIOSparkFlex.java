@@ -6,6 +6,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.ScoringConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class HoodIOSparkFlex implements HoodIO {
     private final CANSparkFlex hoodMotor =
@@ -22,6 +23,7 @@ public class HoodIOSparkFlex implements HoodIO {
                             ScoringConstants.hoodMaxAcceleration));
 
     private boolean override = false;
+    private boolean enableOutput = true;
     private boolean homing = false;
 
     double overrideVolts = 0.0;
@@ -100,12 +102,19 @@ public class HoodIOSparkFlex implements HoodIO {
     }
 
     @Override
+    public void setOutput(boolean output) {
+        enableOutput = output;
+    }
+
+    @Override
     public void updateInputs(HoodIOInputs inputs) {
         State trapezoidSetpoint =
                 profile.calculate(
                         profileTimer.get(),
                         new State(initialAngle, initialVelocity),
                         new State(goalAngleRad, 0.0));
+
+        Logger.recordOutput("Scoring/Hood/OutputEnabled", enableOutput);
 
         // if (homing) {
         //     if (hoodMotor.getOutputCurrent() > ScoringConstants.hoodHomeAmps
@@ -130,7 +139,9 @@ public class HoodIOSparkFlex implements HoodIO {
         // if (hoodMotor.getOutputCurrent() > 70) {
         //     hoodMotor.setVoltage(0.0);
         // } else {
-        hoodMotor.setVoltage(overrideVolts);
+        if (enableOutput) {
+            hoodMotor.setVoltage(overrideVolts);
+        }
         // }
 
         inputs.hoodAngleRad = hoodMotor.getEncoder().getPosition();

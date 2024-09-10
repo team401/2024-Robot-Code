@@ -33,5 +33,6 @@
     "editor.rulers": [
         100
     ],
-    "java.debug.settings.onBuildFailureProceed": true
+    "java.debug.settings.onBuildFailureProceed": true,
+    "java.format.settings.url": "eclipse-formatter.xml"
 }

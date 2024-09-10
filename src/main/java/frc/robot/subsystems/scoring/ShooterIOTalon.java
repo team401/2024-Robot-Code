@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants.ConversionConstants;
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.Constants.SensorConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class ShooterIOTalon implements ShooterIO {
     private final TalonFX kicker = new TalonFX(ScoringConstants.kickerMotorId);
@@ -22,6 +23,7 @@ public class ShooterIOTalon implements ShooterIO {
     DigitalInput bannerSensor = new DigitalInput(SensorConstants.indexerSensorPort);
 
     private boolean override = false;
+    private boolean enableOutput = true;
     private double overrideVolts = 0.0;
 
     double goalLeftVelocityRPM = 0.0;
@@ -70,28 +72,36 @@ public class ShooterIOTalon implements ShooterIO {
     public void setShooterVelocityRPM(double velocity) {
         goalLeftVelocityRPM = velocity;
         goalRightVelocityRPM = velocity * ScoringConstants.shooterOffsetAdjustment;
-
-        if (velocity == 0.0) {
-            shooterLeft.setVoltage(0.0);
-            shooterRight.setVoltage(0.0);
-        } else {
-            shooterLeft.setControl(
-                    new VelocityDutyCycle(
-                            goalLeftVelocityRPM / ConversionConstants.kMinutesToSeconds));
-            shooterRight.setControl(
-                    new VelocityDutyCycle(
-                            goalRightVelocityRPM / ConversionConstants.kMinutesToSeconds));
+        if (enableOutput) {
+            if (velocity == 0.0) {
+                shooterLeft.setVoltage(0.0);
+                shooterRight.setVoltage(0.0);
+            } else {
+                shooterLeft.setControl(
+                        new VelocityDutyCycle(
+                                goalLeftVelocityRPM / ConversionConstants.kMinutesToSeconds));
+                shooterRight.setControl(
+                        new VelocityDutyCycle(
+                                goalRightVelocityRPM / ConversionConstants.kMinutesToSeconds));
+            }
         }
     }
 
     @Override
     public void setKickerVolts(double volts) {
-        kicker.setVoltage(volts);
+        if (enableOutput) {
+            kicker.setVoltage(volts);
+        }
     }
 
     @Override
     public void setOverrideMode(boolean override) {
         this.override = override;
+    }
+
+    @Override
+    public void setOutput(boolean output) {
+        enableOutput = output;
     }
 
     @Override
@@ -121,10 +131,12 @@ public class ShooterIOTalon implements ShooterIO {
 
     @Override
     public void updateInputs(ShooterIOInputs inputs) {
-        if (override) {
+        if (override && enableOutput) {
             shooterLeft.setVoltage(overrideVolts);
             shooterRight.setVoltage(overrideVolts);
         }
+
+        Logger.recordOutput("Scoring/Shooter/OutputEnabled", enableOutput);
 
         inputs.shooterLeftVelocityRPM =
                 shooterLeft.getVelocity().getValueAsDouble()

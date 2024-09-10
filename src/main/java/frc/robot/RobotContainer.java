@@ -149,6 +149,9 @@ public class RobotContainer {
                     if (FeatureFlags.demoMode) {
                         scoringSubsystem.setDemo(true);
                     }
+                    if (!FeatureFlags.outputScore) {
+                        scoringSubsystem.setScoringOutput(false);
+                    }
                 }
 
                 if (FeatureFlags.runEndgame) {

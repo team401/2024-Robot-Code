@@ -31,6 +31,8 @@ public interface ShooterIO {
 
     public default void setOverrideMode(boolean override) {}
 
+    public default void setOutput(boolean output) {}
+
     public default void setOverrideVolts(double volts) {}
 
     public default void setPID(double p, double i, double d) {}

@@ -13,6 +13,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Constants.FeatureFlags;
 import frc.robot.Constants.ScoringConstants;
 import org.littletonrobotics.junction.Logger;
 
@@ -59,7 +60,7 @@ public class AimerIORoboRio implements AimerIO {
     double lastPosition = 0.0;
     double lastTime = Utils.getCurrentTimeSeconds();
 
-    boolean motorDisabled = false;
+    boolean enableOutput = true;
 
     public AimerIORoboRio() {
         aimerLeft.setControl(new Follower(ScoringConstants.aimRightMotorId, true));
@@ -81,7 +82,9 @@ public class AimerIORoboRio implements AimerIO {
                         .withStatorCurrentLimit(60)
                         .withStatorCurrentLimitEnable(true));
 
-        aimerRight.setPosition(0.0);
+        if (FeatureFlags.outputScore) {
+            aimerRight.setPosition(0.0);
+        }
 
         controller.setTolerance(0.015);
     }
@@ -183,8 +186,8 @@ public class AimerIORoboRio implements AimerIO {
     }
 
     @Override
-    public void setMotorDisabled(boolean disabled) {
-        motorDisabled = disabled;
+    public void setOutput(boolean output) {
+        enableOutput = output;
     }
 
     @Override
@@ -202,7 +205,7 @@ public class AimerIORoboRio implements AimerIO {
         double velocitySetpoint = trapezoidSetpoint.velocity;
 
         if (getEncoderPosition() == -1.75) {
-            motorDisabled = true;
+            enableOutput = false;
         }
 
         if (override) {
@@ -214,13 +217,13 @@ public class AimerIORoboRio implements AimerIO {
         }
 
         appliedVolts = MathUtil.clamp(appliedVolts, -12.0, 12.0);
-        if (!motorDisabled || override) {
+        if (enableOutput || override) {
             aimerRight.setVoltage(appliedVolts);
         } else {
             aimerRight.setVoltage(0.0);
         }
 
-        Logger.recordOutput("Scoring/motorDisabled", motorDisabled);
+        Logger.recordOutput("Scoring/Aimer/OutputEnabled", enableOutput);
 
         inputs.aimGoalAngleRad = goalAngleRad;
         inputs.aimProfileGoalAngleRad = controlSetpoint;
