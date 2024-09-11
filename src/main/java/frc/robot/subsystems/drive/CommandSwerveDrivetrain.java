@@ -469,8 +469,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         } else if (!fieldCentric) {
             setControl(
                     driveRobotCentric
-                            .withVelocityX(demo ? MathUtil.clamp(vx, 0, 1) : vx)
-                            .withVelocityY(demo ? MathUtil.clamp(vy, 0, 1) : vy)
+                            .withVelocityX(demo ? MathUtil.clamp(vx, -1, 1) : vx)
+                            .withVelocityY(demo ? MathUtil.clamp(vy, -1, 1) : vy)
                             .withRotationalRate(demo ? omega * 0.50 : omega)
                             .withDeadband(0.0)
                             .withRotationalDeadband(0.0)
@@ -478,8 +478,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         } else {
             setControl(
                     driveFieldCentric
-                            .withVelocityX(demo ? MathUtil.clamp(vx, 0, 1) : vx)
-                            .withVelocityY(demo ? MathUtil.clamp(vy, 0, 1) : vy)
+                            .withVelocityX(demo ? MathUtil.clamp(vx, -1, 1) : vx)
+                            .withVelocityY(demo ? MathUtil.clamp(vy, -1, 1) : vy)
                             .withRotationalRate(demo ? omega * 0.5 : omega)
                             .withDeadband(0.0)
                             .withRotationalDeadband(0.0)

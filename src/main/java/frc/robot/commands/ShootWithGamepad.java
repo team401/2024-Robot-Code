@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain.AlignTarget;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringAction;
@@ -84,6 +85,9 @@ public class ShootWithGamepad extends Command {
                     scoring.setAction(ScoringAction.SHOOT);
                 }
             }
+        } else if (Constants.FeatureFlags.demoMode
+                && (driverShoot.getAsBoolean() || masherShoot.getAsBoolean())) {
+            scoring.setAction(ScoringAction.SHOOT);
         } else if (reverseIntake.getAsBoolean()) {
             scoring.setAction(ScoringAction.SPIT);
         } else if (intake.getAsBoolean()) {

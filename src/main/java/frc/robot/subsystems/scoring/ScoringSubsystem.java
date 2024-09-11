@@ -262,9 +262,11 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         if (demo) {
             shooterReady =
                     shooterInputs.shooterLeftVelocityRPM
-                                    < ScoringConstants.shooterUpperVelocityMarginRPM
+                                    < (shooterInputs.shooterLeftGoalVelocityRPM
+                                            + ScoringConstants.shooterUpperVelocityMarginRPM)
                             && shooterInputs.shooterLeftVelocityRPM
-                                    > ScoringConstants.shooterLowerVelocityMarginRPM;
+                                    > (shooterInputs.shooterLeftGoalVelocityRPM
+                                            - ScoringConstants.shooterLowerVelocityMarginRPM);
             aimReady =
                     Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad) < 0.1
                             && Math.abs(aimerInputs.aimVelocityErrorRadPerSec)

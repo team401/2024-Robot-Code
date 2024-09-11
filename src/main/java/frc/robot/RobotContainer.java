@@ -338,13 +338,13 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.RIGHT)));
 
-            controller.x()
-                .onTrue(new InstantCommand(() -> drivetrain.driveToSource()))
-                .onFalse(new InstantCommand(() -> drivetrain.stopDriveToPose()));
+            // controller.x()
+            //     .onTrue(new InstantCommand(() -> drivetrain.driveToSource()))
+            //     .onFalse(new InstantCommand(() -> drivetrain.stopDriveToPose()));
 
-            controller.y()
-                .onTrue(new InstantCommand(() -> drivetrain.driveToSpeaker()))
-                .onFalse(new InstantCommand(() -> drivetrain.stopDriveToPose()));
+            // controller.y()
+            //     .onTrue(new InstantCommand(() -> drivetrain.driveToSpeaker()))
+            //     .onFalse(new InstantCommand(() -> drivetrain.stopDriveToPose()));
         }
 
         if (FeatureFlags.runEndgame) {

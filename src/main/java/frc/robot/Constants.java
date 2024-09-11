@@ -52,12 +52,12 @@ public final class Constants {
         public static final boolean runVision = true;
         public static final boolean runLocalizer = true;
 
-        public static final boolean runIntake = false;
-        public static final boolean runScoring = false;
+        public static final boolean runIntake = true;
+        public static final boolean runScoring = true;
         public static final boolean runEndgame = false;
         public static final boolean runDrive = true;
-        public static final boolean demoMode = false;
-        public static final boolean outputScore = false;
+        public static final boolean demoMode = true;
+        public static final boolean outputScore = true;
 
         public static final boolean enableLEDS = true;
     }
@@ -539,9 +539,9 @@ public final class Constants {
         public static final int hoodId = 17;
 
         public static final int aimEncoderPort = 0;
-        public static final double aimerEncoderOffset = 1.75 - 0.01; // 0.027
+        public static final double aimerEncoderOffset = 1.75 - 0.1; // 0.027
 
-        public static final double kickerIntakeVolts = 2.0;
+        public static final double kickerIntakeVolts = 1.0;
 
         public static final double aimPositionTolerance = 0.017;
 
@@ -577,7 +577,7 @@ public final class Constants {
         public static final double hoodMaxAcceleration = 0.5;
 
         public static final double demoShooterRPM = 1000;
-        public static final double demoAimAngle = 0.1;
+        public static final double demoAimAngle = 0.3;
 
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters
