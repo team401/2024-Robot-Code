@@ -135,6 +135,9 @@ public class RobotContainer {
                 if (FeatureFlags.runDrive) {
                     driveTelemetry =
                             new Telemetry(DriveConstants.MaxSpeedMetPerSec, new TelemetryIOLive());
+                    if (FeatureFlags.demoMode) {
+                        drivetrain.setDemo(true);
+                    }
                 }
 
                 if (FeatureFlags.runScoring) {
@@ -143,6 +146,12 @@ public class RobotContainer {
                                     new ShooterIOTalon(),
                                     new AimerIORoboRio(),
                                     new HoodIOSparkFlex());
+                    if (FeatureFlags.demoMode) {
+                        scoringSubsystem.setDemo(true);
+                    }
+                    if (!FeatureFlags.outputScore) {
+                        scoringSubsystem.setScoringOutput(false);
+                    }
                 }
 
                 if (FeatureFlags.runEndgame) {
@@ -329,13 +338,13 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                     () -> drivetrain.setAlignTarget(AlignTarget.RIGHT)));
 
-            controller.x()
-                .onTrue(new InstantCommand(() -> drivetrain.driveToSource()))
-                .onFalse(new InstantCommand(() -> drivetrain.stopDriveToPose()));
+            // controller.x()
+            //     .onTrue(new InstantCommand(() -> drivetrain.driveToSource()))
+            //     .onFalse(new InstantCommand(() -> drivetrain.stopDriveToPose()));
 
-            controller.y()
-                .onTrue(new InstantCommand(() -> drivetrain.driveToSpeaker()))
-                .onFalse(new InstantCommand(() -> drivetrain.stopDriveToPose()));
+            // controller.y()
+            //     .onTrue(new InstantCommand(() -> drivetrain.driveToSpeaker()))
+            //     .onFalse(new InstantCommand(() -> drivetrain.stopDriveToPose()));
         }
 
         if (FeatureFlags.runEndgame) {

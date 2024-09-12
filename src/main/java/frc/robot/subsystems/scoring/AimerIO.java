@@ -40,5 +40,5 @@ public interface AimerIO {
 
     public default void setStatorCurrentLimit(double limit) {}
 
-    public default void setMotorDisabled(boolean disabled) {}
+    public default void setOutput(boolean output) {}
 }

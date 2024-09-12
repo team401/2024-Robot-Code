@@ -73,7 +73,62 @@ def render_single(condition: str, in_node: str, out_true: str, out_false: str):
     print(f"{in_node} -.->|true| {out_true}")
     print(f"{in_node} -.->|false| {out_false}")
 
-NON_TRANSITIONS = ['default', 'Not allowed', 'TBD', 'N/A', 'not possible']
+def render_one_check(row: list[str], states_row: list[str], in_node: str):
+    for i, condition in enumerate(row[1:]):
+        if condition in NON_TRANSITIONS:
+            continue
+        next_state = states_row[i]
+        next_state_node = get_node_id(next_state)
+
+        if condition.startswith('!'):
+            print(f"{in_node} -.->|false| {next_state_node}")
+        else:
+            print(in_node + '{"' + condition + '"}')
+            print(f"{in_node} -.->|true| {next_state_node}")
+
+NON_TRANSITIONS = ['default', 'Not allowed', 'TBD']
+
+def is_one_check(row: list[str]) -> bool:
+    condition = ""
+    found_true = False
+    found_false = False
+
+    for transition in row[1:]:
+        if transition in NON_TRANSITIONS:
+            continue
+        if transition.startswith("!"):
+            if found_false:
+                # We've already found one condition starting with `!`
+                # This means this row can't be one check
+                return False
+            elif found_true:
+                if transition[1:] == condition:
+                    found_false = True
+                else:
+                    # The `!...` condition doesn't match the `...` condition
+                    # Can't be one check
+                    return False
+            else:
+                found_false = True
+                condition = transition[1:]
+        else:
+            if found_true:
+                # We've already found one condition not starting with `!`
+                # This means this row can't be one check
+                return False
+            elif found_false:
+                if transition == condition:
+                    found_true = True
+                else:
+                    # The `!...` condition doesn't match the `...` condition
+                    # Can't be one check
+                    return False
+            else:
+                found_true = True
+                condition = transition
+
+    # If we found both a true and false without duplicates, it must be a one check
+    return found_true and found_false
 
 def render_table(rows: list[list[str]], combine: bool=False):
     states_row = rows[0][1:] # Chop off first, empty square
@@ -102,6 +157,9 @@ def render_table(rows: list[list[str]], combine: bool=False):
         if num_transitions > 0:
             in_node = get_node_id()
             print(f"{current_state_node} --> {in_node}")
+            if is_one_check(row):
+                render_one_check(row, states_row, in_node)
+                continue
             for i, condition in enumerate(row[1:]):
                 if condition in NON_TRANSITIONS:
                     continue
