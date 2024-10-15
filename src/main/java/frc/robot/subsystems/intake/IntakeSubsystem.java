@@ -45,6 +45,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
         Logger.recordOutput("intake/running", inputs.leftIntakeVoltage != 0.0);
         Logger.recordOutput("intake/belting", inputs.beltVoltage != 0.0);
+        Logger.recordOutput("intake/scorerWantsNote", scorerWantsNote.getAsBoolean());
 
         Logger.recordOutput("intake/state", state.toString());
     }

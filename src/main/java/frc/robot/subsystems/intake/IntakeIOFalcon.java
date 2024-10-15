@@ -13,7 +13,6 @@ import frc.robot.Constants.SensorConstants;
 public class IntakeIOFalcon implements IntakeIO {
 
     private TalonFX leftIntake = new TalonFX(IntakeConstants.leftIntakeMotorID);
-    private TalonFX rightIntake = new TalonFX(IntakeConstants.rightIntakeMotorID);
 
     private TalonFX belt = new TalonFX(IntakeConstants.indexTwoMotorID);
 
@@ -21,7 +20,6 @@ public class IntakeIOFalcon implements IntakeIO {
 
     public IntakeIOFalcon() {
         leftIntake.setInverted(true);
-        rightIntake.setInverted(true);
 
         belt.setInverted(true);
 
@@ -29,14 +27,7 @@ public class IntakeIOFalcon implements IntakeIO {
         leftConfig.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
         leftConfig.apply(
                 new CurrentLimitsConfigs()
-                        .withStatorCurrentLimit(50)
-                        .withStatorCurrentLimitEnable(true));
-
-        TalonFXConfigurator rightConfig = rightIntake.getConfigurator();
-        rightConfig.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
-        rightConfig.apply(
-                new CurrentLimitsConfigs()
-                        .withStatorCurrentLimit(50)
+                        .withStatorCurrentLimit(120)
                         .withStatorCurrentLimitEnable(true));
 
         TalonFXConfigurator beltConfig = belt.getConfigurator();
@@ -52,9 +43,6 @@ public class IntakeIOFalcon implements IntakeIO {
         inputs.leftIntakeVoltage = leftIntake.getMotorVoltage().getValueAsDouble();
         inputs.leftIntakeStatorCurrent = leftIntake.getStatorCurrent().getValueAsDouble();
 
-        inputs.rightIntakeVoltage = rightIntake.getMotorVoltage().getValueAsDouble();
-        inputs.rightIntakeStatorCurrent = rightIntake.getStatorCurrent().getValueAsDouble();
-
         inputs.beltVoltage = belt.getMotorVoltage().getValueAsDouble();
         inputs.beltStatorCurrent = belt.getStatorCurrent().getValueAsDouble();
         inputs.beltSupplyCurrent = belt.getSupplyCurrent().getValueAsDouble();
@@ -65,7 +53,6 @@ public class IntakeIOFalcon implements IntakeIO {
     @Override
     public void setIntakeVoltage(double volts) {
         leftIntake.setControl(new VoltageOut(volts));
-        rightIntake.setControl(new VoltageOut(volts));
     }
 
     @Override
