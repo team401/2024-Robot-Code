@@ -326,7 +326,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
         double shootRPM = shooterInterpolated.getValue(distancetoGoal);
         shooterIo.setShooterVelocityRPM(shootRPM);
-        double aimAngleRad = aimerInterpolated.getValue(distancetoGoal);
+        double aimAngleRad = aimerInterpolated.getValue(distancetoGoal) - 0.015;
         aimerIo.setAimAngleRad(aimAngleRad, false);
 
         shooterIo.setKickerVolts(10);
