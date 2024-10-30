@@ -399,6 +399,7 @@ public class RobotContainer {
         }
 
         if (FeatureFlags.runScoring) {
+            if(!FeatureFlags.demoMode) {
             scoringSubsystem.setDefaultCommand(new ShootWithGamepad(
                 () -> rightJoystick.getHID().getRawButton(4),
                 controller.getHID()::getRightBumper,
@@ -407,6 +408,9 @@ public class RobotContainer {
                 controller.getHID()::getAButton,
                 controller.getHID()::getBButton, scoringSubsystem,
                 FeatureFlags.runDrive ? drivetrain::getAlignTarget : () -> AlignTarget.NONE));
+            } else {
+                controller.y().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.SHOOT))).onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.WAIT)));
+            }
 
             rightJoystick.button(11).onTrue(new InstantCommand(() -> scoringSubsystem.setArmDisabled(true)));
             rightJoystick.button(16).onTrue(new InstantCommand(() -> scoringSubsystem.setArmDisabled(false)));
