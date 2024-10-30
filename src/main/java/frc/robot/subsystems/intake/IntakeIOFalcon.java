@@ -6,31 +6,29 @@ import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.SensorConstants;
 
-public class IntakeIOSparkMax implements IntakeIO {
+public class IntakeIOFalcon implements IntakeIO {
 
-    private CANSparkMax leftIntake =
-            new CANSparkMax(IntakeConstants.leftIntakeMotorID, MotorType.kBrushless);
-    private CANSparkMax rightIntake =
-            new CANSparkMax(IntakeConstants.rightIntakeMotorID, MotorType.kBrushless);
+    private TalonFX leftIntake = new TalonFX(IntakeConstants.leftIntakeMotorID);
 
     private TalonFX belt = new TalonFX(IntakeConstants.indexTwoMotorID);
 
     DigitalInput bannerSensor = new DigitalInput(SensorConstants.uptakeSensorPort);
 
-    public IntakeIOSparkMax() {
-        leftIntake.setSmartCurrentLimit(50);
-        rightIntake.setSmartCurrentLimit(50);
-
+    public IntakeIOFalcon() {
         leftIntake.setInverted(true);
-        rightIntake.setInverted(true);
 
         belt.setInverted(true);
+
+        TalonFXConfigurator leftConfig = leftIntake.getConfigurator();
+        leftConfig.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
+        leftConfig.apply(
+                new CurrentLimitsConfigs()
+                        .withStatorCurrentLimit(120)
+                        .withStatorCurrentLimitEnable(true));
 
         TalonFXConfigurator beltConfig = belt.getConfigurator();
         beltConfig.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
@@ -42,11 +40,8 @@ public class IntakeIOSparkMax implements IntakeIO {
 
     @Override
     public void updateInputs(IntakeIOInputs inputs) {
-        inputs.leftIntakeVoltage = leftIntake.getAppliedOutput() * 12;
-        inputs.leftIntakeStatorCurrent = leftIntake.getOutputCurrent();
-
-        inputs.rightIntakeVoltage = rightIntake.getAppliedOutput() * 12;
-        inputs.rightIntakeStatorCurrent = rightIntake.getOutputCurrent();
+        inputs.leftIntakeVoltage = leftIntake.getMotorVoltage().getValueAsDouble();
+        inputs.leftIntakeStatorCurrent = leftIntake.getStatorCurrent().getValueAsDouble();
 
         inputs.beltVoltage = belt.getMotorVoltage().getValueAsDouble();
         inputs.beltStatorCurrent = belt.getStatorCurrent().getValueAsDouble();
@@ -57,8 +52,7 @@ public class IntakeIOSparkMax implements IntakeIO {
 
     @Override
     public void setIntakeVoltage(double volts) {
-        leftIntake.set(volts / 12);
-        rightIntake.set(volts / 12);
+        leftIntake.setControl(new VoltageOut(volts));
     }
 
     @Override

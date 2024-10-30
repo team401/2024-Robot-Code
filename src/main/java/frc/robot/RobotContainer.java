@@ -38,8 +38,8 @@ import frc.robot.subsystems.endgame.EndgameIOSparkFlex;
 import frc.robot.subsystems.endgame.EndgameSubsystem;
 import frc.robot.subsystems.endgame.EndgameSubsystem.EndgameAction;
 import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOFalcon;
 import frc.robot.subsystems.intake.IntakeIOSim;
-import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem.IntakeAction;
 import frc.robot.subsystems.localization.CameraContainerReal;
@@ -156,7 +156,7 @@ public class RobotContainer {
                 }
 
                 if (FeatureFlags.runIntake) {
-                    intakeSubsystem = new IntakeSubsystem(new IntakeIOSparkMax());
+                    intakeSubsystem = new IntakeSubsystem(new IntakeIOFalcon());
                 }
 
                 if (FeatureFlags.runVision) {
