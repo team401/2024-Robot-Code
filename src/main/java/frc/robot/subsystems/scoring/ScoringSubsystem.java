@@ -64,6 +64,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     private boolean overrideShoot = false;
     private boolean overrideStageAvoidance = false;
     private boolean overrideBeamBreak = false;
+    private boolean demo = false;
 
     private boolean hoodForced = false;
 
@@ -240,31 +241,55 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private void prime() {
+        double shooterRPM;
+        double aimAngle;
         double distanceToGoal = findDistanceToGoal();
-        Logger.recordOutput("scoring/aimGoal", getAimerAngle(distanceToGoal));
-        shooterIo.setShooterVelocityRPM(shooterInterpolated.getValue(distanceToGoal));
-        aimerIo.setAimAngleRad(getAimerAngle(distanceToGoal), false);
+        if (demo) {
+            shooterRPM = ScoringConstants.demoShooterRPM;
+            aimAngle = ScoringConstants.demoAimAngle;
+        } else {
+            shooterRPM = shooterInterpolated.getValue(distanceToGoal);
+            aimAngle = getAimerAngle(distanceToGoal);
+        }
+        Logger.recordOutput("scoring/aimGoal", aimAngle);
+        shooterIo.setShooterVelocityRPM(shooterRPM);
+        aimerIo.setAimAngleRad(aimAngle, false);
         if (!overrideBeamBreak) {
             shooterIo.setKickerVolts(hasNote() ? 0.0 : ScoringConstants.kickerIntakeVolts);
         }
-
-        boolean shooterReady =
-                shooterInputs.shooterLeftVelocityRPM
-                                < (shooterInputs.shooterLeftGoalVelocityRPM
-                                        + ScoringConstants.shooterUpperVelocityMarginRPM)
-                        && shooterInputs.shooterLeftVelocityRPM
-                                > (shooterInputs.shooterLeftGoalVelocityRPM
-                                        - ScoringConstants.shooterLowerVelocityMarginRPM);
-        boolean aimReady =
-                Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad)
-                                < aimerAngleTolerance.getValue(distanceToGoal)
-                        && Math.abs(aimerInputs.aimVelocityErrorRadPerSec)
-                                < ScoringConstants.aimAngleVelocityMargin;
-        boolean driveReady = driveAllignedSupplier.get();
+        boolean shooterReady;
+        boolean aimReady;
+        if (demo) {
+            shooterReady =
+                    shooterInputs.shooterLeftVelocityRPM
+                                    < (shooterInputs.shooterLeftGoalVelocityRPM
+                                            + ScoringConstants.shooterUpperVelocityMarginRPM)
+                            && shooterInputs.shooterLeftVelocityRPM
+                                    > (shooterInputs.shooterLeftGoalVelocityRPM
+                                            - ScoringConstants.shooterLowerVelocityMarginRPM);
+            aimReady =
+                    Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad) < 0.1
+                            && Math.abs(aimerInputs.aimVelocityErrorRadPerSec)
+                                    < ScoringConstants.aimAngleVelocityMargin;
+        } else {
+            shooterReady =
+                    shooterInputs.shooterLeftVelocityRPM
+                                    < (shooterInputs.shooterLeftGoalVelocityRPM
+                                            + ScoringConstants.shooterUpperVelocityMarginRPM)
+                            && shooterInputs.shooterLeftVelocityRPM
+                                    > (shooterInputs.shooterLeftGoalVelocityRPM
+                                            - ScoringConstants.shooterLowerVelocityMarginRPM);
+            aimReady =
+                    Math.abs(aimerInputs.aimAngleRad - aimerInputs.aimGoalAngleRad)
+                                    < aimerAngleTolerance.getValue(distanceToGoal)
+                            && Math.abs(aimerInputs.aimVelocityErrorRadPerSec)
+                                    < ScoringConstants.aimAngleVelocityMargin;
+        }
+        boolean driveReady = demo || driveAllignedSupplier.get();
         boolean fieldLocationReady = true;
         if (!DriverStation.getAlliance().isPresent()) {
             fieldLocationReady = true;
-        } else {
+        } else if (!demo) {
             switch (DriverStation.getAlliance().get()) {
                 case Blue:
                     fieldLocationReady =
@@ -322,11 +347,16 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
     }
 
     private void shoot() {
-        double distancetoGoal = findDistanceToGoal();
-
-        double shootRPM = shooterInterpolated.getValue(distancetoGoal);
-        shooterIo.setShooterVelocityRPM(shootRPM);
-        double aimAngleRad = aimerInterpolated.getValue(distancetoGoal) - 0.015;
+        double shootRPM;
+        double aimAngleRad;
+        if (!demo) {
+            double distancetoGoal = findDistanceToGoal();
+            shootRPM = shooterInterpolated.getValue(distancetoGoal);
+            aimAngleRad = aimerInterpolated.getValue(distancetoGoal);
+        } else {
+            shootRPM = ScoringConstants.demoShooterRPM;
+            aimAngleRad = ScoringConstants.demoAimAngle;
+        }
         aimerIo.setAimAngleRad(aimAngleRad, false);
 
         shooterIo.setKickerVolts(10);
@@ -407,7 +437,7 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         }
     }
 
-    private double findDistanceToGoal() {
+    public double findDistanceToGoal() {
         Translation2d speakerPose = AllianceUtil.getFieldToSpeaker();
         Pose2d robotPose = poseSupplier.get();
         double distancetoGoal =
@@ -423,7 +453,6 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
 
     public boolean aimerAtIntakePosition() {
         return aimerInputs.aimAngleRad > ScoringConstants.intakeAngleToleranceRadians;
-        // return true;\][]
     }
 
     public boolean canIntake() {
@@ -619,6 +648,10 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         this.overrideBeamBreak = overrideBeamBrake;
     }
 
+    public void setDemo(boolean demo) {
+        this.demo = demo;
+    }
+
     public void setArmDisabled(boolean disabled) {
         aimerIo.setMotorDisabled(disabled);
     }
@@ -688,15 +721,15 @@ public class ScoringSubsystem extends SubsystemBase implements Tunable {
         switch (slot) {
                 // Aimer
             case 0:
-                aimerIo.setOverrideVolts(volts);
+                aimerIo.setOverrideVolts(demo ? volts * 0.5 : volts);
                 break;
                 // Hood
             case 1:
-                hoodIo.setOverrideVolts(volts);
+                hoodIo.setOverrideVolts(demo ? volts * 0.5 : volts);
                 break;
                 // Shooter
             case 2:
-                shooterIo.setOverrideVolts(volts);
+                shooterIo.setOverrideVolts(demo ? volts * 0.5 : volts);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid slot");

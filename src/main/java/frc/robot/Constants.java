@@ -56,6 +56,7 @@ public final class Constants {
         public static final boolean runScoring = true;
         public static final boolean runEndgame = true;
         public static final boolean runDrive = true;
+        public static final boolean demoMode = true;
 
         public static final boolean enableLEDS = true;
     }
@@ -112,6 +113,17 @@ public final class Constants {
         public static final double vYkP = 5.0;
         public static final double vYkI = 2.5;
         public static final double vYkD = 0.0;
+    }
+
+    public static final class AutomatedTeleopConstants {
+        // TODO: Find constants for automated teleop command
+        public static final double intakeTimeoutSeconds = 0.5;
+        public static final double retryIntakeWaitSeconds = 0.5;
+
+        public static final double shootRangeMeters = 3.0;
+
+        // The distance from the source at which to stop driving the robot
+        public static final double sourceRangeMeters = 1.5;
     }
 
     public static final class FieldConstants {
@@ -173,6 +185,16 @@ public final class Constants {
 
         public static final Pose2d robotAgainstRedAmpZone =
                 new Pose2d(13.74, 7.68, Rotation2d.fromDegrees(-90));
+
+        public static final Pose2d robotAgainstBlueSource =
+                new Pose2d(14.82, 0.69, Rotation2d.fromDegrees(-60));
+
+        public static final Pose2d robotAgainstRedSource =
+                new Pose2d(1.63, 0.69, Rotation2d.fromDegrees(60));
+
+        // TODO: Find actual coordinates of shop source
+        public static final Pose2d robotAgainstShopSource =
+                new Pose2d(8.30, 6.80, Rotation2d.fromDegrees(60));
     }
 
     public static final class VisionConstants {
@@ -552,6 +574,9 @@ public final class Constants {
 
         public static final double hoodMaxVelocity = 0.5;
         public static final double hoodMaxAcceleration = 0.5;
+
+        public static final double demoShooterRPM = 1000;
+        public static final double demoAimAngle = 0.4;
 
         // NOTE - This should be monotonically increasing
         // Key - Distance in meters

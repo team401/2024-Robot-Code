@@ -135,6 +135,9 @@ public class RobotContainer {
                 if (FeatureFlags.runDrive) {
                     driveTelemetry =
                             new Telemetry(DriveConstants.MaxSpeedMetPerSec, new TelemetryIOLive());
+                    if (FeatureFlags.demoMode) {
+                        drivetrain.setDemo(true);
+                    }
                 }
 
                 if (FeatureFlags.runScoring) {
@@ -143,6 +146,9 @@ public class RobotContainer {
                                     new ShooterIOTalon(),
                                     new AimerIORoboRio(),
                                     new HoodIOSparkFlex());
+                    if (FeatureFlags.demoMode) {
+                        scoringSubsystem.setDemo(true);
+                    }
                 }
 
                 if (FeatureFlags.runEndgame) {
@@ -393,6 +399,7 @@ public class RobotContainer {
         }
 
         if (FeatureFlags.runScoring) {
+            if(!FeatureFlags.demoMode) {
             scoringSubsystem.setDefaultCommand(new ShootWithGamepad(
                 () -> rightJoystick.getHID().getRawButton(4),
                 controller.getHID()::getRightBumper,
@@ -401,6 +408,9 @@ public class RobotContainer {
                 controller.getHID()::getAButton,
                 controller.getHID()::getBButton, scoringSubsystem,
                 FeatureFlags.runDrive ? drivetrain::getAlignTarget : () -> AlignTarget.NONE));
+            } else {
+                controller.y().onTrue(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.SHOOT))).onFalse(new InstantCommand(() -> scoringSubsystem.setAction(ScoringAction.WAIT)));
+            }
 
             rightJoystick.button(11).onTrue(new InstantCommand(() -> scoringSubsystem.setArmDisabled(true)));
             rightJoystick.button(16).onTrue(new InstantCommand(() -> scoringSubsystem.setArmDisabled(false)));
